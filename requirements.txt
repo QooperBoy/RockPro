@@ -1,0 +1,2 @@
+comtypes==1.4.16
+python-ironcad @ git+https://github.com/IronCAD/python-ironcad.git@85644fad891e428e32617e1063687e44dad15274

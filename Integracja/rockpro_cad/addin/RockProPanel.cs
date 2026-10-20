@@ -1,0 +1,174 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Web.Script.Serialization;
+using System.Runtime.InteropServices;
+using interop.ICApiIronCAD;
+
+namespace RockPro.CAD {
+internal static class Rpc {
+ internal static Dictionary<string,object> Obj(object v) { return v as Dictionary<string,object> ?? new Dictionary<string,object>(); }
+ internal static string Str(Dictionary<string,object> d,string k) { return d.ContainsKey(k) && d[k]!=null ? Convert.ToString(d[k],CultureInfo.InvariantCulture):""; }
+ internal static object[] Rows(object v) { var a=v as object[]; if(a!=null)return a; var l=v as ArrayList;return l==null?new object[0]:l.ToArray(); }
+ internal static Dictionary<string,object> Call(string tool,object args) {
+  var j=new JavaScriptSerializer();j.MaxJsonLength=16000000;
+  var psi=new ProcessStartInfo(Path.GetFullPath(Path.Combine(Addin.Root,"..",".venv","Scripts","python.exe")),"\""+Path.Combine(Addin.Root,"mcp","server.py")+"\"");
+  psi.UseShellExecute=false;psi.CreateNoWindow=true;psi.RedirectStandardInput=true;psi.RedirectStandardOutput=true;psi.RedirectStandardError=true;
+  psi.StandardOutputEncoding=Encoding.UTF8;psi.StandardErrorEncoding=Encoding.UTF8;psi.EnvironmentVariables["PYTHONUTF8"]="1";
+  using(var p=Process.Start(psi)) {
+   var errors=p.StandardError.ReadToEndAsync();var input=new StreamWriter(p.StandardInput.BaseStream,new UTF8Encoding(false));input.AutoFlush=true;
+   input.WriteLine(j.Serialize(new {jsonrpc="2.0",id=1,method="initialize",@params=new {protocolVersion="2025-06-18",capabilities=new {},clientInfo=new {name="rockpro-desktop",version="0.2"}}}));input.Flush();
+   Read(p);
+   input.WriteLine(j.Serialize(new {jsonrpc="2.0",method="notifications/initialized"}));
+   input.WriteLine(j.Serialize(new {jsonrpc="2.0",id=2,method="tools/call",@params=new {name=tool,arguments=args}}));input.Flush();
+   var reply=Rpc.Obj(j.DeserializeObject(Read(p)));input.Close();
+   if(!p.WaitForExit(5000))p.Kill();
+   if(reply.ContainsKey("error"))throw new Exception(j.Serialize(reply["error"]));
+   var r=Obj(reply["result"]);var items=Rows(r["content"]);string text=Str(Obj(items[0]),"text");
+   if(r.ContainsKey("isError") && Convert.ToBoolean(r["isError"]))throw new Exception(text);
+   return Obj(j.DeserializeObject(text));
+  }
+ }
+ static string Read(Process p) {var t=p.StandardOutput.ReadLineAsync();if(!t.Wait(180000)){try{p.Kill();}catch{}throw new TimeoutException("MCP przekroczyło 180 s. Sprawdź IronCAD i historię operacji przed ponowną próbą.");}if(t.Result==null)throw new Exception("MCP zamknęło połączenie bez odpowiedzi.");return t.Result;}
+}
+// Rounded, keyboard-accessible native button; no browser or extra UI runtime.
+[ComVisible(false)]
+internal sealed class StudioButton : Button {
+ bool hover;
+ public StudioButton(){SetStyle(ControlStyles.UserPaint|ControlStyles.AllPaintingInWmPaint|ControlStyles.OptimizedDoubleBuffer,true);FlatStyle=FlatStyle.Flat;FlatAppearance.BorderSize=0;}
+ protected override void OnMouseEnter(EventArgs e){hover=true;Invalidate();base.OnMouseEnter(e);}
+ protected override void OnMouseLeave(EventArgs e){hover=false;Invalidate();base.OnMouseLeave(e);}
+ protected override void OnPaint(PaintEventArgs e){
+  e.Graphics.SmoothingMode=SmoothingMode.AntiAlias;
+  e.Graphics.Clear(Parent==null?SystemColors.Control:Parent.BackColor);
+  var r=new Rectangle(1,1,Width-3,Height-3);int d=16;
+  using(var path=new GraphicsPath()){
+   path.AddArc(r.Left,r.Top,d,d,180,90);path.AddArc(r.Right-d,r.Top,d,d,270,90);path.AddArc(r.Right-d,r.Bottom-d,d,d,0,90);path.AddArc(r.Left,r.Bottom-d,d,d,90,90);path.CloseFigure();
+   var fill=!Enabled?Color.FromArgb(225,229,235):hover?FlatAppearance.MouseOverBackColor:BackColor;
+   using(var brush=new SolidBrush(fill))e.Graphics.FillPath(brush,path);
+   using(var pen=new Pen(Focused?Color.FromArgb(237,102,21):FlatAppearance.BorderColor,Focused?2:1))e.Graphics.DrawPath(pen,path);
+  }
+  var flags=TextFormatFlags.VerticalCenter|TextFormatFlags.EndEllipsis|TextFormatFlags.SingleLine;
+  flags|=TextAlign==ContentAlignment.MiddleLeft?TextFormatFlags.Left:TextFormatFlags.HorizontalCenter;
+  TextRenderer.DrawText(e.Graphics,Text,Font,new Rectangle(14,0,Width-28,Height),Enabled?ForeColor:Color.Gray,flags);
+ }
+}
+[ComVisible(false)]
+public class RockProPanel : Form {
+ readonly IZBaseApp app;
+ readonly Color Orange=Color.FromArgb(237,102,21), Ink=Color.FromArgb(31,42,55), Muted=Color.FromArgb(102,114,130), Paper=Color.FromArgb(238,242,246);
+ readonly ToolTip tips=new ToolTip {AutoPopDelay=18000,InitialDelay=350,ReshowDelay=120};
+ readonly Dictionary<string,object> empty=new Dictionary<string,object>();
+ Dictionary<string,object> project=new Dictionary<string,object>();
+ List<Dictionary<string,object>> projects=new List<Dictionary<string,object>>();
+ string source="",currentView="Projekt";bool busy=false;
+ Panel body;FlowLayoutPanel nav;Label connection,summary,sourceLabel,bottom;ComboBox chooser;Button refresh;ProgressBar progress;
+ TextBox title,client,device,notes,sourceBox;NumericUpDown qty;
+ readonly Dictionary<string,decimal> lastRead=new Dictionary<string,decimal>();readonly Dictionary<string,NumericUpDown> dimensions=new Dictionary<string,NumericUpDown>();
+ readonly string[] names={"RP_Length","RP_Depth","RP_BaseHeight","RP_LidHeight","RP_Thickness","RP_DisplayGap"};
+ readonly string[] meanings={"Długość zewnętrzna konstrukcji • oś X","Głębokość zewnętrzna konstrukcji • oś Y","Wysokość dołu z dnem • oś Z","Wysokość pokrywy z wiekiem • oś Z","Stała grubość wszystkich płyt","Odsunięcie prezentacyjne pokrywy • oś Z"};
+ readonly string[] stageKeys={"inquiry","devices","layout","geometry","hardware","wheels","documentation","materials","production"};
+ readonly string[] stageLabels={"Zapytanie","Urządzenia","Układ wyposażenia","Konstrukcja","Okucia i profile","Koła i piętrowanie","Dokumentacja","Materiały i koszty","Produkcja"};
+ readonly string[] statuses={"draft","waiting","review","approved","outdated"};
+ readonly string[] statusLabels={"Roboczy","Czeka na dane","Do sprawdzenia","Zatwierdzony ręcznie","Nieaktualny"};
+ public RockProPanel(IZBaseApp application) {
+  app=application;Text="RockPro CAD | Stanowisko konstruktora";Size=new Size(1320,940);MinimumSize=new Size(1120,760);Font=new Font("Segoe UI",10);StartPosition=FormStartPosition.CenterScreen;BackColor=Paper;AutoScaleMode=AutoScaleMode.Dpi;
+  var outer=new TableLayoutPanel {Dock=DockStyle.Fill,ColumnCount=2,RowCount=3};outer.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,240));outer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100));outer.RowStyles.Add(new RowStyle(SizeType.Absolute,100));outer.RowStyles.Add(new RowStyle(SizeType.Percent,100));outer.RowStyles.Add(new RowStyle(SizeType.Absolute,44));Controls.Add(outer);
+  var brand=new Panel {Dock=DockStyle.Fill,BackColor=Ink,Padding=new Padding(22,18,22,18)};
+  var pic=new PictureBox {Dock=DockStyle.Fill,SizeMode=PictureBoxSizeMode.Zoom,BackColor=Ink};var logo=Path.Combine(Addin.Root,"assets","rockpro-logo.png");if(File.Exists(logo))pic.Image=Image.FromFile(logo);brand.Controls.Add(pic);outer.Controls.Add(brand,0,0);
+  var header=new TableLayoutPanel {Dock=DockStyle.Fill,ColumnCount=2,RowCount=2,BackColor=Color.White,Padding=new Padding(24,12,20,12)};header.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100));header.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,190));header.RowStyles.Add(new RowStyle(SizeType.Absolute,37));header.RowStyles.Add(new RowStyle(SizeType.Percent,100));
+  chooser=new ComboBox {Dock=DockStyle.Fill,DropDownStyle=ComboBoxStyle.DropDownList};chooser.SelectedIndexChanged+=async delegate {if(chooser.SelectedIndex>=0&&!busy){if(ConfirmDiscard())await SelectProject(projects[chooser.SelectedIndex]);else{busy=true;chooser.SelectedIndex=projects.FindIndex(p=>Rpc.Str(p,"id")==Id);busy=false;}}};
+  refresh=Button("Połącz / Odśwież",async delegate {if(ConfirmDiscard())await LoadProjects();},true);refresh.Dock=DockStyle.Fill;connection=Label("Lokalna baza i MCP • niepołączono",10,Muted);connection.Dock=DockStyle.Fill;summary=Label("",9,Muted);summary.Dock=DockStyle.Fill;
+  header.Controls.Add(chooser,0,0);header.Controls.Add(refresh,1,0);header.Controls.Add(connection,0,1);header.Controls.Add(summary,1,1);outer.Controls.Add(header,1,0);
+  nav=new FlowLayoutPanel {Dock=DockStyle.Fill,FlowDirection=FlowDirection.TopDown,WrapContents=false,BackColor=Ink,Padding=new Padding(14,22,14,12)};
+  foreach(string name in new[]{"Projekt","Etapy","Parametry","Snapshoty","Zakres integracji"}){string n=name;var b=Button(n,delegate {if(ConfirmDiscard())ShowView(n);},false);b.Width=208;b.Height=44;b.TextAlign=ContentAlignment.MiddleLeft;nav.Controls.Add(b);}var newB=Button("+ Nowy projekt",delegate {if(!ConfirmDiscard())return;project=new Dictionary<string,object>();source="";chooser.SelectedIndex=-1;ShowView("Projekt");},false);newB.Width=208;newB.Margin=new Padding(3,28,3,3);nav.Controls.Add(newB);
+  var note=Label("MVP 0.3\n\nCAD: szkielet 10 płyt\nSQLite: lokalna baza\nAI: operacje przez MCP\n\nBez generowania okuć i rysunków w tej wersji.",9,Color.FromArgb(172,186,203));note.Size=new Size(205,160);note.Margin=new Padding(6,28,3,3);nav.Controls.Add(note);outer.Controls.Add(nav,0,1);
+  body=new Panel {Dock=DockStyle.Fill,Padding=new Padding(24,16,24,16),AutoScroll=true};outer.Controls.Add(body,1,1);
+  var foot=new Panel {Dock=DockStyle.Fill,BackColor=Color.White,Padding=new Padding(20,8,20,4)};bottom=Label("Gotowe. Wybierz projekt lub utwórz nową kartę.",9,Muted);bottom.Dock=DockStyle.Fill;progress=new ProgressBar {Dock=DockStyle.Right,Width=130,Style=ProgressBarStyle.Marquee,Visible=false};foot.Controls.Add(bottom);foot.Controls.Add(progress);outer.Controls.Add(foot,0,2);outer.SetColumnSpan(foot,2);
+  ShowView("Projekt");Shown+=async delegate {await LoadProjects();};FormClosing+=delegate(object sender,FormClosingEventArgs e){if(busy){e.Cancel=true;bottom.Text="Trwa operacja. Poczekaj na wynik przed zamknięciem panelu.";}else if(!ConfirmDiscard())e.Cancel=true;};
+ }
+ Label Label(string s,int size,Color color) {return new Label {Text=s,AutoSize=false,ForeColor=color,Font=new Font("Segoe UI",size),AutoEllipsis=true};}
+ Button Button(string text,EventHandler action,bool primary){var b=new StudioButton {Text=text,Height=42,Width=190,FlatStyle=FlatStyle.Flat,BackColor=primary?Orange:Color.White,ForeColor=primary?Color.White:Ink,Cursor=Cursors.Hand,Margin=new Padding(3,3,8,3)};b.FlatAppearance.BorderColor=primary?Orange:Color.FromArgb(218,224,232);b.FlatAppearance.MouseOverBackColor=primary?Color.FromArgb(212,85,10):Color.FromArgb(255,240,228);b.Font=new Font("Segoe UI",10,FontStyle.Bold);b.Click+=action;tips.SetToolTip(b,text);return b;}
+ FlowLayoutPanel Stack(){var s=new FlowLayoutPanel {Dock=DockStyle.Top,AutoSize=true,FlowDirection=FlowDirection.TopDown,WrapContents=false,Padding=new Padding(0,0,0,20)};body.Controls.Add(s);return s;}
+ void Heading(FlowLayoutPanel s,string h,string sub){var a=Label(h,22,Ink);a.Size=new Size(650,42);s.Controls.Add(a);var b=Label(sub,10,Muted);b.Size=new Size(690,48);s.Controls.Add(b);}
+ void Banner(FlowLayoutPanel s,string text,Color color){var l=Label(text,10,color);l.Size=new Size(720,94);l.AutoEllipsis=false;tips.SetToolTip(l,text);l.Padding=new Padding(12,8,12,8);l.BackColor=Color.White;s.Controls.Add(l);}
+ void ShowView(string name){currentView=name;body.Controls.Clear();foreach(Control c in nav.Controls)if(c is Button){var b=(Button)c;bool active=c.Text==name;b.BackColor=active?Color.FromArgb(59,71,87):Ink;b.ForeColor=active?Color.FromArgb(255,173,108):Color.FromArgb(215,224,235);b.FlatAppearance.BorderColor=b.BackColor;b.FlatAppearance.MouseOverBackColor=Color.FromArgb(51,64,80);b.Invalidate();}
+  if(name=="Projekt")ProjectView();else if(name=="Etapy")StagesView();else if(name=="Parametry")ParametersView();else if(name=="Snapshoty")HistoryView();else CapabilitiesView();}
+ bool ConfirmDiscard(){if(currentView=="Parametry"){foreach(var item in dimensions)if(item.Value.Enabled&&lastRead.ContainsKey(item.Key)&&item.Value.Value!=lastRead[item.Key])return MessageBox.Show(this,"Masz niezastosowane parametry. Odrzucić je i kontynuować?","Niezastosowane parametry",MessageBoxButtons.YesNo,MessageBoxIcon.Question)==DialogResult.Yes;}if(currentView!="Projekt"||title==null)return true;bool dirty=title.Text!=Rpc.Str(project,"name")||client.Text!=Rpc.Str(project,"client")||device.Text!=Rpc.Str(project,"device")||notes.Text!=Rpc.Str(project,"notes")||sourceBox.Text!=source||qty.Value!=(project.ContainsKey("quantity")?Convert.ToDecimal(project["quantity"]):1);return !dirty||MessageBox.Show(this,"Masz niezapisane zmiany karty. Odrzucić je i kontynuować?","Niezapisane zmiany",MessageBoxButtons.YesNo,MessageBoxIcon.Question)==DialogResult.Yes;} string Id {get{return Rpc.Str(project,"id");}}
+ async Task Run(string text,Func<Task> work){if(busy)return;busy=true;nav.Enabled=false;body.Enabled=false;chooser.Enabled=false;refresh.Enabled=false;progress.Visible=true;bottom.Text=text;
+  try {await work();bottom.Text="Dokonano: "+text;}catch(Exception e){connection.Text="Ostatnia operacja niepotwierdzona — sprawdź połączenie";bottom.Text="Błąd: "+e.Message;Addin.Log("UI ERROR "+e);MessageBox.Show(this,e.Message,"RockPro CAD — operacja nie została potwierdzona",MessageBoxButtons.OK,MessageBoxIcon.Warning);}finally{busy=false;nav.Enabled=true;body.Enabled=true;chooser.Enabled=true;refresh.Enabled=true;progress.Visible=false;}}
+ async Task<Dictionary<string,object>> Call(string t,object a){return await Task.Run(()=>Rpc.Call(t,a));}
+ async Task LoadProjects(){await Run("Odczyt lokalnej bazy przez MCP",async delegate {var r=await Call("list_projects",empty);projects.Clear();chooser.Items.Clear();foreach(var v in Rpc.Rows(r["projects"])){var p=Rpc.Obj(v);projects.Add(p);chooser.Items.Add(Rpc.Str(p,"name")+"  ·  "+Rpc.Str(p,"client"));}connection.Text="MCP połączone • SQLite lokalna";tips.SetToolTip(connection,"Baza: "+Rpc.Str(r,"database")+". Nie jest to import dawnej biblioteki RockPro.");summary.Text="Projekty w bazie: "+projects.Count;
+  if(Id!=""){var g=await Call("get_project",new {project_id=Id});project=Rpc.Obj(g["project"]);source=Rpc.Str(project,"source");}for(int k=0;k<projects.Count;k++)if(Rpc.Str(projects[k],"id")==Id)chooser.SelectedIndex=k;ShowView(currentView);});}
+ async Task SelectProject(Dictionary<string,object> selected){await Run("Otwieranie karty projektu",async delegate {var r=await Call("get_project",new {project_id=Rpc.Str(selected,"id")});project=Rpc.Obj(r["project"]);source=Rpc.Str(project,"source");for(int k=0;k<projects.Count;k++)if(Rpc.Str(projects[k],"id")==Id)chooser.SelectedIndex=k;ShowView(currentView);});}
+ TextBox Field(FlowLayoutPanel s,string label,string value,bool multi){var l=Label(label,10,Ink);l.Size=new Size(680,24);l.Margin=new Padding(3,12,3,0);s.Controls.Add(l);var t=new TextBox {Text=value,Width=700,Height=multi?80:32,Multiline=multi,BorderStyle=BorderStyle.FixedSingle,BackColor=Color.White,ForeColor=Ink};s.Controls.Add(t);return t;}
+ void ProjectView(){var s=Stack();Heading(s,"Karta projektu",Id==""?"Nowy projekt • dane nie są zapisywane, dopóki nie klikniesz Zapisz kartę.":"ID "+Id+" • metadane projektu w lokalnej bazie SQLite");
+  title=Field(s,"Nazwa projektu *",Rpc.Str(project,"name"),false);client=Field(s,"Klient",Rpc.Str(project,"client"),false);device=Field(s,"Urządzenie / produkt",Rpc.Str(project,"device"),false);
+  var row=new FlowLayoutPanel {Width=700,Height=40};var ql=Label("Liczba skrzyń",10,Ink);ql.Size=new Size(150,28);qty=new NumericUpDown {Minimum=1,Maximum=100000,Width=100,Value=project.ContainsKey("quantity")?Convert.ToDecimal(project["quantity"]):1};row.Controls.Add(ql);row.Controls.Add(qty);s.Controls.Add(row);
+  sourceBox=Field(s,"Powiązany plik ICS • operacje CAD korzystają wyłącznie z tego pliku",source,false);sourceBox.ContextMenuStrip=PathMenu(()=>sourceBox.Text);sourceBox.TextChanged+=delegate{tips.SetToolTip(sourceBox,sourceBox.Text);};sourceBox.ReadOnly=true;sourceBox.Multiline=true;sourceBox.Height=52;tips.SetToolTip(sourceBox,"Zmiana aktywnej zakładki w IronCADzie nie zmienia powiązania projektu. Użyj jawnie przycisku przypisania i zapisz kartę.");
+  var bind=Button("Przypisz aktywny plik ICS",delegate {try{if(app==null)throw new Exception("Podgląd UI nie ma sesji IronCAD.");var d=app.ActiveDoc;if(d==null)throw new Exception("Brak aktywnego dokumentu.");string p=d.Name;if(!Path.IsPathRooted(p)||!File.Exists(p)||!p.EndsWith(".ics",StringComparison.OrdinalIgnoreCase))throw new Exception("Zapisz scenę jako plik ICS przed przypisaniem.");sourceBox.Text=p;}catch(Exception e){MessageBox.Show(this,e.Message,"Powiązanie pliku");}},false);bind.Width=250;s.Controls.Add(bind);
+  notes=Field(s,"Notatki / wymagania",Rpc.Str(project,"notes"),true);var save=Button("Zapisz kartę projektu",async delegate {if(String.IsNullOrWhiteSpace(title.Text)||String.IsNullOrWhiteSpace(sourceBox.Text)){MessageBox.Show(this,"Podaj nazwę i przypisz zapisany plik ICS.");return;}
+   var data=new Dictionary<string,object>{{"name",title.Text.Trim()},{"client",client.Text.Trim()},{"device",device.Text.Trim()},{"quantity",(int)qty.Value},{"notes",notes.Text},{"source",sourceBox.Text}};if(Id!="")data["project_id"]=Id;
+   bool saved=false;await Run("Zapisywanie karty projektu",async delegate {var r=await Call("save_project",data);project=Rpc.Obj(r["project"]);source=Rpc.Str(project,"source");saved=true;ShowView("Projekt");});if(saved)await LoadProjects();},true);save.Width=250;s.Controls.Add(save);
+  Banner(s,"POŁĄCZONE: karta i plik projektu. BRAK BACKENDU: import maila, załączniki, automatyczne rozpoznawanie wymagań. Zapisz kartę przed zmianą widoku — niezapisane pola są tracone.",Muted);
+ }
+ void StagesView(){var s=Stack();Heading(s,"Etapy projektu","Statusy są deklaracją konstruktora. Zatwierdzenie etapu nie uruchamia kontroli CAD ani nie oznacza gotowości produkcyjnej.");if(Id==""){Banner(s,"Najpierw zapisz lub wybierz projekt.",Orange);return;}
+  for(int i=0;i<stageKeys.Length;i++){string key=stageKeys[i];var row=new FlowLayoutPanel {Width=720,Height=48,BackColor=Color.White,Padding=new Padding(8,5,5,2),Margin=new Padding(3,4,3,4)};var l=Label((i+1).ToString("00")+"   "+stageLabels[i],11,Ink);l.Size=new Size(265,32);row.Controls.Add(l);var cb=new ComboBox {Width=200,DropDownStyle=ComboBoxStyle.DropDownList};cb.Items.AddRange(statusLabels);cb.SelectedIndex=StageIndex(key);row.Controls.Add(cb);var b=Button("Zapisz status",async delegate {string val=statuses[cb.SelectedIndex];await Run("Zapisywanie statusu",async delegate {var r=await Call("set_stage",new {project_id=Id,stage=key,status=val});project=Rpc.Obj(r["project"]);});},false);b.Width=140;b.Height=30;row.Controls.Add(b);tips.SetToolTip(b,"Ręczny status etapu. Automatyczny harness tego etapu nie jest jeszcze wdrożony.");s.Controls.Add(row);}
+  Banner(s,"CZĘŚCIOWO: statusy zapisują się w bazie. Automatyczne bramki jakości są w planie. Wybrane zmiany urządzenia, ilości i źródła oznaczają dalsze etapy jako nieaktualne.",Orange);
+ }
+ int StageIndex(string key){if(project.ContainsKey("stages")){var map=Rpc.Obj(project["stages"]);if(map.ContainsKey(key)){string v=map[key] is string?(string)map[key]:Rpc.Str(Rpc.Obj(map[key]),"status");int n=Array.IndexOf(statuses,v);if(n>=0)return n;}foreach(var o in Rpc.Rows(project["stages"])){var d=Rpc.Obj(o);if(Rpc.Str(d,"stage")==key||Rpc.Str(d,"key")==key){int n=Array.IndexOf(statuses,Rpc.Str(d,"status"));if(n>=0)return n;}}}return 0;}
+ void ParametersView(){var s=Stack();Heading(s,"Parametry konstrukcji","Zmiana wymiarów tworzy kopię ICS. Oryginał pozostaje niezmieniony; wynik przechodzi kontrolę geometrii i ponowne otwarcie.");PathCard(s,"Źródło konstrukcji",source);sourceLabel=Label("Parametry nie zostały jeszcze odczytane z CAD.",9,Muted);sourceLabel.Size=new Size(720,30);s.Controls.Add(sourceLabel);try{if(app!=null&&app.ActiveDoc!=null&&!String.Equals(app.ActiveDoc.Name,source,StringComparison.OrdinalIgnoreCase))Banner(s,"Aktywna zakładka CAD jest inna niż przypisane źródło. Operacje użyją pliku projektu wskazanego powyżej.",Orange);}catch{}dimensions.Clear();
+  for(int i=0;i<names.Length;i++){var row=new FlowLayoutPanel {Width=720,Height=76,BackColor=Color.White,Padding=new Padding(8)};var l=Label(names[i]+"\n"+meanings[i],9,Ink);l.Size=new Size(455,56);l.AutoEllipsis=false;var n=new NumericUpDown {DecimalPlaces=3,Maximum=i==4?100:i==5?1000:10000,Minimum=i==5?0:1,Width=140,Enabled=false};dimensions[names[i]]=n;tips.SetToolTip(n,meanings[i]+". Jednostka: mm. Grubość nie skaluje się razem z gabarytem.");row.Controls.Add(l);row.Controls.Add(n);var unit=Label("mm",10,Muted);unit.Size=new Size(65,34);unit.AutoEllipsis=false;row.Controls.Add(unit);s.Controls.Add(row);}
+  var buttons=new FlowLayoutPanel {Width=720,Height=48};var read=Button("Odczytaj z CAD",async delegate {if(source==""){MessageBox.Show(this,"Wybierz projekt z przypisanym plikiem ICS.");return;}foreach(var field in dimensions.Values)field.Enabled=false;await Run("Odczyt parametrów przez MCP",async delegate {var r=await Call("inspect_project",new {source=source});var ps=Rpc.Obj(r["parameters"]);foreach(string n in names){decimal v=Convert.ToDecimal(Rpc.Obj(ps[n])["mm"],CultureInfo.InvariantCulture);if(v<dimensions[n].Minimum||v>dimensions[n].Maximum)throw new Exception("Parametr poza zakresem edycji: "+n);dimensions[n].Value=v;lastRead[n]=v;}foreach(var field in dimensions.Values)field.Enabled=true;sourceLabel.Text="Odczytano 6 parametrów • wartości w milimetrach";});},false);buttons.Controls.Add(read);
+  var change=Button("Zastosuj na kopii",async delegate {if(Id==""||!dimensions[names[0]].Enabled){MessageBox.Show(this,"Wybierz zapisany projekt i odczytaj parametry.");return;}var values=new Dictionary<string,object>();foreach(var pair in dimensions)values[pair.Key]=pair.Value.Value;await Run("Tworzenie i kontrola kopii CAD",async delegate {var r=await Call("change_dimensions_on_copy",new {project_id=Id,source=source,changes=values,label="Zmiana parametrów z panelu"});if(r.ContainsKey("project")){project=Rpc.Obj(r["project"]);source=Rpc.Str(project,"source");}MessageBox.Show(this,"Utworzono i sprawdzono kopię:\n"+Rpc.Str(r,"copy")+"\n\nProjekt wskazuje teraz nową kopię roboczą. Odczytaj jej parametry przed kolejną zmianą.","Kopia zapisana");ShowView("Parametry");});},true);change.Width=220;buttons.Controls.Add(change);s.Controls.Add(buttons);
+  Banner(s,"POŁĄCZONE: 6 parametrów szkieletu 10 płyt. BRAK BACKENDU: zmiany okuć, profili, pianek i dowolnych modeli WoodLAB.",Muted);
+ }
+ void CopyText(string value){if(String.IsNullOrEmpty(value))return;try{Clipboard.SetText(value);bottom.Text="Skopiowano do schowka.";}catch(Exception ex){MessageBox.Show(this,ex.Message,"Schowek");}}
+ ContextMenuStrip PathMenu(Func<string> value){var menu=new ContextMenuStrip {Font=new Font("Segoe UI",10),ShowImageMargin=false};menu.Items.Add("Kopiuj pełną ścieżkę",null,delegate{CopyText(value());});menu.Items.Add("Kopiuj nazwę pliku",null,delegate{CopyText(Path.GetFileName(value()));});menu.Items.Add("Kopiuj katalog",null,delegate{CopyText(Path.GetDirectoryName(value()));});return menu;}
+ void PathCard(FlowLayoutPanel stack,string caption,string path){
+  var card=new Panel {Width=720,Height=86,BackColor=Color.White,Margin=new Padding(3,10,3,14),Padding=new Padding(14)};
+  var heading=Label(caption.ToUpperInvariant(),9,Muted);heading.SetBounds(16,10,535,22);
+  var file=Label(String.IsNullOrEmpty(path)?"Nie przypisano pliku":Path.GetFileName(path),11,Ink);file.SetBounds(16,35,535,30);
+  file.Font=new Font("Segoe UI",11,FontStyle.Bold);tips.SetToolTip(file,path);tips.SetToolTip(card,path);
+  var menu=PathMenu(()=>path);card.ContextMenuStrip=menu;file.ContextMenuStrip=menu;heading.ContextMenuStrip=menu;
+  var copy=Button("Kopiuj",delegate{CopyText(path);},false);copy.SetBounds(575,22,125,40);copy.Enabled=!String.IsNullOrEmpty(path);tips.SetToolTip(copy,"Kopiuj pełną ścieżkę. Prawy przycisk: więcej opcji.");card.Controls.Add(heading);card.Controls.Add(file);card.Controls.Add(copy);stack.Controls.Add(card);
+ }
+ void HistoryView(){var s=Stack();Heading(s,"Historia snapshotów","Rewizje przypisane do projektu. Każdy snapshot zawiera plik ICS, parametry i raport kontroli.");Banner(s,"POŁĄCZONE: zapis i lista snapshotów. BRAK BACKENDU: automatyczny zapis po każdym etapie, porównanie geometrii oraz scalanie zmian ręcznych.",Muted);
+  var label=Field(s,"Nazwa snapshotu","",false);var note=Field(s,"Opis zmian","",true);
+  var save=Button("Zapisz snapshot CAD",async delegate {if(Id==""){MessageBox.Show(this,"Wybierz projekt.");return;}await Run("Zapis snapshotu i kontrola CAD",async delegate {var r=await Call("create_snapshot",new {project_id=Id,label=label.Text,note=note.Text});if(r.ContainsKey("project"))project=Rpc.Obj(r["project"]);MessageBox.Show(this,"Snapshot zapisany. Otwórz historię, aby zobaczyć szczegóły.");});},true);save.Width=240;s.Controls.Add(save);
+  var history=Button("Otwórz historię w oknie",async delegate {if(Id==""){MessageBox.Show(this,"Wybierz projekt.");return;}await Run("Pobieranie historii snapshotów",async delegate {var r=await Call("list_snapshots",new {project_id=Id});SnapshotWindow(Rpc.Rows(r["snapshots"]));});},false);history.Width=240;s.Controls.Add(history);
+  PathCard(s,"Snapshot • przypisane źródło",source);
+ }
+ DataGridView Grid(){var g=new DataGridView {Dock=DockStyle.Fill,ReadOnly=true,AllowUserToAddRows=false,AllowUserToDeleteRows=false,RowHeadersVisible=false,AutoSizeColumnsMode=DataGridViewAutoSizeColumnsMode.Fill,AutoSizeRowsMode=DataGridViewAutoSizeRowsMode.AllCells,SelectionMode=DataGridViewSelectionMode.FullRowSelect,MultiSelect=false,BackgroundColor=Color.White,BorderStyle=BorderStyle.None,ColumnHeadersHeightSizeMode=DataGridViewColumnHeadersHeightSizeMode.AutoSize};g.DefaultCellStyle.WrapMode=DataGridViewTriState.True;g.CellBorderStyle=DataGridViewCellBorderStyle.SingleHorizontal;g.GridColor=Color.FromArgb(232,237,243);g.DefaultCellStyle.Padding=new Padding(10,12,10,12);g.DefaultCellStyle.ForeColor=Ink;g.DefaultCellStyle.SelectionBackColor=Color.FromArgb(255,233,215);g.DefaultCellStyle.SelectionForeColor=Ink;g.AlternatingRowsDefaultCellStyle.BackColor=Color.FromArgb(248,250,252);g.ColumnHeadersDefaultCellStyle.Font=new Font("Segoe UI",10,FontStyle.Bold);g.ColumnHeadersDefaultCellStyle.Padding=new Padding(10);g.ColumnHeadersDefaultCellStyle.BackColor=Paper;g.EnableHeadersVisualStyles=false;return g;}
+ void SnapshotWindow(object[] snapshots){var f=new Form {Text="RockPro CAD — Historia | "+Rpc.Str(project,"name"),Size=new Size(1120,620),MinimumSize=new Size(800,450),StartPosition=FormStartPosition.CenterParent,Font=Font,BackColor=Paper};var g=Grid();foreach(var c in new[]{"Data","Nazwa","Walidacja CAD","Integralność archiwum","Parametry [mm]","Plik ICS"})g.Columns.Add(c,c);
+ foreach(var x in snapshots){var d=Rpc.Obj(x);var ps=d.ContainsKey("parameters")?Rpc.Obj(d["parameters"]):new Dictionary<string,object>();var parts=new List<string>();foreach(string key in names)if(ps.ContainsKey(key)){var v=Rpc.Obj(ps[key]);parts.Add(key.Replace("RP_","")+": "+(v.ContainsKey("mm")?Rpc.Str(v,"mm"):Convert.ToString(ps[key],CultureInfo.InvariantCulture)));}DateTimeOffset stamp;string date=DateTimeOffset.TryParse(Rpc.Str(d,"created_at"),out stamp)?stamp.ToLocalTime().ToString("dd.MM.yyyy HH:mm:ss"):Rpc.Str(d,"created_at");int i=g.Rows.Add(date,Rpc.Str(d,"label"),Rpc.Str(d,"validation"),Rpc.Str(d,"integrity"),String.Join("; ",parts.ToArray()),Path.GetFileName(Rpc.Str(d,"path")));g.Rows[i].Tag=d;foreach(DataGridViewCell cell in g.Rows[i].Cells)cell.ToolTipText="Dwuklik: szczegóły • prawy przycisk: kopiuj ścieżkę\n"+Rpc.Str(d,"path");}
+ var pathMenu=PathMenu(()=>g.SelectedRows.Count==0?"":Rpc.Str(Rpc.Obj(g.SelectedRows[0].Tag),"path"));g.ContextMenuStrip=pathMenu;g.CellMouseDown+=delegate(object sender,DataGridViewCellMouseEventArgs e){if(e.Button==MouseButtons.Right&&e.RowIndex>=0){g.ClearSelection();g.Rows[e.RowIndex].Selected=true;g.CurrentCell=g.Rows[e.RowIndex].Cells[Math.Max(0,e.ColumnIndex)];}};
+ g.CellDoubleClick+=delegate(object sender,DataGridViewCellEventArgs e){if(e.RowIndex<0)return;var d=Rpc.Obj(g.Rows[e.RowIndex].Tag);var detail=new Form {Text="RockPro CAD — Snapshot: "+Rpc.Str(d,"label"),Size=new Size(920,650),MinimumSize=new Size(650,400),StartPosition=FormStartPosition.CenterParent,Font=Font};var text=new TextBox {Dock=DockStyle.Fill,Multiline=true,ReadOnly=true,ScrollBars=ScrollBars.Both,WordWrap=false,Font=new Font("Consolas",10),BackColor=Color.White};var sb=new StringBuilder();foreach(string key in new[]{"id","created_at","label","note","validation","integrity","source","path","report_path","sha256"})sb.AppendLine(key+": "+Rpc.Str(d,key));sb.AppendLine();sb.AppendLine("PARAMETRY [mm]");var ps=d.ContainsKey("parameters")?Rpc.Obj(d["parameters"]):new Dictionary<string,object>();foreach(var item in ps){var v=Rpc.Obj(item.Value);sb.AppendLine(item.Key+" = "+(v.ContainsKey("mm")?Rpc.Str(v,"mm"):Convert.ToString(item.Value,CultureInfo.InvariantCulture))+" mm"+(v.ContainsKey("expression")?"    równanie: "+Rpc.Str(v,"expression"):""));}text.Text=sb.ToString();text.BorderStyle=BorderStyle.None;text.ContextMenuStrip=PathMenu(()=>Rpc.Str(d,"path"));var info=new Panel {Dock=DockStyle.Top,Height=80,BackColor=Paper};var copy=Button("Kopiuj ścieżkę ICS",delegate{CopyText(Rpc.Str(d,"path"));},false);copy.SetBounds(16,16,240,44);var all=Button("Kopiuj szczegóły",delegate{CopyText(text.Text);},false);all.SetBounds(270,16,220,44);info.Controls.Add(copy);info.Controls.Add(all);detail.Padding=new Padding(18);detail.Controls.Add(text);detail.Controls.Add(info);detail.Shown+=delegate{text.Select(0,0);};detail.ShowDialog(f);};
+ var top=Label(snapshots.Length+" snapshotów • Dwuklik w wiersz: pełne szczegóły i ścieżki\nID projektu: "+Id,10,Muted);top.Dock=DockStyle.Top;top.Height=72;top.Padding=new Padding(12);top.AutoEllipsis=false;f.Controls.Add(g);f.Controls.Add(top);f.ShowDialog(this);} void ModuleWindow(string[] module){var f=new Form {Text="RockPro CAD — "+module[0],Size=new Size(820,580),MinimumSize=new Size(650,450),StartPosition=FormStartPosition.CenterParent,Font=Font,BackColor=Paper};var s=new FlowLayoutPanel {Dock=DockStyle.Fill,AutoScroll=true,FlowDirection=FlowDirection.TopDown,WrapContents=false,Padding=new Padding(22)};f.Controls.Add(s);Heading(s,module[0],module[2]);Banner(s,module[1]+" — "+(module[1]=="BRAK BACKENDU"?"Makieta zakresu. Poniższe pola nie zapisują danych i nie uruchamiają operacji.":"Funkcje dostępne w głównych widokach. Zakres opisany w rejestrze integracji."),Orange);
+ string fields="";if(module[0].StartsWith("E-mail"))fields="Źródło wiadomości|Załączniki|Rozpoznane wymagania";else if(module[0].StartsWith("Urządzenia"))fields="Model urządzenia|Źródło wymiarów|Model 3D / obrys roboczy";else if(module[0].StartsWith("Dobór"))fields="Podobny projekt bazowy|Liczba urządzeń i akcesoria|Wariant rozmieszczenia";else if(module[0].StartsWith("Okucia"))fields="Katalog i numer części|Reguła mocowania|Odległość od krawędzi";else if(module[0].StartsWith("Koła"))fields="Model koła i nośność|Wspólny wzorzec koła / gniazda|Orientacja piętrowania";else if(module[0].StartsWith("Rysunki"))fields="Rewizja źródłowa|Formatki i otwory|Paczka produkcyjna";else if(module[0].StartsWith("Excel"))fields="Mapowanie kolumn|BOM konstrukcyjny|Kosztorys rewizji";else if(module[0].StartsWith("Magazyn"))fields="Zapotrzebowanie i rezerwacje|Format arkusza i rzaz|Propozycja zamówienia";else if(module[0].StartsWith("Produkcja"))fields="Wydana rewizja|Zdjęcia i zgłoszenia|Informacja z warsztatu";else if(module[0].StartsWith("Automatyczne"))fields="Warunki wejścia i zakończenia|Zmiany ręczne|Porównanie rewizji";
+ foreach(string field in fields.Split('|'))if(field!=""){var l=Label(field,10,Ink);l.Size=new Size(650,25);s.Controls.Add(l);s.Controls.Add(new TextBox {Width=650,Enabled=false,Text="Zaplanowane — backend niewdrożony"});}f.ShowDialog(this);} void CapabilitiesView(){var s=Stack();Heading(s,"Zakres integracji","Jawny rejestr możliwości MVP. Status „połączone” opisuje zakres funkcji, a nie bieżącą dostępność sesji CAD.");
+  string[][] rows={new[]{"Karta projektu + SQLite","POŁĄCZONE","Zapis i odczyt metadanych; nowa lokalna baza, bez importu archiwum."},new[]{"Parametry CAD przez MCP","POŁĄCZONE","Odczyt 6 parametrów i walidowana zmiana na kopii szkieletu."},new[]{"Snapshoty ICS","POŁĄCZONE","Jawny zapis, historia, parametry i raport kontroli."},new[]{"Etapy projektu","CZĘŚCIOWO","Ręczne statusy w bazie; brak automatycznych bramek."},new[]{"E-mail i załączniki","BRAK BACKENDU","Import zapytania, powiązanie korespondencji."},new[]{"Urządzenia / research / Text-to-CAD","BRAK BACKENDU","Karty urządzeń, modele uproszczone i źródła danych."},new[]{"Dobór szablonu i układu","BRAK BACKENDU","Wyszukiwanie podobnej skrzyni i warianty rozmieszczenia."},new[]{"Okucia, profile, pianki","BRAK BACKENDU","Katalog części i deterministyczne reguły mocowania."},new[]{"Koła i gniazda","BRAK BACKENDU","Wspólny wzorzec, obciążenie i kontrola piętrowania."},new[]{"Rysunki i dokumentacja","BRAK BACKENDU","Paczkowanie dokumentacji konkretnej rewizji."},new[]{"Excel i BOM","BRAK BACKENDU","Import, eksport, mapowanie kolumn i zestawienia."},new[]{"Magazyn, zakupy i rozkrój","BRAK BACKENDU","Rezerwacje, ceny, wspólny rozkrój zamówień."},new[]{"Produkcja i informacja zwrotna","BRAK BACKENDU","Wydanie, zdjęcia, zgłoszenia i sprawdzone rozwiązania."},new[]{"Automatyczne harnessy i porównania","BRAK BACKENDU","Migawki etapów, zależności, wykrywanie ręcznych zmian."}};
+  Banner(s,"14 obszarów: 3 połączone · 1 częściowy · 10 bez backendu",Orange);
+  foreach(var r in rows){var l=Label(r[0]+"   ["+r[1]+"]\n"+r[2],10,r[1]=="POŁĄCZONE"?Color.FromArgb(28,112,79):Muted);l.Size=new Size(720,88);l.AutoEllipsis=false;l.BackColor=Color.White;l.Padding=new Padding(10,7,8,5);l.Margin=new Padding(3,3,3,3);tips.SetToolTip(l,r[2]+" Kliknij, aby zobaczyć zakres modułu.");l.Cursor=Cursors.Hand;string[] module=r;l.Click+=delegate{ModuleWindow(module);};l.MouseEnter+=delegate{l.BackColor=Color.FromArgb(255,240,228);};l.MouseLeave+=delegate{l.BackColor=Color.White;};s.Controls.Add(l);}
+ }
+}
+}
+
+
+
+
+
+
+
+
+
+
+

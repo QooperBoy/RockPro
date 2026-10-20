@@ -1,0 +1,191 @@
+{
+  "file": "RockPro_Epson_szkielet_MVP.ics",
+  "parameters_mm": {
+    "RP_Length": 914,
+    "RP_Depth": 602,
+    "RP_BaseHeight": 239.24,
+    "RP_LidHeight": 104.13,
+    "RP_Thickness": 9.8,
+    "RP_DisplayGap": 30
+  },
+  "assemblies": {
+    "base": 2,
+    "lid": 33
+  },
+  "panels": [
+    {
+      "half": "base",
+      "role": "front",
+      "id": 3,
+      "feature_id": 4,
+      "name": "przód [Y min | płaszczyzna XZ]",
+      "size_expr": [
+        "RP_Length",
+        "RP_Thickness",
+        "RP_BaseHeight - RP_Thickness"
+      ],
+      "position_expr": [
+        "RP_Length/2",
+        "RP_Thickness/2",
+        "RP_Thickness"
+      ]
+    },
+    {
+      "half": "base",
+      "role": "back",
+      "id": 9,
+      "feature_id": 10,
+      "name": "tył [Y max | płaszczyzna XZ]",
+      "size_expr": [
+        "RP_Length",
+        "RP_Thickness",
+        "RP_BaseHeight - RP_Thickness"
+      ],
+      "position_expr": [
+        "RP_Length/2",
+        "RP_Depth - RP_Thickness/2",
+        "RP_Thickness"
+      ]
+    },
+    {
+      "half": "base",
+      "role": "left",
+      "id": 15,
+      "feature_id": 16,
+      "name": "lewa [X min | płaszczyzna YZ]",
+      "size_expr": [
+        "RP_Thickness",
+        "RP_Depth - 2*RP_Thickness",
+        "RP_BaseHeight - RP_Thickness"
+      ],
+      "position_expr": [
+        "RP_Thickness/2",
+        "RP_Depth/2",
+        "RP_Thickness"
+      ]
+    },
+    {
+      "half": "base",
+      "role": "right",
+      "id": 21,
+      "feature_id": 22,
+      "name": "prawa [X max | płaszczyzna YZ]",
+      "size_expr": [
+        "RP_Thickness",
+        "RP_Depth - 2*RP_Thickness",
+        "RP_BaseHeight - RP_Thickness"
+      ],
+      "position_expr": [
+        "RP_Length - RP_Thickness/2",
+        "RP_Depth/2",
+        "RP_Thickness"
+      ]
+    },
+    {
+      "half": "base",
+      "role": "closure",
+      "id": 27,
+      "feature_id": 28,
+      "name": "dno [Z min | płaszczyzna XY]",
+      "size_expr": [
+        "RP_Length",
+        "RP_Depth",
+        "RP_Thickness"
+      ],
+      "position_expr": [
+        "RP_Length/2",
+        "RP_Depth/2",
+        "0 mm"
+      ]
+    },
+    {
+      "half": "lid",
+      "role": "front",
+      "id": 34,
+      "feature_id": 35,
+      "name": "przód [Y min | płaszczyzna XZ]",
+      "size_expr": [
+        "RP_Length",
+        "RP_Thickness",
+        "RP_LidHeight - RP_Thickness"
+      ],
+      "position_expr": [
+        "RP_Length/2",
+        "RP_Thickness/2",
+        "0 mm"
+      ]
+    },
+    {
+      "half": "lid",
+      "role": "back",
+      "id": 40,
+      "feature_id": 41,
+      "name": "tył [Y max | płaszczyzna XZ]",
+      "size_expr": [
+        "RP_Length",
+        "RP_Thickness",
+        "RP_LidHeight - RP_Thickness"
+      ],
+      "position_expr": [
+        "RP_Length/2",
+        "RP_Depth - RP_Thickness/2",
+        "0 mm"
+      ]
+    },
+    {
+      "half": "lid",
+      "role": "left",
+      "id": 46,
+      "feature_id": 47,
+      "name": "lewa [X min | płaszczyzna YZ]",
+      "size_expr": [
+        "RP_Thickness",
+        "RP_Depth - 2*RP_Thickness",
+        "RP_LidHeight - RP_Thickness"
+      ],
+      "position_expr": [
+        "RP_Thickness/2",
+        "RP_Depth/2",
+        "0 mm"
+      ]
+    },
+    {
+      "half": "lid",
+      "role": "right",
+      "id": 52,
+      "feature_id": 53,
+      "name": "prawa [X max | płaszczyzna YZ]",
+      "size_expr": [
+        "RP_Thickness",
+        "RP_Depth - 2*RP_Thickness",
+        "RP_LidHeight - RP_Thickness"
+      ],
+      "position_expr": [
+        "RP_Length - RP_Thickness/2",
+        "RP_Depth/2",
+        "0 mm"
+      ]
+    },
+    {
+      "half": "lid",
+      "role": "closure",
+      "id": 58,
+      "feature_id": 59,
+      "name": "wieko [Z max | płaszczyzna XY]",
+      "size_expr": [
+        "RP_Length",
+        "RP_Depth",
+        "RP_Thickness"
+      ],
+      "position_expr": [
+        "RP_Length/2",
+        "RP_Depth/2",
+        "RP_LidHeight - RP_Thickness"
+      ]
+    }
+  ],
+  "source": "C:\\Ai\\Podnośniki\\Materialy_dla_firm\\RockPro\\Integracja\\skeleton\\20261020T110925Z\\Epson_source_snapshot.ics",
+  "normalizations": [
+    "base back panel height offset -3.02 mm removed in clean conceptual skeleton"
+  ]
+}

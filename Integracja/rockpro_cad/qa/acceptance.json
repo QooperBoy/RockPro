@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "scope": "RockPro CAD frontend MVP: project card, stages, parameters, snapshot history",
+  "rules": [
+    {"id":"P01","area":"projects","check":"Create project with stable identifier, customer, request and source path; reload in new process and compare saved values.","evidence":"automated isolated SQLite test"},
+    {"id":"P02","area":"projects","check":"Two projects retain separate source paths, stages and histories.","evidence":"automated isolated SQLite test"},
+    {"id":"P03","area":"projects","check":"Project list and detail reflect committed edits; failed save remains visible as failure.","evidence":"backend test plus UI"},
+    {"id":"S01","area":"stages","check":"Stage progress denotes recorded human workflow state, not a completed automated CAD check.","evidence":"UI label and backend metadata"},
+    {"id":"S02","area":"stages","check":"Missing-backend and disconnected-backend are distinct; planned functionality cannot imply live capability.","evidence":"capability registry and UI"},
+    {"id":"C01","area":"CAD","check":"Selected project source is explicit. An unrelated active document must not be mutated.","evidence":"code review and serial live inspection"},
+    {"id":"C02","area":"CAD","check":"Parameter change creates a new ICS revision, validates geometry and reopening, verifies original unchanged.","evidence":"live report with source/copy identities and hashes"},
+    {"id":"C03","area":"CAD","check":"Invalid numbers, unknown parameters and physically impossible dimensions are rejected before mutation.","evidence":"automated input tests"},
+    {"id":"R01","area":"snapshots","check":"Failed snapshot is not listed as successful and never becomes latest source.","evidence":"failure injection test"},
+    {"id":"R02","area":"snapshots","check":"History persists and associates each revision with its project, parent, path, timestamp and operation.","evidence":"isolated database test"},
+    {"id":"R03","area":"snapshots","check":"History does not conflate file existence with valid ICS; reopen/geometry checks gate success.","evidence":"worker review/live report"},
+    {"id":"M01","area":"MCP","check":"Native frontend and MCP use the same backend and database, with no separate divergent project state.","evidence":"cross-process protocol test"},
+    {"id":"M02","area":"MCP","check":"JSON-RPC stdout contains only JSON lines and calls expose actionable errors.","evidence":"protocol subprocess test"},
+    {"id":"U01","area":"UX","check":"Project, stages, parameters and history are reachable with clear current selection.","evidence":"live screenshot"},
+    {"id":"U02","area":"UX","check":"Long tables have independent resizable windows with scrolling and explicit titles.","evidence":"live screenshot"},
+    {"id":"U03","area":"UX","check":"Action buttons have tooltips, disabled/busy state and confirmation/result feedback.","evidence":"code review and live UI"},
+    {"id":"U04","area":"UX","check":"At normal and reduced window sizes no essential action or status is clipped.","evidence":"live screenshots at two sizes"},
+    {"id":"U05","area":"UX","check":"Backend-unavailable message is not replaced by fake sample data; retry exists.","evidence":"code review/failure test"},
+    {"id":"U06","area":"UX","check":"Logo, readable hierarchy, consistent spacing and status text work without relying solely on color.","evidence":"live screenshot"},
+    {"id":"U07","area":"UX","check":"CAD operations do not freeze the message loop; concurrent operation is prevented.","evidence":"async code review and live operation"}
+  ]
+}

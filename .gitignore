@@ -1,0 +1,10 @@
+**/.venv/
+**/__pycache__/
+**/bin*/
+**/data/
+**/logs/
+**/revisions/
+**/*.lock
+Integracja/skeleton_state.json
+Integracja/skeleton/demo/skeleton_manifest.json
+mcp-config.local.json
