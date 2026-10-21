@@ -155,6 +155,15 @@ Zainstalowany backend przeszedł oddzielny handshake stdio: wersja 0.3.0,
 Dowód: `artifacts/installed-core-smoke.json`. Ten test nie dowodzi jeszcze
 odświeżenia listy narzędzi w już otwartej rozmowie klienta MCP.
 
+Stan tej rozmowy po wdrożeniu: stare połączenie MCP zwraca `Transport closed`
+i zachowuje poprzednią listę narzędzi. Konfiguracja wskazuje prawidłowy
+zainstalowany serwer i nie ma filtra narzędzi; świeży proces stdio oraz panel
+działają. Próba odświeżenia z UI klienta nie potwierdziła restartu połączenia;
+nie zmieniano konfiguracji ani nie restartowano całej aplikacji Codex.
+Bezpośrednie sterowanie nowymi narzędziami z tej otwartej sesji pozostaje
+niepotwierdzone do jej odświeżenia. To osobny stan od działającej integracji
+panelu IronCAD i CLI z backendem.
+
 ## Próba w rzeczywistym panelu po restarcie
 
 Computer Use otworzył dodatek i nowy panel prototypu w działającym IronCAD.
