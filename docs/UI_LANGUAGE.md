@@ -59,3 +59,5 @@ Testy programu i oględziny w rzeczywistym IronCAD raportujemy oddzielnie.
 ## Potwierdzenie zapisu układu
 
 Po potwierdzonym zapisie w bazie konfigurator pokazuje przez 8 sekund zielone powiadomienie: numer wersji, ścieżka SQLite zwrócona przez backend i przycisk kopiowania ścieżki. Status pod przyciskami jest zielony. Błąd lub konflikt nie pokazuje sukcesu. Edycja pól ukrywa poprzednie potwierdzenie. Zapis układu nie tworzy pliku ICS; służy do tego osobna operacja tworzenia szkieletu na kopii.
+
+Weryfikacja 21.10.2026: PASS pełny harness `20261021T141250140083Z` oraz natywny test w IronCAD 2027. Zapis niezmienionego układu projektu testowego zwiększył wersję 10 → 11 i wyświetlił zielony popup z pełną ścieżką faktycznej bazy SQLite oraz zielony status. Nowa DLL i backend zostały wdrożone po zamknięciu hosta. Lokalny backup kodu, bazy, poprzedniej DLL i źródłowego ICS: `artifacts/save-feedback-checkpoint` (poza Git).
