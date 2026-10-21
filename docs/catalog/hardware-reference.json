@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "checked_on": "2026-10-21",
+  "scope": "Catalogue code identification; not a production-approved parts library",
+  "items": [
+    {
+      "code": "EG-0500/1",
+      "aliases": [
+        "EG-0500_1"
+      ],
+      "name_pl": "Profil zamykający męski",
+      "name_en": "Male closure extrusion",
+      "manufacturer": "Penn Elcom",
+      "function_pl": "prowadzi styk dolnej skrzyni z pokrywą",
+      "source_url": "https://www.penn-elcom.com/ad/flight-case-hardware/extrusions?manufacturer=Penn+Elcom&p=2&view_all=true",
+      "note": "Przekrój nominalny pod płytę 9,5 mm; para z EG-0500/2. Oznaczenie CAD _1 dopasowane do /1; przed automatyzacją potwierdzić przekrój.",
+      "catalogue_status": "matched",
+      "cad_geometry_status": "not_fully_validated",
+      "approved_for_automatic_placement": false
+    },
+    {
+      "code": "EG-0500/2",
+      "aliases": [
+        "EG-0500_2"
+      ],
+      "name_pl": "Profil zamykający żeński",
+      "name_en": "Female closure extrusion",
+      "manufacturer": "Penn Elcom",
+      "function_pl": "przyjmuje pióro profilu dolnego",
+      "source_url": "https://www.penn-elcom.com/es/extrusion-de-ranura-de-9-5-mm-compatible-con-extrusion-de-lengueta-por-ejemplo-0500-1-2m-por-ejemplo-0500-2-2m",
+      "note": "Rowek 9,5 mm; para z EG-0500/1. Nie utożsamiać głębokości rowka z grubością płyty.",
+      "catalogue_status": "matched",
+      "cad_geometry_status": "not_fully_validated",
+      "approved_for_automatic_placement": false
+    },
+    {
+      "code": "EG-0113",
+      "aliases": [
+        "EG-0113"
+      ],
+      "name_pl": "Kątownik ochronny krawędzi",
+      "name_en": "Protective angle extrusion",
+      "manufacturer": "Penn Elcom",
+      "function_pl": "chroni i łączy zewnętrzne krawędzie płyt",
+      "source_url": "https://www.penn-elcom.com/flight-case-hardware/extrusions/single-angle-extrusions?p=2",
+      "note": "Rodzina profilu o ramionach 35 mm. Model ma odcinki różnej długości, a nie jedną sztangę.",
+      "catalogue_status": "matched",
+      "cad_geometry_status": "not_fully_validated",
+      "approved_for_automatic_placement": false
+    },
+    {
+      "code": "410429",
+      "aliases": [
+        "410429"
+      ],
+      "name_pl": "Narożnik kulkowy trójramienny",
+      "name_en": "Three-leg ball corner",
+      "manufacturer": "Adam Hall",
+      "function_pl": "chroni naroże skrzyni",
+      "source_url": "https://www.adamhall.com/shop/en/flight-case-material/corners-l-corners/ball-corners",
+      "note": "Wariant pod kątownik 35 mm, 9 otworów. Kod i rola rozpoznane; nie certyfikuje zgodności geometrii modelu.",
+      "catalogue_status": "matched",
+      "cad_geometry_status": "not_fully_validated",
+      "approved_for_automatic_placement": false
+    },
+    {
+      "code": "B1930",
+      "aliases": [
+        "B1930"
+      ],
+      "name_pl": "Kątownik wzmacniający z przetłoczeniami",
+      "name_en": "Reinforced corner brace",
+      "manufacturer": "Penn Elcom",
+      "function_pl": "wzmacnia połączenie narożne",
+      "source_url": "https://www.penn-elcom.com/4-hole-brace-with-strengthening-ribs-355mm-x-40mm-b1930",
+      "note": "Katalog: 4 otwory, stal 1,2 mm, 35,5 × 40 mm. Wymiary katalogowe nie są automatycznym pomiarem obrysu po obrocie.",
+      "catalogue_status": "matched",
+      "cad_geometry_status": "not_fully_validated",
+      "approved_for_automatic_placement": false
+    },
+    {
+      "code": "B1121",
+      "aliases": [
+        "B1121"
+      ],
+      "name_pl": "Kątownik wzmacniający czterootworowy",
+      "name_en": "Four-hole corner brace",
+      "manufacturer": "Penn Elcom",
+      "function_pl": "wzmacnia narożne połączenie profili",
+      "source_url": "https://www.penn-elcom.com/4-hole-brace-31-2mm-x-40mm-b1121",
+      "note": "Katalog: 31,2 × 40 mm, 4 otwory, stal 1,2 mm; nakładany na profile 30 × 30 mm. Inny wariant niż B1121/20.",
+      "catalogue_status": "matched",
+      "cad_geometry_status": "not_fully_validated",
+      "approved_for_automatic_placement": false
+    },
+    {
+      "code": "2643",
+      "aliases": [
+        "2643"
+      ],
+      "name_pl": "Mały zawias typu L",
+      "name_en": "Small L hinge",
+      "manufacturer": "Adam Hall",
+      "function_pl": "łączy ruchomo krawędzie skrzyni",
+      "source_url": "https://www.adamhall.com/shop/es/piezas-de-flightcase/bisagras-y-bloqueos/bisagras",
+      "note": "Katalog: szerokość 48 mm. W tym modelu wpis 2643 jest pustym zespołem, bez dzieci; nie liczyć jako aktywnego fizycznego zawiasu.",
+      "catalogue_status": "matched",
+      "cad_geometry_status": "not_fully_validated",
+      "approved_for_automatic_placement": false
+    },
+    {
+      "code": "H2026",
+      "aliases": [
+        "H2026"
+      ],
+      "name_pl": "Uchwyt narożny",
+      "name_en": "Corner handle",
+      "manufacturer": "Penn Elcom",
+      "function_pl": "chwyt na krawędzi pokrywy",
+      "source_url": "https://www.penn-elcom.com/us/corner-handle-with-tight-radius-h2026-series",
+      "note": "Rodzina o małym promieniu wewnętrznym 1 mm. Sufiks wykończenia nie wynika z nazwy CAD.",
+      "catalogue_status": "matched",
+      "cad_geometry_status": "not_fully_validated",
+      "approved_for_automatic_placement": false
+    },
+    {
+      "code": "H7159",
+      "aliases": [
+        "H7159"
+      ],
+      "name_pl": "Uchwyt wpuszczany ze sprężynami",
+      "name_en": "Recessed sprung handle",
+      "manufacturer": "Penn Elcom",
+      "function_pl": "podnoszenie i przenoszenie skrzyni",
+      "source_url": "https://www.penn-elcom.com/heavy-duty-medium-recessed-handle-with-rivet-protection-h7159-series",
+      "note": "Rodzina z ochroną nitów, podwójną sprężyną i 10 otworami. Wariant wykończenia/nośność całego montażu wymagają odrębnej weryfikacji.",
+      "catalogue_status": "matched",
+      "cad_geometry_status": "not_fully_validated",
+      "approved_for_automatic_placement": false
+    },
+    {
+      "code": "17251S",
+      "aliases": [
+        "17251S",
+        "17251S_1"
+      ],
+      "name_pl": "Duży zamek motylkowy",
+      "name_en": "Large butterfly latch",
+      "manufacturer": "Adam Hall",
+      "function_pl": "spina dolną skrzynię z pokrywą",
+      "source_url": "https://www.adamhall.com/shop/as-en/flight-case-material/latches/butterflies/318/17251-s",
+      "note": "Katalog: miseczka stopniowana 14 mm, sprężyna. Górę i dół modelu traktować jako podzespoły jednej pary; nie sumować jako czterech kompletnych zamków.",
+      "catalogue_status": "matched",
+      "cad_geometry_status": "not_fully_validated",
+      "approved_for_automatic_placement": false
+    },
+    {
+      "code": "270836",
+      "aliases": [
+        "270836",
+        "270836_góra"
+      ],
+      "name_pl": "Zawias z ogranicznikiem pokrywy",
+      "name_en": "Lid stay with hinge",
+      "manufacturer": "Adam Hall",
+      "function_pl": "prowadzi otwieranie i ogranicza ruch pokrywy",
+      "source_url": "https://www.adamhall.com/shop/pl/materialy-flightcase/zawiasy-i-ograniczniki/ograniczniki-w-miseczce",
+      "note": "Duży, stopniowany. W modelu rozdzielony na górę i dół. Nie przypisywać funkcji Click-Stop wariantu 270837 do 270836.",
+      "catalogue_status": "matched",
+      "cad_geometry_status": "not_fully_validated",
+      "approved_for_automatic_placement": false
+    },
+    {
+      "code": "W0968Z",
+      "aliases": [
+        "PN - W0968Z"
+      ],
+      "name_pl": "Wpustowa miseczka pod koło do piętrowania",
+      "name_en": "Recessed castor dish",
+      "manufacturer": "Penn Elcom",
+      "function_pl": "przyjmuje koło skrzyni ustawionej na wierzchu",
+      "source_url": "https://www.penn-elcom.com/de/flightcase-material/rollen-rader/einbauschalen-fur-rollen",
+      "note": "Katalog producenta 2019 podaje 136 × 90 mm. Model ma ten sam rzut. Nie oznacza to sprawdzenia dopasowania konkretnego koła ani nośności stosu.",
+      "catalogue_status": "matched",
+      "cad_geometry_status": "not_fully_validated",
+      "approved_for_automatic_placement": false
+    }
+  ]
+}
