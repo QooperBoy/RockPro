@@ -14,7 +14,7 @@ SCHEMAS = [
      "annotations": {"readOnlyHint": False, "destructiveHint": False, "idempotentHint": False,
                      "openWorldHint": False},
      "inputSchema": {"type": "object", "required": ["changes"],
-                     "properties": {"source": {"type": "string"}, "project_id": {"type":"string"}, "label":{"type":"string"},
+                     "properties": {"source": {"type": "string"}, "project_id": {"type":"string"}, "label":{"type":"string"}, "layout_revision":{"type":"integer","minimum":1},
                                     "changes": {"type": "object", "minProperties": 1,
                                                 "additionalProperties": False,
                                                 "properties": {n: {"type": "number", "minimum": LIMITS[n][0],
@@ -31,8 +31,8 @@ from layout import DEFAULT
 layout_spec={"type":"object","additionalProperties":False,"properties":{k:{"type":"string" if isinstance(v,str) else "integer" if k=="count" else "number"} for k,v in DEFAULT.items()}}
 SCHEMAS += [
  schema("preview_layout","Calculate device envelopes, partitions and accessory space in mm; no CAD edits",{"spec":layout_spec},["spec"],True),
- schema("get_layout","Read saved layout from project SQLite",{"project_id":S},["project_id"],True),
- schema("save_layout","Save layout specification and invalidate downstream stages",{"project_id":S,"spec":layout_spec},["project_id","spec"])
+ schema("get_layout","Read current or historical immutable layout; revision 0 means unsaved",{"project_id":S,"revision":{"type":"integer","minimum":1}},["project_id"],True),
+ schema("save_layout","Save layout specification and invalidate downstream stages",{"project_id":S,"spec":layout_spec,"expected_revision":{"type":"integer","minimum":0}},["project_id","spec","expected_revision"])
 ]
 SCHEMAS += [
  schema("list_projects","List locally persisted SQLite projects",{},readonly=True),

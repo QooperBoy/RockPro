@@ -38,7 +38,7 @@ class LayoutTests(unittest.TestCase):
                 with project_store.db() as c:
                     c.execute('INSERT INTO projects VALUES (?,?,?,?,?,?,?,?,?)',('p','test','','',1,'','test.ics','now','now'))
                     c.executemany('INSERT INTO stages VALUES (?,?,?,?,?,?)',[('p',k,l,'approved','','now') for k,l in project_store.STAGES])
-                r=save_layout('p',dict(count=4,side='Y'))
+                r=save_layout('p',dict(count=4,side='Y'),0)
                 self.assertEqual(r['spec'],get_layout('p')['spec'])
                 with project_store.db() as c:
                     statuses=dict(c.execute('SELECT key,status FROM stages'))

@@ -30,6 +30,11 @@ def db():
       sha256 TEXT NOT NULL,parameters TEXT NOT NULL,validation TEXT NOT NULL,report_path TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY,project_id TEXT NOT NULL REFERENCES projects(id),
       created_at TEXT NOT NULL,kind TEXT NOT NULL,payload TEXT NOT NULL);''')
+    # Additive migration; older snapshots remain explicitly unbound.
+    conn.execute('BEGIN IMMEDIATE')
+    columns={r[1] for r in conn.execute('PRAGMA table_info(snapshots)')}
+    if 'layout_binding' not in columns: conn.execute('ALTER TABLE snapshots ADD COLUMN layout_binding TEXT')
+    conn.commit()
     try:
         with conn: yield conn
     finally: conn.close()
@@ -54,6 +59,7 @@ def list_snapshots(project_id):
     from worker import digest
     for row in rows:
         row["parameters"]=json.loads(row["parameters"])
+        row["layout_binding"]=json.loads(row["layout_binding"]) if row["layout_binding"] else None
         try: row["integrity"]="verified" if digest(Path(row["path"]))==row["sha256"] else "modified"
         except OSError: row["integrity"]="missing"
     return {"snapshots":rows}
@@ -128,11 +134,21 @@ def register_snapshot(project_id,report,label,note="",advance=False):
     item={"id":uuid.uuid4().hex,"project_id":project_id,"created_at":now(),"label":text(label or "Snapshot","label",200),
           "note":text(note,"note"),"path":str(archive),"source":report["source"],"sha256":digest(archive),
           "parameters":values,"validation":"passed","report_path":str(working.parent/"report.json")}
+    item['layout_binding']=report.get('layout_binding')
     with db() as conn:
+        conn.execute('BEGIN IMMEDIATE')
         current=project_exists(conn,project_id)
+        if item['layout_binding']:
+            from layout import ensure
+            ensure(conn)
+            binding=item['layout_binding']
+            version=conn.execute('SELECT * FROM layout_versions WHERE project_id=? AND revision=?',(project_id,binding['revision'])).fetchone()
+            if not version or version['sha256']!=binding['sha256'] or json.loads(version['spec'])!=binding['spec']:
+                raise ValueError('Invalid snapshot layout binding')
         if Path(current["source"]).resolve()!=Path(report["source"]).resolve():
             raise RuntimeError("Project source changed during CAD operation; snapshot retained on disk but not registered")
-        conn.execute("INSERT INTO snapshots VALUES (?,?,?,?,?,?,?,?,?,?,?)",tuple(json.dumps(item[k],ensure_ascii=False) if k=="parameters" else item[k] for k in ("id","project_id","created_at","label","note","path","source","sha256","parameters","validation","report_path")))
+        conn.execute("INSERT INTO snapshots (id,project_id,created_at,label,note,path,source,sha256,parameters,validation,report_path) VALUES (?,?,?,?,?,?,?,?,?,?,?)",tuple(json.dumps(item[k],ensure_ascii=False) if k=="parameters" else item[k] for k in ("id","project_id","created_at","label","note","path","source","sha256","parameters","validation","report_path")))
+        conn.execute("UPDATE snapshots SET layout_binding=? WHERE id=?",(json.dumps(item["layout_binding"],ensure_ascii=False) if item["layout_binding"] else None,item["id"]))
         if advance:
             conn.execute("UPDATE projects SET source=?,updated_at=? WHERE id=?",(str(working),item["created_at"],project_id))
             conn.execute("UPDATE stages SET status='outdated',updated_at=? WHERE project_id=? AND key IN ('geometry','hardware','wheels','documentation','materials','production')",(item["created_at"],project_id))

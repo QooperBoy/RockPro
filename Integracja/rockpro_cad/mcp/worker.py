@@ -173,13 +173,22 @@ def _change_dimensions_on_copy(changes, source=None):
     return report
 
 
-def change_dimensions_on_copy(changes, source=None, project_id=None, label=None):
+def change_dimensions_on_copy(changes, source=None, project_id=None, label=None, layout_revision=None):
     from project_store import pinned_source, register_snapshot, text
     if label is not None: text(label,"label",200)
     if project_id: source = pinned_source(project_id,source)
     if source and Path(source).name == "snapshot.ics":
         raise ValueError("Archived snapshots cannot be modified; use the project working source")
+    binding=None
+    if layout_revision is not None:
+        from layout import get_layout
+        if not project_id: raise ValueError('layout_revision requires project_id')
+        binding=get_layout(project_id,layout_revision)
+        if changes != binding['parameters']: raise ValueError('CAD parameters do not match the pinned layout revision')
     report = _change_dimensions_on_copy(changes,source)
+    if binding:
+        report['layout_binding']={k:binding[k] for k in ('revision','sha256','spec')}
+        (Path(report['copy']).parent/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
     if project_id:
         report.update(register_snapshot(project_id,report,label or "Zmiana wymiarów",advance=True))
     return report
@@ -197,15 +206,15 @@ def create_snapshot(project_id,label="Snapshot",note=""):
 
 def dispatch(name, arguments):
     from layout import calculate_layout, get_layout, save_layout
-    layout_tools={"preview_layout":(calculate_layout,{"spec"}),"get_layout":(get_layout,{"project_id"}),"save_layout":(save_layout,{"project_id","spec"})}
+    layout_tools={"preview_layout":(calculate_layout,{"spec"}),"get_layout":(get_layout,{"project_id","revision"}),"save_layout":(save_layout,{"project_id","spec","expected_revision"})}
     if name in layout_tools:
         fn, keys=layout_tools[name]
-        if not isinstance(arguments,dict) or set(arguments)!=keys: raise ValueError("Invalid layout arguments")
+        if not isinstance(arguments,dict) or set(arguments)-keys: raise ValueError("Invalid layout arguments")
         return fn(**arguments)
     from project_store import list_projects, save_project, get_project, set_stage, list_snapshots
     db_tools={"list_projects":list_projects,"save_project":save_project,"get_project":get_project,
               "set_stage":set_stage,"list_snapshots":list_snapshots}
-    allowed = {"inspect_project": {"source"}, "change_dimensions_on_copy": {"source", "changes","project_id","label"},
+    allowed = {"inspect_project": {"source"}, "change_dimensions_on_copy": {"source", "changes","project_id","label","layout_revision"},
                "list_projects":set(),"save_project":{"project_id","name","client","device","quantity","notes","source"},
                "get_project":{"project_id"},"set_stage":{"project_id","stage","status","note"},
                "list_snapshots":{"project_id"},"create_snapshot":{"project_id","label","note"}}

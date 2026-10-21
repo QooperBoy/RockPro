@@ -101,21 +101,47 @@ def calculate_layout(spec):
 
 def ensure(conn):
     conn.execute("CREATE TABLE IF NOT EXISTS layouts (project_id TEXT PRIMARY KEY REFERENCES projects(id), spec TEXT NOT NULL, updated_at TEXT NOT NULL)")
+    conn.execute("CREATE TABLE IF NOT EXISTS layout_versions (project_id TEXT NOT NULL REFERENCES projects(id), revision INTEGER NOT NULL, spec TEXT NOT NULL, sha256 TEXT NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY(project_id,revision))")
+    # Preserve the existing saved layout as revision 1, once, inside the write lock.
+    for row in conn.execute("SELECT * FROM layouts WHERE project_id NOT IN (SELECT project_id FROM layout_versions)").fetchall():
+        payload, digest = encode_spec(json.loads(row['spec']))
+        conn.execute("INSERT INTO layout_versions VALUES (?,?,?,?,?)", (row['project_id'],1,payload,digest,row['updated_at']))
 
-def get_layout(project_id):
+
+def encode_spec(spec):
+    import hashlib
+    payload=json.dumps(spec,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False)
+    return payload,hashlib.sha256(payload.encode('utf-8')).hexdigest()
+
+
+def get_layout(project_id,revision=None):
     with db() as conn:
+        conn.execute('BEGIN IMMEDIATE')
         project_exists(conn,project_id);ensure(conn)
-        row=conn.execute("SELECT spec,updated_at FROM layouts WHERE project_id=?",(project_id,)).fetchone()
-    return dict(saved=bool(row),updated_at=row["updated_at"] if row else None,**calculate_layout(json.loads(row["spec"]) if row else {}))
+        if revision is not None:
+            if type(revision) is not int or revision < 1: raise ValueError('Invalid layout revision')
+            row=conn.execute('SELECT * FROM layout_versions WHERE project_id=? AND revision=?',(project_id,revision)).fetchone()
+            if row is None: raise ValueError('Layout revision not found')
+        else:
+            row=conn.execute('SELECT * FROM layout_versions WHERE project_id=? ORDER BY revision DESC LIMIT 1',(project_id,)).fetchone()
+    return dict(saved=bool(row),revision=row['revision'] if row else 0,sha256=row['sha256'] if row else None,updated_at=row['created_at'] if row else None,**calculate_layout(json.loads(row['spec']) if row else {}))
 
-def save_layout(project_id,spec):
+
+def save_layout(project_id,spec,expected_revision):
+    if type(expected_revision) is not int or expected_revision<0: raise ValueError('expected_revision must be a nonnegative integer; read get_layout first')
     result=calculate_layout(spec);stamp=now()
-    payload=json.dumps(result["spec"],ensure_ascii=False)
+    payload,digest=encode_spec(result['spec'])
     with db() as conn:
+        conn.execute('BEGIN IMMEDIATE')
         project_exists(conn,project_id);ensure(conn)
+        current=conn.execute('SELECT COALESCE(MAX(revision),0) FROM layout_versions WHERE project_id=?',(project_id,)).fetchone()[0]
+        if current!=expected_revision:
+            raise ValueError('LAYOUT_CONFLICT: Układ zmienił inny użytkownik lub AI. Odczytana wersja '+str(expected_revision)+', aktualna '+str(current)+'. Pobierz aktualny układ i porównaj zmiany przed ponownym zapisem.')
+        revision=current+1
+        conn.execute('INSERT INTO layout_versions VALUES (?,?,?,?,?)',(project_id,revision,payload,digest,stamp))
         conn.execute("INSERT OR REPLACE INTO layouts VALUES (?,?,?)",(project_id,payload,stamp))
         conn.execute("UPDATE projects SET updated_at=? WHERE id=?",(stamp,project_id))
         conn.execute("UPDATE stages SET status='outdated',updated_at=? WHERE project_id=? AND key IN ('geometry','hardware','wheels','documentation','materials','production')",(stamp,project_id))
         conn.execute("UPDATE stages SET status='review',updated_at=? WHERE project_id=? AND key='layout'",(stamp,project_id))
-        conn.execute("INSERT INTO events(project_id,created_at,kind,payload) VALUES (?,?,?,?)",(project_id,stamp,"layout_saved",payload))
-    return dict(saved=True,updated_at=stamp,**result)
+        conn.execute("INSERT INTO events(project_id,created_at,kind,payload) VALUES (?,?,?,?)",(project_id,stamp,"layout_saved",json.dumps(dict(revision=revision,sha256=digest,spec=result['spec']),ensure_ascii=False)))
+    return dict(saved=True,revision=revision,sha256=digest,updated_at=stamp,**result)

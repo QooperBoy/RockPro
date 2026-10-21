@@ -57,3 +57,5 @@ Nie mieszaj dużego refaktoru i nowych możliwości bez rozdzielenia rezultatów
 Instrukcje procesu nie zastępują jawnego zlecenia użytkownika. Nie wymagamy dodatkowej zgody na odwracalne, autoryzowane zmiany. Przy publikacji, zmianie środowiska lub danych stosuj rzeczywiste uprawnienia zadania. Kopie binarne wdrażaj dopiero po testach, z zachowaniem poprzedniej wersji i zamkniętym hostem. Samo opublikowanie kodu na Git nie dowodzi instalacji u Kuby.
 
 Zmiany instrukcji aktualizuj razem z kontraktem, który zmieniają. Źródła zewnętrzne i decyzje adopcji: docs/AI_SOURCES.md. Stan audytu i pozostałe braki: docs/REPOSITORY_AUDIT.md.
+
+Kontrakt wersjonowania układu, konfliktów i powiązania CAD: [LAYOUT_VERSIONING.md](LAYOUT_VERSIONING.md). UI i AI muszą przekazywać odczytane expected_revision; nie ponawiać konfliktu z automatycznie odświeżonym tokenem.

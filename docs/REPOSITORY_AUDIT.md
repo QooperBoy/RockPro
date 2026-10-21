@@ -53,3 +53,7 @@ To oczekiwane zachowania zapisanych instrukcji, nie wyniki osobnego benchmarku m
 Przykładowy prompt wynikający z audytu:
 
 > Użyj $rockpro-scope-check i $rockpro-verification. Najpierw dodaj wersjonowanie układu i powiązanie snapshotu CAD z jego specyfikacją. Na izolowanej bazie potwierdź, że późniejsza zmiana układu nie zmienia danych historycznej rewizji. Zachowaj bazę użytkownika i allowlistę CAD; dopiero po sprawdzeniu przejdź do wstawiania wyposażenia jako części ICS.
+
+## Aktualizacja 21.10 — układy i snapshoty
+
+R01 rozwiązane dla układów: transakcyjne expected_revision i test równoczesnych zapisów. Karta projektu i statusy pozostają poza zakresem tokenów. R02 rozwiązane dla nowych eksportów z konfiguratora: snapshot wiąże konkretną wersję, hash i specyfikację. Starsze i ręczne snapshoty są jawnie niepowiązane. Kontrakt: [LAYOUT_VERSIONING.md](LAYOUT_VERSIONING.md). Pozostałe ustalenia audytu pozostają aktualne.

@@ -15,10 +15,10 @@ Panel WinForms → MCP stdio → `layout.py` → wspólna baza SQLite. Nowe narz
 
 Wzdłuż wybranej osi wymagany obrys urządzeń wynosi `liczba × wymiar + (liczba − 1) × (luz + grubość przegrody)`. Rezerwa jest dodawana z obu stron na każdej osi. Komora może powiększyć pozostałe wymiary, jeśli zawartość jest większa od urządzeń. Backend kontroluje skończone liczby, zakresy, liczbę brył, mieszczalność i przenikanie osiowych obrysów. Styk powierzchni jest dozwolony.
 
-`layouts` przechowuje bieżącą specyfikację projektu. Każdy zapis trafia też do tabeli `events` i ustawia etap układu na `review`, a etapy od konstrukcji dalej na `outdated`. Nie jest to snapshot CAD ani automatyczne zatwierdzenie projektu.
+`layouts` przechowuje bieżącą specyfikację projektu, a `layout_versions` dopisywane wersje. Zapis wymaga `expected_revision`; konflikt nie nadpisuje danych. Szczegóły: [wersjonowanie i powiązanie CAD](docs/LAYOUT_VERSIONING.md). Każdy zapis trafia też do tabeli `events` i ustawia etap układu na `review`, a etapy od konstrukcji dalej na `outdated`. Nie jest to snapshot CAD ani automatyczne zatwierdzenie projektu.
 
 ## Przekazanie do CAD
-Przycisk **Utwórz szkielet na kopii ICS** zapisuje układ, przelicza sześć parametrów RP_* i wywołuje istniejącą walidowaną operację `change_dimensions_on_copy`. Zachowuje kontrolę manifestu dziesięciu płyt, zapis/otwarcie, oddzielne archiwum i projektową historię snapshotów.
+Przycisk **Utwórz szkielet na kopii ICS** zapisuje układ i przypina jego wersję oraz SHA256 do snapshotu, przelicza sześć parametrów RP_* i wywołuje istniejącą walidowaną operację `change_dimensions_on_copy`. Zachowuje kontrolę manifestu dziesięciu płyt, zapis/otwarcie, oddzielne archiwum i projektową historię snapshotów.
 
 Do ICS trafiają obecnie gabaryty szkieletu. Bryły wyposażenia, przegrody i boczna komora pozostają opisem układu oraz podglądem — nie są jeszcze wstawiane jako części CAD. Dowolny model WoodLAB nie jest obsługiwany. Podparcie pięter, sposób wkładania i wyjmowania, rzeczywisty profil urządzenia, pianki i wytrzymałość wymagają następnego etapu oraz oceny konstruktora.
 
