@@ -1,0 +1,6411 @@
+{
+  "schema_version": 1,
+  "template_version": "synthetic-roc43-v1",
+  "rule_pack_version": "synthetic-roc43-rules-v1",
+  "synthetic": true,
+  "production_approved": false,
+  "source": "Synthetic input recipe, no manufacturer or native CAD dimensions",
+  "units": "mm",
+  "axes": "right-handed-XYZ",
+  "expression_language": {
+    "version": 1,
+    "op_allowlist": [
+      "add",
+      "sub",
+      "mul",
+      "div",
+      "min",
+      "max",
+      "at",
+      "eq",
+      "select",
+      "axis_index",
+      "permute_dimensions"
+    ],
+    "input_selector_allowlist": [
+      "resized_dimension",
+      "approved_group_edge_offset",
+      "presentation_gap"
+    ],
+    "reference_roots": [
+      "spec.layout",
+      "spec.display_gap",
+      "scenario"
+    ],
+    "derived_references": "bare names defined in ordered derived entries",
+    "unknown_operation_or_reference": "reject",
+    "no_code_execution": true,
+    "evaluation": "recursive arrays and dictionaries; derived entries in order; select evaluates selected branch only",
+    "semantics": {
+      "add": "sum args",
+      "sub": "args0-args1",
+      "mul": "product args",
+      "div": "args0/args1; reject zero denominator",
+      "min": "minimum args",
+      "max": "maximum args",
+      "at": "zero-based vector indexing",
+      "eq": "typed equality",
+      "select": "if args0 then args1 else args2",
+      "axis_index": "X=0,Y=1,Z=2",
+      "permute_dimensions": "args0 is [x,y,z], args1 is permutation of XYZ; return dimensions in character order"
+    }
+  },
+  "input_validation": {
+    "layout_count": 2,
+    "count_reason": "Frozen 37-role recipe defines two devices and two dividers; other device counts require a manifest revision",
+    "orientation": [
+      "XYZ",
+      "XZY",
+      "YXZ",
+      "YZX",
+      "ZXY",
+      "ZYX"
+    ],
+    "arrangement": [
+      "X",
+      "Y",
+      "Z"
+    ],
+    "side": [
+      "X",
+      "Y"
+    ],
+    "positive_finite_mm": [
+      "x",
+      "y",
+      "z",
+      "side_width",
+      "side_depth",
+      "side_height",
+      "thickness",
+      "lid_height",
+      "separator"
+    ],
+    "nonnegative_finite_mm": [
+      "gap",
+      "clearance"
+    ],
+    "max_plywood_dimension": 10000,
+    "base_and_lid_height_greater_than_thickness": true,
+    "units_required": "mm"
+  },
+  "constants": {
+    "profile_section": 20,
+    "brace_edge_offset": 80,
+    "handle_edge_offset": 100,
+    "handle_inner_offset": 260,
+    "handle_min_separation": 10,
+    "latch_edge_offset": 100,
+    "hinge_edge_offset": 120,
+    "wheel_grid_edge_offset": 60,
+    "wheel_z": -40,
+    "wheelpad_z": -10,
+    "socket_roof_offset": 10,
+    "numeric_tolerance": 1e-06
+  },
+  "catalog": {
+    "corner": {
+      "shape": [
+        30,
+        30,
+        30
+      ],
+      "local_bounds": [
+        [
+          -15.0,
+          -15.0,
+          -15.0
+        ],
+        [
+          15.0,
+          15.0,
+          15.0
+        ]
+      ],
+      "geometry_policy": "rigid",
+      "mounting_point": [
+        0,
+        0,
+        0
+      ],
+      "synthetic_approved": true
+    },
+    "brace": {
+      "shape": [
+        40,
+        40,
+        3
+      ],
+      "local_bounds": [
+        [
+          -20.0,
+          -20.0,
+          -1.5
+        ],
+        [
+          20.0,
+          20.0,
+          1.5
+        ]
+      ],
+      "geometry_policy": "rigid",
+      "mounting_point": [
+        0,
+        0,
+        0
+      ],
+      "synthetic_approved": true
+    },
+    "panel-handle": {
+      "shape": [
+        150,
+        80,
+        25
+      ],
+      "local_bounds": [
+        [
+          -75.0,
+          -40.0,
+          -12.5
+        ],
+        [
+          75.0,
+          40.0,
+          12.5
+        ]
+      ],
+      "geometry_policy": "rigid",
+      "mounting_point": [
+        0,
+        0,
+        0
+      ],
+      "synthetic_approved": true
+    },
+    "corner-handle": {
+      "shape": [
+        60,
+        60,
+        25
+      ],
+      "local_bounds": [
+        [
+          -30.0,
+          -30.0,
+          -12.5
+        ],
+        [
+          30.0,
+          30.0,
+          12.5
+        ]
+      ],
+      "geometry_policy": "rigid",
+      "mounting_point": [
+        0,
+        0,
+        0
+      ],
+      "synthetic_approved": true
+    },
+    "latch-half": {
+      "shape": [
+        60,
+        40,
+        15
+      ],
+      "local_bounds": [
+        [
+          -30.0,
+          -20.0,
+          -7.5
+        ],
+        [
+          30.0,
+          20.0,
+          7.5
+        ]
+      ],
+      "geometry_policy": "rigid",
+      "mounting_point": [
+        0,
+        0,
+        0
+      ],
+      "synthetic_approved": true
+    },
+    "hinge-half": {
+      "shape": [
+        60,
+        40,
+        15
+      ],
+      "local_bounds": [
+        [
+          -30.0,
+          -20.0,
+          -7.5
+        ],
+        [
+          30.0,
+          20.0,
+          7.5
+        ]
+      ],
+      "geometry_policy": "rigid",
+      "mounting_point": [
+        0,
+        0,
+        0
+      ],
+      "synthetic_approved": true
+    },
+    "wheel": {
+      "shape": [
+        80,
+        80,
+        40
+      ],
+      "local_bounds": [
+        [
+          -40.0,
+          -40.0,
+          -20.0
+        ],
+        [
+          40.0,
+          40.0,
+          20.0
+        ]
+      ],
+      "geometry_policy": "rigid",
+      "mounting_point": [
+        0,
+        0,
+        0
+      ],
+      "synthetic_approved": true
+    },
+    "socket": {
+      "shape": [
+        80,
+        80,
+        10
+      ],
+      "local_bounds": [
+        [
+          -40.0,
+          -40.0,
+          -5.0
+        ],
+        [
+          40.0,
+          40.0,
+          5.0
+        ]
+      ],
+      "geometry_policy": "rigid",
+      "mounting_point": [
+        0,
+        0,
+        0
+      ],
+      "synthetic_approved": true
+    },
+    "wheelpad": {
+      "shape": [
+        100,
+        100,
+        20
+      ],
+      "local_bounds": [
+        [
+          -50.0,
+          -50.0,
+          -10.0
+        ],
+        [
+          50.0,
+          50.0,
+          10.0
+        ]
+      ],
+      "geometry_policy": "rigid",
+      "mounting_point": [
+        0,
+        0,
+        0
+      ],
+      "synthetic_approved": true
+    },
+    "insert": {
+      "shape": [
+        100,
+        100,
+        9
+      ],
+      "local_bounds": [
+        [
+          -50.0,
+          -50.0,
+          -4.5
+        ],
+        [
+          50.0,
+          50.0,
+          4.5
+        ]
+      ],
+      "geometry_policy": "rigid",
+      "mounting_point": [
+        0,
+        0,
+        0
+      ],
+      "synthetic_approved": true
+    },
+    "foam": {
+      "shape": [
+        100,
+        100,
+        20
+      ],
+      "local_bounds": [
+        [
+          -50.0,
+          -50.0,
+          -10.0
+        ],
+        [
+          50.0,
+          50.0,
+          10.0
+        ]
+      ],
+      "geometry_policy": "rigid",
+      "mounting_point": [
+        0,
+        0,
+        0
+      ],
+      "synthetic_approved": true
+    },
+    "custom": {
+      "shape": [
+        100,
+        100,
+        9
+      ],
+      "local_bounds": [
+        [
+          -50.0,
+          -50.0,
+          -4.5
+        ],
+        [
+          50.0,
+          50.0,
+          4.5
+        ]
+      ],
+      "geometry_policy": "rigid",
+      "mounting_point": [
+        0,
+        0,
+        0
+      ],
+      "synthetic_approved": true
+    },
+    "import": {
+      "shape": [
+        40,
+        40,
+        40
+      ],
+      "local_bounds": [
+        [
+          -20.0,
+          -20.0,
+          -20.0
+        ],
+        [
+          20.0,
+          20.0,
+          20.0
+        ]
+      ],
+      "geometry_policy": "rigid",
+      "mounting_point": [
+        0,
+        0,
+        0
+      ],
+      "synthetic_approved": true
+    },
+    "panel": {
+      "geometry_policy": "two_dimensions_variable_thickness_fixed",
+      "local_bounds_operation": "centered_box_from_shape"
+    },
+    "profile": {
+      "geometry_policy": "one_length_variable_section_fixed",
+      "local_bounds_operation": "centered_box_from_shape",
+      "section": [
+        20,
+        20
+      ]
+    },
+    "device-envelope": {
+      "geometry_policy": "already_oriented_envelope_from_layout",
+      "local_bounds_operation": "centered_box_from_shape",
+      "rotation": "identity"
+    },
+    "divider": {
+      "geometry_policy": "planar_from_layout",
+      "local_bounds_operation": "centered_box_from_shape"
+    }
+  },
+  "rotations": {
+    "identity": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        1
+      ]
+    ],
+    "front": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        -1
+      ],
+      [
+        0,
+        1,
+        0
+      ]
+    ],
+    "rear": [
+      [
+        -1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1
+      ],
+      [
+        0,
+        1,
+        0
+      ]
+    ],
+    "left": [
+      [
+        0,
+        0,
+        -1
+      ],
+      [
+        -1,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0
+      ]
+    ],
+    "right": [
+      [
+        0,
+        0,
+        1
+      ],
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0
+      ]
+    ],
+    "lid": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        -1,
+        0
+      ],
+      [
+        0,
+        0,
+        -1
+      ]
+    ],
+    "corner-1": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        1
+      ]
+    ],
+    "corner-2": [
+      [
+        0,
+        -1,
+        0
+      ],
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1
+      ]
+    ],
+    "corner-3": [
+      [
+        0,
+        1,
+        0
+      ],
+      [
+        -1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1
+      ]
+    ],
+    "corner-4": [
+      [
+        -1,
+        0,
+        0
+      ],
+      [
+        0,
+        -1,
+        0
+      ],
+      [
+        0,
+        0,
+        1
+      ]
+    ],
+    "lid-corner-1": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        -1,
+        0
+      ],
+      [
+        0,
+        0,
+        -1
+      ]
+    ],
+    "lid-corner-2": [
+      [
+        0,
+        1,
+        0
+      ],
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        -1
+      ]
+    ],
+    "lid-corner-3": [
+      [
+        0,
+        -1,
+        0
+      ],
+      [
+        -1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        -1
+      ]
+    ],
+    "lid-corner-4": [
+      [
+        -1,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        -1
+      ]
+    ]
+  },
+  "derived": [
+    {
+      "name": "T",
+      "value": {
+        "ref": "spec.layout.thickness"
+      }
+    },
+    {
+      "name": "L",
+      "value": {
+        "ref": "spec.layout.lid_height"
+      }
+    },
+    {
+      "name": "q",
+      "value": {
+        "op": "permute_dimensions",
+        "args": [
+          [
+            {
+              "ref": "spec.layout.x"
+            },
+            {
+              "ref": "spec.layout.y"
+            },
+            {
+              "ref": "spec.layout.z"
+            }
+          ],
+          {
+            "ref": "spec.layout.orientation"
+          }
+        ]
+      }
+    },
+    {
+      "name": "a",
+      "value": {
+        "op": "axis_index",
+        "args": [
+          {
+            "ref": "spec.layout.arrangement"
+          }
+        ]
+      }
+    },
+    {
+      "name": "s",
+      "value": {
+        "op": "axis_index",
+        "args": [
+          {
+            "ref": "spec.layout.side"
+          }
+        ]
+      }
+    },
+    {
+      "name": "c",
+      "value": {
+        "ref": "spec.layout.clearance"
+      }
+    },
+    {
+      "name": "g",
+      "value": {
+        "ref": "spec.layout.gap"
+      }
+    },
+    {
+      "name": "p",
+      "value": {
+        "ref": "spec.layout.separator"
+      }
+    },
+    {
+      "name": "N",
+      "value": {
+        "ref": "spec.layout.count"
+      }
+    },
+    {
+      "name": "extent0",
+      "value": {
+        "op": "select",
+        "args": [
+          {
+            "op": "eq",
+            "args": [
+              {
+                "ref": "a"
+              },
+              0
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "ref": "N"
+                  },
+                  {
+                    "op": "at",
+                    "args": [
+                      {
+                        "ref": "q"
+                      },
+                      0
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "sub",
+                    "args": [
+                      {
+                        "ref": "N"
+                      },
+                      1
+                    ]
+                  },
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "ref": "g"
+                      },
+                      {
+                        "ref": "p"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "at",
+            "args": [
+              {
+                "ref": "q"
+              },
+              0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "extent1",
+      "value": {
+        "op": "select",
+        "args": [
+          {
+            "op": "eq",
+            "args": [
+              {
+                "ref": "a"
+              },
+              1
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "ref": "N"
+                  },
+                  {
+                    "op": "at",
+                    "args": [
+                      {
+                        "ref": "q"
+                      },
+                      1
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "sub",
+                    "args": [
+                      {
+                        "ref": "N"
+                      },
+                      1
+                    ]
+                  },
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "ref": "g"
+                      },
+                      {
+                        "ref": "p"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "at",
+            "args": [
+              {
+                "ref": "q"
+              },
+              1
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "extent2",
+      "value": {
+        "op": "select",
+        "args": [
+          {
+            "op": "eq",
+            "args": [
+              {
+                "ref": "a"
+              },
+              2
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "ref": "N"
+                  },
+                  {
+                    "op": "at",
+                    "args": [
+                      {
+                        "ref": "q"
+                      },
+                      2
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "sub",
+                    "args": [
+                      {
+                        "ref": "N"
+                      },
+                      1
+                    ]
+                  },
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "ref": "g"
+                      },
+                      {
+                        "ref": "p"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "at",
+            "args": [
+              {
+                "ref": "q"
+              },
+              2
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "comp0",
+      "value": {
+        "op": "select",
+        "args": [
+          {
+            "op": "eq",
+            "args": [
+              {
+                "ref": "s"
+              },
+              1
+            ]
+          },
+          {
+            "op": "max",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "ref": "extent0"
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      2,
+                      {
+                        "ref": "c"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "ref": "spec.layout.side_depth"
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      2,
+                      {
+                        "ref": "c"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "extent0"
+              },
+              {
+                "op": "mul",
+                "args": [
+                  2,
+                  {
+                    "ref": "c"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "comp1",
+      "value": {
+        "op": "select",
+        "args": [
+          {
+            "op": "eq",
+            "args": [
+              {
+                "ref": "s"
+              },
+              0
+            ]
+          },
+          {
+            "op": "max",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "ref": "extent1"
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      2,
+                      {
+                        "ref": "c"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "ref": "spec.layout.side_depth"
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      2,
+                      {
+                        "ref": "c"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "extent1"
+              },
+              {
+                "op": "mul",
+                "args": [
+                  2,
+                  {
+                    "ref": "c"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "comp2",
+      "value": {
+        "op": "max",
+        "args": [
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "extent2"
+              },
+              {
+                "op": "mul",
+                "args": [
+                  2,
+                  {
+                    "ref": "c"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "spec.layout.side_height"
+              },
+              {
+                "op": "mul",
+                "args": [
+                  2,
+                  {
+                    "ref": "c"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "inside0",
+      "value": {
+        "op": "select",
+        "args": [
+          {
+            "op": "eq",
+            "args": [
+              {
+                "ref": "s"
+              },
+              0
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "comp0"
+              },
+              {
+                "ref": "T"
+              },
+              {
+                "ref": "spec.layout.side_width"
+              },
+              {
+                "op": "mul",
+                "args": [
+                  2,
+                  {
+                    "ref": "c"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "ref": "comp0"
+          }
+        ]
+      }
+    },
+    {
+      "name": "inside1",
+      "value": {
+        "op": "select",
+        "args": [
+          {
+            "op": "eq",
+            "args": [
+              {
+                "ref": "s"
+              },
+              1
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "comp1"
+              },
+              {
+                "ref": "T"
+              },
+              {
+                "ref": "spec.layout.side_width"
+              },
+              {
+                "op": "mul",
+                "args": [
+                  2,
+                  {
+                    "ref": "c"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "ref": "comp1"
+          }
+        ]
+      }
+    },
+    {
+      "name": "inside2",
+      "value": {
+        "op": "select",
+        "args": [
+          {
+            "op": "eq",
+            "args": [
+              {
+                "ref": "s"
+              },
+              2
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "comp2"
+              },
+              {
+                "ref": "T"
+              },
+              {
+                "ref": "spec.layout.side_width"
+              },
+              {
+                "op": "mul",
+                "args": [
+                  2,
+                  {
+                    "ref": "c"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "ref": "comp2"
+          }
+        ]
+      }
+    },
+    {
+      "name": "initial_internal",
+      "value": [
+        {
+          "ref": "inside0"
+        },
+        {
+          "ref": "inside1"
+        },
+        {
+          "ref": "inside2"
+        }
+      ]
+    },
+    {
+      "name": "initialW",
+      "value": {
+        "op": "add",
+        "args": [
+          {
+            "ref": "inside0"
+          },
+          {
+            "op": "mul",
+            "args": [
+              2,
+              {
+                "ref": "T"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "W",
+      "value": {
+        "input_selector": "resized_dimension",
+        "axis": 0,
+        "default": {
+          "ref": "initialW"
+        }
+      }
+    },
+    {
+      "name": "initialD",
+      "value": {
+        "op": "add",
+        "args": [
+          {
+            "ref": "inside1"
+          },
+          {
+            "op": "mul",
+            "args": [
+              2,
+              {
+                "ref": "T"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "D",
+      "value": {
+        "input_selector": "resized_dimension",
+        "axis": 1,
+        "default": {
+          "ref": "initialD"
+        }
+      }
+    },
+    {
+      "name": "initialH",
+      "value": {
+        "op": "add",
+        "args": [
+          {
+            "ref": "inside2"
+          },
+          {
+            "op": "mul",
+            "args": [
+              2,
+              {
+                "ref": "T"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "H",
+      "value": {
+        "input_selector": "resized_dimension",
+        "axis": 2,
+        "default": {
+          "ref": "initialH"
+        }
+      }
+    },
+    {
+      "name": "B",
+      "value": {
+        "op": "sub",
+        "args": [
+          {
+            "ref": "H"
+          },
+          {
+            "ref": "L"
+          }
+        ]
+      }
+    },
+    {
+      "name": "internal",
+      "value": [
+        {
+          "op": "sub",
+          "args": [
+            {
+              "ref": "W"
+            },
+            {
+              "op": "mul",
+              "args": [
+                2,
+                {
+                  "ref": "T"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "sub",
+          "args": [
+            {
+              "ref": "D"
+            },
+            {
+              "op": "mul",
+              "args": [
+                2,
+                {
+                  "ref": "T"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "sub",
+          "args": [
+            {
+              "ref": "H"
+            },
+            {
+              "op": "mul",
+              "args": [
+                2,
+                {
+                  "ref": "T"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "frames": {
+    "closed": {
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "rotation": "identity"
+    },
+    "front": {
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "rotation": "front"
+    },
+    "rear": {
+      "origin": [
+        {
+          "ref": "W"
+        },
+        {
+          "ref": "D"
+        },
+        0
+      ],
+      "rotation": "rear"
+    },
+    "left": {
+      "origin": [
+        0,
+        {
+          "ref": "D"
+        },
+        0
+      ],
+      "rotation": "left"
+    },
+    "right": {
+      "origin": [
+        {
+          "ref": "W"
+        },
+        0,
+        0
+      ],
+      "rotation": "right"
+    },
+    "lid": {
+      "origin": [
+        0,
+        {
+          "ref": "D"
+        },
+        {
+          "ref": "H"
+        }
+      ],
+      "rotation": "lid"
+    },
+    "seam-front": {
+      "origin": [
+        0,
+        0,
+        {
+          "ref": "B"
+        }
+      ],
+      "rotation": "front"
+    },
+    "seam-rear": {
+      "origin": [
+        {
+          "ref": "W"
+        },
+        {
+          "ref": "D"
+        },
+        {
+          "ref": "B"
+        }
+      ],
+      "rotation": "rear"
+    },
+    "corner-handle": {
+      "origin": [
+        {
+          "ref": "W"
+        },
+        0,
+        {
+          "op": "div",
+          "args": [
+            {
+              "ref": "B"
+            },
+            2
+          ]
+        }
+      ],
+      "rotation": "identity"
+    }
+  },
+  "groups": [
+    {
+      "symmetry_group_id": "plates-base-front",
+      "family": "plates",
+      "mode": "centered",
+      "datum": "front",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "base/front",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "B"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "panel",
+      "slots": [
+        [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "W"
+              },
+              2
+            ]
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "B"
+              },
+              2
+            ]
+          },
+          0
+        ]
+      ],
+      "rotation": "front",
+      "shape": [
+        {
+          "ref": "W"
+        },
+        {
+          "ref": "B"
+        },
+        {
+          "ref": "T"
+        }
+      ]
+    },
+    {
+      "symmetry_group_id": "plates-lid-front",
+      "family": "plates",
+      "mode": "centered",
+      "datum": "front",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "lid/front",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "add",
+          "args": [
+            {
+              "ref": "B"
+            },
+            {
+              "op": "div",
+              "args": [
+                {
+                  "ref": "L"
+                },
+                2
+              ]
+            }
+          ]
+        }
+      },
+      "definition": "panel",
+      "slots": [
+        [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "W"
+              },
+              2
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "B"
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "ref": "L"
+                  },
+                  2
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      ],
+      "rotation": "front",
+      "shape": [
+        {
+          "ref": "W"
+        },
+        {
+          "ref": "L"
+        },
+        {
+          "ref": "T"
+        }
+      ]
+    },
+    {
+      "symmetry_group_id": "plates-base-rear",
+      "family": "plates",
+      "mode": "centered",
+      "datum": "rear",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "base/rear",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "B"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "panel",
+      "slots": [
+        [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "W"
+              },
+              2
+            ]
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "B"
+              },
+              2
+            ]
+          },
+          0
+        ]
+      ],
+      "rotation": "rear",
+      "shape": [
+        {
+          "ref": "W"
+        },
+        {
+          "ref": "B"
+        },
+        {
+          "ref": "T"
+        }
+      ]
+    },
+    {
+      "symmetry_group_id": "plates-lid-rear",
+      "family": "plates",
+      "mode": "centered",
+      "datum": "rear",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "lid/rear",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "add",
+          "args": [
+            {
+              "ref": "B"
+            },
+            {
+              "op": "div",
+              "args": [
+                {
+                  "ref": "L"
+                },
+                2
+              ]
+            }
+          ]
+        }
+      },
+      "definition": "panel",
+      "slots": [
+        [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "W"
+              },
+              2
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "B"
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "ref": "L"
+                  },
+                  2
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      ],
+      "rotation": "rear",
+      "shape": [
+        {
+          "ref": "W"
+        },
+        {
+          "ref": "L"
+        },
+        {
+          "ref": "T"
+        }
+      ]
+    },
+    {
+      "symmetry_group_id": "plates-base-left",
+      "family": "plates",
+      "mode": "centered",
+      "datum": "left",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "base/left",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "D"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "B"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "panel",
+      "slots": [
+        [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "D"
+              },
+              2
+            ]
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "B"
+              },
+              2
+            ]
+          },
+          0
+        ]
+      ],
+      "rotation": "left",
+      "shape": [
+        {
+          "ref": "D"
+        },
+        {
+          "ref": "B"
+        },
+        {
+          "ref": "T"
+        }
+      ]
+    },
+    {
+      "symmetry_group_id": "plates-lid-left",
+      "family": "plates",
+      "mode": "centered",
+      "datum": "left",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "lid/left",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "D"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "add",
+          "args": [
+            {
+              "ref": "B"
+            },
+            {
+              "op": "div",
+              "args": [
+                {
+                  "ref": "L"
+                },
+                2
+              ]
+            }
+          ]
+        }
+      },
+      "definition": "panel",
+      "slots": [
+        [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "D"
+              },
+              2
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "B"
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "ref": "L"
+                  },
+                  2
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      ],
+      "rotation": "left",
+      "shape": [
+        {
+          "ref": "D"
+        },
+        {
+          "ref": "L"
+        },
+        {
+          "ref": "T"
+        }
+      ]
+    },
+    {
+      "symmetry_group_id": "plates-base-right",
+      "family": "plates",
+      "mode": "centered",
+      "datum": "right",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "base/right",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "D"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "B"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "panel",
+      "slots": [
+        [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "D"
+              },
+              2
+            ]
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "B"
+              },
+              2
+            ]
+          },
+          0
+        ]
+      ],
+      "rotation": "right",
+      "shape": [
+        {
+          "ref": "D"
+        },
+        {
+          "ref": "B"
+        },
+        {
+          "ref": "T"
+        }
+      ]
+    },
+    {
+      "symmetry_group_id": "plates-lid-right",
+      "family": "plates",
+      "mode": "centered",
+      "datum": "right",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "lid/right",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "D"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "add",
+          "args": [
+            {
+              "ref": "B"
+            },
+            {
+              "op": "div",
+              "args": [
+                {
+                  "ref": "L"
+                },
+                2
+              ]
+            }
+          ]
+        }
+      },
+      "definition": "panel",
+      "slots": [
+        [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "D"
+              },
+              2
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "B"
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "ref": "L"
+                  },
+                  2
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      ],
+      "rotation": "right",
+      "shape": [
+        {
+          "ref": "D"
+        },
+        {
+          "ref": "L"
+        },
+        {
+          "ref": "T"
+        }
+      ]
+    },
+    {
+      "symmetry_group_id": "plates-floor",
+      "family": "plates",
+      "mode": "centered",
+      "datum": "closed",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "base/floor",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "D"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "panel",
+      "slots": [
+        [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "W"
+              },
+              2
+            ]
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "D"
+              },
+              2
+            ]
+          },
+          0
+        ]
+      ],
+      "rotation": "identity",
+      "shape": [
+        {
+          "ref": "W"
+        },
+        {
+          "ref": "D"
+        },
+        {
+          "ref": "T"
+        }
+      ]
+    },
+    {
+      "symmetry_group_id": "plates-roof",
+      "family": "plates",
+      "mode": "centered",
+      "datum": "lid",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "lid/roof",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "D"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "panel",
+      "slots": [
+        [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "W"
+              },
+              2
+            ]
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "D"
+              },
+              2
+            ]
+          },
+          0
+        ]
+      ],
+      "rotation": "lid",
+      "shape": [
+        {
+          "ref": "W"
+        },
+        {
+          "ref": "D"
+        },
+        {
+          "ref": "T"
+        }
+      ]
+    },
+    {
+      "symmetry_group_id": "profiles",
+      "family": "profiles",
+      "mode": "mirrored_pair",
+      "datum": "closed",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "closed-case",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "D"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "profile",
+      "slots": [
+        [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "W"
+              },
+              2
+            ]
+          },
+          0,
+          0
+        ],
+        [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "W"
+              },
+              2
+            ]
+          },
+          {
+            "ref": "D"
+          },
+          0
+        ]
+      ],
+      "rotation": "identity",
+      "shape": [
+        {
+          "ref": "W"
+        },
+        20,
+        20
+      ]
+    },
+    {
+      "symmetry_group_id": "corners",
+      "family": "corners",
+      "mode": "centered_pattern",
+      "datum": "closed",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "base/bottom-corners",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "D"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "corner",
+      "slots": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          {
+            "ref": "W"
+          },
+          0,
+          0
+        ],
+        [
+          0,
+          {
+            "ref": "D"
+          },
+          0
+        ],
+        [
+          {
+            "ref": "W"
+          },
+          {
+            "ref": "D"
+          },
+          0
+        ]
+      ],
+      "rotation": [
+        "corner-1",
+        "corner-2",
+        "corner-3",
+        "corner-4"
+      ]
+    },
+    {
+      "symmetry_group_id": "corners-lid",
+      "family": "corners",
+      "mode": "centered_pattern",
+      "datum": "closed",
+      "axes": [
+        "0",
+        "1",
+        "2"
+      ],
+      "scope": "lid/top-corners",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "D"
+            },
+            2
+          ]
+        },
+        "2": {
+          "ref": "H"
+        }
+      },
+      "definition": "corner",
+      "slots": [
+        [
+          0,
+          0,
+          {
+            "ref": "H"
+          }
+        ],
+        [
+          {
+            "ref": "W"
+          },
+          0,
+          {
+            "ref": "H"
+          }
+        ],
+        [
+          0,
+          {
+            "ref": "D"
+          },
+          {
+            "ref": "H"
+          }
+        ],
+        [
+          {
+            "ref": "W"
+          },
+          {
+            "ref": "D"
+          },
+          {
+            "ref": "H"
+          }
+        ]
+      ],
+      "rotation": [
+        "lid-corner-1",
+        "lid-corner-2",
+        "lid-corner-3",
+        "lid-corner-4"
+      ]
+    },
+    {
+      "symmetry_group_id": "closure-x-base",
+      "family": "profiles",
+      "mode": "mirrored_pair",
+      "datum": "closed",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "base/closure-x",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "D"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "profile",
+      "slots": [
+        [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "W"
+              },
+              2
+            ]
+          },
+          0,
+          {
+            "ref": "B"
+          }
+        ],
+        [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "W"
+              },
+              2
+            ]
+          },
+          {
+            "ref": "D"
+          },
+          {
+            "ref": "B"
+          }
+        ]
+      ],
+      "rotation": "identity",
+      "shape": [
+        {
+          "ref": "W"
+        },
+        20,
+        20
+      ]
+    },
+    {
+      "symmetry_group_id": "closure-y-base",
+      "family": "profiles",
+      "mode": "mirrored_pair",
+      "datum": "closed",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "base/closure-y",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "D"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "profile",
+      "slots": [
+        [
+          0,
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "D"
+              },
+              2
+            ]
+          },
+          {
+            "ref": "B"
+          }
+        ],
+        [
+          {
+            "ref": "W"
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "D"
+              },
+              2
+            ]
+          },
+          {
+            "ref": "B"
+          }
+        ]
+      ],
+      "rotation": "identity",
+      "shape": [
+        20,
+        {
+          "ref": "D"
+        },
+        20
+      ]
+    },
+    {
+      "symmetry_group_id": "closure-x-lid",
+      "family": "profiles",
+      "mode": "mirrored_pair",
+      "datum": "closed",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "lid/closure-x",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "D"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "profile",
+      "slots": [
+        [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "W"
+              },
+              2
+            ]
+          },
+          0,
+          {
+            "ref": "B"
+          }
+        ],
+        [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "W"
+              },
+              2
+            ]
+          },
+          {
+            "ref": "D"
+          },
+          {
+            "ref": "B"
+          }
+        ]
+      ],
+      "rotation": "identity",
+      "shape": [
+        {
+          "ref": "W"
+        },
+        20,
+        20
+      ]
+    },
+    {
+      "symmetry_group_id": "closure-y-lid",
+      "family": "profiles",
+      "mode": "mirrored_pair",
+      "datum": "closed",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "lid/closure-y",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "D"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "profile",
+      "slots": [
+        [
+          0,
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "D"
+              },
+              2
+            ]
+          },
+          {
+            "ref": "B"
+          }
+        ],
+        [
+          {
+            "ref": "W"
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "D"
+              },
+              2
+            ]
+          },
+          {
+            "ref": "B"
+          }
+        ]
+      ],
+      "rotation": "identity",
+      "shape": [
+        20,
+        {
+          "ref": "D"
+        },
+        20
+      ]
+    },
+    {
+      "symmetry_group_id": "edge-vertical",
+      "family": "profiles",
+      "mode": "centered_pattern",
+      "datum": "closed",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "base/vertical-edges",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "D"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "profile",
+      "slots": [
+        [
+          0,
+          0,
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "B"
+              },
+              2
+            ]
+          }
+        ],
+        [
+          {
+            "ref": "W"
+          },
+          0,
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "B"
+              },
+              2
+            ]
+          }
+        ],
+        [
+          0,
+          {
+            "ref": "D"
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "B"
+              },
+              2
+            ]
+          }
+        ],
+        [
+          {
+            "ref": "W"
+          },
+          {
+            "ref": "D"
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "B"
+              },
+              2
+            ]
+          }
+        ]
+      ],
+      "rotation": "identity",
+      "shape": [
+        20,
+        20,
+        {
+          "ref": "B"
+        }
+      ]
+    },
+    {
+      "symmetry_group_id": "braces",
+      "family": "braces",
+      "mode": "mirrored_pair",
+      "datum": "front",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "base/front",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "B"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "brace",
+      "slots": [
+        [
+          {
+            "input_selector": "approved_group_edge_offset",
+            "group_id": "braces",
+            "default": 80
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "B"
+              },
+              2
+            ]
+          },
+          0
+        ],
+        [
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "W"
+              },
+              {
+                "input_selector": "approved_group_edge_offset",
+                "group_id": "braces",
+                "default": 80
+              }
+            ]
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "B"
+              },
+              2
+            ]
+          },
+          0
+        ]
+      ],
+      "rotation": "front"
+    },
+    {
+      "symmetry_group_id": "braces-lid",
+      "family": "braces",
+      "mode": "mirrored_pair",
+      "datum": "front",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "lid/front/second-synthetic-brace-definition",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "add",
+          "args": [
+            {
+              "ref": "B"
+            },
+            {
+              "op": "div",
+              "args": [
+                {
+                  "ref": "L"
+                },
+                2
+              ]
+            }
+          ]
+        }
+      },
+      "definition": "brace",
+      "slots": [
+        [
+          {
+            "input_selector": "approved_group_edge_offset",
+            "group_id": "braces-lid",
+            "default": 80
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "B"
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "ref": "L"
+                  },
+                  2
+                ]
+              }
+            ]
+          },
+          0
+        ],
+        [
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "W"
+              },
+              {
+                "input_selector": "approved_group_edge_offset",
+                "group_id": "braces-lid",
+                "default": 80
+              }
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "B"
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "ref": "L"
+                  },
+                  2
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      ],
+      "rotation": "front"
+    },
+    {
+      "symmetry_group_id": "handles",
+      "family": "handles",
+      "mode": "centered",
+      "datum": "front",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "base/front/ordinary-panel-handle",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "B"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "panel-handle",
+      "slots": [
+        [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "W"
+              },
+              2
+            ]
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "B"
+              },
+              2
+            ]
+          },
+          0
+        ]
+      ],
+      "rotation": "front",
+      "count_override": "scenario_contract.set_group_count"
+    },
+    {
+      "symmetry_group_id": "latches-base",
+      "family": "latches",
+      "mode": "mirrored_pair",
+      "datum": "seam-front",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "base/seam-front",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": 0
+      },
+      "definition": "latch-half",
+      "slots": [
+        [
+          100,
+          0,
+          0
+        ],
+        [
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "W"
+              },
+              100
+            ]
+          },
+          0,
+          0
+        ]
+      ],
+      "rotation": "front"
+    },
+    {
+      "symmetry_group_id": "latches-lid",
+      "family": "latches",
+      "mode": "mirrored_pair",
+      "datum": "seam-front",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "lid/seam-front",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": 0
+      },
+      "definition": "latch-half",
+      "slots": [
+        [
+          100,
+          0,
+          0
+        ],
+        [
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "W"
+              },
+              100
+            ]
+          },
+          0,
+          0
+        ]
+      ],
+      "rotation": "front"
+    },
+    {
+      "symmetry_group_id": "hinges-base",
+      "family": "hinges",
+      "mode": "mirrored_pair",
+      "datum": "seam-rear",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "base/seam-rear",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": 0
+      },
+      "definition": "hinge-half",
+      "slots": [
+        [
+          120,
+          0,
+          0
+        ],
+        [
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "W"
+              },
+              120
+            ]
+          },
+          0,
+          0
+        ]
+      ],
+      "rotation": "rear"
+    },
+    {
+      "symmetry_group_id": "hinges-lid",
+      "family": "hinges",
+      "mode": "mirrored_pair",
+      "datum": "seam-rear",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "lid/seam-rear",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": 0
+      },
+      "definition": "hinge-half",
+      "slots": [
+        [
+          120,
+          0,
+          0
+        ],
+        [
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "W"
+              },
+              120
+            ]
+          },
+          0,
+          0
+        ]
+      ],
+      "rotation": "rear"
+    },
+    {
+      "symmetry_group_id": "wheels",
+      "family": "wheels",
+      "mode": "centered_pattern",
+      "datum": "closed",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "closed-case",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "D"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "wheel",
+      "slots": [
+        [
+          60,
+          60,
+          -40
+        ],
+        [
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "W"
+              },
+              60
+            ]
+          },
+          60,
+          -40
+        ],
+        [
+          60,
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "D"
+              },
+              60
+            ]
+          },
+          -40
+        ],
+        [
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "W"
+              },
+              60
+            ]
+          },
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "D"
+              },
+              60
+            ]
+          },
+          -40
+        ]
+      ],
+      "rotation": "identity"
+    },
+    {
+      "symmetry_group_id": "sockets",
+      "family": "sockets",
+      "mode": "centered_pattern",
+      "datum": "closed",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "closed-case",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "D"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "socket",
+      "slots": [
+        [
+          60,
+          60,
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "H"
+              },
+              10
+            ]
+          }
+        ],
+        [
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "W"
+              },
+              60
+            ]
+          },
+          60,
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "H"
+              },
+              10
+            ]
+          }
+        ],
+        [
+          60,
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "D"
+              },
+              60
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "H"
+              },
+              10
+            ]
+          }
+        ],
+        [
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "W"
+              },
+              60
+            ]
+          },
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "D"
+              },
+              60
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "H"
+              },
+              10
+            ]
+          }
+        ]
+      ],
+      "rotation": "identity"
+    },
+    {
+      "symmetry_group_id": "wheelpads",
+      "family": "wheels",
+      "mode": "centered_pattern",
+      "datum": "closed",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "base/wheel-supports",
+      "exception_approval": null,
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "D"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "wheelpad",
+      "slots": [
+        [
+          60,
+          60,
+          -10
+        ],
+        [
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "W"
+              },
+              60
+            ]
+          },
+          60,
+          -10
+        ],
+        [
+          60,
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "D"
+              },
+              60
+            ]
+          },
+          -10
+        ],
+        [
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "W"
+              },
+              60
+            ]
+          },
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "D"
+              },
+              60
+            ]
+          },
+          -10
+        ]
+      ],
+      "rotation": "identity"
+    },
+    {
+      "symmetry_group_id": "interior",
+      "family": "interior",
+      "mode": "centered",
+      "datum": "closed",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "synthetic-local-insert",
+      "exception_approval": "SYNTHETIC-CONSTRUCTOR-APPROVAL-1",
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "D"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "insert",
+      "slots": [
+        [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "W"
+              },
+              2
+            ]
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "D"
+              },
+              2
+            ]
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "B"
+              },
+              2
+            ]
+          }
+        ]
+      ],
+      "rotation": "identity"
+    },
+    {
+      "symmetry_group_id": "interior-foam",
+      "family": "interior",
+      "mode": "centered",
+      "datum": "closed",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "synthetic-local-foam",
+      "exception_approval": "SYNTHETIC-CONSTRUCTOR-APPROVAL-1",
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "D"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "foam",
+      "slots": [
+        [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "W"
+              },
+              2
+            ]
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "D"
+              },
+              2
+            ]
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "B"
+              },
+              2
+            ]
+          }
+        ]
+      ],
+      "rotation": "identity"
+    },
+    {
+      "symmetry_group_id": "interior-custom",
+      "family": "interior",
+      "mode": "centered",
+      "datum": "closed",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "synthetic-local-custom",
+      "exception_approval": "SYNTHETIC-CONSTRUCTOR-APPROVAL-1",
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "D"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "custom",
+      "slots": [
+        [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "W"
+              },
+              2
+            ]
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "D"
+              },
+              2
+            ]
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "B"
+              },
+              2
+            ]
+          }
+        ]
+      ],
+      "rotation": "identity"
+    },
+    {
+      "symmetry_group_id": "interior-import",
+      "family": "interior",
+      "mode": "centered",
+      "datum": "closed",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "synthetic-local-import",
+      "exception_approval": "SYNTHETIC-CONSTRUCTOR-APPROVAL-1",
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "W"
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "ref": "D"
+            },
+            2
+          ]
+        }
+      },
+      "definition": "import",
+      "slots": [
+        [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "W"
+              },
+              2
+            ]
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "D"
+              },
+              2
+            ]
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "B"
+              },
+              2
+            ]
+          }
+        ]
+      ],
+      "rotation": "identity"
+    },
+    {
+      "symmetry_group_id": "corner-handle",
+      "family": "handles",
+      "mode": "centered",
+      "datum": "corner-handle",
+      "axes": [
+        "0",
+        "1"
+      ],
+      "scope": "base/front-right-corner/SYNTHETIC-corner-handle",
+      "exception_approval": "SYNTHETIC-CORNER-FUNCTION-APPROVAL-1",
+      "centers": {
+        "0": 0,
+        "1": 0
+      },
+      "definition": "corner-handle",
+      "slots": [
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "rotation": "identity"
+    },
+    {
+      "symmetry_group_id": "interior-devices",
+      "family": "interior",
+      "mode": "mirrored_pair",
+      "datum": "closed",
+      "axes": [
+        "0",
+        "1",
+        "2"
+      ],
+      "scope": "device-compartment-local-pattern",
+      "exception_approval": "SYNTHETIC-CONSTRUCTOR-APPROVAL-1",
+      "centers": {
+        "0": {
+          "op": "div",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "ref": "c"
+                    },
+                    {
+                      "op": "div",
+                      "args": [
+                        {
+                          "op": "at",
+                          "args": [
+                            {
+                              "ref": "q"
+                            },
+                            0
+                          ]
+                        },
+                        2
+                      ]
+                    },
+                    {
+                      "op": "select",
+                      "args": [
+                        {
+                          "op": "eq",
+                          "args": [
+                            {
+                              "ref": "a"
+                            },
+                            0
+                          ]
+                        },
+                        {
+                          "op": "mul",
+                          "args": [
+                            0,
+                            {
+                              "op": "add",
+                              "args": [
+                                {
+                                  "op": "at",
+                                  "args": [
+                                    {
+                                      "ref": "q"
+                                    },
+                                    0
+                                  ]
+                                },
+                                {
+                                  "ref": "g"
+                                },
+                                {
+                                  "ref": "p"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        0
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "ref": "c"
+                    },
+                    {
+                      "op": "div",
+                      "args": [
+                        {
+                          "op": "at",
+                          "args": [
+                            {
+                              "ref": "q"
+                            },
+                            0
+                          ]
+                        },
+                        2
+                      ]
+                    },
+                    {
+                      "op": "select",
+                      "args": [
+                        {
+                          "op": "eq",
+                          "args": [
+                            {
+                              "ref": "a"
+                            },
+                            0
+                          ]
+                        },
+                        {
+                          "op": "mul",
+                          "args": [
+                            1,
+                            {
+                              "op": "add",
+                              "args": [
+                                {
+                                  "op": "at",
+                                  "args": [
+                                    {
+                                      "ref": "q"
+                                    },
+                                    0
+                                  ]
+                                },
+                                {
+                                  "ref": "g"
+                                },
+                                {
+                                  "ref": "p"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        0
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            2
+          ]
+        },
+        "1": {
+          "op": "div",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "ref": "c"
+                    },
+                    {
+                      "op": "div",
+                      "args": [
+                        {
+                          "op": "at",
+                          "args": [
+                            {
+                              "ref": "q"
+                            },
+                            1
+                          ]
+                        },
+                        2
+                      ]
+                    },
+                    {
+                      "op": "select",
+                      "args": [
+                        {
+                          "op": "eq",
+                          "args": [
+                            {
+                              "ref": "a"
+                            },
+                            1
+                          ]
+                        },
+                        {
+                          "op": "mul",
+                          "args": [
+                            0,
+                            {
+                              "op": "add",
+                              "args": [
+                                {
+                                  "op": "at",
+                                  "args": [
+                                    {
+                                      "ref": "q"
+                                    },
+                                    1
+                                  ]
+                                },
+                                {
+                                  "ref": "g"
+                                },
+                                {
+                                  "ref": "p"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        0
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "ref": "c"
+                    },
+                    {
+                      "op": "div",
+                      "args": [
+                        {
+                          "op": "at",
+                          "args": [
+                            {
+                              "ref": "q"
+                            },
+                            1
+                          ]
+                        },
+                        2
+                      ]
+                    },
+                    {
+                      "op": "select",
+                      "args": [
+                        {
+                          "op": "eq",
+                          "args": [
+                            {
+                              "ref": "a"
+                            },
+                            1
+                          ]
+                        },
+                        {
+                          "op": "mul",
+                          "args": [
+                            1,
+                            {
+                              "op": "add",
+                              "args": [
+                                {
+                                  "op": "at",
+                                  "args": [
+                                    {
+                                      "ref": "q"
+                                    },
+                                    1
+                                  ]
+                                },
+                                {
+                                  "ref": "g"
+                                },
+                                {
+                                  "ref": "p"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        0
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            2
+          ]
+        },
+        "2": {
+          "op": "div",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "ref": "c"
+                    },
+                    {
+                      "op": "div",
+                      "args": [
+                        {
+                          "op": "at",
+                          "args": [
+                            {
+                              "ref": "q"
+                            },
+                            2
+                          ]
+                        },
+                        2
+                      ]
+                    },
+                    {
+                      "op": "select",
+                      "args": [
+                        {
+                          "op": "eq",
+                          "args": [
+                            {
+                              "ref": "a"
+                            },
+                            2
+                          ]
+                        },
+                        {
+                          "op": "mul",
+                          "args": [
+                            0,
+                            {
+                              "op": "add",
+                              "args": [
+                                {
+                                  "op": "at",
+                                  "args": [
+                                    {
+                                      "ref": "q"
+                                    },
+                                    2
+                                  ]
+                                },
+                                {
+                                  "ref": "g"
+                                },
+                                {
+                                  "ref": "p"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        0
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "ref": "c"
+                    },
+                    {
+                      "op": "div",
+                      "args": [
+                        {
+                          "op": "at",
+                          "args": [
+                            {
+                              "ref": "q"
+                            },
+                            2
+                          ]
+                        },
+                        2
+                      ]
+                    },
+                    {
+                      "op": "select",
+                      "args": [
+                        {
+                          "op": "eq",
+                          "args": [
+                            {
+                              "ref": "a"
+                            },
+                            2
+                          ]
+                        },
+                        {
+                          "op": "mul",
+                          "args": [
+                            1,
+                            {
+                              "op": "add",
+                              "args": [
+                                {
+                                  "op": "at",
+                                  "args": [
+                                    {
+                                      "ref": "q"
+                                    },
+                                    2
+                                  ]
+                                },
+                                {
+                                  "ref": "g"
+                                },
+                                {
+                                  "ref": "p"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        0
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            2
+          ]
+        }
+      },
+      "definition": "device-envelope",
+      "slots": [
+        [
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "c"
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "op": "at",
+                    "args": [
+                      {
+                        "ref": "q"
+                      },
+                      0
+                    ]
+                  },
+                  2
+                ]
+              },
+              {
+                "op": "select",
+                "args": [
+                  {
+                    "op": "eq",
+                    "args": [
+                      {
+                        "ref": "a"
+                      },
+                      0
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      0,
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "at",
+                            "args": [
+                              {
+                                "ref": "q"
+                              },
+                              0
+                            ]
+                          },
+                          {
+                            "ref": "g"
+                          },
+                          {
+                            "ref": "p"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  0
+                ]
+              }
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "c"
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "op": "at",
+                    "args": [
+                      {
+                        "ref": "q"
+                      },
+                      1
+                    ]
+                  },
+                  2
+                ]
+              },
+              {
+                "op": "select",
+                "args": [
+                  {
+                    "op": "eq",
+                    "args": [
+                      {
+                        "ref": "a"
+                      },
+                      1
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      0,
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "at",
+                            "args": [
+                              {
+                                "ref": "q"
+                              },
+                              1
+                            ]
+                          },
+                          {
+                            "ref": "g"
+                          },
+                          {
+                            "ref": "p"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  0
+                ]
+              }
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "c"
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "op": "at",
+                    "args": [
+                      {
+                        "ref": "q"
+                      },
+                      2
+                    ]
+                  },
+                  2
+                ]
+              },
+              {
+                "op": "select",
+                "args": [
+                  {
+                    "op": "eq",
+                    "args": [
+                      {
+                        "ref": "a"
+                      },
+                      2
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      0,
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "at",
+                            "args": [
+                              {
+                                "ref": "q"
+                              },
+                              2
+                            ]
+                          },
+                          {
+                            "ref": "g"
+                          },
+                          {
+                            "ref": "p"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "c"
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "op": "at",
+                    "args": [
+                      {
+                        "ref": "q"
+                      },
+                      0
+                    ]
+                  },
+                  2
+                ]
+              },
+              {
+                "op": "select",
+                "args": [
+                  {
+                    "op": "eq",
+                    "args": [
+                      {
+                        "ref": "a"
+                      },
+                      0
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      1,
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "at",
+                            "args": [
+                              {
+                                "ref": "q"
+                              },
+                              0
+                            ]
+                          },
+                          {
+                            "ref": "g"
+                          },
+                          {
+                            "ref": "p"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  0
+                ]
+              }
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "c"
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "op": "at",
+                    "args": [
+                      {
+                        "ref": "q"
+                      },
+                      1
+                    ]
+                  },
+                  2
+                ]
+              },
+              {
+                "op": "select",
+                "args": [
+                  {
+                    "op": "eq",
+                    "args": [
+                      {
+                        "ref": "a"
+                      },
+                      1
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      1,
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "at",
+                            "args": [
+                              {
+                                "ref": "q"
+                              },
+                              1
+                            ]
+                          },
+                          {
+                            "ref": "g"
+                          },
+                          {
+                            "ref": "p"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  0
+                ]
+              }
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "c"
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "op": "at",
+                    "args": [
+                      {
+                        "ref": "q"
+                      },
+                      2
+                    ]
+                  },
+                  2
+                ]
+              },
+              {
+                "op": "select",
+                "args": [
+                  {
+                    "op": "eq",
+                    "args": [
+                      {
+                        "ref": "a"
+                      },
+                      2
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      1,
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "at",
+                            "args": [
+                              {
+                                "ref": "q"
+                              },
+                              2
+                            ]
+                          },
+                          {
+                            "ref": "g"
+                          },
+                          {
+                            "ref": "p"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  0
+                ]
+              }
+            ]
+          }
+        ]
+      ],
+      "rotation": "identity",
+      "shape": {
+        "ref": "q"
+      }
+    },
+    {
+      "symmetry_group_id": "interior-accessory",
+      "family": "interior",
+      "mode": "centered",
+      "datum": "closed",
+      "axes": [
+        "0",
+        "1",
+        "2"
+      ],
+      "scope": "accessory-compartment-local",
+      "exception_approval": "SYNTHETIC-CONSTRUCTOR-APPROVAL-1",
+      "centers": {
+        "0": {
+          "op": "add",
+          "args": [
+            {
+              "ref": "c"
+            },
+            {
+              "op": "div",
+              "args": [
+                {
+                  "op": "select",
+                  "args": [
+                    {
+                      "op": "eq",
+                      "args": [
+                        {
+                          "ref": "s"
+                        },
+                        0
+                      ]
+                    },
+                    {
+                      "ref": "spec.layout.side_width"
+                    },
+                    {
+                      "ref": "spec.layout.side_depth"
+                    }
+                  ]
+                },
+                2
+              ]
+            },
+            {
+              "op": "select",
+              "args": [
+                {
+                  "op": "eq",
+                  "args": [
+                    {
+                      "ref": "s"
+                    },
+                    0
+                  ]
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "ref": "comp0"
+                    },
+                    {
+                      "ref": "T"
+                    }
+                  ]
+                },
+                0
+              ]
+            }
+          ]
+        },
+        "1": {
+          "op": "add",
+          "args": [
+            {
+              "ref": "c"
+            },
+            {
+              "op": "div",
+              "args": [
+                {
+                  "op": "select",
+                  "args": [
+                    {
+                      "op": "eq",
+                      "args": [
+                        {
+                          "ref": "s"
+                        },
+                        1
+                      ]
+                    },
+                    {
+                      "ref": "spec.layout.side_width"
+                    },
+                    {
+                      "ref": "spec.layout.side_depth"
+                    }
+                  ]
+                },
+                2
+              ]
+            },
+            {
+              "op": "select",
+              "args": [
+                {
+                  "op": "eq",
+                  "args": [
+                    {
+                      "ref": "s"
+                    },
+                    1
+                  ]
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "ref": "comp1"
+                    },
+                    {
+                      "ref": "T"
+                    }
+                  ]
+                },
+                0
+              ]
+            }
+          ]
+        },
+        "2": {
+          "op": "add",
+          "args": [
+            {
+              "ref": "c"
+            },
+            {
+              "op": "div",
+              "args": [
+                {
+                  "ref": "spec.layout.side_height"
+                },
+                2
+              ]
+            },
+            {
+              "op": "select",
+              "args": [
+                {
+                  "op": "eq",
+                  "args": [
+                    {
+                      "ref": "s"
+                    },
+                    2
+                  ]
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "ref": "comp2"
+                    },
+                    {
+                      "ref": "T"
+                    }
+                  ]
+                },
+                0
+              ]
+            }
+          ]
+        }
+      },
+      "definition": "device-envelope",
+      "slots": [
+        [
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "c"
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "op": "select",
+                    "args": [
+                      {
+                        "op": "eq",
+                        "args": [
+                          {
+                            "ref": "s"
+                          },
+                          0
+                        ]
+                      },
+                      {
+                        "ref": "spec.layout.side_width"
+                      },
+                      {
+                        "ref": "spec.layout.side_depth"
+                      }
+                    ]
+                  },
+                  2
+                ]
+              },
+              {
+                "op": "select",
+                "args": [
+                  {
+                    "op": "eq",
+                    "args": [
+                      {
+                        "ref": "s"
+                      },
+                      0
+                    ]
+                  },
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "ref": "comp0"
+                      },
+                      {
+                        "ref": "T"
+                      }
+                    ]
+                  },
+                  0
+                ]
+              }
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "c"
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "op": "select",
+                    "args": [
+                      {
+                        "op": "eq",
+                        "args": [
+                          {
+                            "ref": "s"
+                          },
+                          1
+                        ]
+                      },
+                      {
+                        "ref": "spec.layout.side_width"
+                      },
+                      {
+                        "ref": "spec.layout.side_depth"
+                      }
+                    ]
+                  },
+                  2
+                ]
+              },
+              {
+                "op": "select",
+                "args": [
+                  {
+                    "op": "eq",
+                    "args": [
+                      {
+                        "ref": "s"
+                      },
+                      1
+                    ]
+                  },
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "ref": "comp1"
+                      },
+                      {
+                        "ref": "T"
+                      }
+                    ]
+                  },
+                  0
+                ]
+              }
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "c"
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "ref": "spec.layout.side_height"
+                  },
+                  2
+                ]
+              },
+              {
+                "op": "select",
+                "args": [
+                  {
+                    "op": "eq",
+                    "args": [
+                      {
+                        "ref": "s"
+                      },
+                      2
+                    ]
+                  },
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "ref": "comp2"
+                      },
+                      {
+                        "ref": "T"
+                      }
+                    ]
+                  },
+                  0
+                ]
+              }
+            ]
+          }
+        ]
+      ],
+      "rotation": "identity",
+      "shape": [
+        {
+          "op": "select",
+          "args": [
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "ref": "s"
+                },
+                0
+              ]
+            },
+            {
+              "ref": "spec.layout.side_width"
+            },
+            {
+              "ref": "spec.layout.side_depth"
+            }
+          ]
+        },
+        {
+          "op": "select",
+          "args": [
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "ref": "s"
+                },
+                1
+              ]
+            },
+            {
+              "ref": "spec.layout.side_width"
+            },
+            {
+              "ref": "spec.layout.side_depth"
+            }
+          ]
+        },
+        {
+          "ref": "spec.layout.side_height"
+        }
+      ]
+    },
+    {
+      "symmetry_group_id": "interior-divider-1",
+      "family": "interior",
+      "mode": "centered",
+      "datum": "closed",
+      "axes": [
+        "0",
+        "1",
+        "2"
+      ],
+      "scope": "local-partition-1",
+      "exception_approval": "SYNTHETIC-CONSTRUCTOR-APPROVAL-1",
+      "centers": {
+        "0": {
+          "op": "select",
+          "args": [
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "ref": "a"
+                },
+                0
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "ref": "c"
+                },
+                {
+                  "op": "at",
+                  "args": [
+                    {
+                      "ref": "q"
+                    },
+                    0
+                  ]
+                },
+                {
+                  "op": "div",
+                  "args": [
+                    {
+                      "ref": "g"
+                    },
+                    2
+                  ]
+                },
+                {
+                  "op": "div",
+                  "args": [
+                    {
+                      "ref": "p"
+                    },
+                    2
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "div",
+              "args": [
+                {
+                  "ref": "comp0"
+                },
+                2
+              ]
+            }
+          ]
+        },
+        "1": {
+          "op": "select",
+          "args": [
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "ref": "a"
+                },
+                1
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "ref": "c"
+                },
+                {
+                  "op": "at",
+                  "args": [
+                    {
+                      "ref": "q"
+                    },
+                    1
+                  ]
+                },
+                {
+                  "op": "div",
+                  "args": [
+                    {
+                      "ref": "g"
+                    },
+                    2
+                  ]
+                },
+                {
+                  "op": "div",
+                  "args": [
+                    {
+                      "ref": "p"
+                    },
+                    2
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "div",
+              "args": [
+                {
+                  "ref": "comp1"
+                },
+                2
+              ]
+            }
+          ]
+        },
+        "2": {
+          "op": "select",
+          "args": [
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "ref": "a"
+                },
+                2
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "ref": "c"
+                },
+                {
+                  "op": "at",
+                  "args": [
+                    {
+                      "ref": "q"
+                    },
+                    2
+                  ]
+                },
+                {
+                  "op": "div",
+                  "args": [
+                    {
+                      "ref": "g"
+                    },
+                    2
+                  ]
+                },
+                {
+                  "op": "div",
+                  "args": [
+                    {
+                      "ref": "p"
+                    },
+                    2
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "div",
+              "args": [
+                {
+                  "ref": "comp2"
+                },
+                2
+              ]
+            }
+          ]
+        }
+      },
+      "definition": "divider",
+      "slots": [
+        [
+          {
+            "op": "select",
+            "args": [
+              {
+                "op": "eq",
+                "args": [
+                  {
+                    "ref": "a"
+                  },
+                  0
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "ref": "c"
+                  },
+                  {
+                    "op": "at",
+                    "args": [
+                      {
+                        "ref": "q"
+                      },
+                      0
+                    ]
+                  },
+                  {
+                    "op": "div",
+                    "args": [
+                      {
+                        "ref": "g"
+                      },
+                      2
+                    ]
+                  },
+                  {
+                    "op": "div",
+                    "args": [
+                      {
+                        "ref": "p"
+                      },
+                      2
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "ref": "comp0"
+                  },
+                  2
+                ]
+              }
+            ]
+          },
+          {
+            "op": "select",
+            "args": [
+              {
+                "op": "eq",
+                "args": [
+                  {
+                    "ref": "a"
+                  },
+                  1
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "ref": "c"
+                  },
+                  {
+                    "op": "at",
+                    "args": [
+                      {
+                        "ref": "q"
+                      },
+                      1
+                    ]
+                  },
+                  {
+                    "op": "div",
+                    "args": [
+                      {
+                        "ref": "g"
+                      },
+                      2
+                    ]
+                  },
+                  {
+                    "op": "div",
+                    "args": [
+                      {
+                        "ref": "p"
+                      },
+                      2
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "ref": "comp1"
+                  },
+                  2
+                ]
+              }
+            ]
+          },
+          {
+            "op": "select",
+            "args": [
+              {
+                "op": "eq",
+                "args": [
+                  {
+                    "ref": "a"
+                  },
+                  2
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "ref": "c"
+                  },
+                  {
+                    "op": "at",
+                    "args": [
+                      {
+                        "ref": "q"
+                      },
+                      2
+                    ]
+                  },
+                  {
+                    "op": "div",
+                    "args": [
+                      {
+                        "ref": "g"
+                      },
+                      2
+                    ]
+                  },
+                  {
+                    "op": "div",
+                    "args": [
+                      {
+                        "ref": "p"
+                      },
+                      2
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "ref": "comp2"
+                  },
+                  2
+                ]
+              }
+            ]
+          }
+        ]
+      ],
+      "rotation": "identity",
+      "shape": [
+        {
+          "op": "select",
+          "args": [
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "ref": "a"
+                },
+                0
+              ]
+            },
+            {
+              "ref": "p"
+            },
+            {
+              "ref": "comp0"
+            }
+          ]
+        },
+        {
+          "op": "select",
+          "args": [
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "ref": "a"
+                },
+                1
+              ]
+            },
+            {
+              "ref": "p"
+            },
+            {
+              "ref": "comp1"
+            }
+          ]
+        },
+        {
+          "op": "select",
+          "args": [
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "ref": "a"
+                },
+                2
+              ]
+            },
+            {
+              "ref": "p"
+            },
+            {
+              "ref": "comp2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "symmetry_group_id": "interior-divider-2",
+      "family": "interior",
+      "mode": "centered",
+      "datum": "closed",
+      "axes": [
+        "0",
+        "1",
+        "2"
+      ],
+      "scope": "local-partition-2",
+      "exception_approval": "SYNTHETIC-CONSTRUCTOR-APPROVAL-1",
+      "centers": {
+        "0": {
+          "op": "select",
+          "args": [
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "ref": "s"
+                },
+                0
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "ref": "comp0"
+                },
+                {
+                  "op": "div",
+                  "args": [
+                    {
+                      "ref": "T"
+                    },
+                    2
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "div",
+              "args": [
+                {
+                  "ref": "comp0"
+                },
+                2
+              ]
+            }
+          ]
+        },
+        "1": {
+          "op": "select",
+          "args": [
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "ref": "s"
+                },
+                1
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "ref": "comp1"
+                },
+                {
+                  "op": "div",
+                  "args": [
+                    {
+                      "ref": "T"
+                    },
+                    2
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "div",
+              "args": [
+                {
+                  "ref": "comp1"
+                },
+                2
+              ]
+            }
+          ]
+        },
+        "2": {
+          "op": "select",
+          "args": [
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "ref": "s"
+                },
+                2
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "ref": "comp2"
+                },
+                {
+                  "op": "div",
+                  "args": [
+                    {
+                      "ref": "T"
+                    },
+                    2
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "div",
+              "args": [
+                {
+                  "ref": "comp2"
+                },
+                2
+              ]
+            }
+          ]
+        }
+      },
+      "definition": "divider",
+      "slots": [
+        [
+          {
+            "op": "select",
+            "args": [
+              {
+                "op": "eq",
+                "args": [
+                  {
+                    "ref": "s"
+                  },
+                  0
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "ref": "comp0"
+                  },
+                  {
+                    "op": "div",
+                    "args": [
+                      {
+                        "ref": "T"
+                      },
+                      2
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "ref": "comp0"
+                  },
+                  2
+                ]
+              }
+            ]
+          },
+          {
+            "op": "select",
+            "args": [
+              {
+                "op": "eq",
+                "args": [
+                  {
+                    "ref": "s"
+                  },
+                  1
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "ref": "comp1"
+                  },
+                  {
+                    "op": "div",
+                    "args": [
+                      {
+                        "ref": "T"
+                      },
+                      2
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "ref": "comp1"
+                  },
+                  2
+                ]
+              }
+            ]
+          },
+          {
+            "op": "select",
+            "args": [
+              {
+                "op": "eq",
+                "args": [
+                  {
+                    "ref": "s"
+                  },
+                  2
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "ref": "comp2"
+                  },
+                  {
+                    "op": "div",
+                    "args": [
+                      {
+                        "ref": "T"
+                      },
+                      2
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "ref": "comp2"
+                  },
+                  2
+                ]
+              }
+            ]
+          }
+        ]
+      ],
+      "rotation": "identity",
+      "shape": [
+        {
+          "op": "select",
+          "args": [
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "ref": "s"
+                },
+                0
+              ]
+            },
+            {
+              "ref": "T"
+            },
+            {
+              "ref": "comp0"
+            }
+          ]
+        },
+        {
+          "op": "select",
+          "args": [
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "ref": "s"
+                },
+                1
+              ]
+            },
+            {
+              "ref": "T"
+            },
+            {
+              "ref": "comp1"
+            }
+          ]
+        },
+        {
+          "op": "select",
+          "args": [
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "ref": "s"
+                },
+                2
+              ]
+            },
+            {
+              "ref": "T"
+            },
+            {
+              "ref": "comp2"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "pairings": [
+    {
+      "kind": "latches",
+      "members": [
+        "latches-base/1",
+        "latches-lid/1"
+      ],
+      "axes": [
+        0,
+        1,
+        2
+      ],
+      "datum": "closed",
+      "display_gap_effect": "none"
+    },
+    {
+      "kind": "latches",
+      "members": [
+        "latches-base/2",
+        "latches-lid/2"
+      ],
+      "axes": [
+        0,
+        1,
+        2
+      ],
+      "datum": "closed",
+      "display_gap_effect": "none"
+    },
+    {
+      "kind": "hinges",
+      "members": [
+        "hinges-base/1",
+        "hinges-lid/1"
+      ],
+      "axes": [
+        0,
+        1,
+        2
+      ],
+      "datum": "closed",
+      "display_gap_effect": "none"
+    },
+    {
+      "kind": "hinges",
+      "members": [
+        "hinges-base/2",
+        "hinges-lid/2"
+      ],
+      "axes": [
+        0,
+        1,
+        2
+      ],
+      "datum": "closed",
+      "display_gap_effect": "none"
+    },
+    {
+      "kind": "wheel/socket",
+      "members": [
+        "wheels/1",
+        "sockets/1"
+      ],
+      "axes": [
+        0,
+        1
+      ],
+      "datum": "closed",
+      "display_gap_effect": "none"
+    },
+    {
+      "kind": "wheel/socket",
+      "members": [
+        "wheels/2",
+        "sockets/2"
+      ],
+      "axes": [
+        0,
+        1
+      ],
+      "datum": "closed",
+      "display_gap_effect": "none"
+    },
+    {
+      "kind": "wheel/socket",
+      "members": [
+        "wheels/3",
+        "sockets/3"
+      ],
+      "axes": [
+        0,
+        1
+      ],
+      "datum": "closed",
+      "display_gap_effect": "none"
+    },
+    {
+      "kind": "wheel/socket",
+      "members": [
+        "wheels/4",
+        "sockets/4"
+      ],
+      "axes": [
+        0,
+        1
+      ],
+      "datum": "closed",
+      "display_gap_effect": "none"
+    }
+  ],
+  "inventory": {
+    "empty_assembly_ids": [
+      "synthetic-empty"
+    ],
+    "unresolved_ids": []
+  },
+  "scenario_contract": {
+    "resized_dimension": "For scenario.operation=resize use target_plywood_external[axis]; otherwise default. Validate finite dimensions. Recompute B, internal as [W-2*T,D-2*T,H-2*T], and external datums; preserve local compartment box dimensions/centers.",
+    "approved_group_edge_offset": "Use explicitly approved persisted whole-group parameter from previous observation if present, otherwise default; unilateral member edits are conflicts.",
+    "set_group_count": {
+      "group_id": "handles",
+      "allowed_counts": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "edge_offset_default": 100,
+      "inner_offset_default": 260,
+      "patterns": {
+        "1": [
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "W"
+              },
+              2
+            ]
+          }
+        ],
+        "2": [
+          {
+            "ref": "scenario.edge_offset"
+          },
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "W"
+              },
+              {
+                "ref": "scenario.edge_offset"
+              }
+            ]
+          }
+        ],
+        "3": [
+          {
+            "ref": "scenario.edge_offset"
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "ref": "W"
+              },
+              2
+            ]
+          },
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "W"
+              },
+              {
+                "ref": "scenario.edge_offset"
+              }
+            ]
+          }
+        ],
+        "4": [
+          {
+            "ref": "scenario.edge_offset"
+          },
+          {
+            "ref": "scenario.inner_offset"
+          },
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "W"
+              },
+              {
+                "ref": "scenario.inner_offset"
+              }
+            ]
+          },
+          {
+            "op": "sub",
+            "args": [
+              {
+                "ref": "W"
+              },
+              {
+                "ref": "scenario.edge_offset"
+              }
+            ]
+          }
+        ]
+      },
+      "v": {
+        "op": "div",
+        "args": [
+          {
+            "ref": "B"
+          },
+          2
+        ]
+      },
+      "n": 0,
+      "member_order": "ascending local u",
+      "mode_by_count": {
+        "1": "centered",
+        "2": "mirrored_pair",
+        "3": "centered_pattern",
+        "4": "centered_pattern"
+      }
+    },
+    "default_operation": "initial plan",
+    "resize_preserves": "device/accessory/divider local layout; whole-group approved overrides",
+    "manual_override": {
+      "group_id": "braces",
+      "parameter": "edge_offset",
+      "approval_required": true,
+      "default": 80
+    },
+    "reconcile": {
+      "operation": "reconcile",
+      "manual_overrides": "Validated whole-group changes from scenario.manual_overrides; preserve approval IDs in observation.preserved_manual_approvals and carry decisions through previous on resize",
+      "allowed_group_parameters": {
+        "braces": [
+          "edge_offset"
+        ],
+        "handles": [
+          "count",
+          "edge_offset",
+          "inner_offset"
+        ]
+      },
+      "manual_additions": {
+        "required": [
+          "id",
+          "definition",
+          "anchor",
+          "group",
+          "group_id",
+          "approval"
+        ],
+        "allowed_anchor_frame": "closed",
+        "anchor_rule_allowlist": {
+          "W/2": {
+            "op": "div",
+            "args": [
+              {
+                "ref": "W"
+              },
+              2
+            ]
+          },
+          "D/2": {
+            "op": "div",
+            "args": [
+              {
+                "ref": "D"
+              },
+              2
+            ]
+          },
+          "base_height/4": {
+            "op": "div",
+            "args": [
+              {
+                "ref": "B"
+              },
+              4
+            ]
+          }
+        },
+        "approved_definition_allowlist": {
+          "synthetic-20-cube": {
+            "shape": [
+              20,
+              20,
+              20
+            ],
+            "local_bounds": [
+              [
+                -10,
+                -10,
+                -10
+              ],
+              [
+                10,
+                10,
+                10
+              ]
+            ],
+            "rotation": "identity",
+            "geometry_policy": "rigid"
+          }
+        },
+        "membership": "supplied reviewed group and unique physical id; include in inventory and transport bounds",
+        "missing_anchor": "block MANUAL_ANCHOR_REQUIRED",
+        "unknown_anchor_rule": "block; never evaluate strings",
+        "allowed_group_id": "manual-attached",
+        "group_contract": {
+          "family": "interior",
+          "mode": "centered",
+          "datum": "closed",
+          "axes": [
+            "0",
+            "1"
+          ],
+          "scope": "constructor-attached-local-part",
+          "centers": "W/2,D/2",
+          "rotation": "identity"
+        }
+      },
+      "manual_approval": "Nonempty explicit scenario approval and approved group scope required; synthetic test tokens are not production authorization"
+    },
+    "display": {
+      "operation": "display",
+      "input": "scenario.display_gap",
+      "fallback": "spec.display_gap",
+      "physical_effect": "none"
+    }
+  },
+  "coordinate_rules": {
+    "frames": "rotation columns are local u/v/n in closed XYZ; P = origin + rotation * uvn",
+    "occurrence_rotation": "rotation entries name proper local-part-to-closed matrices; list means one name per slot",
+    "local_bounds": "centered_box_from_shape means min=-shape/2, max=shape/2 in catalog axes; rigid definitions use catalog literals",
+    "interior_origin": "Internal layout origin coincides with closed origin in this synthetic contract; do not add panel thickness",
+    "panel_planes": "Synthetic panels straddle mounting planes by thickness/2; these are envelope test boxes, not production joinery",
+    "slot_ids": "group_id + / + one_based_slot_index; list order is stable"
+  },
+  "approvals": {
+    "SYNTHETIC-CONSTRUCTOR-APPROVAL-1": {
+      "status": "test-only-assumed-constructor-approval",
+      "groups": [
+        "interior",
+        "interior-devices",
+        "interior-accessory",
+        "interior-divider-1",
+        "interior-divider-2",
+        "interior-foam",
+        "interior-custom",
+        "interior-import"
+      ],
+      "permits": "Local compartment centers rather than global case symmetry; no waiver of member completeness, proper rotation, or accounting"
+    },
+    "SYNTHETIC-CORNER-FUNCTION-APPROVAL-1": {
+      "status": "test-only-assumed-constructor-approval",
+      "groups": [
+        "corner-handle"
+      ],
+      "permits": "Single front-right functional corner handle in stable dedicated local frame; ordinary handles retain wall symmetry"
+    },
+    "SYNTHETIC-CONSTRUCTOR-MANUAL-1": {
+      "status": "test-only-assumed-constructor-approval",
+      "groups": [
+        "braces"
+      ],
+      "parameters": [
+        "edge_offset"
+      ],
+      "scope": "whole-group override; preserve after resize"
+    },
+    "SYNTHETIC-B-HANDLE-APPROVAL": {
+      "status": "test-only-assumed-constructor-approval",
+      "groups": [
+        "handles"
+      ],
+      "parameters": [
+        "count",
+        "edge_offset"
+      ],
+      "scope": "whole-group handle pattern; preserve after resize"
+    },
+    "SYNTHETIC-C-ANCHOR-APPROVAL": {
+      "status": "test-only-assumed-constructor-approval",
+      "groups": [
+        "manual-attached"
+      ],
+      "parameters": [
+        "anchored_addition"
+      ],
+      "scope": "one rigid synthetic-20-cube with closed W/2,D/2,base_height/4 anchor; preserve after resize"
+    }
+  },
+  "fit_and_allowances": {
+    "ordinary_handle_wall_fit": {
+      "width": 150,
+      "height": 80,
+      "edge_clearance_min": 0,
+      "adjacent_separation_min": 10,
+      "reject_duplicate_or_crossed_slots": true
+    },
+    "other_footprints": "Require finite positive shapes, fixed approved catalog geometry and valid anchor domains; detailed contact and cutout clearances are outside this recipe",
+    "profile_cut_allowance": 0,
+    "interior_containment": "Layout envelope boxes must fit internal, without positive overlap between device/accessory/divider boxes; foam/custom/import are symbolic test insert roles allowed to share local placement, not a production collision claim",
+    "approved_contacts": [
+      "paired closure profiles share seam plane",
+      "paired latch/hinge half mounting points coincide",
+      "wheel and socket share X/Y only"
+    ]
+  },
+  "transport_envelope": {
+    "operation": "union_transformed_local_bounds",
+    "source": "all physical occurrences",
+    "coordinate_system": "closed",
+    "include_display_gap": false,
+    "proof_scope": "synthetic transport AABB only; no collision or structural proof"
+  },
+  "presentation": {
+    "lid_translation": [
+      0,
+      0,
+      {
+        "input_selector": "presentation_gap",
+        "default": {
+          "ref": "spec.display_gap"
+        }
+      }
+    ],
+    "physical_coordinates": "unchanged",
+    "lid_groups": [
+      "plates-lid-front",
+      "plates-lid-rear",
+      "plates-lid-left",
+      "plates-lid-right",
+      "plates-roof",
+      "corners-lid",
+      "closure-x-lid",
+      "closure-y-lid",
+      "braces-lid",
+      "latches-lid",
+      "hinges-lid",
+      "sockets"
+    ]
+  },
+  "out_of_scope": [
+    "native CAD execution",
+    "cutouts",
+    "precise profile joints",
+    "production collision clearances",
+    "strength and stacking support approval"
+  ],
+  "group_count": 37,
+  "physical_occurrence_count_default": 67
+}

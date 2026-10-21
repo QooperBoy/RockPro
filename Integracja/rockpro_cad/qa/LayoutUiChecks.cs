@@ -60,6 +60,7 @@ class LayoutUiChecks {
   Console.WriteLine("PASS: revision conflicts classify, preserve draft/token, show three-way values, capture independent row baselines");
   Console.WriteLine("PASS: depth buffer in both orders; number and choice wheel suppression; form scrolling");
   LanguageChecks();
+  CasePlanUiChecks.Run();
   }finally{UiText.SetLanguage(previousLanguage,false);}
  }
  static void LayoutLanguageChecks(){

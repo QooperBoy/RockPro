@@ -1,5 +1,45 @@
 # RockPro CAD — kontrakt developerski
 
+## Kontrakt i inwentarz części — ROC-15 / ROC-42
+
+Pakiet `Integracja/rockpro_cad/core_case` zawiera walidatory danych, generator
+`plan_case` i osobnego wykonawcę natywnego prototypu CAD. [CASE_CONTRACT.md](CASE_CONTRACT.md)
+opisuje wersje, jednostki, pochodzenie wymiarów, tożsamość części, kotwy i grupy
+symetrii. [PARTS_MANIFEST.md](PARTS_MANIFEST.md) opisuje źródłowy inwentarz oraz
+powtarzalny odczyt z zachowaną mapą UUID. Oba moduły są sprawdzane w kroku
+`core-contracts` zwykłego `scripts/Verify.ps1`.
+
+`inventory_draft` z odczytu CAD jest propozycją pełnego rozliczenia węzłów.
+Nie jest wykonywalnym szablonem: brak potwierdzonych ról, ram montażowych,
+parowania lub symetrii blokuje dalsze użycie. Kontrakt zgłasza
+`MANIFEST_NOT_READY`, gdy taki szkic jest podstawiany do żądania planera.
+Zgody i dane syntetyczne z ROC-43 nie zatwierdzają rzeczywistego modelu Epson.
+Przy odczycie JSON zawsze podawaj `encoding='utf-8'`; domyślne kodowanie Windows
+może uszkodzić polskie nazwy i spowodować prawidłową odmowę zgodności hashy.
+
+Rzeczywiste manifesty klienta i mapowania źródła przechowuj wyłącznie lokalnie,
+w ignorowanym `artifacts/`. Zakończenie kontraktu nie oznacza ukończenia montażu,
+promocji źródłowego manifestu do szablonu ani natywnej walidacji ICS.
+
+Architektura i zakres docelowy (nie wszystkie moduły są gotowe produkcyjnie):
+[CORE_CASE_DESIGN.md](CORE_CASE_DESIGN.md) — pełna rodzina skrzyń, kotwy okuć,
+zachowanie ręcznej pracy i TDD. Pierwszy przyrost: ROC-43; plan nadrzędny: ROC-6.
+
+ROC-43: [specyfikacja testów i instrukcja uruchomienia](ROC43_TDD.md).
+Zwykły harness uruchamia `core-design` w trybie `all`: zamrożone wymagania
+generatora oraz testy obliczeń układu i niezależnego weryfikatora oczekiwań.
+Historyczna nazwa `--mode red` oznacza teraz ten sam zestaw TDD po implementacji;
+wynik musi być PASS, a każdy regres zwraca kod niezerowy.
+Nie zastępuj błędów skip/expectedFailure ani nie przedstawiaj testów offline
+jako dowodu działania CAD. Osobno sprawdzaj zapis, ponowne otwarcie i pomiar ICS.
+
+Nowy przepływ `mcp/core_service.py` korzysta z tej samej bazy co UI. Wersjonuje
+żądanie, przypina plan do wersji karty i układu oraz SHA źródła. Dziennik operacji
+uniemożliwia ponowny montaż po niejednoznacznym błędzie; odzyskiwanie weryfikuje
+zapisany raport przed rejestracją snapshotu. Prototyp generuje bryły zastępcze,
+nie zatwierdzone okucia katalogowe. Nie promuje manifestu Epson ani gotowości
+produkcyjnej. Szczegóły: [CORE_RUNTIME.md](CORE_RUNTIME.md).
+
 ## Źródło i środowisko
 
 Źródłem kodu jest checkout `rockpro-cad`. Sąsiedni `../Integracja/rockpro_cad` to lokalne wdrożenie autora, z własnym venv, bazą, manifestem i rewizjami. Zmiany wdrożeniowe należy najpierw zachować w Git; baz i konfiguracji nie kopiujemy między checkoutami. Nowa kompilacja nie przeładowuje DLL w otwartym IronCAD.

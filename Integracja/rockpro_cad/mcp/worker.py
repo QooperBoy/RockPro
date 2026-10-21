@@ -205,6 +205,22 @@ def create_snapshot(project_id,label="Snapshot",note=""):
 
 
 def dispatch(name, arguments):
+    core_keys = {
+        'preview_case': {'request'},
+        'prepare_case_request': {'project_id','expected_layout_revision'},
+        'get_case_request': {'project_id'},
+        'save_case_request': {'project_id','request','expected_revision','actor','change_source'},
+        'plan_project_case': {'project_id','expected_revision','scenario'},
+        'execute_case_plan': {'project_id','plan_id','operation_id','expected_revision'},
+        'get_case_operation': {'project_id','operation_id'},
+        'list_case_operations': {'project_id','limit'},
+        'recover_case_operation': {'project_id','operation_id'},
+    }
+    if name in core_keys:
+        if not isinstance(arguments, dict) or set(arguments)-core_keys[name]:
+            raise ValueError('Unknown case tool argument')
+        import core_service
+        return getattr(core_service, name)(**arguments)
     from layout import calculate_layout, get_layout, save_layout
     layout_tools={"preview_layout":(calculate_layout,{"spec"}),"get_layout":(get_layout,{"project_id","revision"}),"save_layout":(save_layout,{"project_id","spec","expected_revision","actor","change_source"})}
     if name in layout_tools:
@@ -223,22 +239,9 @@ def dispatch(name, arguments):
     if name in db_tools:
         return db_tools[name](**arguments)
     # CLI panel and MCP server must never drive the COM document concurrently.
-    import msvcrt
-    with (Path(__file__).parent/"cad.lock").open("a+b") as lock:
-        lock.seek(0)
-        if not lock.read(1):
-            lock.write(b"0")
-            lock.flush()
-        lock.seek(0)
-        try:
-            msvcrt.locking(lock.fileno(), msvcrt.LK_NBLCK, 1)
-        except OSError as exc:
-            raise RuntimeError("Another RockPro CAD operation is running") from exc
-        try:
-            return globals()[name](**arguments)
-        finally:
-            lock.seek(0)
-            msvcrt.locking(lock.fileno(), msvcrt.LK_UNLCK, 1)
+    from rockpro_cad.cad_lock import cad_writer_lock
+    with cad_writer_lock():
+        return globals()[name](**arguments)
 
 
 if __name__ == "__main__":
