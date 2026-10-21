@@ -28,6 +28,7 @@ def main():
     steps=[];py=sys.executable;source=ROOT/'Integracja'/'rockpro_cad'
     jobs=[('repository',[py,ROOT/'scripts/repo_audit.py','--output',folder/'repository.json']),
           ('backend',[py,'-m','unittest','discover','-s',source/'mcp','-p','test_*.py','-v']),
+          ('parts',[py,'-m','unittest','discover','-s',source/'parts','-p','test_*.py','-v']),
           ('qa',[py,'-m','unittest','discover','-s',source/'qa','-p','test_acceptance.py','-v']),
           ('harness',[py,'-m','unittest','discover','-s',ROOT/'scripts','-p','test_verification.py','-v'])]
     if args.build or args.ui:

@@ -62,3 +62,77 @@ Kontrakt wersjonowania układu, konfliktów i powiązania CAD: [LAYOUT_VERSIONIN
 
 Karta projektu i każdy etap mają niezależne rewizje. Kontrakt aktualizacji,
 historii i odbioru: [PROJECT_CONCURRENCY.md](PROJECT_CONCURRENCY.md).
+
+## Czytnik części — etap przed montażem okuć
+
+Pakiet `Integracja/rockpro_cad/parts` jest osobnym narzędziem tylko do odczytu,
+nie nowym panelem dodatku ani uruchomionym w tle agentem. Rozdziela czysty traversal
+z wstrzykiwanym adapterem, adapter natywnego ICAPI i lokalny dziennik JSONL.
+Testy `parts/test_*.py` są częścią `scripts/Verify.ps1` w kroku `parts`.
+
+Obowiązuje hierarchia zespołów i wystąpień części, nie drzewo wszystkich operacji
+wewnątrz brył. Liczba węzłów/zespołów/części nie jest zakupowym BOM: połówki zamka
+mogą być osobnymi wystąpieniami, a puste zespoły nie oznaczają fizycznych elementów.
+Czytnik nie rozpoznaje automatycznie kodów i nie zatwierdza reguł mocowania.
+
+Obrys ma jawny układ `part_local`: min/max API w metrach przeliczamy na mm.
+Nie jest to obrys globalny po obrocie ani gwarancja wymiaru katalogowego.
+Brak obrysu, niepoprawne współrzędne i brak właściwości są oznaczane w wyniku;
+nie zamieniamy ich na fikcyjne zera. Materiał modelu pozostaje `material_cad_raw`.
+
+Odczyt ma ograniczenia głębokości, liczby węzłów/prób i czasu. Limit czasu jest
+kooperacyjny między wywołaniami API; pojedynczy zablokowany COM nie ma bezpiecznego
+przerwania. Nie uruchamiaj równolegle modyfikacji CAD podczas zbierania inwentarza.
+Natywny adapter tylko dołącza do otwartego pliku przez ROT, porównuje pełną ścieżkę,
+odczytuje stan dokumentu i hash pliku przed/po. Nie uruchamia IronCAD, nie otwiera,
+nie aktywuje, nie zamyka i nie zapisuje dokumentów. Hash dysku nie dowodzi zgodności
+ze stanem pamięci; zapisane w raporcie flagi dokumentu są osobnym dowodem.
+
+Surowy wynik może zawierać nazwy i dane klienta: zapisujemy go wyłącznie lokalnie,
+poza śledzonymi plikami repo. Osobny logger przepuszcza tylko ograniczone metadane,
+liczniki i hashe; nie zapisuje pełnych ścieżek, geometrii ani treści wyjątków.
+Limit logu daje jawny znacznik ucięcia. Błąd zapisu logu nie może dawać sukcesu.
+Pole modelu pozostaje null, gdy dana operacja jest deterministycznym odczytem API.
+
+Plan routingu modeli, rozwoju dowodów i regresji:
+[PARTS_CATALOG_PLAN.md](PARTS_CATALOG_PLAN.md). Nie wszystkie pola planowanego
+pełnego audytu (np. rewizje SQLite i relacje zdarzeń projektu) są częścią tego loggera.
+
+### Uruchomienie czytnika
+
+Użyj Pythona z przygotowanego venv (patrz rozdział Sprawdzanie), z katalogu
+`Integracja` tego checkoutu. Plik musi już być otwarty w IronCAD i wskazany pełną
+ścieżką. Katalog raportu musi istnieć, a plik wynikowy nie może istnieć wcześniej.
+
+```text
+python -m rockpro_cad.parts --source "C:\projekty\przyklad.ics" --max-seconds 180 --output "..\artifacts\nowy-inwentarz.json"
+```
+
+Domyślne limity: głębokość 12, 10000 węzłów/prób przejścia do dzieci, 30 sekund
+samego traversal. Poza tym czasem pozostają m.in. attach, hashowanie i zapis raportu.
+Kody wyjścia: `0` kompletny odczyt w zadanym zakresie, `2` wynik częściowy,
+`1` błąd wykonania lub integralności. `0` nie oznacza gotowego projektu produkcyjnego.
+Inwentarz zapisany przez `--output` ma `operation_log_status=pending_finalization`:
+finalnym potwierdzeniem jest JSON na stdout i odpowiadający mu końcowy wpis JSONL
+z hashem inwentarza. Te dwa pliki nie stanowią transakcji atomowej. Nie traktuj samego
+inwentarza jako dowodu ukończenia audytu. Stdout można zachować jako osobny lokalny
+plik odbioru; zawiera dane klienta tak samo jak inwentarz.
+
+Sandbox może nie widzieć rejestru COM procesu na pulpicie. Komunikat o braku otwartego
+źródła nie dowodzi wtedy, że użytkownik zamknął model. Nie dodawaj fallbacku otwierania
+lub uruchamiania aplikacji: sprawdź uprawnienia i kontekst uruchomienia testu.
+
+### Odbiór pierwszej wersji 21.10.2026
+
+- PASS: cały harness repozytorium, backendu, części, QA i harnessu; 29 testów części.
+- PASS: natywny odczyt już otwartego modelu, pełna ścieżka/GUID i hash przed/po.
+  403 węzły hierarchii: 113 zespołów (11 pustych) i 289 wystąpień części; 254 obrysy
+  przeszły walidację liczbową. Nie jest to zatwierdzenie geometrii montażu.
+- Oczekiwany wynik natywny: `partial`, exit 2. 35 obrysów jest niepoprawnych, a flaga
+  Modified była true przed i po odczycie. Hash źródła był identyczny; dokumentu nie zapisano.
+- PASS: niezależny przegląd Astra kodu, lokalnych raportów i JSONL; implementacja Sol.
+- NOT RUN: nowe UI, nowy endpoint MCP, montaż okuć i jego geometria — nie należą do tej wersji.
+
+Dowody lokalne: `artifacts/verification/20261021T160039766635Z/`,
+`artifacts/parts-reader-native/20261021T160057Z/` i wskazany w raporcie dziennik
+`artifacts/agent-runs/`. Te dane nie są publikowane w Git.
