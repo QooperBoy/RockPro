@@ -196,6 +196,12 @@ def create_snapshot(project_id,label="Snapshot",note=""):
 
 
 def dispatch(name, arguments):
+    from layout import calculate_layout, get_layout, save_layout
+    layout_tools={"preview_layout":(calculate_layout,{"spec"}),"get_layout":(get_layout,{"project_id"}),"save_layout":(save_layout,{"project_id","spec"})}
+    if name in layout_tools:
+        fn, keys=layout_tools[name]
+        if not isinstance(arguments,dict) or set(arguments)!=keys: raise ValueError("Invalid layout arguments")
+        return fn(**arguments)
     from project_store import list_projects, save_project, get_project, set_stage, list_snapshots
     db_tools={"list_projects":list_projects,"save_project":save_project,"get_project":get_project,
               "set_stage":set_stage,"list_snapshots":list_snapshots}

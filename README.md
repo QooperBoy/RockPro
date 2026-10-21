@@ -2,7 +2,7 @@
 
 Natywny dodatek IronCAD 2027: panel projektu, parametry szkieletu skrzyni, historia snapshotów oraz lokalny serwer MCP i SQLite.
 
-**Wersja MVP 0.3.** Obsługa CAD obejmuje znany szkielet dziesięciu płyt. To nie jest jeszcze automat do dowolnych projektów WoodLAB ani wydanie produkcyjne.
+**Wersja MVP 0.4.** Obsługa CAD obejmuje znany szkielet dziesięciu płyt. To nie jest jeszcze automat do dowolnych projektów WoodLAB ani wydanie produkcyjne.
 
 ## Start
 
@@ -29,4 +29,6 @@ Dane klientów, baza SQLite, logi, środowisko Python, wygenerowane DLL i robocz
 .\Integracja\.venv\Scripts\python.exe -m unittest discover -s .\Integracja\rockpro_cad\qa -p test_acceptance.py -v
 ```
 
-13 testów backendu + 7 odbiorczych. Testy te nie zastępują testu natywnego IronCAD na komputerze docelowym.
+19 testów backendu + 7 odbiorczych. Testy te nie zastępują testu natywnego IronCAD na komputerze docelowym.
+
+Konfigurator rozmieszczenia: [LAYOUT.md](LAYOUT.md) — podgląd 3D, zapis w SQLite oraz gabaryty kopii ICS.

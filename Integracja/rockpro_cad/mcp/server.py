@@ -27,6 +27,13 @@ def schema(name, description, properties, required=(), readonly=False):
     return {"name":name,"description":description,"annotations":{"readOnlyHint":readonly,"destructiveHint":False,"openWorldHint":False},
             "inputSchema":{"type":"object","properties":properties,"required":list(required),"additionalProperties":False}}
 S={"type":"string"}
+from layout import DEFAULT
+layout_spec={"type":"object","additionalProperties":False,"properties":{k:{"type":"string" if isinstance(v,str) else "integer" if k=="count" else "number"} for k,v in DEFAULT.items()}}
+SCHEMAS += [
+ schema("preview_layout","Calculate device envelopes, partitions and accessory space in mm; no CAD edits",{"spec":layout_spec},["spec"],True),
+ schema("get_layout","Read saved layout from project SQLite",{"project_id":S},["project_id"],True),
+ schema("save_layout","Save layout specification and invalidate downstream stages",{"project_id":S,"spec":layout_spec},["project_id","spec"])
+]
 SCHEMAS += [
  schema("list_projects","List locally persisted SQLite projects",{},readonly=True),
  schema("save_project","Create or update a project card bound to a native ICS file",{k:S for k in ("project_id","name","client","device","notes","source")}|{"quantity":{"type":"integer","minimum":1,"maximum":100000}},["name"]),
