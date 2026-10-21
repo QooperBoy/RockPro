@@ -40,13 +40,13 @@ class Acceptance(unittest.TestCase):
 
     def test_partial_metadata_update_preserves_omitted_fields(self):
         p = self.create()
-        updated = store.save_project(project_id=p["id"], name="Renamed")["project"]
+        updated = store.save_project(project_id=p["id"], name="Renamed", expected_revision=p["revision"])["project"]
         self.assertEqual((updated["client"], updated["device"], updated["quantity"], updated["notes"]),
                          ("RockPro", "Epson", 3, "wymagania"))
 
     def test_stage_updates_are_project_scoped_and_manual(self):
         a, b = self.create("Alpha"), self.create("Beta")
-        store.set_stage(a["id"], "geometry", "approved", "constructeur")
+        store.set_stage(a["id"], "geometry", "approved", "constructeur", expected_revision=1)
         aa = store.get_project(a["id"])["project"]["stages"]
         bb = store.get_project(b["id"])["project"]["stages"]
         self.assertEqual(next(x for x in aa if x["key"] == "geometry")["status"], "approved")

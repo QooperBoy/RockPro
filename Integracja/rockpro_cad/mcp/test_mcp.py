@@ -84,7 +84,7 @@ class Boundaries(unittest.TestCase):
         replies = [json.loads(line) for line in run.stdout.splitlines()]
         self.assertEqual(len(replies), 2)
         self.assertEqual(replies[0]["result"]["protocolVersion"], "2025-06-18")
-        self.assertEqual(len(replies[1]["result"]["tools"]), 11)
+        self.assertIn("get_history", {t["name"] for t in replies[1]["result"]["tools"]})
 
 
 if __name__ == "__main__":

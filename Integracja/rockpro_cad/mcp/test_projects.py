@@ -16,31 +16,31 @@ class ProjectStoreTests(unittest.TestCase):
         self.dbpatch.stop();self.pathpatch.stop();self.temp.cleanup()
     def create(self): return store.save_project('Test',client='Client',device='Speaker',quantity=4)['project']
     def test_persistence_and_partial_update(self):
-        p=self.create();updated=store.save_project('Renamed',project_id=p['id'])['project']
+        p=self.create();updated=store.save_project('Renamed',project_id=p['id'],expected_revision=p['revision'])['project']
         self.assertEqual(updated['quantity'],4);self.assertEqual(updated['client'],'Client')
         self.assertEqual(store.list_projects()['projects'][0]['id'],p['id'])
         self.assertEqual(len(updated['stages']),9)
     def test_manual_status_and_bad_input(self):
         p=self.create()
-        result=store.set_stage(p['id'],'geometry','approved','Reviewed by constructor')['project']
+        result=store.set_stage(p['id'],'geometry','approved','Reviewed by constructor',expected_revision=1)['project']
         stage=next(s for s in result['stages'] if s['key']=='geometry')
         self.assertEqual(stage['validation'],'manual')
         with self.assertRaises(ValueError):store.set_stage(p['id'],'geometry','validated')
         with self.assertRaises(ValueError):store.save_project('Bad',quantity=True)
     def test_metadata_invalidates_dependent_stages(self):
         p=self.create()
-        for key in ("materials","production","layout"): store.set_stage(p["id"],key,"approved")
-        changed=store.save_project("Test",project_id=p["id"],quantity=5)["project"]
+        for key in ("materials","production","layout"): store.set_stage(p["id"],key,"approved",expected_revision=1)
+        changed=store.save_project("Test",project_id=p["id"],quantity=5,expected_revision=1)["project"]
         states={s["key"]:s["status"] for s in changed["stages"]}
         self.assertEqual(states["materials"],"outdated");self.assertEqual(states["layout"],"approved")
-        changed=store.save_project("Test",project_id=p["id"],device="Other")["project"]
+        changed=store.save_project("Test",project_id=p["id"],device="Other",expected_revision=2)["project"]
         self.assertEqual(next(s for s in changed["stages"] if s["key"]=="layout")["status"],"outdated")
         with self.assertRaises(ValueError):store.save_project("Archive",source=str(self.root/"snapshot.ics"))
     def test_source_pinned(self):
         p=self.create()
         with self.assertRaises(ValueError):store.pinned_source(p['id'],str(self.root/'other.ics'))
     def test_snapshot_archive_independent_and_detects_modification(self):
-        p=self.create();store.set_stage(p['id'],'documentation','approved')
+        p=self.create();store.set_stage(p['id'],'documentation','approved',expected_revision=1)
         working=self.root/'revision.ics';working.write_bytes(b'validated model')
         report={'copy':str(working),'source':str(self.source),'passed':True,'source_unchanged':True,
                 'after_reopen':{'measurements':{'parameters_mm':{'RP_Length':100}}}}

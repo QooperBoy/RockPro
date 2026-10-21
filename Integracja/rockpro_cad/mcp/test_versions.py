@@ -18,8 +18,8 @@ class VersionTests(unittest.TestCase):
         self.dbpatch=patch.object(store,'DB_PATH',self.root/'test.sqlite3');self.dbpatch.start()
         self.source=self.root/'source.ics';self.source.write_bytes(b'original')
         with store.db() as c:
-            c.execute('INSERT INTO projects VALUES (?,?,?,?,?,?,?,?,?)',('p','test','','',1,'',str(self.source),'now','now'))
-            c.executemany('INSERT INTO stages VALUES (?,?,?,?,?,?)',[('p',k,l,'approved','','now') for k,l in store.STAGES])
+            c.execute('INSERT INTO projects (id,name,client,device,quantity,notes,source,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?)',('p','test','','',1,'',str(self.source),'now','now'))
+            c.executemany('INSERT INTO stages (project_id,key,label,status,note,updated_at) VALUES (?,?,?,?,?,?)',[('p',k,l,'approved','','now') for k,l in store.STAGES])
     def tearDown(self):
         self.dbpatch.stop();self.temp.cleanup()
     def test_legacy_migration_idempotent(self):
@@ -46,7 +46,7 @@ class VersionTests(unittest.TestCase):
             self.assertEqual(c.execute("SELECT COUNT(*) FROM events WHERE kind='layout_saved'").fetchone()[0],1)
     def test_stale_save_never_changes_stages_or_history(self):
         first=layout.save_layout('p',{},0)
-        store.set_stage('p','geometry','approved')
+        store.set_stage('p','geometry','approved',expected_revision=2)
         with self.assertRaisesRegex(ValueError,'LAYOUT_CONFLICT'):layout.save_layout('p',dict(count=9),0)
         self.assertEqual(layout.get_layout('p')['sha256'],first['sha256'])
         self.assertEqual(next(s for s in store.get_project('p')['project']['stages'] if s['key']=='geometry')['status'],'approved')
