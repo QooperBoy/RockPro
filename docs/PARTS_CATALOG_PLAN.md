@@ -18,3 +18,7 @@
 Odczyt API modelu Epson do głębokości 3: 218 węzłów; 36 bezpośrednich węzłów pod górą/dołem, pogrupowanych do 24 nazw z uwzględnieniem zespołu. To inwentaryzacja drzewa, nie kompletny BOM. Zawiera m.in. konstrukcję, zespół urządzenia, wnętrze i okucia. Nazwy 410429, B1930, H7159, 17251S i 270836 wymagają potwierdzenia funkcji i danych katalogowych.
 
 Lokalne surowe dane oraz CSV są w sąsiednim wdrożeniu autora w `Integracja/assembly_audit.json` i `Integracja/parts/Epson_czesci_do_opisania.csv`. Nie są publikowane w Git. Źródłowy ICS nie został zmodyfikowany przez odczyt.
+
+## Wykonany research identyfikacyjny
+
+Wynik identyfikacji kodów i funkcji: [PARTS_IDENTIFICATION.md](PARTS_IDENTIFICATION.md). Katalog referencyjny PL/EN z aliasami i źródłami: [hardware-reference.json](catalog/hardware-reference.json). To podstawa do dalszej weryfikacji geometrii i reguł mocowania; żaden wpis nie jest jeszcze dopuszczony do automatycznego wstawiania.
