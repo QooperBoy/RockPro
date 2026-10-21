@@ -46,7 +46,11 @@ namespace RockPro.CAD {
                 ZControlBar bar=env.AddControlBar(site,"RockPro CAD");
                 bar.Controls.Add(ezControlType.Z_CONTROL_BUTTON,command.ControlDescriptor,null);
                 env.GetRibbonBar(eZRibbonBarType.Z_RIBBONBAR).AddButton(command.ControlDescriptor);
-                Log("InitSelf OK; ribbon command registered");
+                string binary=typeof(Addin).Assembly.Location;
+                string digest;
+                using(var hash=System.Security.Cryptography.SHA256.Create())
+                using(var stream=File.OpenRead(binary))digest=BitConverter.ToString(hash.ComputeHash(stream)).Replace("-","").ToLowerInvariant();
+                Log("InitSelf OK; build=core-prototype-20261021; ribbon command registered; dll="+binary+"; sha256="+digest);
             } catch(Exception e) {Log("InitSelf ERROR "+e);MessageBox.Show(e.Message,"RockPro CAD");}
         }
         private void OnUpdate() {if(command!=null) command.Enabled=true;}

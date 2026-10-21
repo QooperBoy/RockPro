@@ -48,6 +48,33 @@ SCHEMAS += [
 ]
 
 
+CORE_REQUEST = {"type":"object", "required":["spec","manifest","template_recipe"],
+                "properties":{k:{"type":"object"} for k in ("spec","manifest","template_recipe","scenario")},
+                "additionalProperties":False}
+CORE_REV = {"type":"integer","minimum":1}
+SCHEMAS += [
+ schema("preview_case", "Calculate a complete prototype plan; no CAD edits or production approval",
+        {"request":CORE_REQUEST}, ["request"], True),
+ schema("prepare_case_request", "Prepare prototype inputs from the saved layout; unsupported variants are refused",
+        {"project_id":S,"expected_layout_revision":CORE_REV}, ["project_id","expected_layout_revision"],True),
+ schema("get_case_request", "Read the versioned case inputs shared by UI and AI", {"project_id":S},["project_id"],True),
+ schema("save_case_request", "Save case inputs with optimistic concurrency; provenance is a caller claim",
+        {"project_id":S,"request":CORE_REQUEST,"expected_revision":REV}|PROVENANCE,
+        ["project_id","request","expected_revision"]),
+ schema("plan_project_case", "Persist an immutable plan bound to inputs and source identity",
+        {"project_id":S,"expected_revision":CORE_REV,"scenario":{"type":"object"}},["project_id","expected_revision"]),
+ schema("execute_case_plan", "Execute a verified prototype plan once into a separate ICS and archive",
+        {"project_id":S,"plan_id":S,"operation_id":S,"expected_revision":CORE_REV},
+        ["project_id","plan_id","operation_id","expected_revision"]),
+ schema("list_case_operations", "Find CAD operations after reopening the UI; unresolved operations first",
+        {"project_id":S,"limit":{"type":"integer","minimum":1,"maximum":100}},["project_id"],True),
+ schema("get_case_operation", "Read a CAD operation journal and its evidence",
+        {"project_id":S,"operation_id":S},["project_id","operation_id"],True),
+ schema("recover_case_operation", "Reconcile saved evidence after interruption; does not reinsert CAD parts",
+        {"project_id":S,"operation_id":S},["project_id","operation_id"])
+]
+
+
 def handle(request):
     ident = request.get("id")
     if ident is None:
@@ -57,7 +84,7 @@ def handle(request):
     if method == "initialize":
         version = params.get("protocolVersion")
         result = {"protocolVersion": version if version in ("2024-11-05", "2025-03-26", "2025-06-18") else "2025-06-18",
-                  "capabilities": {"tools": {}}, "serverInfo": {"name": "rockpro-cad", "version": "0.2.0"}}
+                  "capabilities": {"tools": {}}, "serverInfo": {"name": "rockpro-cad", "version": "0.3.0"}}
     elif method == "ping":
         result = {}
     elif method == "tools/list":

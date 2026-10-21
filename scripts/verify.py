@@ -29,6 +29,12 @@ def main():
     jobs=[('repository',[py,ROOT/'scripts/repo_audit.py','--output',folder/'repository.json']),
           ('backend',[py,'-m','unittest','discover','-s',source/'mcp','-p','test_*.py','-v']),
           ('parts',[py,'-m','unittest','discover','-s',source/'parts','-p','test_*.py','-v']),
+          # The generator exists now: the frozen RED specifications must remain
+          # a regular regression gate, together with the oracle/layout probes.
+          ('core-design',[py,ROOT/'scripts/test_core_design.py','--mode','all',
+                                '--output',folder/'core-design.json']),
+          ('core-contracts',[py,'-m','unittest','discover','-s',source/'core_case',
+                             '-p','test_*.py','-v']),
           ('qa',[py,'-m','unittest','discover','-s',source/'qa','-p','test_acceptance.py','-v']),
           ('harness',[py,'-m','unittest','discover','-s',ROOT/'scripts','-p','test_verification.py','-v'])]
     if args.build or args.ui:
@@ -42,7 +48,7 @@ def main():
                  r'/reference:C:\Program Files\IronCAD\2027\ICAPI\Samples\C#\References\interop.ICApiIronCAD.dll',
                  r'/reference:C:\Program Files (x86)\Microsoft.NET\Primary Interop Assemblies\stdole.dll',
                  '/reference:System.Windows.Forms.dll','/reference:System.Drawing.dll','/reference:System.Web.Extensions.dll',
-                 source/'addin/RockProAddin.cs',source/'addin/UiText.cs',source/'addin/RockProPanel.cs',source/'addin/LayoutForm.cs',source/'qa/LayoutUiChecks.cs']),
+                 source/'addin/RockProAddin.cs',source/'addin/UiText.cs',source/'addin/RockProPanel.cs',source/'addin/LayoutForm.cs',source/'addin/CasePlanForm.cs',source/'qa/LayoutUiChecks.cs',source/'qa/CasePlanUiChecks.cs']),
                 ('ui-checks',[exe])])
     passed=True
     for name,command in jobs:
