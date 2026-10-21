@@ -55,3 +55,7 @@ Testy programu i oględziny w rzeczywistym IronCAD raportujemy oddzielnie.
 - Nie zmieniono geometrii, bazy ani danych projektów podczas oględzin.
 - NOT RUN: pełna macierz skalowania DPI oraz ręczny odbiór każdego dialogu
   w obu językach. Diagnostyczne błędy backendu i techniczny JSON zachowano.
+
+## Potwierdzenie zapisu układu
+
+Po potwierdzonym zapisie w bazie konfigurator pokazuje przez 8 sekund zielone powiadomienie: numer wersji, ścieżka SQLite zwrócona przez backend i przycisk kopiowania ścieżki. Status pod przyciskami jest zielony. Błąd lub konflikt nie pokazuje sukcesu. Edycja pól ukrywa poprzednie potwierdzenie. Zapis układu nie tworzy pliku ICS; służy do tego osobna operacja tworzenia szkieletu na kopii.

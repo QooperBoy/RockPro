@@ -2,6 +2,7 @@
 import itertools
 import json
 import math
+import project_store
 from project_store import db, project_exists, now, change_stages
 
 DEFAULT = dict(name="Urządzenie", x=345.4, y=241.9, z=88.2, count=2,
@@ -145,4 +146,5 @@ def save_layout(project_id,spec,expected_revision,actor='unspecified',change_sou
                       'outdated',actor,change_source,'layout_saved',stamp)
         change_stages(conn,project_id,['layout'],'review',actor,change_source,'layout_saved',stamp)
         conn.execute("INSERT INTO events(project_id,created_at,kind,payload) VALUES (?,?,?,?)",(project_id,stamp,"layout_saved",json.dumps(dict(revision=revision,sha256=digest,spec=result['spec']),ensure_ascii=False)))
-    return dict(saved=True,revision=revision,sha256=digest,updated_at=stamp,**result)
+    return dict(saved=True,revision=revision,sha256=digest,updated_at=stamp,
+                database=str(project_store.DB_PATH),**result)
