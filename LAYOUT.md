@@ -27,3 +27,11 @@ Do ICS trafiają obecnie gabaryty szkieletu. Bryły wyposażenia, przegrody i bo
 
 ## Próba natywna — 21.10.2026
 W IronCAD 2027 przetestowano zmianę z układu obok siebie na piętrowy, przegrodę 9 mm i komorę +X. Dwie bryły 345,4 × 241,9 × 88,2 mm dały wnętrze 514,4 × 340 × 245,4 mm i gabaryt 532,4 × 358 × 263,4 mm. Przycisk w UI zapisał SQLite i wygenerował nową kopię ICS. Kontrola geometrii po ponownym otwarciu: passed; oryginał niezmieniony; suma kontrolna snapshotu: verified. Dane tej próby są lokalne, poza repozytorium.
+
+## Ranking objętości 0.4.2
+
+Backend porównuje 6 orientacji × 3 kierunki rozmieszczenia (18 układów liniowych). Kryterium: objętość zewnętrznego szkieletu w litrach `V = X × Y × Z / 1 000 000`, z uwzględnieniem luzów, przegród, sklejki i komory. Nie jest to optymalizacja dowolnego pakowania przestrzennego ani ocena wytrzymałości.
+
+Lista orientacji jest sortowana przy bieżącym kierunku, lista kierunków przy bieżącej orientacji. Po przeliczeniu zachowany jest wybrany klucz — zmiana kolejności nie zmienia urządzenia ani kierunku. Wybór najlepszego wariantu spośród 18 następuje przyciskiem „Zastosuj najmniejszą objętość”. Nie zmienia się samoczynnie po edycji wymiarów.
+
+Zielony = najmniejsza objętość w danej liście, czerwony = największa, odcienie pośrednie = względny wynik `(V − Vmin)/(Vmax − Vmin)`. Remisy mają jednakowy kolor; gdy wszystkie objętości są równe, wszystkie są zielone. Warianty niedopuszczalne są na końcu, szare i opisane jako niedostępne. Każdy wariant pokazuje litry, skrajne także min/max. Objętość pod tabelą porównuje aktualny wybór z minimum wszystkich 18 kombinacji.

@@ -1,6 +1,6 @@
 # RockPro CAD — przekazanie dla Jakuba Siwca
 
-Aktualizacja 0.4: konfigurator urządzeń i układu opisuje [LAYOUT.md](LAYOUT.md). MCP udostępnia obecnie 11 narzędzi, testy backendu obejmują 19 przypadków plus 7 QA. Poniżej zachowano opis bazowej wersji 0.3; zakres nowego modułu i ograniczenia eksportu mają opis w LAYOUT.md.
+Aktualizacja 0.4: konfigurator urządzeń i układu opisuje [LAYOUT.md](LAYOUT.md). MCP udostępnia obecnie 11 narzędzi, testy backendu obejmują 22 przypadki plus 7 QA. Poniżej zachowano opis bazowej wersji 0.3; zakres nowego modułu i ograniczenia eksportu mają opis w LAYOUT.md.
 
 ## Co dostajesz
 Scalone źródła frontendu WinForms, backendu MCP stdio i lokalnej bazy SQLite, adapter COM, walidatory oraz demonstracyjny szkielet ICS (10 płyt). Repozytorium rozpoczyna wspólną historię zmian na podstawie wydania MVP 0.3. Nie zawiera środowiska autora, bazy klientów, korespondencji, oryginalnych projektów produkcyjnych ani bibliotek DLL dostawcy. Baza projektów zostanie utworzona lokalnie od zera.

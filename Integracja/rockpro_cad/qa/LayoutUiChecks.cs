@@ -5,6 +5,12 @@ using System.Windows.Forms;
 using RockPro.CAD;
 class LayoutUiChecks {
  [STAThread] static void Main(){Application.EnableVisualStyles();
+  using(var ranked=new RankedChoice {Tag=new[]{"XYZ","YZX"}}){
+   ranked.Initialize(new[]{"XYZ","YZX"},new[]{"Standard","Obrót"});ranked.Items.AddRange(new[]{"Standard","Obrót"});ranked.SelectedIndex=0;
+   ranked.Rank(new object[]{new System.Collections.Generic.Dictionary<string,object>{{"key","YZX"},{"valid",true},{"volume_l",20.0},{"score",0.0}},new System.Collections.Generic.Dictionary<string,object>{{"key","XYZ"},{"valid",true},{"volume_l",40.0},{"score",1.0}}});
+   if(ranked.SelectedKey!="XYZ"||ranked.SelectedIndex!=1)throw new Exception("Ranking changed selected orientation");
+   ranked.SelectKey("YZX");if(ranked.SelectedKey!="YZX"||ranked.SelectedIndex!=0)throw new Exception("Ranked key mapping failed");
+  }
   var orange=Color.FromArgb(239,143,65);var gray=Color.Gray;int[] f={0,1,2,3};
   var partition=new[]{new PointF(10,10),new PointF(90,10),new PointF(90,90),new PointF(10,90)};
   var accessory=new[]{new PointF(65,30),new PointF(85,30),new PointF(85,70),new PointF(65,70)};

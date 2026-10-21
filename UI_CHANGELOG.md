@@ -20,3 +20,8 @@ Nie wykonano ponownego testu CAD ani restartu hosta: IronCAD ma niezapisany doku
 - Regresje C#: qa/LayoutUiChecks.cs — kolejność rysowania nie zmienia widoczności bliższego akcesorium, kółko nie zmienia liczby i orientacji oraz przesuwa formularz. Testy backendu przed zmianą: 19/19 i QA 7/7.
 
 Weryfikacja natywna 21.10.2026: wczytano ustawienia ze zgłoszenia (339,4 × 238,9 × 88,2; 1 szt.; orientacja YZX). Akcesorium ma poprawne zasłanianie w 3D; tabela ma osobne kolumny X/Y/Z i dwa wiersze. Kółko nad polem liczby: X 339,40 bez zmiany, przewijanie 0→22; nad listą: Y/Z/X bez zmiany, przewijanie 22→44. Dialog informacji działa. Brak zmian geometrii CAD w tej poprawce.
+
+
+## UI 0.4.2 — ranking objętości
+
+Listy orientacji i kierunku sortowane rosnąco po objętości, zielony–pomarańczowy–czerwony, litry i oznaczenia min/max. Pod tabelą bieżąca objętość i minimum 18 kombinacji; przycisk stosujący najlepszą parę. Wybrany klucz jest zachowany po sortowaniu. Testy: 22 backend + 7 QA, regresja C# zachowania klucza po zmianie kolejności. Próba natywna: 4 urządzenia, orientacja ZYX / kierunek Z → XYZ / Z; 65,2 l → 58,7 l; odświeżenie rankingu i podglądu poprawne.

@@ -29,6 +29,6 @@ Dane klientów, baza SQLite, logi, środowisko Python, wygenerowane DLL i robocz
 .\Integracja\.venv\Scripts\python.exe -m unittest discover -s .\Integracja\rockpro_cad\qa -p test_acceptance.py -v
 ```
 
-19 testów backendu + 7 odbiorczych. Testy te nie zastępują testu natywnego IronCAD na komputerze docelowym.
+22 testów backendu + 7 odbiorczych. Testy te nie zastępują testu natywnego IronCAD na komputerze docelowym.
 
 Konfigurator rozmieszczenia: [LAYOUT.md](LAYOUT.md) — podgląd 3D, zapis w SQLite oraz gabaryty kopii ICS.

@@ -9,7 +9,7 @@ DEFAULT = dict(name="Urządzenie", x=345.4, y=241.9, z=88.2, count=2,
                separator=0, side="none", side_width=80, side_depth=300,
                side_height=50, side_name="Kable", thickness=9, lid_height=50)
 
-def calculate_layout(spec):
+def _calculate_layout(spec):
     if not isinstance(spec, dict) or set(spec)-set(DEFAULT):
         raise ValueError("Nieznane pola układu")
     s = DEFAULT | spec
@@ -69,8 +69,35 @@ def calculate_layout(spec):
     if s["arrangement"]=="Z" and s["count"]>1:
         warnings.append("Piętrowanie: zaprojektuj podparcie i dostęp do dolnych urządzeń; przegroda nie jest zweryfikowaną półką.")
     return dict(spec=s,boxes=boxes,internal=inside,external=outer,warnings=warnings,
+                volume_l=math.prod(outer)/1_000_000,
                 checks=dict(collisions=False,contained=True),
                 parameters=dict(RP_Length=outer[0],RP_Depth=outer[1],RP_BaseHeight=outer[2]-s["lid_height"],RP_LidHeight=s["lid_height"],RP_Thickness=s["thickness"],RP_DisplayGap=0))
+
+def calculate_layout(spec):
+    result=_calculate_layout(spec)
+    s=result['spec']
+    candidates=[]
+    for orientation in map(''.join,itertools.permutations('XYZ')):
+        for arrangement in 'XYZ':
+            item=dict(orientation=orientation,arrangement=arrangement)
+            try:
+                variant=_calculate_layout(s|item)
+                item.update(valid=True,volume_l=variant['volume_l'],external=variant['external'])
+            except ValueError as exc:
+                item.update(valid=False,volume_l=None,reason=str(exc))
+            candidates.append(item)
+    # Stable tie order; equal-volume choices receive the same colour/score.
+    candidates.sort(key=lambda c:(not c['valid'],round(c['volume_l'] or 0,9),c['orientation'],c['arrangement']))
+    def decorate(rows,key):
+        valid=[r['volume_l'] for r in rows if r['valid']]
+        lo,hi=min(valid),max(valid)
+        return [dict(r,key=r[key],score=0.0 if hi-lo<1e-9 else (r['volume_l']-lo)/(hi-lo)) if r['valid'] else dict(r,key=r[key],score=None) for r in rows]
+    result['ranking']=dict(
+        criterion='external_volume',best=candidates[0],
+        orientations=decorate([r for r in candidates if r['arrangement']==s['arrangement']],'orientation'),
+        arrangements=decorate([r for r in candidates if r['orientation']==s['orientation']],'arrangement'),
+        variants=candidates)
+    return result
 
 def ensure(conn):
     conn.execute("CREATE TABLE IF NOT EXISTS layouts (project_id TEXT PRIMARY KEY REFERENCES projects(id), spec TEXT NOT NULL, updated_at TEXT NOT NULL)")

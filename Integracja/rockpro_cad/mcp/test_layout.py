@@ -49,5 +49,32 @@ class LayoutTests(unittest.TestCase):
     def test_mcp_contract(self):
         self.assertEqual(dispatch('preview_layout',{'spec':{}})['spec']['count'],2)
         with self.assertRaises(ValueError):dispatch('preview_layout',{'spec':{},'shell':'bad'})
+    def test_ranking_formula_and_global_minimum(self):
+        r=calculate_layout(dict(x=100,y=200,z=300,count=4,gap=20,separator=9,clearance=10,thickness=9,lid_height=30))
+        expected=[]
+        for order in itertools.permutations('XYZ'):
+            for a in range(3):
+                d=[dict(X=100,Y=200,Z=300)[k] for k in order]
+                d[a]=4*d[a]+3*(20+9)
+                volume=math.prod(v+2*10+2*9 for v in d)/1_000_000
+                expected.append(volume)
+        self.assertAlmostEqual(r['ranking']['best']['volume_l'],min(expected))
+        self.assertEqual(len(r['ranking']['variants']),18)
+        for field in ('orientations','arrangements'):
+            rows=r['ranking'][field]
+            self.assertEqual([v['volume_l'] for v in rows],sorted(v['volume_l'] for v in rows))
+            self.assertAlmostEqual(rows[0]['score'],0)
+            self.assertAlmostEqual(rows[-1]['score'],1)
+    def test_equal_volume_choices_have_equal_score(self):
+        r=calculate_layout(dict(x=100,y=100,z=100,count=1,lid_height=30))
+        self.assertTrue(all(v['score']==0 for v in r['ranking']['orientations']))
+        self.assertTrue(all(v['score']==0 for v in r['ranking']['arrangements']))
+    def test_ranking_uses_accessory_and_marks_infeasible(self):
+        r=calculate_layout(dict(x=100,y=200,z=300,count=3,side='X',side_depth=400,side_width=80,lid_height=200))
+        valid=[v for v in r['ranking']['variants'] if v['valid']]
+        self.assertTrue(any(not v['valid'] for v in r['ranking']['variants']))
+        for item in valid:
+            self.assertAlmostEqual(item['volume_l'],math.prod(item['external'])/1_000_000)
+        self.assertAlmostEqual(r['ranking']['best']['volume_l'],min(v['volume_l'] for v in valid))
 
 if __name__=='__main__': unittest.main()
