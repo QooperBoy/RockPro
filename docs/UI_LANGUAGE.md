@@ -41,3 +41,17 @@ parametry RP_*, osie, wersje oraz ścieżki plików pozostają niezmienione.
 6. Zamknij i otwórz dodatek: wybrany język powinien zostać zapamiętany.
 
 Testy programu i oględziny w rzeczywistym IronCAD raportujemy oddzielnie.
+
+## Wynik wdrożenia 21.10.2026
+
+- PASS: pełny harness `20261021T132929833334Z` oraz niezależny przegląd agenta.
+- PASS: testy zmiany języka zachowują szkice karty i etapów, starsze tokeny
+  wersji, wymiary, orientację i stan niezapisanego układu.
+- PASS w IronCAD 2027: karta PL/EN, etapy EN, historia i porównanie przed/po EN,
+  konfigurator i podgląd EN, dostępne funkcje PL/EN, powrót do polskiego.
+- Poprawiono ucięty napis angielskiego przycisku: `Refresh`; szczegóły w tooltipie.
+- Nowa DLL została skopiowana do istniejącego lokalnego wdrożenia po zamknięciu
+  hosta; poprzednia kopia w `artifacts/ui-language-predeploy` (poza Git).
+- Nie zmieniono geometrii, bazy ani danych projektów podczas oględzin.
+- NOT RUN: pełna macierz skalowania DPI oraz ręczny odbiór każdego dialogu
+  w obu językach. Diagnostyczne błędy backendu i techniczny JSON zachowano.
