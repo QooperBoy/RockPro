@@ -1,7 +1,12 @@
-param([string]$BinaryFolder='bin')
+﻿param([string]$BinaryFolder='bin')
 $ErrorActionPreference='Stop'
 $dll=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "$BinaryFolder\RockPro.CAD.dll")).Path
 $assembly=[Reflection.AssemblyName]::GetAssemblyName($dll).FullName
+# The host needs native ICAPI COM metadata in addition to the managed add-in class.
+$python=Join-Path $PSScriptRoot '..\..\.venv\Scripts\python.exe'
+if (-not (Test-Path -LiteralPath $python)) { throw 'Missing integration venv. Run Setup.ps1 first.' }
+& $python (Join-Path $PSScriptRoot 'Repair-IcApi.py')
+if ($LASTEXITCODE -ne 0) { throw 'ICAPI registration failed; add-in installation stopped.' }
 $guid='{B7659903-7C95-4E26-923F-DB5119AD1460}'
 $prog='RockPro.CAD.Addin'
 $codebase=[Uri]::UnescapeDataString(([Uri]$dll).AbsoluteUri)
@@ -23,6 +28,11 @@ $cls.CreateSubKey('Implemented Categories\{6CA5004A-8CD0-454D-88BA-E9700C9789A6}
 $cls.CreateSubKey('Required Categories\{2D652377-6B3B-450E-840A-5DE09A48B464}').Close()
 $cls.CreateSubKey('Name').SetValue('', 'RockPro CAD')
 $cls.CreateSubKey('Description').SetValue('', 'RockPro CAD: parametry szkieletu i lokalny MCP.')
+# SDK MyRegistration.rgs: declare host-version compatibility for discovery.
+$compat=$cls.CreateSubKey('AddIn Version Compatibility')
+$compat.CreateSubKey('GreaterThanAndEqualTo').SetValue('', '29..')
+$compat.Close()
+
 $root.CreateSubKey("Software\Classes\$prog\CLSID").SetValue('',$guid)
 $app=$root.CreateSubKey('Software\IronCAD\IRONCAD 29.0\Applications\RockPro CAD')
 $app.SetValue('',$guid)
