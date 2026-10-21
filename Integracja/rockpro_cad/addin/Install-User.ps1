@@ -1,5 +1,8 @@
 ﻿param([string]$BinaryFolder='bin')
 $ErrorActionPreference='Stop'
+if (Get-Process -Name IRONCAD -ErrorAction SilentlyContinue) {
+    throw 'Close IronCAD after saving documents before registering the add-in. No registration was changed.'
+}
 $dll=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "$BinaryFolder\RockPro.CAD.dll")).Path
 $assembly=[Reflection.AssemblyName]::GetAssemblyName($dll).FullName
 # The host needs native ICAPI COM metadata in addition to the managed add-in class.

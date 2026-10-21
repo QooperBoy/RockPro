@@ -1,5 +1,8 @@
 ﻿param([string]$Python='python', [switch]$InstallAddin)
 $ErrorActionPreference='Stop'
+if ($InstallAddin -and (Get-Process -Name IRONCAD -ErrorAction SilentlyContinue)) {
+    throw 'Save documents and close IronCAD before Setup -InstallAddin. Setup made no changes.'
+}
 Set-Location -LiteralPath $PSScriptRoot
 $base=Join-Path $PSScriptRoot 'Integracja'
 $py=Join-Path $base '.venv\Scripts\python.exe'
