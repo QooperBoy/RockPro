@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using RockPro.CAD;
 class LayoutUiChecks {
- [STAThread] static void Main(){Application.EnableVisualStyles();
+ [STAThread] static void Main(){Application.EnableVisualStyles();bool previousLanguage=UiText.IsEnglish;try{UiText.SetLanguage(false,false);
   using(var ranked=new RankedChoice {Tag=new[]{"XYZ","YZX"}}){
    ranked.Initialize(new[]{"XYZ","YZX"},new[]{"Standard","Obrót"});ranked.Items.AddRange(new[]{"Standard","Obrót"});ranked.SelectedIndex=0;
    ranked.Rank(new object[]{new System.Collections.Generic.Dictionary<string,object>{{"key","YZX"},{"valid",true},{"volume_l",20.0},{"score",0.0}},new System.Collections.Generic.Dictionary<string,object>{{"key","XYZ"},{"valid",true},{"volume_l",40.0},{"score",1.0}}});
@@ -59,5 +59,72 @@ class LayoutUiChecks {
   }
   Console.WriteLine("PASS: revision conflicts classify, preserve draft/token, show three-way values, capture independent row baselines");
   Console.WriteLine("PASS: depth buffer in both orders; number and choice wheel suppression; form scrolling");
+  LanguageChecks();
+  }finally{UiText.SetLanguage(previousLanguage,false);}
+ }
+ static void LayoutLanguageChecks(){
+  var flags=BindingFlags.Instance|BindingFlags.NonPublic;
+  UiText.SetLanguage(false,false);
+  using(var form=new LayoutForm("language-test-not-opened")){
+   var fields=(System.Collections.Generic.Dictionary<string,Control>)typeof(LayoutForm).GetField("fields",flags).GetValue(form);
+   fields["name"].Text="Urządzenie użytkownika / custom device";
+   fields["side_name"].Text="Kable klienta / custom cables";
+   ((NumericUpDown)fields["x"]).Value=412.75m;
+   ((RankedChoice)fields["orientation"]).SelectKey("YZX");
+   ((RankedChoice)fields["arrangement"]).SelectKey("Z");
+   ((ComboBox)fields["side"]).SelectedIndex=2;
+   typeof(LayoutForm).GetField("dirty",flags).SetValue(form,true);
+   typeof(LayoutForm).GetField("layoutRevision",flags).SetValue(form,17L);
+   typeof(LayoutForm).GetField("revision",flags).SetValue(form,8);
+   foreach(bool english in new[]{true,false}){
+    UiText.SetLanguage(english,false);
+    if(fields["name"].Text!="Urządzenie użytkownika / custom device"||fields["side_name"].Text!="Kable klienta / custom cables")throw new Exception("Layout language switch translated user text");
+    if(((NumericUpDown)fields["x"]).Value!=412.75m)throw new Exception("Layout language switch changed dimensions");
+    if(((RankedChoice)fields["orientation"]).SelectedKey!="YZX"||((RankedChoice)fields["arrangement"]).SelectedKey!="Z"||((ComboBox)fields["side"]).SelectedIndex!=2)throw new Exception("Layout language switch changed canonical layout choices");
+    if(!(bool)typeof(LayoutForm).GetField("dirty",flags).GetValue(form)||(long)typeof(LayoutForm).GetField("layoutRevision",flags).GetValue(form)!=17L||(int)typeof(LayoutForm).GetField("revision",flags).GetValue(form)!=8)throw new Exception("Layout language switch reset dirty state or version tokens");
+    if(english&&!form.Text.Contains("version 17"))throw new Exception("Layout title did not switch to English");
+    if(!english&&!form.Text.Contains("wersja 17"))throw new Exception("Layout title did not return to Polish");
+   }
+  }
+  Console.WriteLine("PASS: layout PL/EN/PL preserves dimensions, user text, orientation, arrangement, dirty state and both version tokens");
+ }
+ static void LanguageChecks(){
+  LayoutLanguageChecks();
+  var flags=BindingFlags.Instance|BindingFlags.NonPublic;
+  using(var panel=new RockProPanel(null)){
+   var data=new System.Collections.Generic.Dictionary<string,object>{{"id","language-test"},{"name","Projekt klienta / customer name"},{"notes","Notatka użytkownika — do not translate"},{"revision",7},{"quantity",2},{"source","C:\\sample\\projekt.ics"}};
+   typeof(RockProPanel).GetField("project",flags).SetValue(panel,data);
+   typeof(RockProPanel).GetMethod("ShowView",flags).Invoke(panel,new object[]{"Projekt"});
+   var note=(TextBox)typeof(RockProPanel).GetField("notes",flags).GetValue(panel);note.Text="Niezapisany szkic / draft ąę";
+   data["revision"]=8; // Simulate a newer project cache while the editor retains its old baseline.
+   UiText.SetLanguage(true,false);
+   var translatedNote=(TextBox)typeof(RockProPanel).GetField("notes",flags).GetValue(panel);
+   if(translatedNote.Text!="Niezapisany szkic / draft ąę")throw new Exception("Language switch lost unsaved card notes");
+   if(UiText.T("polski","English")!="English")throw new Exception("English selection failed");
+   if(Rpc.Str(data,"name")!="Projekt klienta / customer name"||Rpc.Str(data,"revision")!="8")throw new Exception("Language switch mutated project data/version");
+   var cardBaseline=(System.Collections.Generic.Dictionary<string,object>)typeof(RockProPanel).GetField("cardBase",flags).GetValue(panel);
+   if(Rpc.Str(cardBaseline,"revision")!="7")throw new Exception("Language switch adopted newer card baseline");
+   using(var diff=RevisionUi.DifferenceGrid(data,data,data)){
+    if(diff.Columns[1].HeaderText=="Przy otwarciu")throw new Exception("Conflict headers remain Polish in English mode");
+    if(Convert.ToString(diff.Rows[0].Cells[1].Value)!="Projekt klienta / customer name")throw new Exception("Conflict translated customer data");
+   }
+   UiText.SetLanguage(false,false);
+   if(((TextBox)typeof(RockProPanel).GetField("notes",flags).GetValue(panel)).Text!="Niezapisany szkic / draft ąę")throw new Exception("Round-trip language switch lost draft");
+   var stages=new System.Collections.Generic.Dictionary<string,object>{{"inquiry",new System.Collections.Generic.Dictionary<string,object>{{"status","draft"},{"revision",7}}}};
+   data["stages"]=stages;
+   typeof(RockProPanel).GetMethod("ShowView",flags).Invoke(panel,new object[]{"Etapy"});
+   var inputs=(System.Collections.Generic.Dictionary<string,ComboBox>)typeof(RockProPanel).GetField("stageInputs",flags).GetValue(panel);
+   inputs["inquiry"].SelectedIndex=2;
+   stages["inquiry"]=new System.Collections.Generic.Dictionary<string,object>{{"status","waiting"},{"revision",8}};
+   foreach(bool english in new[]{true,false}){
+    UiText.SetLanguage(english,false);
+    inputs=(System.Collections.Generic.Dictionary<string,ComboBox>)typeof(RockProPanel).GetField("stageInputs",flags).GetValue(panel);
+    var baselines=(System.Collections.Generic.Dictionary<string,System.Collections.Generic.Dictionary<string,object>>)typeof(RockProPanel).GetField("stageBases",flags).GetValue(panel);
+    if(inputs["inquiry"].SelectedIndex!=2||Rpc.Str(baselines["inquiry"],"revision")!="7"||Rpc.Str(baselines["inquiry"],"status")!="draft")throw new Exception("Language switch lost stage draft or adopted newer cached baseline");
+    if(!inputs["inquiry"].Parent.Controls[0].Text.Contains("v7"))throw new Exception("Stage render/save baseline adopted newer cached revision");
+   }
+  }
+  Console.WriteLine("PASS: PL/EN switch preserves user text, draft and project revision; conflict headers localize");
  }
 }
+
