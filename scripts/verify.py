@@ -41,7 +41,7 @@ def main():
                  r'/reference:C:\Program Files\IronCAD\2027\ICAPI\Samples\C#\References\interop.ICApiIronCAD.dll',
                  r'/reference:C:\Program Files (x86)\Microsoft.NET\Primary Interop Assemblies\stdole.dll',
                  '/reference:System.Windows.Forms.dll','/reference:System.Drawing.dll','/reference:System.Web.Extensions.dll',
-                 source/'addin/RockProAddin.cs',source/'addin/RockProPanel.cs',source/'addin/LayoutForm.cs',source/'qa/LayoutUiChecks.cs']),
+                 source/'addin/RockProAddin.cs',source/'addin/UiText.cs',source/'addin/RockProPanel.cs',source/'addin/LayoutForm.cs',source/'qa/LayoutUiChecks.cs']),
                 ('ui-checks',[exe])])
     passed=True
     for name,command in jobs:

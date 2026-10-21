@@ -37,7 +37,7 @@ namespace RockPro.CAD {
                 site=addinSite;
                 var logo=Image.FromFile(Path.Combine(Root,"assets","rockpro-logo.png"));
                 command=site.CreateCommandHandler("RockProCAD.Connect","RockPro CAD",
-                    "RockPro CAD - polacz i odczytaj parametry","RockPro CAD",
+                    "RockPro CAD — projekty, układ i parametry / projects, layout and parameters","RockPro CAD",
                     PictureConverter.Convert(logo),PictureConverter.Convert(logo));
                 command.Enabled=true;
                 command.OnClick += OnClick;
