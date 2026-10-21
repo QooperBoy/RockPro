@@ -181,3 +181,15 @@ obrysu wyniósł ok. 3,18e-12 mm; identyfikatory CAD pozostały stabilne.
 Zweryfikowano zgodność żądania, planu, dziennika, raportu i hashy plików.
 Wcześniejsze rekordy bazy pozostały dokładnie zgodne z kopią zapasową;
 przybył jeden projekt QA z jedną operacją i jednym snapshotem.
+
+Dowód przebiegu UI: `artifacts/runtime-ui-20261022/ui_receipt.json`;
+zrzuty `case-success-pl.jpg` i `case-success-en.jpg` w tym samym katalogu.
+W wersji angielskiej ponownie odczytano tę samą operację, bez ponownego
+tworzenia modelu. Zapis niezależnego przeglądu:
+`artifacts/runtime-ui-20261022/independent-review.json`.
+
+Pozostały drobne poprawki UI: etykieta przycisku odzyskiwania jest skrócona
+przy domyślnej szerokości okna, a całe ID operacji wymaga przewinięcia lub
+skopiowania. Po aktywacji CAD okno panelu wymagało maksymalizacji/przywrócenia,
+żeby odmalować zawartość. Końcowe zrzuty pokazują rzeczywisty wynik, ale nie
+oznacza to odbioru UI bez zastrzeżeń.
