@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
@@ -35,6 +35,29 @@ class LayoutUiChecks {
    if(choice.SelectedIndex!=1)throw new Exception("Wheel changed orientation");
    form.Close();
   }
+  var original=new System.Collections.Generic.Dictionary<string,object>{{"name","Początek"},{"notes","Baza"},{"revision",1}};
+  var draft=RevisionUi.Clone(original);draft["notes"]="Moje niezapisane wpisy";
+  var current=RevisionUi.Clone(original);current["notes"]="Zmiana AI";current["revision"]=2;
+  var conflict=RevisionUi.Conflict(new Exception(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(new {code="PROJECT_CONFLICT",expected_revision=1,current_revision=2,current=current})),"PROJECT_CONFLICT");
+  if(conflict==null||RevisionUi.Conflict(new Exception("Brak połączenia"),"PROJECT_CONFLICT")!=null)throw new Exception("Conflict classification failed");
+  using(var differences=RevisionUi.DifferenceGrid(original,draft,current)){
+   if(differences.ColumnHeadersHeightSizeMode!=DataGridViewColumnHeadersHeightSizeMode.AutoSize||differences.ColumnHeadersDefaultCellStyle.WrapMode!=DataGridViewTriState.True)throw new Exception("Conflict/history headers must autosize for DPI");
+   bool found=false;foreach(DataGridViewRow row in differences.Rows)if(Convert.ToString(row.Cells[0].Value)=="Notatki"){found=true;if(Convert.ToString(row.Cells[1].Value)!="Baza"||Convert.ToString(row.Cells[2].Value)!="Moje niezapisane wpisy"||Convert.ToString(row.Cells[3].Value)!="Zmiana AI")throw new Exception("Three-way comparison lost values");}
+   if(!found)throw new Exception("Missing conflict row");
+  }
+  if(Convert.ToString(draft["revision"])!="1"||Convert.ToString(draft["notes"])!="Moje niezapisane wpisy"||Convert.ToString(original["notes"])!="Baza")throw new Exception("Conflict mutated draft or token");
+  using(var panel=new RockProPanel(null)){
+   var flags=BindingFlags.Instance|BindingFlags.NonPublic;
+   var stageA=new System.Collections.Generic.Dictionary<string,object>{{"status","draft"},{"revision",1},{"note","Notatka konstruktora"}};
+   var stageB=new System.Collections.Generic.Dictionary<string,object>{{"status","review"},{"revision",4}};
+   var project=new System.Collections.Generic.Dictionary<string,object>{{"id","test"},{"name","Test"},{"revision",1},{"stages",new System.Collections.Generic.Dictionary<string,object>{{"inquiry",stageA},{"devices",stageB}}}};
+   typeof(RockProPanel).GetField("project",flags).SetValue(panel,project);
+   typeof(RockProPanel).GetMethod("StagesView",flags).Invoke(panel,null);
+   var bases=(System.Collections.Generic.Dictionary<string,System.Collections.Generic.Dictionary<string,object>>)typeof(RockProPanel).GetField("stageBases",flags).GetValue(panel);
+   stageA["revision"]=2;stageB["revision"]=5;
+   if(Convert.ToInt32(bases["inquiry"]["revision"])!=1||Convert.ToInt32(bases["devices"]["revision"])!=4)throw new Exception("Stage row baselines follow mutable project versions");
+  }
+  Console.WriteLine("PASS: revision conflicts classify, preserve draft/token, show three-way values, capture independent row baselines");
   Console.WriteLine("PASS: depth buffer in both orders; number and choice wheel suppression; form scrolling");
  }
 }

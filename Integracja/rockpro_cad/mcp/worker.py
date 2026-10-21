@@ -206,18 +206,18 @@ def create_snapshot(project_id,label="Snapshot",note=""):
 
 def dispatch(name, arguments):
     from layout import calculate_layout, get_layout, save_layout
-    layout_tools={"preview_layout":(calculate_layout,{"spec"}),"get_layout":(get_layout,{"project_id","revision"}),"save_layout":(save_layout,{"project_id","spec","expected_revision"})}
+    layout_tools={"preview_layout":(calculate_layout,{"spec"}),"get_layout":(get_layout,{"project_id","revision"}),"save_layout":(save_layout,{"project_id","spec","expected_revision","actor","change_source"})}
     if name in layout_tools:
         fn, keys=layout_tools[name]
         if not isinstance(arguments,dict) or set(arguments)-keys: raise ValueError("Invalid layout arguments")
         return fn(**arguments)
-    from project_store import list_projects, save_project, get_project, set_stage, list_snapshots
+    from project_store import list_projects, save_project, get_project, set_stage, list_snapshots, get_history
     db_tools={"list_projects":list_projects,"save_project":save_project,"get_project":get_project,
-              "set_stage":set_stage,"list_snapshots":list_snapshots}
+              "set_stage":set_stage,"list_snapshots":list_snapshots,"get_history":get_history}
     allowed = {"inspect_project": {"source"}, "change_dimensions_on_copy": {"source", "changes","project_id","label","layout_revision"},
-               "list_projects":set(),"save_project":{"project_id","name","client","device","quantity","notes","source"},
-               "get_project":{"project_id"},"set_stage":{"project_id","stage","status","note"},
-               "list_snapshots":{"project_id"},"create_snapshot":{"project_id","label","note"}}
+               "list_projects":set(),"save_project":{"project_id","name","client","device","quantity","notes","source","expected_revision","actor","change_source"},
+               "get_project":{"project_id"},"set_stage":{"project_id","stage","status","note","expected_revision","actor","change_source"},
+               "get_history":{"project_id","limit","before_id"},"list_snapshots":{"project_id"},"create_snapshot":{"project_id","label","note"}}
     if name not in allowed or not isinstance(arguments, dict) or set(arguments)-allowed[name]:
         raise ValueError("Unknown tool or argument")
     if name in db_tools:

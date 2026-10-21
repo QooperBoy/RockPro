@@ -59,3 +59,6 @@ Instrukcje procesu nie zastępują jawnego zlecenia użytkownika. Nie wymagamy d
 Zmiany instrukcji aktualizuj razem z kontraktem, który zmieniają. Źródła zewnętrzne i decyzje adopcji: docs/AI_SOURCES.md. Stan audytu i pozostałe braki: docs/REPOSITORY_AUDIT.md.
 
 Kontrakt wersjonowania układu, konfliktów i powiązania CAD: [LAYOUT_VERSIONING.md](LAYOUT_VERSIONING.md). UI i AI muszą przekazywać odczytane expected_revision; nie ponawiać konfliktu z automatycznie odświeżonym tokenem.
+
+Karta projektu i każdy etap mają niezależne rewizje. Kontrakt aktualizacji,
+historii i odbioru: [PROJECT_CONCURRENCY.md](PROJECT_CONCURRENCY.md).

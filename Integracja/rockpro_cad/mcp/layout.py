@@ -2,7 +2,7 @@
 import itertools
 import json
 import math
-from project_store import db, project_exists, now
+from project_store import db, project_exists, now, change_stages
 
 DEFAULT = dict(name="Urządzenie", x=345.4, y=241.9, z=88.2, count=2,
                orientation="XYZ", arrangement="X", gap=20, clearance=20,
@@ -127,7 +127,7 @@ def get_layout(project_id,revision=None):
     return dict(saved=bool(row),revision=row['revision'] if row else 0,sha256=row['sha256'] if row else None,updated_at=row['created_at'] if row else None,**calculate_layout(json.loads(row['spec']) if row else {}))
 
 
-def save_layout(project_id,spec,expected_revision):
+def save_layout(project_id,spec,expected_revision,actor='unspecified',change_source='unspecified'):
     if type(expected_revision) is not int or expected_revision<0: raise ValueError('expected_revision must be a nonnegative integer; read get_layout first')
     result=calculate_layout(spec);stamp=now()
     payload,digest=encode_spec(result['spec'])
@@ -141,7 +141,8 @@ def save_layout(project_id,spec,expected_revision):
         conn.execute('INSERT INTO layout_versions VALUES (?,?,?,?,?)',(project_id,revision,payload,digest,stamp))
         conn.execute("INSERT OR REPLACE INTO layouts VALUES (?,?,?)",(project_id,payload,stamp))
         conn.execute("UPDATE projects SET updated_at=? WHERE id=?",(stamp,project_id))
-        conn.execute("UPDATE stages SET status='outdated',updated_at=? WHERE project_id=? AND key IN ('geometry','hardware','wheels','documentation','materials','production')",(stamp,project_id))
-        conn.execute("UPDATE stages SET status='review',updated_at=? WHERE project_id=? AND key='layout'",(stamp,project_id))
+        change_stages(conn,project_id,['geometry','hardware','wheels','documentation','materials','production'],
+                      'outdated',actor,change_source,'layout_saved',stamp)
+        change_stages(conn,project_id,['layout'],'review',actor,change_source,'layout_saved',stamp)
         conn.execute("INSERT INTO events(project_id,created_at,kind,payload) VALUES (?,?,?,?)",(project_id,stamp,"layout_saved",json.dumps(dict(revision=revision,sha256=digest,spec=result['spec']),ensure_ascii=False)))
     return dict(saved=True,revision=revision,sha256=digest,updated_at=stamp,**result)

@@ -3,6 +3,7 @@ import json
 import sys
 from contextlib import redirect_stdout
 from worker import dispatch, NAMES, LIMITS
+from project_store import RevisionConflict
 
 SCHEMAS = [
     {"name": "inspect_project", "description": "Read and validate the open RockPro plywood skeleton.",
@@ -27,18 +28,21 @@ def schema(name, description, properties, required=(), readonly=False):
     return {"name":name,"description":description,"annotations":{"readOnlyHint":readonly,"destructiveHint":False,"openWorldHint":False},
             "inputSchema":{"type":"object","properties":properties,"required":list(required),"additionalProperties":False}}
 S={"type":"string"}
+REV={"type":"integer","minimum":0}
+PROVENANCE={"actor":S,"change_source":S}
 from layout import DEFAULT
 layout_spec={"type":"object","additionalProperties":False,"properties":{k:{"type":"string" if isinstance(v,str) else "integer" if k=="count" else "number"} for k,v in DEFAULT.items()}}
 SCHEMAS += [
  schema("preview_layout","Calculate device envelopes, partitions and accessory space in mm; no CAD edits",{"spec":layout_spec},["spec"],True),
  schema("get_layout","Read current or historical immutable layout; revision 0 means unsaved",{"project_id":S,"revision":{"type":"integer","minimum":1}},["project_id"],True),
- schema("save_layout","Save layout specification and invalidate downstream stages",{"project_id":S,"spec":layout_spec,"expected_revision":{"type":"integer","minimum":0}},["project_id","spec","expected_revision"])
+ schema("save_layout","Save layout specification and invalidate downstream stages",{"project_id":S,"spec":layout_spec,"expected_revision":REV}|PROVENANCE,["project_id","spec","expected_revision"])
 ]
 SCHEMAS += [
  schema("list_projects","List locally persisted SQLite projects",{},readonly=True),
- schema("save_project","Create or update a project card bound to a native ICS file",{k:S for k in ("project_id","name","client","device","notes","source")}|{"quantity":{"type":"integer","minimum":1,"maximum":100000}},["name"]),
+ schema("save_project","Create a project (revision 0/absent) or update with expected_revision from get_project; caller provenance is unverified",{k:S for k in ("project_id","name","client","device","notes","source")}|{"quantity":{"type":"integer","minimum":1,"maximum":100000},"expected_revision":REV}|PROVENANCE,["name"]),
  schema("get_project","Read project card, manually recorded stages and snapshot history",{"project_id":S},["project_id"],True),
- schema("set_stage","Record a manual workflow status; this does NOT validate CAD",{"project_id":S,"stage":{"enum":["inquiry","devices","layout","geometry","hardware","wheels","documentation","materials","production"]},"status":{"enum":["draft","waiting","review","approved","outdated"]},"note":S},["project_id","stage","status"]),
+ schema("set_stage","Record a manual workflow status; this does NOT validate CAD",{"project_id":S,"stage":{"enum":["inquiry","devices","layout","geometry","hardware","wheels","documentation","materials","production"]},"status":{"enum":["draft","waiting","review","approved","outdated"]},"note":S,"expected_revision":REV}|PROVENANCE,["project_id","stage","status","expected_revision"]),
+ schema("get_history","Read paginated project audit; actor/source are caller claims, not authenticated identities",{"project_id":S,"limit":{"type":"integer","minimum":1,"maximum":200},"before_id":{"type":"integer","minimum":1}},["project_id"],True),
  schema("list_snapshots","Read validated archived snapshots and checksum integrity",{"project_id":S},["project_id"],True),
  schema("create_snapshot","Capture and validate an unchanged native skeleton copy, then archive it separately from working files",{"project_id":S,"label":S,"note":S},["project_id"])
 ]
@@ -64,6 +68,8 @@ def handle(request):
                 data = dispatch(params["name"], params.get("arguments", {}))
             result = {"content": [{"type": "text", "text": json.dumps(data, ensure_ascii=False)}],
                       "isError": False}
+        except RevisionConflict as exc:
+            result = {"content": [{"type": "text", "text": json.dumps(exc.details, ensure_ascii=False)}], "isError": True}
         except Exception as exc:
             print(str(exc), file=sys.stderr, flush=True)
             result = {"content": [{"type": "text", "text": str(exc)}], "isError": True}

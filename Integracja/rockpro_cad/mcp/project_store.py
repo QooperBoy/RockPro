@@ -34,6 +34,9 @@ def db():
     conn.execute('BEGIN IMMEDIATE')
     columns={r[1] for r in conn.execute('PRAGMA table_info(snapshots)')}
     if 'layout_binding' not in columns: conn.execute('ALTER TABLE snapshots ADD COLUMN layout_binding TEXT')
+    for table in ('projects','stages'):
+        if 'revision' not in {r[1] for r in conn.execute('PRAGMA table_info('+table+')')}:
+            conn.execute('ALTER TABLE '+table+' ADD COLUMN revision INTEGER NOT NULL DEFAULT 1')
     conn.commit()
     try:
         with conn: yield conn
@@ -66,52 +69,109 @@ def list_snapshots(project_id):
 
 def get_project(project_id):
     with db() as conn:
+        conn.execute("BEGIN")
         result=project_exists(conn,project_id)
         rows={r["key"]:dict(r) for r in conn.execute("SELECT * FROM stages WHERE project_id=?",(project_id,))}
         result["stages"]=[rows[key]|{"validation":"manual"} for key,_ in STAGES]
     result.update(list_snapshots(project_id))
     return {"project":result}
 
-def save_project(name,project_id=None,client=None,device=None,quantity=None,notes=None,source=None):
-    from worker import source_path
-    name=text(name,"name",200)
-    if not name: raise ValueError("Project name is required")
-    with db() as conn: previous=project_exists(conn,project_id) if project_id else {}
-    client=previous.get("client","") if client is None else client
-    device=previous.get("device","") if device is None else device
-    quantity=previous.get("quantity",1) if quantity is None else quantity
-    notes=previous.get("notes","") if notes is None else notes
-    if isinstance(quantity,bool) or not isinstance(quantity,int) or not 1<=quantity<=100000: raise ValueError("quantity must be integer 1..100000")
-    client,device,notes=text(client,"client",500),text(device,"device",500),text(notes,"notes")
-    stamp=now()
-    with db() as conn:
-        old=project_exists(conn,project_id) if project_id else None
-        path=str(source_path(source or (old["source"] if old else None)))
-        if Path(path).name == "snapshot.ics": raise ValueError("Archive is read-only; bind the working revision instead")
-        if old:
-            conn.execute("UPDATE projects SET name=?,client=?,device=?,quantity=?,notes=?,source=?,updated_at=? WHERE id=?",(name,client,device,quantity,notes,path,stamp,project_id))
-            if path!=old["source"]:
-                conn.execute("UPDATE stages SET status='outdated',updated_at=? WHERE project_id=? AND key IN ('geometry','hardware','wheels','documentation','materials','production')",(stamp,project_id))
-            if quantity!=old["quantity"]:
-                conn.execute("UPDATE stages SET status='outdated',updated_at=? WHERE project_id=? AND key IN ('materials','production')",(stamp,project_id))
-            if device!=old["device"]:
-                conn.execute("UPDATE stages SET status='outdated',updated_at=? WHERE project_id=? AND key NOT IN ('inquiry','devices')",(stamp,project_id))
-        else:
-            project_id=uuid.uuid4().hex
-            conn.execute("INSERT INTO projects VALUES (?,?,?,?,?,?,?,?,?)",(project_id,name,client,device,quantity,notes,path,stamp,stamp))
-            conn.executemany("INSERT INTO stages VALUES (?,?,?,?,?,?)",[(project_id,k,l,"draft","",stamp) for k,l in STAGES])
-        conn.execute("INSERT INTO events(project_id,created_at,kind,payload) VALUES (?,?,?,?)",(project_id,stamp,"save_project",json.dumps({"source":path},ensure_ascii=False)))
-    return get_project(project_id)
+class RevisionConflict(ValueError):
+    def __init__(self, code, expected, current):
+        self.details = dict(code=code, expected_revision=expected,
+                            current_revision=current['revision'], current=current)
+        super().__init__(json.dumps(self.details, ensure_ascii=False))
 
-def set_stage(project_id,stage,status,note=""):
-    if stage not in dict(STAGES) or status not in STATUSES: raise ValueError("Unknown stage or status")
-    note=text(note,"note")
-    stamp=now()
+
+def check_revision(expected, current, code):
+    if type(expected) is not int or expected < 0:
+        raise ValueError('expected_revision must be a nonnegative integer; read the entity first')
+    if expected != current['revision']:
+        raise RevisionConflict(code, expected, current)
+
+
+def audit(conn, project_id, entity, before, after, actor='unspecified', change_source='unspecified', reason='manual', stamp=None):
+    # Caller-supplied provenance is descriptive, not authenticated identity.
+    actor=text(actor,'actor',200);change_source=text(change_source,'change_source',200)
+    payload=dict(entity=entity,entity_key=after.get('key',project_id),before=before,after=after,
+                 actor=actor,source=change_source,identity_verified=False,reason=reason)
+    conn.execute('INSERT INTO events(project_id,created_at,kind,payload) VALUES (?,?,?,?)',
+                 (project_id,stamp or now(),entity+'_changed',json.dumps(payload,ensure_ascii=False)))
+
+
+def change_stages(conn, project_id, keys, status, actor, change_source, reason, stamp):
+    for key in sorted(set(keys)):
+        before=dict(conn.execute('SELECT * FROM stages WHERE project_id=? AND key=?',(project_id,key)).fetchone())
+        conn.execute('UPDATE stages SET status=?,updated_at=?,revision=revision+1 WHERE project_id=? AND key=?',
+                     (status,stamp,project_id,key))
+        after=dict(conn.execute('SELECT * FROM stages WHERE project_id=? AND key=?',(project_id,key)).fetchone())
+        audit(conn,project_id,'stage',before,after,actor,change_source,reason,stamp)
+
+
+def get_history(project_id,limit=50,before_id=None):
+    if type(limit) is not int or not 1<=limit<=200: raise ValueError('limit must be integer 1..200')
+    if before_id is not None and (type(before_id) is not int or before_id<1): raise ValueError('Invalid before_id')
     with db() as conn:
         project_exists(conn,project_id)
-        conn.execute("UPDATE stages SET status=?,note=?,updated_at=? WHERE project_id=? AND key=?",(status,note,stamp,project_id,stage))
-        conn.execute("UPDATE projects SET updated_at=? WHERE id=?",(stamp,project_id))
-        conn.execute("INSERT INTO events(project_id,created_at,kind,payload) VALUES (?,?,?,?)",(project_id,stamp,"manual_stage",json.dumps({"stage":stage,"status":status,"note":note},ensure_ascii=False)))
+        rows=[dict(r) for r in conn.execute('SELECT * FROM events WHERE project_id=? AND (? IS NULL OR id<?) ORDER BY id DESC LIMIT ?',
+                                            (project_id,before_id,before_id,limit+1))]
+    more=len(rows)>limit;rows=rows[:limit]
+    for row in rows: row['payload']=json.loads(row['payload'])
+    return dict(events=rows,next_before_id=rows[-1]['id'] if more else None)
+
+
+def save_project(name,project_id=None,client=None,device=None,quantity=None,notes=None,source=None,
+                 expected_revision=None,actor='unspecified',change_source='unspecified'):
+    from worker import source_path
+    name=text(name,'name',200)
+    if not name: raise ValueError('Project name is required')
+    stamp=now()
+    with db() as conn:
+        conn.execute('BEGIN IMMEDIATE')
+        old=project_exists(conn,project_id) if project_id else None
+        if old: check_revision(expected_revision,old,'PROJECT_CONFLICT')
+        elif expected_revision is not None and (type(expected_revision) is not int or expected_revision!=0):
+            raise ValueError('New project expected_revision must be absent or zero')
+        previous=old or {}
+        client=previous.get('client','') if client is None else client
+        device=previous.get('device','') if device is None else device
+        quantity=previous.get('quantity',1) if quantity is None else quantity
+        notes=previous.get('notes','') if notes is None else notes
+        if type(quantity) is not int or not 1<=quantity<=100000: raise ValueError('quantity must be integer 1..100000')
+        client,device,notes=text(client,'client',500),text(device,'device',500),text(notes,'notes')
+        path=str(source_path(source or previous.get('source')))
+        if Path(path).name == 'snapshot.ics': raise ValueError('Archive is read-only; bind the working revision instead')
+        if old:
+            conn.execute('UPDATE projects SET name=?,client=?,device=?,quantity=?,notes=?,source=?,updated_at=?,revision=revision+1 WHERE id=?',
+                         (name,client,device,quantity,notes,path,stamp,project_id))
+            invalid=set()
+            if path!=old['source']: invalid.update(['geometry','hardware','wheels','documentation','materials','production'])
+            if quantity!=old['quantity']: invalid.update(['materials','production'])
+            if device!=old['device']: invalid.update(k for k,_ in STAGES if k not in ('inquiry','devices'))
+            change_stages(conn,project_id,invalid,'outdated',actor,change_source,'project_inputs_changed',stamp)
+        else:
+            project_id=uuid.uuid4().hex
+            conn.execute('INSERT INTO projects (id,name,client,device,quantity,notes,source,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?)',
+                         (project_id,name,client,device,quantity,notes,path,stamp,stamp))
+            conn.executemany('INSERT INTO stages (project_id,key,label,status,note,updated_at) VALUES (?,?,?,?,?,?)',
+                             [(project_id,k,l,'draft','',stamp) for k,l in STAGES])
+        audit(conn,project_id,'project',old,project_exists(conn,project_id),actor,change_source,'save_project',stamp)
+    return get_project(project_id)
+
+
+def set_stage(project_id,stage,status,note='',expected_revision=None,actor='unspecified',change_source='unspecified'):
+    if stage not in dict(STAGES) or status not in STATUSES: raise ValueError('Unknown stage or status')
+    note=text(note,'note');stamp=now()
+    with db() as conn:
+        conn.execute('BEGIN IMMEDIATE')
+        project_exists(conn,project_id)
+        before=dict(conn.execute('SELECT * FROM stages WHERE project_id=? AND key=?',(project_id,stage)).fetchone())
+        check_revision(expected_revision,before,'STAGE_CONFLICT')
+        conn.execute('UPDATE stages SET status=?,note=?,updated_at=?,revision=revision+1 WHERE project_id=? AND key=?',
+                     (status,note,stamp,project_id,stage))
+        conn.execute('UPDATE projects SET updated_at=? WHERE id=?',(stamp,project_id))
+        after=dict(conn.execute('SELECT * FROM stages WHERE project_id=? AND key=?',(project_id,stage)).fetchone())
+        audit(conn,project_id,'stage',before,after,actor,change_source,'manual_stage',stamp)
     return get_project(project_id)
 
 def pinned_source(project_id,source=None):
@@ -121,7 +181,7 @@ def pinned_source(project_id,source=None):
     if source and source_path(source)!=path: raise ValueError("Source differs from project's pinned ICS file")
     return str(path)
 
-def register_snapshot(project_id,report,label,note="",advance=False):
+def register_snapshot(project_id,report,label,note="",advance=False,actor="unspecified",change_source="cad") :
     import shutil
     from worker import digest
     if not report.get("passed") or not report.get("source_unchanged"): raise ValueError("Cannot register failed CAD validation")
@@ -150,7 +210,9 @@ def register_snapshot(project_id,report,label,note="",advance=False):
         conn.execute("INSERT INTO snapshots (id,project_id,created_at,label,note,path,source,sha256,parameters,validation,report_path) VALUES (?,?,?,?,?,?,?,?,?,?,?)",tuple(json.dumps(item[k],ensure_ascii=False) if k=="parameters" else item[k] for k in ("id","project_id","created_at","label","note","path","source","sha256","parameters","validation","report_path")))
         conn.execute("UPDATE snapshots SET layout_binding=? WHERE id=?",(json.dumps(item["layout_binding"],ensure_ascii=False) if item["layout_binding"] else None,item["id"]))
         if advance:
-            conn.execute("UPDATE projects SET source=?,updated_at=? WHERE id=?",(str(working),item["created_at"],project_id))
-            conn.execute("UPDATE stages SET status='outdated',updated_at=? WHERE project_id=? AND key IN ('geometry','hardware','wheels','documentation','materials','production')",(item["created_at"],project_id))
+            conn.execute("UPDATE projects SET source=?,updated_at=?,revision=revision+1 WHERE id=?",(str(working),item["created_at"],project_id))
+            audit(conn,project_id,'project',current,project_exists(conn,project_id),actor,change_source,'cad_source_advanced',item['created_at'])
+            change_stages(conn,project_id,['geometry','hardware','wheels','documentation','materials','production'],
+                          'outdated',actor,change_source,'cad_source_advanced',item['created_at'])
         else: conn.execute("UPDATE projects SET updated_at=? WHERE id=?",(item["created_at"],project_id))
     return {"snapshot":item,**get_project(project_id)}
