@@ -35,6 +35,7 @@ Uruchom scripts/Verify.ps1 z opcjami -WithAddinBuild -WithUiChecks. Test natywny
 - PASS: rzeczywisty IronCAD 2027, nowa kopia ICS, przebudowa, pomiar przed zapisem i po ponownym otwarciu. Źródło niezmienione; archiwum SHA256 verified.
 - PASS: snapshot przypięty do v1; po kolejnym zapisie identycznej specyfikacji jako v2 snapshot nadal ma v1 i pierwotny hash. Stary token v1 odrzucony po utworzeniu v2.
 - PASS: nowa DLL zarejestrowana i załadowana (InitSelf w logu hosta). Baza oraz poprzedni kod zostały zachowane lokalnie poza Git.
-- NOT RUN: pełny scenariusz komunikatu konfliktu w UI hosta — okno powitalne IronCAD poza obszarem głównego okna blokowało Computer Use. Kompilacja/formularzowe testy offline nie zastępują tej kontroli.
+- PASS: po zamknięciu okna powitalnego wykonano test w UI hosta: formularz odczytał v2, drugi klient MCP zapisał identyczną specyfikację jako v3, zapis z formularza zwrócił LAYOUT_CONFLICT i zachował pola. Baza pozostała na v3, bez dodatkowej wersji po konflikcie.
+- PASS: tabela historii w IronCAD pokazuje powiązany snapshot jako v1 oraz starszy jako Niepowiązany; walidacja passed i integralność verified. Wymiary użytkownika nie zmieniły się w próbie konfliktu. Dowód lokalny: artifacts/ui_versions_acceptance.json.
 
 Raporty lokalne: artifacts/verification/20261021T113017680230Z oraz artifacts/native_versions.json (nie publikować ścieżek klientów i modeli w Git). Testy jednostkowe obejmują prawdziwe równoczesne transakcje SQLite, ale symulują CAD; wyżej wymieniona próba natywna została wykonana oddzielnie.
