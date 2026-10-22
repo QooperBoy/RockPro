@@ -21,6 +21,13 @@ Rzeczywiste manifesty klienta i mapowania źródła przechowuj wyłącznie lokal
 w ignorowanym `artifacts/`. Zakończenie kontraktu nie oznacza ukończenia montażu,
 promocji źródłowego manifestu do szablonu ani natywnej walidacji ICS.
 
+Wersjonowana definicja kandydata H7159 i podgląd symetrycznej pary mają osobną
+granicę offline: [CATALOG_ASSETS.md](CATALOG_ASSETS.md). Nie przyjmuj sidecaru
+jako gotowego szablonu ani zgody produkcyjnej. Zapisany eksport z pamięci
+zmodyfikowanego dokumentu nie jest automatycznie zgodny z wcześniejszym
+inwentarzem dyskowym; brak tego dowodu ma blokować powiązanie, a nie uruchamiać
+dopasowanie po nazwie części.
+
 Architektura i zakres docelowy (nie wszystkie moduły są gotowe produkcyjnie):
 [CORE_CASE_DESIGN.md](CORE_CASE_DESIGN.md) — pełna rodzina skrzyń, kotwy okuć,
 zachowanie ręcznej pracy i TDD. Pierwszy przyrost: ROC-43; plan nadrzędny: ROC-6.

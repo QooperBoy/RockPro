@@ -68,6 +68,35 @@ To kontrola źródła, a nie dowód poprawnego montażu uchwytu.
 Wycięcia pod okucia, styki profili, nośność, paletyzacja i dokumentacja
 produkcyjna nie otrzymują automatycznej akceptacji z tego prototypu.
 
+## Katalog części — przyrost offline
+
+Kontrakt i instrukcja: [CATALOG_ASSETS.md](CATALOG_ASSETS.md).
+
+`core_case/catalog_assets.py` i `scripts/import_catalog_asset.py` wprowadzają
+wersjonowaną definicję kandydacką H7159, fingerprint pomiarów wszystkich
+trzynastu części oraz deterministyczny plan symetrycznej pary. Definicja
+przypina raporty źródłowe, eksport, jednostki i surowe punkty płaszczyzn
+montażowych. Nie uwierzytelnia producenta ani zgody konstruktora.
+
+Import zapisanych dowodów POC i podgląd A/B/C przeszły próbę bez CAD.
+Powiązanie z historycznym manifestem pozostało zablokowane jako
+`INVENTORY_RELATION_UNPROVEN`: eksport z pamięci otwartego dokumentu nie
+potwierdza jego zgodności z wcześniejszym odczytem całego źródła. Do odblokowania
+potrzebne będą nowy inwentarz i eksport z jednej przypiętej, zapisanej rewizji.
+Nie wolno zastępować tego dopasowaniem po nazwie H7159.
+
+To przyrost w checkoutcie; nie został podłączony do UI, SQLite ani nowego
+narzędzia wykonawczego MCP. Podczas tej pracy użytkownik korzystał z komputera:
+nie wykonywano Computer Use, wywołań COM, otwierania modeli ani restartu hosta.
+Natywny odbiór wcześniejszego POC pozostaje osobnym dowodem.
+
+Weryfikacja: 31 nowych testów katalogu (w tym 21 niezależnych testów Astry)
+przeszło. Pełny harness przeszedł siedem etapów; `core-contracts` obejmował
+129 testów, a `core-design` 182. Raport:
+`artifacts/verification/20261022T083603537097Z/results.json`.
+Wcześniejsza nieudana próba z wykrytym błędem układu odniesienia pozostaje
+zachowana w `artifacts/verification/20261022T083335046392Z/`.
+
 ## Instrukcja testu nowego panelu
 
 Po bezpiecznym przeładowaniu dodatku: **Układ urządzeń → Otwórz prototyp skrzyni**.
@@ -94,9 +123,10 @@ Uruchom `scripts/Verify.ps1 -WithAddinBuild -WithUiChecks` zgodnie z
 
 Prompt wznowienia: „Użyj $rockpro-scope-check i $rockpro-verification. Wróć do
 ROC-42 i ROC-17: wykorzystaj odebrany POC H7159 opisany w H7159_POC.md.
-Zbuduj wersjonowaną definicję części z pochodzeniem, kandydacką bazą montażową
-i deterministycznym podglądem grupy symetrycznej, bez automatycznej promocji
-manifestu. Zachowaj istniejące dowody
+Wersjonowana definicja i podgląd są już w catalog_assets.py; nie buduj ich od
+nowa. Gdy użytkownik ponownie dopuści aktywowanie CAD, uzyskaj nowy inwentarz
+i eksport z jednej przypiętej, zapisanej rewizji oraz jawnie uzgodnij sidecar.
+Bez automatycznej promocji manifestu. Zachowaj istniejące dowody
 A/B/C i resize, dokumenty użytkownika, allowlistę starego szkieletu oraz brak
 zatwierdzenia produkcyjnego. Następnie rozlicz kolejne rodziny okuć i przejdź
 do odbioru pełnego szablonu oraz ręcznych edycji CAD w ROC-16 i ROC-40”.
