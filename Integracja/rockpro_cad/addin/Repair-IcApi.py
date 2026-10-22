@@ -32,7 +32,9 @@ def repair():
     register.restype=HRESULT
     for filename in files+["ICApiFoundation.tlb","ICApiIronCAD.tlb"]:
         path=str(folder/filename)
-        register(typeinfo.LoadTypeLibEx(path,0),path,str(folder))
+        # Loading must not attempt machine registration before the explicit
+        # per-user registration below.
+        register(typeinfo.LoadTypeLibEx(path,typeinfo.REGKIND_NONE),path,str(folder))
     print("ICAPI COM metadata registered for current user. Restart IronCAD.")
 
 if __name__=="__main__":repair()

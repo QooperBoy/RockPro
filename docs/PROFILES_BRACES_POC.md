@@ -18,6 +18,26 @@ dodatkowych części. B1930 to kątownik wzmacniający, nie profil do wydłużan
 zawias. EG-0500/1 i /2 tworzą katalogową parę pióro–rowek; identyfikacja nazwy nie
 potwierdza przekroju konkretnej geometrii ani styku w źródle.
 
+## Uzupełnienie źródeł producenta — 22.10.2026
+
+Oznaczenia EG-0500/1, EG-0500/2 i EG-0113 występują w oficjalnych produktach
+Penn Elcom; nie są wyłącznie kodami wewnętrznymi tego CAD. Poniższe dane są
+nominałami katalogowymi, nie pomiarem źródłowych części ani wyborem długości
+zakupowej. Sufiksy CAD `_1`/`_2` nadal wymagają powiązania z konkretnym przekrojem.
+
+| Potwierdzona strona produktu | Dodatkowe dane przekroju na stronie producenta | Opublikowany odnośnik modelu |
+|---|---|---|
+| [EG-0500/1-2M — pióro](https://www.penn-elcom.com/pl_en/9-5mm-tongue-extrusion-mates-with-eg-0500-2-2m-groove-extrusion-eg-0500-1-2m) | Otwarcie 9,5 mm, głębokość otwarcia 18,5 mm, grubość 1,5 mm, ramię 20 mm; odcinek 2 m. Jawnie parowany z EG-0500/2-2M. | [View 3D Drawing](https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=944122) |
+| [EG-0500/2-2M — rowek](https://www.penn-elcom.com/lc/9-5mm-groove-extrusion-mates-with-eg-0500-1-2m-tongue-extrusion-eg-0500-2-2m) | Otwarcie 9,5 mm, głębokość otwarcia 16,5 mm, grubość 1,5 mm, ramię 20 mm; odcinek 2 m. Jawnie parowany z EG-0500/1-2M. | [View 3D Drawing](https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=943659) |
+| [EG-0113-2M — kątownik](https://www.penn-elcom.com/cn/single-angle-extrusion-with-35mm-legs-2m-long-eg-0113-2m) | Ramiona 35 mm, promień 2 mm, odcinek 2 m. Promień nie oznacza grubości ścianki. | [View 3D Drawing](https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=939958) |
+
+Linki modeli pochodzą bezpośrednio z kart producenta. Próba ich odczytu zakończyła
+się odpowiedzią 502 lub brakiem dostępnej kopii w narzędziu przeglądania; **nie
+pobrano i nie zweryfikowano pełnego przekroju ani modelu 2D/3D**. Same tabele
+wymiarów nie opisują wszystkich promieni, rowków i tolerancji. Znalezienie tych
+źródeł nie usuwa blokady osi cięcia, styku ani kotew źródłowego CAD i nie zmienia
+statusu katalogu na zatwierdzony do automatycznego montażu.
+
 ## Co wiadomo, czego nie wolno zgadnąć
 
 Każda połówka EG-0500 ma w lokalnym bbox dwa odcinki o rozpiętości Z około

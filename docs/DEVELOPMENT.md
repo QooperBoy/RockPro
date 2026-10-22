@@ -49,6 +49,14 @@ produkcyjnej. Szczegóły: [CORE_RUNTIME.md](CORE_RUNTIME.md).
 
 ## CAD w tle
 
+Aktualny stan okuć i dowody: [HARDWARE_MVP_STATUS.md](HARDWARE_MVP_STATUS.md).
+Incydent połączenia z 22.10.2026: [ICAPI_CONNECTION_RUNBOOK.md](ICAPI_CONNECTION_RUNBOOK.md).
+Odczyt wewnątrz hosta działał, lecz zewnętrzny `IZBaseApp` nadal zwracał
+`E_NOINTERFACE`. Próbny wykonawca wewnętrzny nie oznacza zainstalowanego mostu
+MCP. Nie powtarzaj rejestracji, prób Trial ani joba CAD, kiedy inna operacja
+czeka na modalny komunikat. [Propozycja wykonawcy](ADR_INPROCESS_CAD_EXECUTOR.md)
+oddziela docelową architekturę od bieżącego POC.
+
 Próby bez przejmowania pulpitu: [CORNER410429_POC.md](CORNER410429_POC.md).
 Używaj udokumentowanego otwarcia sceny `OpenFile2` z `vbVisible=false` i sprawdzaj
 `pbAlreadyOpen`: dokument już otwarty przez użytkownika nie staje się własnością
