@@ -4,7 +4,7 @@
 
 1. Odczyt drzewa wskazanego modelu bez zmiany źródła: identyfikatory węzłów, ścieżki, liczba wystąpień, przynależność góra/dół. Oddzielne zestawienie zespołów i fizycznych elementów zapobiega podwójnemu liczeniu.
 2. Dla każdej rodziny: polska i angielska nazwa, funkcja, producent, numer katalogowy, potwierdzone źródło danych, materiał, masa i wariant. Nazwa CAD pozostaje osobnym polem; podobnych sufiksów nie scalać automatycznie.
-3. Geometria i montaż: rzeczywisty obrys, lokalne osie i transformacje, płaszczyzna mocowania, odsadzenie od krawędzi, otwory, wycięcia i przestrzeń ruchu. Sam SizeBox może być zerowy lub szczątkowy w importowanych złożeniach; nie używać go bez weryfikacji jako gabarytu części.
+3. Geometria i montaż MVP: obrys całego okucia, jego środek, lokalne osie, orientacja i odsadzenie od krawędzi ściany. Okucie jest jednym gotowym elementem; jego otwory, wiercenia i szkice nie są edytowane ani osobno parametryzowane. Sam SizeBox może być zerowy lub szczątkowy w importowanych złożeniach; nie używać go bez weryfikacji jako gabarytu części.
 4. Reguły zgodności: pary zamka i profilu, połówki zawiasów, narożniki, koła i gniazda piętrowania, dopuszczalne grubości płyt. Dla koła i gniazda wspólna pozycja X/Y oraz kontrola kierunku i nośności.
 5. Konstruktor potwierdza mapowanie rodzin. Niepewne pozycje pozostają niezweryfikowane i nie są automatycznie dobierane.
 6. Pierwsza automatyzacja: jedna potwierdzona rodzina narożników na kopii szkieletu. Odbiór po zmianie X/Y/Z, zapis i ponowne otwarcie. Dopiero potem uchwyty, zamki, profile, koła i gniazda.
