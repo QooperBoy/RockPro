@@ -6,6 +6,10 @@ i formularz; Astra niezależnie sprawdzała wymagania, nowe przypadki i błędy.
 
 ## Co działa
 
+Checkpoint narożników 410429 (22.10.2026): [kod, zakres i wyniki](CORNER410429_POC.md).
+Osiem rzeczywistych części, symetryczny plan i wykonawca działający w tle;
+22 testy PASS. Natywne A potwierdzone, końcowy odbiór B/C pozostaje otwarty.
+
 - `core_case/planner.py`: interpretacja jawnej recepty, ramy ścian i podziału
   pokrywy, płyty, profile, kotwy, grupy symetrii, parowanie okuć i koło–gniazdo.
   Stałe grubości/przekroje; właściwe obroty; osobne pozycje prezentacyjne wieka.
