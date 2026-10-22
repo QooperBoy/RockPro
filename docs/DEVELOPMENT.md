@@ -90,6 +90,31 @@ Harness nie rejestruje dodatku, nie uruchamia CAD i nie zmienia modeli. Uruchami
 
 Test natywny wykonuje jeden aktor: zapisane dane użytkownika → znany plik źródłowy → odczyt → zmiana na kopii → pomiar → zapis i ponowne otwarcie → kontrola niezmienności oryginału, historii i SQLite. Nie wykonuj live_test.py --change jako zwykłego testu: zmienia kopię i otwiera dokumenty hosta. UI, autostart oraz geometrię raportuj oddzielnie od testów bez CAD.
 
+### Importowane okucia: geometria i grafika to oddzielne dowody
+
+W POC H7159 poprawne macierze oraz nawet bezpośredni globalny obrys ICAPI
+nie wystarczyły do poprawnego widoku: grafika jednego wstawionego zespołu
+pozostawała w poprzednim położeniu także po zapisie i otwarciu.
+Potwierdzona naprawa na nowej kopii to aktualizacja części/zespołów,
+rekurencyjne `IZElement.SetDirtyFlag(Z_DIRTY_GRAPHICS)`, a następnie
+`scene.Update`, `UpdateGraphics(0)` i `Redraw` przed zapisem.
+Sam `UpdateGraphics` nie naprawił tego przypadku.
+
+Przy ponownym użyciu natywnych okuć sprawdzaj po otwarciu zarówno pomiary,
+jak i rzeczywisty widok właściwego dokumentu. Zapisz jego pełną ścieżkę;
+identyczna nazwa zakładki nie identyfikuje modelu. Naprawę grafiki wykonuj
+wyłącznie na kopii i potwierdź, że nie zmieniła geometrii. Nie wyciągaj
+wniosku o wyglądzie/przezroczystości tylko z wartości gettera materiału.
+Zakres, runner i wyniki: [H7159_POC.md](H7159_POC.md).
+
+Druga potwierdzona pułapka: w użytym ICAPI `IZPart.GetBoundingBox(False)`
+zwraca obrys w układzie rodzica, nie zawsze w układzie świata. Dla części
+bezpośrednio pod sceną te układy są identyczne, co może ukryć błąd testu.
+Dla części wewnątrz okucia zachowuj surowy obrys rodzica i jego macierz
+do świata; nie nakładaj ponownie lokalnego ruchu części. Przy nieosiowym
+obrocie transformowany AABB może być tylko konserwatywnym ograniczeniem,
+a nie dokładnym obrysem. Jawnie rozróżniaj te rodzaje porównania.
+
 ## Utrzymanie i wydanie
 
 Nie mieszaj dużego refaktoru i nowych możliwości bez rozdzielenia rezultatów i dowodów. Nie przeformatowuj całego MVP przy drobnym fixie. Przy powtarzającym się problemie najpierw odtwórz objaw i napraw przyczynę, potem wróć do funkcji. Konkretna forma checkpointu jest w skillu scope-check.
