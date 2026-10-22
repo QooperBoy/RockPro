@@ -67,6 +67,28 @@ wiązań natywnych. Wygląd: **NOT RUN**; gotowość produkcyjna: **niezatwierdz
 3. Przekaż uwagi o wyglądzie i osadzeniu. Nie oczekuj jeszcze automatycznego
    przeliczenia tych okuć po ręcznej zmianie tabeli parametrów tego POC.
 
+## Kostka 1000 × 1000 × 1000 mm
+
+Przebieg `artifacts/cube1000-native-20261022-01/`: **PASS**.
+Zewnętrzny gabaryt konstrukcji ze sklejki wynosi 1000 mm w każdej osi;
+okucia mogą wystawać poza ten obrys. Model zawiera 10 płyt zastępczych,
+8 rzeczywistych narożników 410429, 4 całe połówki zatrzasków 17251S
+oraz 2 całe uchwyty H7159. Uchwyty umieszczono symetrycznie na przedniej
+ścianie, na połowie wysokości dolnej części skrzyni. Nie wykonano wycięć.
+
+Pomiary całych okuć, symetria, zapis i ponowne otwarcie: PASS.
+Źródło niezmienione, pomocnicze dokumenty zamknięte. Niezapisana scena
+użytkownika zachowana. Po odbiorze, na wyraźne polecenie użytkownika,
+osobno otwarto `delivery/RockPro_skrzynia_1000x1000x1000.ics` i celowo
+pozostawiono tylko ten wynik do oglądania. To wyjątek od zamykania własnych
+prototypów dotyczący wskazanego pliku, nie zgoda na pozostawianie helperów.
+
+Runner obsługuje teraz opcjonalne `--single-size 1000 1000 1000`
+i `--handle-proof` ze sprawdzonym raportem H7159. Domyślne A/B pozostaje.
+Jawne `--preserve-dirty-context` zachowuje niezapisany dokument, także pustą
+scenę: przytrzymuje jej referencję COM i kontroluje stan zamiast wymuszać zapis.
+Nie deklaruje zgodności niezapisanej pamięci z plikiem na dysku.
+
 ## Kod i dalsza praca
 
 - [Reguły narożników](../Integracja/rockpro_cad/core_case/corner_mount.py)

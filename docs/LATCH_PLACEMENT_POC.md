@@ -206,3 +206,42 @@ automatycznego Remove(Index); własny dokładnyUUID zachowany i sprawdzany, UNKN
 nietknięty. Funkcja build oraz wykonawca C++/C# nie zmieniły się. SkładniaPASS,
 bez kolejnego CADrun. Historyczne hashe09 zachowane; zmiana opisana w
 `postproof_probe_safety_change.json`.
+
+## Kostka1000mm z narożnikami, zatrzaskami i uchwytami — PASS
+
+Jedna nowa konstrukcja ma zewnętrzny gabaryt płyt1000×1000×1000mm (okucia mogą
+wystawać poza ten obrys), grubość9.8mm i wieko104.13mm. Zawiera10prostych płyt,
+8rzeczywistych narożników410429,2pary połówek zatrzasków17251S oraz2całe uchwyty
+H7159. Uchwyty pochodzą ze sprawdzonego historycznego assetu POC04; zachowano
+kandydata ramy montażowej i jego ograniczenia. Nie dodano profili, kół ani zawiasów.
+Nie wykonano wycięć pod wpuszczane uchwyty ani oceny kolizji/wytrzymałości.
+
+Dowody: `artifacts/cube1000-native-20261022-01/acceptance.json`, obrysy/macierze
+przed zapisem i po otwarciu oraz osobny byte-identyczny snapshot. Podstawowa
+kontrola rozmieszczenia, symetrii i zachowania całych zespołów: **PASS**.
+Żadnych nowych audytów BRep/otworów. Do odświeżenia cacheH7159 wykorzystano
+sprawdzoną kolejność Update→SetDirtyFlag(graphics) na13bezpośrednich częściach,
+a następnie na złożeniu; nie zmieniano wewnętrznej geometrii.
+
+Czytelny plik dostawy:
+`artifacts/cube1000-native-20261022-01/delivery/RockPro_skrzynia_1000x1000x1000.ics`.
+SHA `15eae6b696243683ef39b7b2f7e114cc36b3b5212d6451810b3db53e647ebb20`.
+Na wyraźne polecenie użytkownika otwarto go później oddzielną operacją API
+`Pages.Add(filename,false)`, bez CU/klawiatury. Pełna aktywna ścieżka potwierdzona,
+wynik celowo pozostał otwarty. `delivery/visible_open_receipt.json` ma PASS.
+Ocena wyglądu pozostaje po stronie użytkownika; nie twierdzimy visualQA.
+
+Wcześniejszy użytkownikowski draftScene27 był niezapisany. Jawna opcja
+`--preserve-dirty-context` zachowała jego canonicalIUnknown (referencja trzymana
+przez cały job), PID/HWND/Saved/FullName oraz SDK Name/GUID/Modified przed==po.
+Pusta ścieżka nie trafiła do Path.resolve ani GetOpenDocByName. Draft nie był
+zapisywany, modyfikowany ani zamykany; po widocznym otwarciu nadal miał pustą
+ścieżkę i Saved=false. Oryginalny SHA nie zmienił się. Wszystkie własne helpery
+zamknięte przed osobnym pokazaniem wyniku.
+
+Nowe opcje kontrolera: `--single-size 1000 1000 1000` tworzy jeden model (domyślne
+A/B pozostają), `--handle-proof .../hardware_poc_receipt.json` dodaje znany
+wholeH7159pair, `--preserve-dirty-context` jawnie dopuszcza zachowanie istniejącej
+niezapisanej sceny. Default bez flagi nadal wymaga zapisanego kontekstu.
+`scripts/show_cube1000_delivery.py` pokazuje wyłącznie zaakceptowaną kostkę,
+po zamknięciu helperów, jako oddzielny jawnie widoczny etap.
