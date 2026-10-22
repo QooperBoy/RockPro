@@ -1,6 +1,6 @@
 # Identyfikacja rodzin części — wynik researchu
 
-Stan 21.10.2026. Rozpoznano 12 kodów katalogowych (dwie połówki EG-0500 liczone oddzielnie) z głównego drzewa modelu. Poniżej są identyfikacje kodów i funkcji, nie zatwierdzona biblioteka do automatycznego montażu. Parametry wiercenia, konkretne warianty i zgodność geometrii wymagają dalszej walidacji.
+Stan 21.10.2026. Rozpoznano 12 kodów katalogowych (dwie połówki EG-0500 liczone oddzielnie) z głównego drzewa modelu. Poniżej są identyfikacje kodów i funkcji, nie zatwierdzona biblioteka do automatycznego montażu. MVP rozmieszcza całe gotowe okucia według środka i orientacji; nie obejmuje parametrów wiercenia. Wzmianki o liczbie otworów w opisach producentów służą wyłącznie rozpoznaniu wariantu, nie są zadaniami generatora.
 
 | Kod / alias CAD | Rozpoznanie | Producent i źródło | Uwagi |
 |---|---|---|---|
