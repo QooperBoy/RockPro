@@ -247,3 +247,40 @@ przy domyślnej szerokości okna, a całe ID operacji wymaga przewinięcia lub
 skopiowania. Po aktywacji CAD okno panelu wymagało maksymalizacji/przywrócenia,
 żeby odmalować zawartość. Końcowe zrzuty pokazują rzeczywisty wynik, ale nie
 oznacza to odbioru UI bez zastrzeżeń.
+
+## Zatrzaski i porządkowanie prototypów — 22.10.2026
+
+Planer czterech całych złożeń 17251S / 17251S_1 zachowuje pary pokrywa–dół,
+orientację i symetrię. Opis: [LATCH_PLACEMENT_POC.md](LATCH_PLACEMENT_POC.md).
+Trzy podstawowe testy offline: PASS. Próba na historycznych czterech wierszach:
+PASS, z zastrzeżeniami starego odczytu opisanymi w notatce. Świeży odczyt,
+montaż i zapis/ponowne otwarcie zatrzasków w CAD: NOT RUN.
+
+Zlecone zamykanie własnych prototypów nie zostało potwierdzone: pierwszy
+odczyt listy dokumentów przez COM zwrócił RPC_E_SERVERFAULT. Następnie nie
+znaleziono działającego procesu IronCAD. Dziennik Windows potwierdził
+Application Error 1000 z 22.10.2026 20:17:31, wersja 29.0.20.20605,
+wyjątek 0xc0000005, nieznany moduł. Związek przyczynowy z konkretnym
+wywołaniem API nie został ustalony. Nie wykonywano wymuszonego zamykania
+procesu, restartu ani przejmowania pulpitu. Nie potwierdzono zachowania
+niezapisanych zmian prototypów; istniejące zapisane kopie pozostają na dysku.
+
+## Zatrzaski — końcowy POC A/B, 22.10.2026
+
+Późniejszy przebieg `latch17251-inprocess-native-20261022-09` zakończył się
+**PASS**: świeży odczyt czterech całych zespołów 17251S/17251S_1, eksport,
+montaż na dwóch regularnych kopiach, symetria, pomiar, zapis i ponowne otwarcie.
+A: 914×602×352; B: 1100×720×410 mm. Oba modele mają 10 płyt zastępczych,
+8 rzeczywistych narożników i 4 całe zespoły połówek zatrzasków.
+Nie jest to jeszcze pełny Epson ani trwałe wiązania parametrów w natywnym CAD.
+
+Niezależny przegląd potwierdził zgodność raportów przed/po otwarciu, zachowanie
+obrysów i orientacji oraz rzeczywiste hashe obu ICS i osobnych snapshotów.
+Środki zatrzasków pozostały około 150 mm od bocznych krawędzi w A i B.
+Źródło i aktywny kontekst niezmienione; własne dokumenty zamknięte.
+Wygląd: **NOT RUN**, do oceny użytkownika.
+
+Wykonano to przez małego wykonawcę CLR uruchamianego wewnątrz hosta.
+Zewnętrzny `IZBaseApp` nadal nie działa, więc nie deklarujemy naprawionego
+MCP ani wdrożenia nowego stałego wykonawcy. Szczegóły i granice:
+[stan MVP okuć](HARDWARE_MVP_STATUS.md), [runbook API](ICAPI_CONNECTION_RUNBOOK.md).
