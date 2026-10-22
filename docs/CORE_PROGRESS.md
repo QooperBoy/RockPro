@@ -33,6 +33,7 @@ i formularz; Astra niezależnie sprawdzała wymagania, nowe przypadki i błędy.
 | Natywne A — punkt kontrolny A02 | PASS | 67 brył, zapis i ponowne otwarcie ICS, stabilne ID; maks. błąd pozycji/obrysu ok. 2e-12 mm. |
 | Aktualny mostek po przeglądzie | PASS natywny | Istniejące-only ROT, kontrola obrysu i osobna tolerancja obrotu; A/B/C oraz resize zapisane i ponownie otwarte. |
 | Rzeczywisty uchwyt H7159 | PASS osobnej próby | Natywny zespół 13 części zachował topologię, objętości i wewnętrzne transformacje po eksporcie/imporcie, obrocie, zapisie i ponownym otwarciu. Nie jest to jeszcze montaż na ścianie całej skrzyni. |
+| POC pary H7159 + jedno urządzenie | PASS natywny i niezależny | Dwa rzeczywiste uchwyty na prostej skrzyni z 10 płyt i jednym urządzeniem poglądowym; bazowy rozmiar, XYZ resize i powrót. 37 części, w tym 26 rzeczywistych; nie jest to pełna skrzynia katalogowa ani natywne wiązania. |
 | Natywne A/B/C, resize, rejestracja SQLite | PASS | Cztery operacje i cztery snapshoty na izolowanej bazie; zgodne hashe kopii/archiwów, ponowienie bez duplikacji. Źródło to jawny wcześniejszy prototyp, nie model Epson. |
 | Nowa DLL w działającym IronCAD | PASS ładowania | Po zapisaniu dokumentów i bezpiecznym restarcie log InitSelf potwierdził znacznik kompilacji, ścieżkę i SHA256 zainstalowanej DLL. Odbiór całej ścieżki panel–CAD jest osobnym sprawdzeniem. |
 | Rzeczywisty panel → backend → CAD → snapshot | PASS prototypu | Oddzielny projekt QA; zapis układu, przygotowanie i przypięcie planu, jawne utworzenie 67 brył, zapis/ponowne otwarcie ICS i rejestracja archiwum. Źródło niezmienione. |
@@ -92,9 +93,10 @@ Uruchom `scripts/Verify.ps1 -WithAddinBuild -WithUiChecks` zgodnie z
 źródłowe pozostają lokalnie w ignorowanym `artifacts/`.
 
 Prompt wznowienia: „Użyj $rockpro-scope-check i $rockpro-verification. Wróć do
-ROC-42 i ROC-17: zmapuj źródłową bazę montażową rzeczywistego H7159, połącz
-natywne kopiowanie z kotwami oraz symetrią grupy na nowej kopii skrzyni.
-Potwierdź geometrię po zapisie i ponownym otwarciu. Zachowaj istniejące dowody
+ROC-42 i ROC-17: wykorzystaj odebrany POC H7159 opisany w H7159_POC.md.
+Zbuduj wersjonowaną definicję części z pochodzeniem, kandydacką bazą montażową
+i deterministycznym podglądem grupy symetrycznej, bez automatycznej promocji
+manifestu. Zachowaj istniejące dowody
 A/B/C i resize, dokumenty użytkownika, allowlistę starego szkieletu oraz brak
 zatwierdzenia produkcyjnego. Następnie rozlicz kolejne rodziny okuć i przejdź
 do odbioru pełnego szablonu oraz ręcznych edycji CAD w ROC-16 i ROC-40”.
@@ -130,6 +132,13 @@ połączenie tego kopiowania z kotwami i symetrią całej skrzyni. Obecny przyci
 prototypu nadal generuje jawne bryły zastępcze; nie podmienia ich automatycznie
 na zatwierdzony katalog.
 
+Kolejny, osobny przyrost 22.10.2026: [POC pary H7159](H7159_POC.md).
+Powstała prosta skrzynia z dwoma rzeczywistymi uchwytami i jednym urządzeniem
+poglądowym. Stan bazowy, zmiana XYZ i powrót przeszły natywny zapis oraz
+ponowne otwarcie, z osobnymi archiwami i kontrolą źródeł. To ograniczony runner
+CLI: nie podmienia jeszcze okuć w przycisku pełnego prototypu i nie tworzy
+natywnych wiązań tabeli parametrów. Szczegóły i granice odbioru są w opisie POC.
+
 ## Wdrożenie i bezpieczny restart 22.10.2026
 
 Po zgodzie użytkownika zapisano dziesięć otwartych, nazwanych dokumentów.
@@ -160,9 +169,11 @@ i zachowuje poprzednią listę narzędzi. Konfiguracja wskazuje prawidłowy
 zainstalowany serwer i nie ma filtra narzędzi; świeży proces stdio oraz panel
 działają. Próba odświeżenia z UI klienta nie potwierdziła restartu połączenia;
 nie zmieniano konfiguracji ani nie restartowano całej aplikacji Codex.
-Bezpośrednie sterowanie nowymi narzędziami z tej otwartej sesji pozostaje
-niepotwierdzone do jej odświeżenia. To osobny stan od działającej integracji
-panelu IronCAD i CLI z backendem.
+Był to stan sesji w czasie wdrożenia, osobny od działającej integracji
+panelu IronCAD i CLI z backendem. Przy rozpoczęciu POC H7159 22.10.2026
+narzędzia odświeżyły się: bieżąca rozmowa udostępnia 21 narzędzi,
+a odczyt listy projektów przez MCP przeszedł poprawnie. Nie zmieniano
+konfiguracji serwera ani zakresu uprawnień w ramach tego odświeżenia.
 
 ## Próba w rzeczywistym panelu po restarcie
 
