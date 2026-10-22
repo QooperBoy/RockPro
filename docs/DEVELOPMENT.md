@@ -47,6 +47,22 @@ zapisany raport przed rejestracją snapshotu. Prototyp generuje bryły zastępcz
 nie zatwierdzone okucia katalogowe. Nie promuje manifestu Epson ani gotowości
 produkcyjnej. Szczegóły: [CORE_RUNTIME.md](CORE_RUNTIME.md).
 
+## CAD w tle
+
+Próby bez przejmowania pulpitu: [CORNER410429_POC.md](CORNER410429_POC.md).
+Używaj udokumentowanego otwarcia sceny `OpenFile2` z `vbVisible=false` i sprawdzaj
+`pbAlreadyOpen`: dokument już otwarty przez użytkownika nie staje się własnością
+wykonawcy. Nie zastępuj błędu ukrytego otwarcia widocznym `OpenFile`.
+Kontrola aktywnego dokumentu i okna musi wykonać się także po wyjątku COM
+(`finally`), bez przywracania fokusu przez program.
+
+W próbie IronCAD 2027 ukryta scena obsłużyła tworzenie, pomiar, zapis i ponowne
+otwarcie geometrii, ale `UpdateGraphics(0)` zwróciło `E_FAIL`. Nie uruchamiaj
+widocznej sceny ani `Redraw` jako obejścia w zadaniu ograniczonym do tła.
+Oznacz elementy jako wymagające odświeżenia grafiki i wykonaj aktualizację
+geometrii; odbiór wyglądu pozostaje osobnym testem **NOT RUN** do czasu jego
+rzeczywistego wykonania.
+
 ## Źródło i środowisko
 
 Źródłem kodu jest checkout `rockpro-cad`. Sąsiedni `../Integracja/rockpro_cad` to lokalne wdrożenie autora, z własnym venv, bazą, manifestem i rewizjami. Zmiany wdrożeniowe należy najpierw zachować w Git; baz i konfiguracji nie kopiujemy między checkoutami. Nowa kompilacja nie przeładowuje DLL w otwartym IronCAD.
