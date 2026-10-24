@@ -41,7 +41,8 @@ Onboarding ROC-1–4 nie należy do projektu CAD. ROC-5–10 to epiki. ROC-15/43
 | ROC-28 | Indeks źródeł i macierz braków gotowe; pięć zakończonych zleceń NOT RUN | docs/CUTTING_BOM_IMPORT.md. Brak kompletnych cen, rzeczywistego rozkroju i kosztów; nie zastępować pięcioma kartami SQLite. |
 | ROC-29 | Import i agregacja backendu PASS | 7 testów; pełny harness PASS 20261024T220828460477Z. Niezmienne źródła, CAS, powtórzenia bez duplikacji, nowa rewizja zastępuje popyt, oddzielne technologie/daty/grain. Rzeczywisty zatwierdzony BOM klienta NOT RUN. |
 | ROC-30 | Referencyjny rozkrój, neutralny eksport i niezależny checker PASS | 5 testów, docs/CUTTING_PLAN_CONTRACT.md. PLAN/maszyna/realna technologia NOT RUN. Nie deklarować optimum ani produkcji. |
-| ROC-31–33,41,44 | Kolejne prace techniczne | Odczytać opisy i rozpatrywać według zależności; nie pomijać. |
+| ROC-31 | Transakcyjny backend magazynu PASS | 6 testów, także wyścig o tę samą resztkę; brak podwójnego odejmowania i cofania zużycia. docs/INVENTORY_CONTRACT.md. Ekran/pilotaż klienta NOT RUN. |
+| ROC-32–33,41,44 | Kolejne prace techniczne | Odczytać opisy i rozpatrywać według zależności; nie pomijać. |
 
 ## Następna czynność
 

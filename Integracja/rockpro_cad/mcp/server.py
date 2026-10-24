@@ -128,6 +128,14 @@ SCHEMAS += [
 ]
 
 
+SCHEMAS += [
+ schema('inventory_command','Operator-only transactional register/reserve/issue/consume/return/cancel/delivery/receive. CAS uses lot revision; no automatic purchasing',
+        {'command':{'type':'object'},'operation_id':S,'expected_revision':REV},['command','operation_id','expected_revision']),
+ schema('get_inventory','Read physical, held and free stock without double subtraction; confirmed unreceived deliveries are separate',{},readonly=True),
+ schema('get_inventory_history','Read bounded immutable inventory operation receipts; caller identity is unverified',{'limit':{'type':'integer','minimum':1,'maximum':500}},readonly=True),
+]
+
+
 def handle(request):
     ident = request.get("id")
     if ident is None:

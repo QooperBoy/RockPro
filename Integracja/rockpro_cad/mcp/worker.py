@@ -234,6 +234,12 @@ def create_snapshot(project_id,label="Snapshot",note=""):
 
 
 def dispatch(name, arguments):
+    inventory_keys={'inventory_command': {'command','operation_id','expected_revision'},
+                    'get_inventory':set(),'get_inventory_history':{'limit'}}
+    if name in inventory_keys:
+        if not isinstance(arguments,dict) or set(arguments)-inventory_keys[name]:raise ValueError('Invalid inventory tool argument')
+        import inventory_service
+        return getattr(inventory_service,name)(**arguments)
     cutting_keys={'verify_cut_plan': {'demand','sheets','technology','plan'},
                   'solve_reference_cut_plan': {'demand','sheets','technology','max_seconds'},
                   'export_cutting_csv': {'demand'}}
