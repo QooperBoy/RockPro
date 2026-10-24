@@ -37,10 +37,17 @@ Onboarding ROC-1–4 nie należy do projektu CAD. ROC-5–10 to epiki. ROC-15/43
 | ROC-24 | Filtry/ranking i evaluator benchmarku PASS; pełny historyczny odbiór zablokowany etykietami | 5 testów, harness PASS 20261024T214444139483Z; rzeczywista trafność historyczna NOT RUN, brak zamrożonego oznaczonego zbioru. docs/FAMILY_RECOMMENDATIONS.md. |
 | ROC-25 | Backend wariantów i kontroli wyjmowania PASS; harness PASS 20261024T214830686049Z | Do 3 odrębnych układów, jawne orientacje/kierunki, AABB toru +Z, blokada niepotwierdzonych danych dla wydania. 5 testów PASS, 2 propozycje rzeczywistego rekordu Epson. Pełny UI nowej ścieżki NOT RUN. docs/DEVICE_LAYOUT_VARIANTS.md. |
 | ROC-26 | Bramka propozycji z budżetami i logami PASS; harness PASS 20261024T215341335976Z | agent_server.py ma statyczną allowlistę bez zapisów/zgód/CAD. Czas rzeczywisty, tokeny/koszt jawnie niedostępne. Zewnętrzny model/pilotaż H0–H6 NOT RUN. configure.py zmienione w źródle; istniejące mcp-config.local.json przepięte wyłącznie na agent_server.py po zachowaniu kopii, bez resetu demo. docs/AGENT_RUN_POLICY.md. |
+| ROC-27 | Audyt lokalny i dokumentacja producenta wykonane; próba produkcyjna zablokowana dostępem | WoodLAB PLAN nie znaleziono w lokalnych instalacjach. Dokumentowany ASCII/Excel, resztki, rzaz i grain; preferowany istniejący PLAN po próbie na stanowisku. Technologia rzeczywista null/nieznana. docs/MATERIAL_INTEGRATION_AUDIT.md. |
 | ROC-29–33,41,44 | Kolejne prace techniczne | Odczytać opisy i rozpatrywać według zależności; nie pomijać. |
 
 ## Następna czynność
 
-ROC-21: przyrost gotowy i pełny harness PASS 20261024T213454896201Z. ROC-23 gotowe technicznie: katalog i ekstrakcja lokalnych źródeł z 5 testami PASS; aktualizacja Linear jeszcze do wykonania. ROC-24: przyrost zapisany i sprawdzony, benchmark historyczny czeka na dane. ROC-25 backend ukończony i przetestowany; UI nowej ścieżki pozostaje NOT RUN. ROC-26 bramka gotowa, pełny agent/zużycie modelu i pilotaż NOT RUN. Następnie FIX_FIRST ROC-20: catalog_native.close_owned_documents nadal ma stary SaveAsCopy bez potwierdzenia pliku; poprawić przed kolejnymi CAD. Potem ROC-27–33 i pozostałe zadania. Uzupełnić też status ROC-21 w Linear jako In Progress; nie Done z powodu brakujących dokumentów produkcyjnych. Po każdym sprawdzonym przyroście
+ROC-21: przyrost gotowy i pełny harness PASS 20261024T213454896201Z. ROC-23 gotowe technicznie: katalog i ekstrakcja lokalnych źródeł z 5 testami PASS; aktualizacja Linear jeszcze do wykonania. ROC-24: przyrost zapisany i sprawdzony, benchmark historyczny czeka na dane. ROC-25 backend ukończony i przetestowany; UI nowej ścieżki pozostaje NOT RUN. ROC-26 bramka gotowa, pełny agent/zużycie modelu i pilotaż NOT RUN. FIX_FIRST ROC-20 zakończony (szczegóły na końcu). ROC-27 audyt lokalny wykonany, próba PLAN zablokowana instalacją/technologią klienta. Następne ROC-28/29: inwentarz historycznych źródeł i import BOM/formatek z agregacją, bez zgadywania materiału/grain. Uzupełnić też status ROC-21 w Linear jako In Progress; nie Done z powodu brakujących dokumentów produkcyjnych. Po każdym sprawdzonym przyroście
 uzupełnić ten dziennik, dowody i commit. Pełny zakres zakończony tylko wtedy,
 gdy istnieją dowody dla kryteriów zadania; blokery to osobna lista na rano.
+
+
+Dodatkowy FIX_FIRST ROC-20 zakończony: catalog_native cleanup ma potwierdzony
+SaveAs i zatrzymuje własność przy nieudanym zachowaniu. Native PASS po błędzie:
+artifacts/overnight-20261024/catalog-cleanup-native/verification.json.
+Pełny harness PASS 20261024T215741060210Z.
