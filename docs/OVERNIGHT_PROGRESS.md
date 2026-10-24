@@ -34,10 +34,12 @@ Onboarding ROC-1–4 nie należy do projektu CAD. ROC-5–10 to epiki. ROC-15/43
 | ROC-11–14,27–28,34–39 | Wymagania trzeba rozpatrzyć, zależne od danych/licencji/użytkownika | Nie tworzyć fikcyjnych cenników, zakupów, licencji ani odbiorów klienta. Wykonać dostępne przygotowanie techniczne, zapisać dokładne braki. |
 | ROC-21 | Pakiet rewizji i wykrywanie dezaktualizacji PASS; pełny odbiór wymaga dokumentów | release_bundle.py, 5 testów, rzeczywisty draft pakietu w artifacts/overnight-20261024/release-prototype-03. Rysunki/produkcja pending, zakupowy BOM/materiał NOT RUN. docs/REVISION_RELEASE_BUNDLE.md. |
 | ROC-23 | Implementacja katalogu i ekstrakcji PASS; pełny harness PASS 20261024T214134912003Z | Per-field units/source/status, brak automatycznego scalenia wariantów, null/conflict, projekt zapytania bez wysyłki. Lokalny PDF/EML odczytany. Rekord Epson ze strony producenta zapisany do wspólnej SQLite. docs/DEVICE_CATALOG.md. |
-| ROC-24–26,29–33,41,44 | Kolejne prace techniczne | Odczytać opisy i rozpatrywać według zależności; nie pomijać. |
+| ROC-24 | Filtry/ranking i evaluator benchmarku PASS; pełny historyczny odbiór zablokowany etykietami | 5 testów, harness PASS 20261024T214444139483Z; rzeczywista trafność historyczna NOT RUN, brak zamrożonego oznaczonego zbioru. docs/FAMILY_RECOMMENDATIONS.md. |
+| ROC-25 | W realizacji | Opis odczytany: do 3 układów, dozwolone orientacje, kolizje i dostęp wyjmowania. Istniejący solver ma 18 układów, wymaga warstwy ograniczeń i kontroli dostępu. |
+| ROC-26,29–33,41,44 | Kolejne prace techniczne | Odczytać opisy i rozpatrywać według zależności; nie pomijać. |
 
 ## Następna czynność
 
-ROC-21: przyrost gotowy i pełny harness PASS 20261024T213454896201Z. ROC-23 gotowe technicznie: katalog i ekstrakcja lokalnych źródeł z 5 testami PASS; aktualizacja Linear jeszcze do wykonania. Następne ROC-24: opis odczytany, filtrowanie/ranking kandydatów + benchmark historyczny (wymaga zamkniętego zestawu oznaczonych przykładów). Uzupełnić też status ROC-21 w Linear jako In Progress; nie Done z powodu brakujących dokumentów produkcyjnych. Po każdym sprawdzonym przyroście
+ROC-21: przyrost gotowy i pełny harness PASS 20261024T213454896201Z. ROC-23 gotowe technicznie: katalog i ekstrakcja lokalnych źródeł z 5 testami PASS; aktualizacja Linear jeszcze do wykonania. ROC-24: przyrost zapisany i sprawdzony, benchmark historyczny czeka na dane. Następne ROC-25: ograniczone warianty i dostęp wyjmowania. Uzupełnić też status ROC-21 w Linear jako In Progress; nie Done z powodu brakujących dokumentów produkcyjnych. Po każdym sprawdzonym przyroście
 uzupełnić ten dziennik, dowody i commit. Pełny zakres zakończony tylko wtedy,
 gdy istnieją dowody dla kryteriów zadania; blokery to osobna lista na rano.

@@ -234,6 +234,11 @@ def create_snapshot(project_id,label="Snapshot",note=""):
 
 
 def dispatch(name, arguments):
+    recommendation_keys={'recommend_case_families': {'query','families'},'benchmark_case_recommendations': {'families','cases'}}
+    if name in recommendation_keys:
+        if not isinstance(arguments,dict) or set(arguments)-recommendation_keys[name]:raise ValueError('Invalid recommendation tool argument')
+        import family_recommendation
+        return getattr(family_recommendation,name)(**arguments)
     device_keys={
         'preview_device_record': {'record'},'save_device_record': {'record','expected_revision'},
         'get_device_record': {'catalog_id','revision'},'draft_device_inquiry': {'record'},

@@ -92,6 +92,14 @@ SCHEMAS += [
 ]
 
 
+SCHEMAS += [
+ schema('recommend_case_families','Filter source-bound family capabilities and rank candidates with reasons; no match routes to manual design',
+        {'query':{'type':'object'},'families':{'type':'array','maxItems':200,'items':{'type':'object'}}},['query','families'],True),
+ schema('benchmark_case_recommendations','Evaluate supplied closed labeled cases; never invent historical success labels',
+        {'families':{'type':'array','maxItems':200,'items':{'type':'object'}},'cases':{'type':'array','minItems':1,'maxItems':500,'items':{'type':'object'}}},['families','cases'],True),
+]
+
+
 def handle(request):
     ident = request.get("id")
     if ident is None:
