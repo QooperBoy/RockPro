@@ -12,3 +12,4 @@ artifacts/
 
 # Private Excel source staging and RPC request files
 Integracja/imports/
+examples/excel-input/preview.png
