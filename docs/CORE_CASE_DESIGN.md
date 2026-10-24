@@ -178,3 +178,10 @@ Nie przenosić całego projektu do innego stosu technologicznego. Osobny pakiet 
 Panel powinien pokazywać: wersję specyfikacji/szablonu, stan mapowania części, plan różnic, właściciela ręcznych zmian, zakres walidacji, nierozstrzygnięte elementy, przebieg operacji i wynik odzyskiwania. Zielony status nie może oznaczać gotowości produkcyjnej, jeśli wycięcia lub technologia są poza zakresem.
 
 Dokumentacja/plan: przygotowane. Nowe testy i implementacja core: NOT RUN / jeszcze do wykonania. Brak zmian źródłowego CAD i instalacji dodatku w ramach tego planowania.
+
+## Aktualna konfiguracja uchwytów do podnoszenia
+
+Dwie przeciwległe ściany boczne, prostopadłe do tylnej ściany zawiasów.
+handles_per_wall=2 domyślnie (cztery łącznie), albo jawne 1 (dwa łącznie,
+wyśrodkowane). SDK dostaje właściwe obroty i kotwy parametryczne.
+Obowiązujące szczegóły i reguły odstępów: [CASE_DEFAULTS.md](CASE_DEFAULTS.md).

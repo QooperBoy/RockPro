@@ -3,6 +3,7 @@ import itertools
 import json
 import math
 import project_store
+from lid_policy import validate_lid_height
 from project_store import db, project_exists, now, change_stages
 
 DEFAULT = dict(name="Urządzenie", x=345.4, y=241.9, z=88.2, count=2,
@@ -11,13 +12,18 @@ DEFAULT = dict(name="Urządzenie", x=345.4, y=241.9, z=88.2, count=2,
                side_height=50, side_name="Kable", thickness=9, lid_height=50)
 
 def _calculate_layout(spec):
-    if not isinstance(spec, dict) or set(spec)-set(DEFAULT):
+    if not isinstance(spec, dict) or set(spec)-(set(DEFAULT)|{'lid_hardware_width','lid_hinge_height','lid_constructor_override'}):
         raise ValueError("Nieznane pola układu")
     s = DEFAULT | spec
+    s.setdefault('lid_hardware_width',0)
+    active_lid_policy='lid_hinge_height' in spec or 'lid_constructor_override' in spec
+    s.setdefault('lid_hinge_height',0)
+    s.setdefault('lid_constructor_override',False)
+    if type(s['lid_constructor_override']) is not bool:raise ValueError('Odstępstwo konstruktora musi być jawne')
     for key in ("name", "side_name"):
         if not isinstance(s[key], str) or not s[key].strip() or len(s[key])>100:
             raise ValueError("Podaj nazwę (do 100 znaków)")
-    for key, low, high in [(k, 1, 5000) for k in ("x","y","z","side_width","side_depth","side_height")] + [("gap",0,500),("clearance",0,500),("separator",0,50),("thickness",1,100),("lid_height",2,1000)]:
+    for key, low, high in [(k, 1, 5000) for k in ("x","y","z","side_width","side_depth","side_height")] + [("gap",0,500),("clearance",0,500),("separator",0,50),("thickness",1,100),("lid_height",2,1000),("lid_hardware_width",0,1000),("lid_hinge_height",0,1000)]:
         v=s[key]
         if isinstance(v,bool) or not isinstance(v,(float,int)) or not math.isfinite(v) or not low<=v<=high:
             raise ValueError(key+": nieprawidłowa wartość w mm")
@@ -25,6 +31,7 @@ def _calculate_layout(spec):
         raise ValueError("Liczba urządzeń: 1–30")
     if s["orientation"] not in ["".join(p) for p in itertools.permutations("XYZ")] or s["arrangement"] not in ("X","Y","Z") or s["side"] not in ("none","X","Y"):
         raise ValueError("Nieznany kierunek lub orientacja")
+    minimum=validate_lid_height(s['lid_height'],[s['lid_hinge_height']] if s['lid_hinge_height'] else [])
     sizes=[s[c.lower()] for c in s["orientation"]]
     axis="XYZ".index(s["arrangement"])
     clearance=s["clearance"]
@@ -57,9 +64,14 @@ def _calculate_layout(spec):
         dims=[0.,0.,s["side_height"]];dims[a]=s["side_width"];dims[1-a]=s["side_depth"]
         boxes.append(dict(kind="accessory",label=s["side_name"],pos=pos,size=dims))
         inside[a]+=s["thickness"]+s["side_width"]+2*clearance
+    if active_lid_policy or s['lid_hardware_width']:
+        # Keep the equipment compartment below the seam while adding the chosen lid.
+        inside[2]+=s['lid_height']-s['thickness']
     outer=[v+2*s["thickness"] for v in inside]
     if max(outer)>10000 or s["lid_height"]<=s["thickness"] or outer[2]-s["lid_height"]<=s["thickness"]:
         raise ValueError("Gabaryt lub wysokość pokrywy poza zakresem szkieletu")
+    if active_lid_policy:
+        validate_lid_height(s['lid_height'],[s['lid_hinge_height']] if s['lid_hinge_height'] else [],outer[2]-s['lid_height'],s['lid_constructor_override'])
     for i,b in enumerate(boxes):
         if any(p<0 or p+d>lim+1e-6 for p,d,lim in zip(b["pos"],b["size"],inside)):
             raise ValueError("Element poza obrysem")
@@ -69,7 +81,16 @@ def _calculate_layout(spec):
     warnings=["Bryły uproszczone: uwzględnij wystające złącza, uchwyty i przewody.","Wyjmowanie urządzeń, pianki i wytrzymałość wymagają oceny konstruktora."]
     if s["arrangement"]=="Z" and s["count"]>1:
         warnings.append("Piętrowanie: zaprojektuj podparcie i dostęp do dolnych urządzeń; przegroda nie jest zweryfikowaną półką.")
-    return dict(spec=s,boxes=boxes,internal=inside,external=outer,warnings=warnings,
+    if active_lid_policy and not s['lid_hinge_height']:warnings.append('Nie wybrano zawiasu: minimum montażowe pokrywy wymaga potwierdzenia.')
+    if active_lid_policy and s['lid_constructor_override']:warnings.append('Jawne odstępstwo konstruktora od proporcji pokrywy 10–15%.')
+    saved_spec=dict(s)
+    if not active_lid_policy:
+        saved_spec.pop('lid_hinge_height');saved_spec.pop('lid_constructor_override')
+    if not s['lid_hardware_width']:saved_spec.pop('lid_hardware_width')
+    return dict(spec=saved_spec,boxes=boxes,internal=inside,external=outer,warnings=warnings,
+                lid_policy=dict(rule='hinge_minimum_and_shallow_proportion',minimum_mm=minimum,
+                    hinge_required_height_mm=s['lid_hinge_height'],constructor_override=s['lid_constructor_override'],maximum_ratio=.15,
+                    height_source='explicit_configuration' if active_lid_policy else 'legacy_without_hardware_rule'),
                 volume_l=math.prod(outer)/1_000_000,
                 checks=dict(collisions=False,contained=True),
                 parameters=dict(RP_Length=outer[0],RP_Depth=outer[1],RP_BaseHeight=outer[2]-s["lid_height"],RP_LidHeight=s["lid_height"],RP_Thickness=s["thickness"],RP_DisplayGap=0))

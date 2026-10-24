@@ -93,6 +93,23 @@ def validate_source_binding(binding):
     return binding
 
 
+def close_owned_documents(documents, api, folder):
+    """Close only explicit operation-owned scene references, preserving changes."""
+    errors = []
+    while documents:
+        document = documents.pop()
+        try:
+            if document.Modified:
+                recovery = Path(folder)/('owned_recovery_'+uuid.uuid4().hex+'.ics')
+                document.QueryInterface(api.IZSceneDoc).SaveAsCopy(
+                    str(recovery), api.Z_LINKS_COPY_ALL, False)
+            document.Close()
+        except Exception as exc:
+            errors.append(str(exc))
+    if errors:
+        raise NativeExecutionError('Owned catalog document cleanup failed: '+'; '.join(errors))
+
+
 def execute_rigid_reuse(binding, *, output_dir, target_matrix_mm, operation_id=None, source_is_captured_copy=False):
     """Copy/export/import a measured proper source node, rigidly place, reopen.
 
@@ -130,6 +147,7 @@ def execute_rigid_reuse(binding, *, output_dir, target_matrix_mm, operation_id=N
                 if abs(source_matrix[i][j]-binding["expected_world_matrix_mm"][i][j]) > tolerance:
                     raise NativeExecutionError("live source pose drifted from binding")
         destination.mkdir(exist_ok=False)
+        owned_documents = []
         try:
             source_evidence = driver.capture(destination/"source_snapshot.ics")
             if source_is_captured_copy:
@@ -142,6 +160,7 @@ def execute_rigid_reuse(binding, *, output_dir, target_matrix_mm, operation_id=N
                 copied_doc = driver.base.OpenFile(source_evidence["snapshot_path"],False)
                 if not same_document_path(copied_doc.Name,source_evidence["snapshot_path"]):
                     raise NativeExecutionError("wrong copied source opened")
+                owned_documents.append(copied_doc)
                 copied_scene = copied_doc.QueryInterface(driver.api.IZSceneDoc)
                 copied_node = copied_scene.QueryInterface(driver.api.IZSceneDocUtility).GetElementById(binding["node_id"])
                 copied_pose = NativePoseAdapter(driver.adapter.legacy,driver.base,copied_doc,driver.api,driver.source)
@@ -154,6 +173,7 @@ def execute_rigid_reuse(binding, *, output_dir, target_matrix_mm, operation_id=N
             copied_node.QueryInterface(interface).SaveAs(str(asset),False)
             # OpenNewDoc is implemented in ICAPI 2027; OpenNewScene is not.
             document = driver.base.OpenNewDoc(driver.api.Z_SCENE,False,True,"")
+            owned_documents.append(document)
             scene = document.QueryInterface(driver.api.IZSceneDoc)
             assembly = scene.GetTopElement().QueryInterface(driver.api.IZAssembly)
             imported = assembly.AddChildFromExternalFile(str(asset),False)
@@ -176,9 +196,11 @@ def execute_rigid_reuse(binding, *, output_dir, target_matrix_mm, operation_id=N
                 raise NativeExecutionError("rigid output did not save cleanly")
             imported_id = int(imported.Id)
             document.Close()
+            owned_documents.pop()
             reopened = driver.base.OpenFile(str(output),False)
             if not same_document_path(reopened.Name,output):
                 raise NativeExecutionError("wrong rigid output reopened")
+            owned_documents.append(reopened)
             reopened_scene = reopened.QueryInterface(driver.api.IZSceneDoc)
             observed = reopened_scene.QueryInterface(driver.api.IZSceneDocUtility).GetElementById(imported_id)
             reopened_pose = NativePoseAdapter(driver.adapter.legacy,driver.base,reopened,driver.api,driver.source)
@@ -200,7 +222,11 @@ def execute_rigid_reuse(binding, *, output_dir, target_matrix_mm, operation_id=N
                 "target_matrix_mm":target_matrix_mm,"matrix_world_mm":observed_matrix,"max_pose_error_mm":error,
                 "max_rotation_component_error":rotation_error,
                 "stages":{"source_capture":"PASS","native_catalog_export_import":"PASS","rigid_move":"PASS", "body_topology_volume":"PASS","save_reopen":"PASS"}}
-            write_receipt_once(destination/"native_receipt.json",receipt)
-            return receipt
         finally:
-            driver.assert_source_unchanged()
+            try:
+                close_owned_documents(owned_documents,driver.api,destination)
+            finally:
+                driver.assert_source_unchanged()
+        # A PASS receipt is published only after owned document cleanup succeeds.
+        write_receipt_once(destination/"native_receipt.json",receipt)
+        return receipt
