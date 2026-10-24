@@ -234,6 +234,16 @@ def create_snapshot(project_id,label="Snapshot",note=""):
 
 
 def dispatch(name, arguments):
+    revision_keys={
+        'save_material_plan':{'plan_id','project_ids','sheets','technology','cut_plan','supersedes_plan_id'},
+        'get_material_plan':{'plan_id'},'start_material_plan':{'plan_id','expected_revision'},
+        'record_material_progress':{'plan_id','event_id','event','expected_revision'},
+        'compare_material_plans':{'old_plan_id','new_plan_id'},
+    }
+    if name in revision_keys:
+        if not isinstance(arguments,dict) or set(arguments)-revision_keys[name]:raise ValueError('Invalid material revision tool argument')
+        import material_revisions
+        return getattr(material_revisions,name)(**arguments)
     if name=='preview_purchases':
         if not isinstance(arguments,dict) or set(arguments)-{'requirements','offers','policy'}:raise ValueError('Invalid purchase tool argument')
         from purchase_proposals import preview_purchases

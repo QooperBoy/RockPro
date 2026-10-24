@@ -140,6 +140,18 @@ SCHEMAS += [schema('preview_purchases','Draft dated piece/sheet SKU purchase opt
     {'requirements':{'type':'object'},'offers':{'type':'array','maxItems':200,'items':{'type':'object'}},'policy':{'type':'object'}},['requirements','offers','policy'],True)]
 
 
+SCHEMAS += [
+ schema('save_material_plan','Persist an immutable independently verified draft cutting plan tied to current BOM/card/layout/source/snapshot; does not reserve stock',
+        {'plan_id':S,'project_ids':{'type':'array','minItems':1,'maxItems':100,'items':S},'sheets':CUT_INPUT['sheets'],'technology':{'type':'object'},'cut_plan':{'type':'object'},'supersedes_plan_id':S},['plan_id','project_ids','sheets','technology','cut_plan']),
+ schema('get_material_plan','Read saved plan, append-only progress and computed staleness against saved files and database revisions',{'plan_id':S},['plan_id'],True),
+ schema('start_material_plan','Record operator start once with CAS; refuses stale plan and does not execute a machine',{'plan_id':S,'expected_revision':REV},['plan_id','expected_revision']),
+ schema('record_material_progress','Append actual produced quantities or committed-order claims; never undo consumption or cancel purchases',
+        {'plan_id':S,'event_id':S,'event':{'type':'object'},'expected_revision':REV},['plan_id','event_id','event','expected_revision']),
+ schema('compare_material_plans','Compare revisions: produced parts, unapproved reuse candidates, shortages, preserved orders/expense and explicit unknown cost delta',
+        {'old_plan_id':S,'new_plan_id':S},['old_plan_id','new_plan_id'],True),
+]
+
+
 def handle(request):
     ident = request.get("id")
     if ident is None:
