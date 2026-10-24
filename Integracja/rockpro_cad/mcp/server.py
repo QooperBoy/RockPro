@@ -109,6 +109,25 @@ SCHEMAS += [schema('preview_device_layouts','Propose up to three allowed layouts
     ['record','spec','allowed_orientations','allowed_arrangements'],True)]
 
 
+SCHEMAS += [
+ schema('preview_bom_file','Validate staged technology cutting BOM JSON and its approval reference; no CAD or production approval',{'path':S},['path'],True),
+ schema('import_bom_file','Import immutable cutting BOM into shared SQLite with source hash and optimistic concurrency; repeated revision never adds demand',
+        {'project_id':S,'path':S,'expected_revision':REV,'expected_source_sha256':S},['project_id','path','expected_revision','expected_source_sha256']),
+ schema('aggregate_bom_demand','Aggregate only the latest cutting BOM per project; separate material, finish, thickness, technology, grain and exact due date',
+        {'project_ids':{'type':'array','minItems':1,'maxItems':100,'uniqueItems':True,'items':S}},['project_ids'],True),
+]
+
+
+CUT_INPUT={'demand':{'type':'object'},'sheets':{'type':'array','minItems':1,'maxItems':500,'items':{'type':'object'}},'technology':{'type':'object'}}
+SCHEMAS += [
+ schema('verify_cut_plan','Independently verify exact quantities, material, grain, kerf, trims and guillotine cut sequence; not machine approval',
+        CUT_INPUT|{'plan':{'type':'object'}},['demand','sheets','technology','plan'],True),
+ schema('solve_reference_cut_plan','Bounded deterministic first-fit guillotine proposal; no optimum claim, timeout returns no unverified result',
+        CUT_INPUT|{'max_seconds':{'type':'number','exclusiveMinimum':0,'maximum':30}},['demand','sheets','technology'],True),
+ schema('export_cutting_csv','Export neutral cutting columns for explicit mapping in a verified vendor profile; not machine-ready',{'demand':{'type':'object'}},['demand'],True),
+]
+
+
 def handle(request):
     ident = request.get("id")
     if ident is None:

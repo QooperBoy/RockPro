@@ -234,6 +234,23 @@ def create_snapshot(project_id,label="Snapshot",note=""):
 
 
 def dispatch(name, arguments):
+    cutting_keys={'verify_cut_plan': {'demand','sheets','technology','plan'},
+                  'solve_reference_cut_plan': {'demand','sheets','technology','max_seconds'},
+                  'export_cutting_csv': {'demand'}}
+    if name in cutting_keys:
+        if not isinstance(arguments,dict) or set(arguments)-cutting_keys[name]:raise ValueError('Invalid cutting tool argument')
+        import cutting_plan
+        function={'solve_reference_cut_plan':'solve_reference','export_cutting_csv':'export_neutral_csv'}.get(name,name)
+        return getattr(cutting_plan,function)(**arguments)
+    material_keys={
+        'preview_bom_file': {'path'},
+        'import_bom_file': {'project_id','path','expected_revision','expected_source_sha256'},
+        'aggregate_bom_demand': {'project_ids'},
+    }
+    if name in material_keys:
+        if not isinstance(arguments,dict) or set(arguments)-material_keys[name]:raise ValueError('Invalid material tool argument')
+        import material_service
+        return getattr(material_service,name)(**arguments)
     if name=='preview_device_layouts':
         keys={'record','spec','allowed_orientations','allowed_arrangements','removal_clearance_mm','max_external_mm'}
         if not isinstance(arguments,dict) or set(arguments)-keys:raise ValueError('Invalid device layout tool argument')
