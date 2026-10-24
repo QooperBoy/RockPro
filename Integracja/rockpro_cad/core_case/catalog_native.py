@@ -96,14 +96,18 @@ def validate_source_binding(binding):
 def close_owned_documents(documents, api, folder):
     """Close only explicit operation-owned scene references, preserving changes."""
     errors = []
-    while documents:
-        document = documents.pop()
+    for document in reversed(list(documents)):
         try:
             if document.Modified:
-                recovery = Path(folder)/('owned_recovery_'+uuid.uuid4().hex+'.ics')
-                document.QueryInterface(api.IZSceneDoc).SaveAsCopy(
-                    str(recovery), api.Z_LINKS_COPY_ALL, False)
+                recovery = (Path(folder)/('owned_recovery_'+uuid.uuid4().hex+'.ics')).resolve()
+                scene=document.QueryInterface(api.IZSceneDoc)
+                scene.Update()
+                scene.SaveAs(str(recovery),api.Z_LINKS_COPY_ALL,False)
+                if (not recovery.is_file() or not same_document_path(document.Name,recovery)
+                        or document.Modified):
+                    raise NativeExecutionError('Recovery save not confirmed; owned document retained in host')
             document.Close()
+            documents.remove(document)
         except Exception as exc:
             errors.append(str(exc))
     if errors:

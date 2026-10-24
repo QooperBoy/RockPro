@@ -138,3 +138,20 @@ nie historii tworzenia tego Epsona. Brak powiązania nie jest ukrywany.
 PASS: pełny harness artifacts/verification/20261024T200943262042Z;
 sprawdzenie widoku rzeczywistych siatek, tylnej strony, ukrytej sklejki,
 kolorów warstw oraz rozwijania etapów w aplikacjach. Nie zmieniano DLL ani CAD.
+
+
+## Nocna kontynuacja ROC-20 — sprzątanie katalogowego wykonawcy
+
+Znaleziono drugi, starszy helper catalog_native.close_owned_documents, który
+korzystał jeszcze z SaveAsCopy bez potwierdzenia pliku. Wymieniono go na Update
++ SaveAs własnego dokumentu do unikalnej kopii odzyskiwania. Przed zamknięciem
+sprawdzane są istnienie pliku, zgodna nazwa dokumentu i Modified=false.
+Nieudane zachowanie pozostawia zmieniony dokument i jego wpis własności w hoście.
+Pozostałe własne dokumenty nadal są sprzątane.
+
+PASS: trzy testy, w tym silent save failure bez pliku, który nie może zamknąć
+zmienionego dokumentu. PASS natywny na kopii lekkiego szkieletu: zmiana długości
+935 mm, celowy błąd ciała operacji, zachowanie kopii i ponowne otwarcie tej samej
+wartości. Oryginał i aktywny kontekst bez zmian. Dowód:
+artifacts/overnight-20261024/catalog-cleanup-native/verification.json.
+PASS pełny harness: artifacts/verification/20261024T215741060210Z/results.json.

@@ -10,10 +10,14 @@ from rockpro_cad.core_case.catalog_native import close_owned_documents
 
 
 class Document:
-    def __init__(self,modified=False,fail=False):
-        self.Modified=modified;self.fail=fail;self.closed=False;self.recovery=[]
+    def __init__(self,modified=False,fail=False,silent_save_failure=False):
+        self.Modified=modified;self.fail=fail;self.closed=False;self.recovery=[];self.Name="owned.ics";self.silent_save_failure=silent_save_failure
     def QueryInterface(self,interface):return self
-    def SaveAsCopy(self,path,*args):self.recovery.append(path)
+    def Update(self):pass
+    def SaveAs(self,path,*args):
+        self.recovery.append(path)
+        if not self.silent_save_failure:
+            Path(path).write_bytes(b'saved owned changes');self.Name=path;self.Modified=False
     def Close(self):
         if self.fail:raise RuntimeError('fixture close failed')
         self.closed=True
@@ -34,3 +38,11 @@ class CleanupTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError,'cleanup failed'):
             close_owned_documents([first,bad,last],SimpleNamespace(),Path('unused'))
         self.assertTrue(first.closed);self.assertTrue(last.closed)
+
+    def test_silent_save_failure_retains_modified_document_and_ownership(self):
+        dirty=Document(True,silent_save_failure=True);clean=Document();owned=[clean,dirty]
+        with tempfile.TemporaryDirectory() as folder:
+            with self.assertRaisesRegex(RuntimeError,'Recovery save not confirmed'):
+                close_owned_documents(owned,SimpleNamespace(IZSceneDoc=object(),Z_LINKS_COPY_ALL=0),folder)
+        self.assertFalse(dirty.closed);self.assertTrue(dirty.Modified)
+        self.assertTrue(clean.closed);self.assertEqual(owned,[dirty])
