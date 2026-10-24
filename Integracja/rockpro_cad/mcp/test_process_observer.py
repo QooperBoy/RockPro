@@ -53,3 +53,36 @@ class ProcessObserverTests(unittest.TestCase):
         rows=[{'operation':'native.create','occurrence_id':'handle/1','result':{'status':'passed'}}]
         self.assertEqual(visible_elements(rows,[{'id':'handle/1'}]),[{'id':'handle/1'}])
         with self.assertRaises(ValueError):valid_elements({'kind':'rockpro_process_preview','units':'mm','elements':[{'id':'bad','bounds':[0,0,0,float('nan'),1,1]}]})
+
+
+class StageGroupingTests(unittest.TestCase):
+    def test_nested_durations_are_preserved_not_summed(self):
+        from rockpro_cad.process_observer import grouped_events
+        rows=[{'operation':'case.create','duration_ms':100},
+              {'operation':'native.create','occurrence_id':'plates-base/1','duration_ms':20},
+              {'operation':'native.create','occurrence_id':'handles/1','duration_ms':30},
+              {'operation':'unrecognized','duration_ms':10}]
+        groups=grouped_events(rows)
+        self.assertEqual([g[0] for g in groups],['sdk','plywood','handles','other'])
+        self.assertEqual(sorted(i for *_,events in groups for i,r in events),list(range(4)))
+        self.assertEqual(groups[0][3][0][1]['duration_ms'],100)
+
+    def test_layer_server_only_serves_allowlisted_files(self):
+        import threading
+        from http.server import ThreadingHTTPServer
+        from urllib.request import urlopen
+        from urllib.error import HTTPError
+        from rockpro_cad.layer_viewer import make_handler
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);(root/'geometry.bin').write_bytes(b'geometry')
+            (root/'model.json').write_text(json.dumps({'kind':'ironcad_native_mesh','geometry_sha256':hashlib.sha256(b'geometry').hexdigest()}),encoding='utf-8')
+            server=ThreadingHTTPServer(('127.0.0.1',0),make_handler(root,'test'))
+            thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
+            try:
+                url=f'http://127.0.0.1:{server.server_port}'
+                with urlopen(url+'/test/geometry.bin') as response:self.assertEqual(response.read(),b'geometry')
+                for path in ['/model.json','/test/../model.json','/test/private.db']:
+                    with self.assertRaises(HTTPError):urlopen(url+path)
+            finally:server.shutdown();server.server_close();thread.join()
+            (root/'geometry.bin').write_bytes(b'changed')
+            with self.assertRaisesRegex(ValueError,'checksum'):make_handler(root,'test')

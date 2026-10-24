@@ -105,3 +105,36 @@ Building does not reload the DLL in an open IronCAD host. Current session still
 uses its previously loaded panel. F1 requires loading the rebuilt add-in on a
 safe next restart; backend, bridge and observer run from the modified sources.
 Existing modified user tabs were not closed or overwritten for deployment.
+
+
+## Warstwy i czytelne etapy — 2026-10-24
+
+Usunięto odrzucony rysunek AABB z obserwatora. Dziennik grupuje zdarzenia
+w numerowane etapy z kolorami, rozwijanymi szczegółami, bieżącym etapem
+oraz stanami oczekuje / w toku / OK / BŁĄD. Suwak zachowuje oryginalną
+kolejność zdarzeń; grupy są klasyfikacją, nie zmianą harmonogramu wykonania.
+Czasy pozostają na zdarzeniach: sumowanie SDK i etapów liczyłoby pracę dwukrotnie.
+
+Przycisk modelu otwiera lokalny Three.js r180 (MIT, vendor/PROVENANCE.json).
+Eksport siatek pochodzi z IZSceneDoc.ExportICWebViewerFile; konwerter
+scripts/prepare_layer_viewer.py zachowuje macierze i kolory. Nie zmienia ICS.
+Serwer udostępnia wyłącznie allowlistę plików na loopback, pod losowym tokenem.
+Nie wysyła modelu do zewnętrznej usługi. SHA256 bufora jest sprawdzany przez
+serwer i przeglądarkę. Wymagany WebGL.
+
+Uruchomienie: scripts/View3D.ps1 -Dataset <folder-z-model.json> albo
+scripts/Observe.ps1 -Trace <plik.jsonl> -Model <folder-z-model.json>.
+Warstwy: sklejka, profile, narożniki/wzmocnienia, zamki/zawiasy, uchwyty, koła.
+Dostępne obrót, zoom, widok z obu stron, ukrywanie warstw, kolory etapów
+oraz poglądowe składanie. Animacja NIE odtwarza czasu historycznej operacji.
+
+Dowód lokalny: artifacts/epson-layer-viewer-20261024/model-02 — rzeczywisty
+prototyp Epson 650 × 500 × 381 mm, 240 siatek / 582780 trójkątów.
+Cztery puste węzły zawiasów nie mają siatki w eksporcie; zapisane w
+missing_export_meshes i ujawnione w UI. Model źródłowy pozostał niezmieniony.
+Trace native-probe-01 dotyczy osobnego syntetycznego testu 67 elementów,
+nie historii tworzenia tego Epsona. Brak powiązania nie jest ukrywany.
+
+PASS: pełny harness artifacts/verification/20261024T200943262042Z;
+sprawdzenie widoku rzeczywistych siatek, tylnej strony, ukrytej sklejki,
+kolorów warstw oraz rozwijania etapów w aplikacjach. Nie zmieniano DLL ani CAD.

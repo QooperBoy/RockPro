@@ -17,6 +17,44 @@ LABELS={'case.capture':'Kopia źródła', 'case.create':'Wykonawca SDK (czas ł�
         'native.save':'Zapis ICS', 'native.reopen':'Ponowne otwarcie ICS'}
 
 
+STAGES = [
+    ('source', '01 · Przygotowanie źródła', '#dce8f2'),
+    ('sdk', '02 · Montaż SDK — czas łączny', '#e6e9ed'),
+    ('plywood', '03 · Sklejka', '#d3e9e5'),
+    ('profiles', '04 · Profile', '#d9eafa'),
+    ('corners', '05 · Narożniki i wzmocnienia', '#f4e8ce'),
+    ('closures', '06 · Zamki i zawiasy', '#e8def4'),
+    ('handles', '07 · Uchwyty', '#f5dfe6'),
+    ('wheels', '08 · Koła', '#dfe4ed'),
+    ('checks', '09 · Regeneracja i kontrola', '#deeddb'),
+    ('save', '10 · Zapis i ponowne otwarcie', '#dcebee'),
+    ('receipt', '11 · Integralność i potwierdzenie', '#e8edda'),
+    ('other', '12 · Pozostałe zdarzenia', '#eeeeee'),
+]
+
+def stage_key(row):
+    operation = row.get('operation', '')
+    if operation == 'case.capture': return 'source'
+    if operation == 'case.create': return 'sdk'
+    if operation == 'native.create':
+        name = (str(row.get('family', '')) + ' ' + str(row.get('occurrence_id', ''))).lower()
+        for key, words in [('plywood', ('plate','panel','plywood')), ('profiles', ('profile',)),
+                           ('corners', ('corner','brace','socket')), ('closures', ('hinge','latch','lock')),
+                           ('handles', ('handle',)), ('wheels', ('wheel','caster'))]:
+            if any(word in name for word in words): return key
+        return 'other'
+    if operation in ('native.save','native.reopen','case.save_reopen'): return 'save'
+    if operation in ('case.source_check','case.receipt'): return 'receipt'
+    if operation in ('native.regenerate','native.measure','case.measure','case.verify'): return 'checks'
+    return 'other'
+
+
+def grouped_events(rows):
+    # Parent duration is deliberately not a sum: SDK and child spans overlap.
+    return [(key, title, color, [(i,r) for i,r in enumerate(rows) if stage_key(r)==key])
+            for key,title,color in STAGES if any(stage_key(r)==key for r in rows)]
+
+
 def bounded_json(path):
     path=Path(path)
     if path.stat().st_size>LIMIT: raise ValueError('Plik przekracza limit 8 MB')
@@ -106,11 +144,11 @@ def visible_elements(rows,elements):
 
 
 class Observer:
-    def __init__(self,root,path=None,database=None):
+    def __init__(self,root,path=None,database=None,model=None):
         import tkinter as tk
         from tkinter import ttk, filedialog
         self.tk=tk; self.ttk=ttk; self.root=root; self.path=None; self.database=database
-        self.rows=[];self.elements=[];self.playing=False;self.rebuilding=False
+        self.model=model;self.viewer_server=None;self.row_indices={};self.rows=[];self.elements=[];self.playing=False;self.rebuilding=False
         root.title('RockPro — obserwator procesu (tylko odczyt)');root.geometry('1240x780');root.minsize(950,600)
         root.configure(bg='#eef2f6')
         style=ttk.Style();style.theme_use('clam');style.configure('Treeview',rowheight=27,font=('Segoe UI',10))
@@ -127,13 +165,17 @@ class Observer:
         book=ttk.Notebook(root);book.pack(fill='both',expand=True,padx=12)
         timeline=ttk.Frame(book);book.add(timeline,text='Etapy i podgląd')
         journal=ttk.Frame(book);book.add(journal,text='Dziennik operacji SQLite')
-        self.tree=ttk.Treeview(timeline,columns=('stage','status','time','actor'),show='headings',height=12)
-        for name,title,width in [('stage','Etap',245),('status','Stan',100),('time','Czas [ms]',95),('actor','Wykonawca',100)]:
-            self.tree.heading(name,text=title);self.tree.column(name,width=width,stretch=name=='stage')
+        self.tree=ttk.Treeview(timeline,columns=('status','time','actor'),show='tree headings',height=12)
+        for name,title,width in [('stage','Etap',245),('status','Stan',180),('time','Czas [ms]',95),('actor','Wykonawca',100)]:
+            col='#0' if name=='stage' else name
+            self.tree.heading(col,text=title);self.tree.column(col,width=width,stretch=name=='stage')
         self.tree.pack(side='left',fill='both',expand=True)
         scroll=ttk.Scrollbar(timeline,orient='vertical',command=self.tree.yview);scroll.pack(side='left',fill='y');self.tree.configure(yscrollcommand=scroll.set)
-        self.canvas=tk.Canvas(timeline,bg='#f5f8fa',width=480,highlightthickness=0);self.canvas.pack(side='right',fill='both',expand=True)
-        self.canvas.bind('<Configure>',lambda e:self.render())
+        self.current=tk.StringVar(value='Etap: brak zdarzeń')
+        ttk.Label(root,textvariable=self.current,padding=10,font=('Segoe UI',12,'bold')).pack(fill='x')
+        ttk.Button(bar,text='Otwórz rzeczywisty model 3D…',command=self.open_viewer).pack(side='left',padx=8)
+        self.tree.tag_configure('active',background='#ffe1b8',foreground='#623300',font=('Segoe UI',10,'bold'))
+        self.tree.tag_configure('failure',background='#f8d6d6',foreground='#922222')
         self.tree.bind('<<TreeviewSelect>>',self.select)
         self.slider=tk.Scale(root,from_=0,to=1,orient='horizontal',command=self.seek,showvalue=False,bg='#eef2f6',highlightthickness=0);self.slider.pack(fill='x',padx=15)
         self.details=tk.StringVar();ttk.Label(root,textvariable=self.details,padding=12,wraplength=1180).pack(fill='x')
@@ -145,6 +187,24 @@ class Observer:
         ttk.Label(journal,textvariable=self.db_status,padding=10).pack(fill='x')
         if path:self.path=Path(path);self.refresh()
         self.refresh_db();root.after(2000,self.poll)
+
+    def open_viewer(self):
+        from tkinter import filedialog, messagebox
+        import secrets, threading, webbrowser
+        from http.server import ThreadingHTTPServer
+        from .layer_viewer import make_handler
+        if not self.model:
+            selected=filedialog.askopenfilename(title='Wybierz eksport model.json (nie musi odpowiadać śladowi)',filetypes=[('Eksport siatki','model.json')])
+            if not selected:return
+            self.model=Path(selected).parent
+        try:
+            if self.viewer_server is None:
+                token=secrets.token_urlsafe(24)
+                self.viewer_server=ThreadingHTTPServer(('127.0.0.1',0),make_handler(self.model,token))
+                self.viewer_url=f'http://127.0.0.1:{self.viewer_server.server_port}/{token}/'
+                threading.Thread(target=self.viewer_server.serve_forever,daemon=True).start()
+            webbrowser.open(self.viewer_url)
+        except (OSError,ValueError,KeyError) as exc:messagebox.showerror('Podgląd 3D',str(exc))
 
     def choose(self,dialog):
         p=dialog.askopenfilename(filetypes=[('Ślady i raporty','*.jsonl *.json')])
@@ -165,21 +225,27 @@ class Observer:
         try:
             rows,elements,notes=read_trace(self.path) if self.path.suffix=='.jsonl' else read_report(self.path)
             self.rows,self.elements=rows,elements;self.rebuilding=True
-            self.tree.delete(*self.tree.get_children())
-            for i,r in enumerate(rows):
-                status=r.get('result',{}).get('status') or ('start' if r.get('event')=='operation_started' else r.get('event','?'))
-                status={'passed':'OK','failed':'błąd','unknown':'nieznany'}.get(status,status)
-                duration=r.get('duration_ms');time_label=f'{duration:.1f}' if type(duration) in (int,float) and math.isfinite(duration) else '—'
-                title=LABELS.get(r.get('operation'),r.get('operation','?'))
-                if r.get('occurrence_id'):title+=' · '+r['occurrence_id']
-                self.tree.insert('', 'end',iid=str(i),values=(title,status,time_label,r.get('actor') or 'nieznany'))
+            expanded={key for key in self.tree.get_children() if self.tree.item(key,'open')}
+            self.tree.delete(*self.tree.get_children());self.row_indices={}
+            for key,title,color,events in grouped_events(rows):
+                self.tree.tag_configure(key,background=color,foreground='#203b42')
+                parent='stage:'+key;self.row_indices[parent]=events[0][0]
+                self.tree.insert('', 'end',iid=parent,text=title,values=('—','szczegóły ↓',''),tags=(key,),open=parent in expanded)
+                for i,r in events:
+                    status=r.get('result',{}).get('status') or ('start' if r.get('event')=='operation_started' else r.get('event','?'))
+                    status={'passed':'OK','failed':'BŁĄD','unknown':'nieznany'}.get(status,status)
+                    duration=r.get('duration_ms');time_label=f'{duration:.1f}' if type(duration) in (int,float) and math.isfinite(duration) else '—'
+                    title=LABELS.get(r.get('operation'),r.get('operation','?'))
+                    if r.get('occurrence_id'):title+=' · '+r['occurrence_id']
+                    self.row_indices[str(i)]=i
+                    self.tree.insert(parent,'end',iid=str(i),text=title,values=(status,time_label,r.get('actor') or 'nieznany'),tags=('failure',) if status=='BŁĄD' else ())
             self.slider.configure(to=max(0,len(rows)-1))
             if self.follow.get() and not self.playing:self.slider.set(max(0,len(rows)-1))
-            self.caption.set(str(self.path)+'\n'+(' • '.join(notes) if notes else 'Ślad rzeczywistego przebiegu. Czasy wierszy mogą się zawierać — nie sumuj czasu SDK i jego etapów.'))
+            self.caption.set(str(self.path)+'\n'+(' • '.join(notes) if notes else 'Ślad wybranego przebiegu; model 3D jest osobnym eksportem. Czasy wierszy mogą się zawierać — nie sumuj czasu SDK i jego etapów.'))
             self.rebuilding=False;self.render()
         except (OSError,ValueError,TypeError,KeyError) as exc:self.rebuilding=False;self.caption.set('Błąd odczytu: '+str(exc))
     def select(self,event):
-        if not self.rebuilding and self.tree.selection():self.follow.set(False);self.slider.set(int(self.tree.selection()[0]))
+        if not self.rebuilding and self.tree.selection():self.follow.set(False);self.slider.set(self.row_indices[self.tree.selection()[0]])
     def seek(self,value):
         if not self.rebuilding:self.render()
     def play(self):
@@ -196,25 +262,23 @@ class Observer:
         if self.follow.get():self.refresh();self.refresh_db()
         self.root.after(2000,self.poll)
     def render(self):
-        c=self.canvas;c.delete('all');w=max(c.winfo_width(),300);h=max(c.winfo_height(),250)
-        index=min(self.slider.get(),len(self.rows)-1);upto=self.rows[:index+1]
-        shown=visible_elements(upto,self.elements)
-        c.create_text(w/2,24,text='Poglądowe obrysy • nie walidacja CAD',fill='#365159',font=('Segoe UI',11,'bold'))
-        if self.elements:
-            def project(x,y,z):return (.85*(x-y), .35*(x+y)-z)
-            points=[project(*[e['bounds'][j+(3 if mask&(1<<j) else 0)] for j in range(3)]) for e in self.elements for mask in range(8)]
-            lo=[min(p[j] for p in points) for j in range(2)];hi=[max(p[j] for p in points) for j in range(2)]
-            scale=min((w-70)/max(hi[0]-lo[0],1),(h-110)/max(hi[1]-lo[1],1))
-            for e in sorted(shown,key=lambda e:e['bounds'][0]+e['bounds'][1]):
-                b=e['bounds'];verts=[]
-                for mask in range(8):
-                    x,y=project(*[b[j+(3 if mask&(1<<j) else 0)] for j in range(3)])
-                    verts.append((35+(x-lo[0])*scale,55+(y-lo[1])*scale))
-                color='#408080' if 'panel' in e['family'] or 'plywood' in e['family'] or 'plate' in e['family'] else '#c5d0d5'
-                for face in ((0,1,5,4),(0,2,6,4),(4,5,7,6)):
-                    c.create_polygon(*[v for k in face for v in verts[k]],fill=color,outline='#304d52',width=1)
-        else:c.create_text(w/2,h/2,text='Brak powiązanej geometrii podglądu.\nNie odtwarzamy części z domysłów.',fill='#52666d',font=('Segoe UI',12),justify='center')
-        c.create_text(w/2,h-30,text=f'Pokazano {len(shown)} / {len(self.elements)} obrysów',fill='#365159')
+        index=min(self.slider.get(),len(self.rows)-1)
+        active=stage_key(self.rows[index]) if index>=0 else None
+        for key,title,color,events in grouped_events(self.rows):
+            for i,r in events:
+                if i>index:self.tree.item(str(i),values=('oczekuje','—',r.get('actor') or 'nieznany'))
+                else:
+                    status=r.get('result',{}).get('status') or ('start' if r.get('event')=='operation_started' else r.get('event','?'))
+                    status={'passed':'OK','failed':'BŁĄD','unknown':'nieznany'}.get(status,status)
+                    duration=r.get('duration_ms');label=f'{duration:.1f}' if type(duration) in (int,float) and math.isfinite(duration) else '—'
+                    self.tree.item(str(i),values=(status,label,r.get('actor') or 'nieznany'))
+            observed=[r for i,r in events if i<=index]
+            state='oczekuje'
+            if observed:
+                state='BŁĄD' if any(r.get('result',{}).get('status')=='failed' for r in observed) else 'w toku'
+                if all(i<=index for i,r in events) and observed[-1].get('result',{}).get('status')=='passed':state='OK'
+            self.tree.item('stage:'+key,values=(state,'szczegóły ↓',''),tags=('failure',) if state=='BŁĄD' else ('active',) if key==active else (key,))
+            if key==active:self.current.set('▶ '+title+'  •  '+state)
         row=self.rows[index] if index>=0 else {}
         self.details.set(f'Zdarzenie {index+1}/{len(self.rows)} • UTC: {row.get("timestamp_utc") or "brak danych"}\n'
             'Wykonawca skryptu nie oznacza autora decyzji. Interwencje agentów, model, tokeny i koszt: brak pełnych danych; udział automatyzacji nie jest wyliczany.')
@@ -222,9 +286,9 @@ class Observer:
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--trace',type=Path);parser.add_argument('--database',type=Path)
+    parser.add_argument('--model',type=Path);parser.add_argument('--trace',type=Path);parser.add_argument('--database',type=Path)
     args=parser.parse_args()
     import tkinter as tk
-    root=tk.Tk();Observer(root,args.trace,args.database);root.mainloop()
+    root=tk.Tk();Observer(root,args.trace,args.database,args.model);root.mainloop()
 
 if __name__=='__main__':main()
