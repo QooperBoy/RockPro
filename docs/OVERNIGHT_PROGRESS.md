@@ -44,6 +44,9 @@ Onboarding ROC-1–4 nie należy do projektu CAD. ROC-5–10 to epiki. ROC-15/43
 | ROC-31 | Transakcyjny backend magazynu PASS | 6 testów, także wyścig o tę samą resztkę; brak podwójnego odejmowania i cofania zużycia. docs/INVENTORY_CONTRACT.md. Ekran/pilotaż klienta NOT RUN. |
 | ROC-32 | Terminowe bilanse i propozycje backendu PASS | 6 testów; 120/20/30/paczka25 → 75, spóźniona → 100. docs/PURCHASE_PROPOSALS.md. Brak faktycznych ofert/limitów/odbioru; wspólny budżet i transport wielopozycyjny nieoptymalizowane. |
 | ROC-33 | Niezmienne plany, kontrola starych wejść i raport reuse PASS | 5 testów; start odmówiony po zmianie, rozpoczęty plan zachowuje wykonanie i zobowiązania, bez cofania zapasu. docs/MATERIAL_PLAN_REVISIONS.md. Koszt delta null do realnej wyceny, UI/pilotaż NOT RUN. |
+| ROC-34–36,38 | Odbiory pozostają otwarte | Kryteria odczytane. Wymagają Tomasza/użytkownika/produkcji i realnych pilotaży. ROC-38: Done dopiero po OK. Nie zastępować testem agenta. |
+| ROC-37 | Runbook i odtworzenie PASS | 268 plików, commit i SQLite odzyskane osobno. docs/OPERATIONS_AND_OWNERSHIP.md. Imienni właściciele, koszty i decyzje po pilotażach nieustalone. |
+| ROC-39 | Zakres po MVP odczytany; pilot NOT RUN | Wymaga wskazanej próbki 10–20 projektów, źródeł poczty i odbioru Tomasza. Lokalny indeks nie udaje pełnego importera. |
 | ROC-41,44 | Kolejne prace techniczne | Odczytać opisy i rozpatrywać według zależności; nie pomijać. |
 
 ## Następna czynność
