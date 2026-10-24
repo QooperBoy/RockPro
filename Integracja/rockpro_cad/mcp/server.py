@@ -136,6 +136,10 @@ SCHEMAS += [
 ]
 
 
+SCHEMAS += [schema('preview_purchases','Draft dated piece/sheet SKU purchase options from actual free stock and outstanding deliveries; MOQ/pack/tier/shipping/tax/cash limits; never orders',
+    {'requirements':{'type':'object'},'offers':{'type':'array','maxItems':200,'items':{'type':'object'}},'policy':{'type':'object'}},['requirements','offers','policy'],True)]
+
+
 def handle(request):
     ident = request.get("id")
     if ident is None:

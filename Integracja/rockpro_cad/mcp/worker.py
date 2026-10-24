@@ -234,6 +234,10 @@ def create_snapshot(project_id,label="Snapshot",note=""):
 
 
 def dispatch(name, arguments):
+    if name=='preview_purchases':
+        if not isinstance(arguments,dict) or set(arguments)-{'requirements','offers','policy'}:raise ValueError('Invalid purchase tool argument')
+        from purchase_proposals import preview_purchases
+        return preview_purchases(**arguments)
     inventory_keys={'inventory_command': {'command','operation_id','expected_revision'},
                     'get_inventory':set(),'get_inventory_history':{'limit'}}
     if name in inventory_keys:
