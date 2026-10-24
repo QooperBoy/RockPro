@@ -84,6 +84,14 @@ SCHEMAS += [
 ]
 
 
+SCHEMAS += [
+ schema('preview_device_record','Validate a device variant with per-field units, sources and confirmation claims; preserve missing/conflicting data',{'record':{'type':'object'}},['record'],True),
+ schema('save_device_record','Version source-cited device data in the shared SQLite with CAS; no product variant merging',{'record':{'type':'object'},'expected_revision':REV},['record','expected_revision']),
+ schema('get_device_record','Read a current or historical device observation record',{'catalog_id':S,'revision':{'type':'integer','minimum':1}},['catalog_id'],True),
+ schema('draft_device_inquiry','Draft missing/conflicting device data questions for an authorized sender; never sends messages',{'record':{'type':'object'}},['record'],True),
+]
+
+
 def handle(request):
     ident = request.get("id")
     if ident is None:

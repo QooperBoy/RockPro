@@ -234,6 +234,14 @@ def create_snapshot(project_id,label="Snapshot",note=""):
 
 
 def dispatch(name, arguments):
+    device_keys={
+        'preview_device_record': {'record'},'save_device_record': {'record','expected_revision'},
+        'get_device_record': {'catalog_id','revision'},'draft_device_inquiry': {'record'},
+    }
+    if name in device_keys:
+        if not isinstance(arguments,dict) or set(arguments)-device_keys[name]:raise ValueError('Invalid device tool argument')
+        import device_catalog
+        return getattr(device_catalog,name)(**arguments)
     excel_keys={
         'preview_excel_configuration': {'path'},
         'import_excel_configuration': {'project_id','path','expected_revision','expected_source_sha256'},
