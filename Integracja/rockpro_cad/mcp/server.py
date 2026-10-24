@@ -75,6 +75,15 @@ SCHEMAS += [
 ]
 
 
+SCHEMAS += [
+ schema('preview_excel_configuration','Validate a bounded XLSX staged in Integracja/imports; explicit units, no CAD edits',
+        {'path':S},['path'],True),
+ schema('import_excel_configuration','Import the previewed XLSX into versioned SQLite layout with CAS and duplicate protection; does not run CAD',
+        {'project_id':S,'path':S,'expected_revision':REV,'expected_source_sha256':S},
+        ['project_id','path','expected_revision','expected_source_sha256']),
+]
+
+
 def handle(request):
     ident = request.get("id")
     if ident is None:

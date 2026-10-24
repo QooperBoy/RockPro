@@ -234,6 +234,15 @@ def create_snapshot(project_id,label="Snapshot",note=""):
 
 
 def dispatch(name, arguments):
+    excel_keys={
+        'preview_excel_configuration': {'path'},
+        'import_excel_configuration': {'project_id','path','expected_revision','expected_source_sha256'},
+    }
+    if name in excel_keys:
+        if not isinstance(arguments,dict) or set(arguments)-excel_keys[name]:raise ValueError('Invalid Excel tool argument')
+        import excel_input
+        return getattr(excel_input,name)(**arguments)
+
     core_keys = {
         'preview_case': {'request'},
         'prepare_case_request': {'project_id','expected_layout_revision'},

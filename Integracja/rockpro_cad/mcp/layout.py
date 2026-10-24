@@ -157,23 +157,29 @@ def get_layout(project_id,revision=None):
     return dict(saved=bool(row),revision=row['revision'] if row else 0,sha256=row['sha256'] if row else None,updated_at=row['created_at'] if row else None,**calculate_layout(json.loads(row['spec']) if row else {}))
 
 
-def save_layout(project_id,spec,expected_revision,actor='unspecified',change_source='unspecified'):
+def save_layout_in_transaction(conn,project_id,result,expected_revision,actor,change_source):
+    """Shared CAS write; caller owns BEGIN IMMEDIATE and the transaction."""
     if type(expected_revision) is not int or expected_revision<0: raise ValueError('expected_revision must be a nonnegative integer; read get_layout first')
-    result=calculate_layout(spec);stamp=now()
-    payload,digest=encode_spec(result['spec'])
-    with db() as conn:
-        conn.execute('BEGIN IMMEDIATE')
-        project_exists(conn,project_id);ensure(conn)
-        current=conn.execute('SELECT COALESCE(MAX(revision),0) FROM layout_versions WHERE project_id=?',(project_id,)).fetchone()[0]
-        if current!=expected_revision:
-            raise ValueError('LAYOUT_CONFLICT: Układ zmienił inny użytkownik lub AI. Odczytana wersja '+str(expected_revision)+', aktualna '+str(current)+'. Pobierz aktualny układ i porównaj zmiany przed ponownym zapisem.')
-        revision=current+1
-        conn.execute('INSERT INTO layout_versions VALUES (?,?,?,?,?)',(project_id,revision,payload,digest,stamp))
-        conn.execute("INSERT OR REPLACE INTO layouts VALUES (?,?,?)",(project_id,payload,stamp))
-        conn.execute("UPDATE projects SET updated_at=? WHERE id=?",(stamp,project_id))
-        change_stages(conn,project_id,['geometry','hardware','wheels','documentation','materials','production'],
-                      'outdated',actor,change_source,'layout_saved',stamp)
-        change_stages(conn,project_id,['layout'],'review',actor,change_source,'layout_saved',stamp)
-        conn.execute("INSERT INTO events(project_id,created_at,kind,payload) VALUES (?,?,?,?)",(project_id,stamp,"layout_saved",json.dumps(dict(revision=revision,sha256=digest,spec=result['spec']),ensure_ascii=False)))
+    stamp=now();payload,digest=encode_spec(result['spec'])
+    project_exists(conn,project_id);ensure(conn)
+    current=conn.execute('SELECT COALESCE(MAX(revision),0) FROM layout_versions WHERE project_id=?',(project_id,)).fetchone()[0]
+    if current!=expected_revision:
+        raise ValueError('LAYOUT_CONFLICT: Układ zmienił inny użytkownik lub AI. Odczytana wersja '+str(expected_revision)+', aktualna '+str(current)+'. Pobierz aktualny układ i porównaj zmiany przed ponownym zapisem.')
+    revision=current+1
+    conn.execute('INSERT INTO layout_versions VALUES (?,?,?,?,?)',(project_id,revision,payload,digest,stamp))
+    conn.execute("INSERT OR REPLACE INTO layouts VALUES (?,?,?)",(project_id,payload,stamp))
+    conn.execute("UPDATE projects SET updated_at=? WHERE id=?",(stamp,project_id))
+    change_stages(conn,project_id,['geometry','hardware','wheels','documentation','materials','production'],
+                  'outdated',actor,change_source,'layout_saved',stamp)
+    change_stages(conn,project_id,['layout'],'review',actor,change_source,'layout_saved',stamp)
+    conn.execute("INSERT INTO events(project_id,created_at,kind,payload) VALUES (?,?,?,?)",(project_id,stamp,"layout_saved",json.dumps(dict(revision=revision,sha256=digest,spec=result['spec']),ensure_ascii=False)))
     return dict(saved=True,revision=revision,sha256=digest,updated_at=stamp,
                 database=str(project_store.DB_PATH),**result)
+
+
+def save_layout(project_id,spec,expected_revision,actor='unspecified',change_source='unspecified'):
+    if type(expected_revision) is not int or expected_revision<0: raise ValueError('expected_revision must be a nonnegative integer; read get_layout first')
+    result=calculate_layout(spec)
+    with db() as conn:
+        conn.execute('BEGIN IMMEDIATE')
+        return save_layout_in_transaction(conn,project_id,result,expected_revision,actor,change_source)

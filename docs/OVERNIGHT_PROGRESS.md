@@ -1,0 +1,41 @@
+# Nocna kolejka RockPro — rozpoczęta 24.10.2026
+
+Polecenie użytkownika: snapshot, zadania z Linear po kolei, rutynowe decyzje
+samodzielnie, pytania na rano. Nie oznaczamy niewykonanych odbiorów jako Done.
+
+Snapshot PASS: workspace/snapshoty/przed-nocna-kolejka-20261024-232012 w głównym
+workspace Ironcad. Git bundle, archiwum 268 plików kodu/projektów/dowodów,
+spójny backup SQLite, manifest SHA256 i test integralności ZIP.
+HEAD startowy 4bd25ec0b1fbf0ce26de4790b0c3b3a592aba5e4, czysty checkout.
+Snapshot obejmuje zapisane pliki; niezapisane dokumenty CAD pozostają w hoście.
+
+## Kontynuacja automatyczna
+
+Heartbeat rockpro-nocna-realizacja-kolejki działa w tym czacie co 30 minut.
+Nie powtarzać snapshotu ani zakończonych przyrostów. Nie uruchamiać kilku CAD
+writerów. Nie uruchamiać pełnego harnessu równocześnie z natywnym writerem,
+bo testy przechwytywania źródła współdzielą blokadę.
+
+Konektor Linear widzi Modivo (MOD), a nie Rock_Pro (ROC). Browser IAB karta 2
+ma prawidłową sesję Rock_Pro. Lista team/ROC/all odczytana, surowe AX w
+raporty/LINEAR_KOLEJKA_NOC_TOP.txt i BOTTOM.txt głównego workspace.
+Indeks odczytanych linków: artifacts/overnight-20261024/linear_queue.json.
+Onboarding ROC-1–4 nie należy do projektu CAD. ROC-5–10 to epiki. ROC-15/43 Done.
+
+## Stan zadań
+
+| Zadanie | Stan lokalnej nocy | Dowód / dalsza praca |
+|---|---|---|
+| ROC-42 | Częściowo gotowe, pełny odbiór zablokowany danymi źródłowymi | Świeży manifest 403/403 z saved-source-native-20261024-02 i pełny prototyp 66 korzeni z registry-native-20261024-01 istnieją. Nieznana Część2648/import, SKU kół i zatwierdzenia źródła pozostają otwarte. Nie zastępować źródłowego manifestu manifestem prototypu. |
+| ROC-16/17 | Gotowe działające prototypy; brak pełnego odbioru rodziny | Profile, okucia, uchwyty i pary kół/gniazd są natywne i parametryczne, dowody w docs/CASE_HANDLES_V3.md i PART_FAMILY_REGISTRY_TASK.md. H2026 i pełny źródłowy szablon niezatwierdzone. |
+| ROC-40 | Kontynuacja wymagań odczytana | Porównanie baseline/current/target dla czterech H7159 działa i ma native PASS. Brak pełnego ekranu decyzji, trwałych odsadzeń i integracji z wykonaniem. Patrz NATIVE_MANUAL_CHANGES.md. |
+| ROC-18 | Implementacja techniczna PASS | XLSX, 3 przykłady, walidacja jednostek, trwałe wersje źródeł w tej samej SQLite, atomowy CAS i idempotencja. 9 nowych testów PASS; pełny harness/build/UI PASS 20261024T213039539715Z. Wrapper PowerShell PASS. docs/EXCEL_CONFIGURATION_INPUT.md. |
+| ROC-20/22/19 | Implementacje i dowody istnieją, pozostają integracja pełnych okuć i odbiór | Nie zamykać całych zadań na podstawie syntetycznej próby. |
+| ROC-11–14,27–28,34–39 | Wymagania trzeba rozpatrzyć, zależne od danych/licencji/użytkownika | Nie tworzyć fikcyjnych cenników, zakupów, licencji ani odbiorów klienta. Wykonać dostępne przygotowanie techniczne, zapisać dokładne braki. |
+| ROC-21,23–26,29–33,41,44 | Kolejne prace techniczne | Odczytać opisy i rozpatrywać według zależności; nie pomijać. |
+
+## Następna czynność
+
+ROC-21: opis odczytany, następny przyrost to pakiet wydania przypięty do modelu, reguł i wejść. Rysunki/produkcyjne materiały mogą pozostać jawnymi krokami ręcznymi zgodnie z opisem zadania. Po każdym sprawdzonym przyroście
+uzupełnić ten dziennik, dowody i commit. Pełny zakres zakończony tylko wtedy,
+gdy istnieją dowody dla kryteriów zadania; blokery to osobna lista na rano.
