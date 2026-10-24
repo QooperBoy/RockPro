@@ -3,6 +3,7 @@
 Independent of the six-parameter skeleton worker. Expressions are native mm.
 Catalog geometry is never mirrored or scaled in its transverse directions.
 """
+from ..part_registry import metadata
 import math
 import ast
 import operator
@@ -86,4 +87,5 @@ def rules():
             [f'{L} - 10.3 mm',f'{D} - 12.85 mm',z])
         add(half+'/brace-rear-left','B1121',[[-1,0,0],[0,0,1],[0,1,0]],
             ['10.3 mm',f'{D} - 12.85 mm',z])
+    for row in rows:row.update(metadata("braces" if row["sku"].startswith("B") else "profiles"))
     return rows

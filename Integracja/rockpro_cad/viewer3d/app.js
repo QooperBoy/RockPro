@@ -2,9 +2,8 @@ import * as THREE from 'three';
 import {OrbitControls} from './vendor/OrbitControls.js';
 
 const host=document.querySelector('#viewport'),status=document.querySelector('#status');
-const layers=[['plywood','Sklejka'],['profiles','Profile aluminiowe'],['corners','Narożniki i wzmocnienia'],['closures','Zamki i zawiasy'],['handles','Uchwyty'],['wheels','Koła']];
-const palette=['#408080','#458bc1','#a47c36','#9465b6','#cf6578','#637595'];
-const groups=new Map(layers.map(([key])=>[key,new THREE.Group()]));
+let layers=[],palette=[];
+const groups=new Map();
 const modelGroup=new THREE.Group(),edges=[],materials=new Map();
 let renderer,controls,camera,scene,center,radius,playing=false,timer=null;
 
@@ -18,8 +17,8 @@ function showCamera(back=false){
 }
 function visible(){
  const step=Number(document.querySelector('#progress').value);
- layers.forEach(([key],i)=>{groups.get(key).visible=i<step&&document.querySelector('#layer-'+key).checked;const row=document.querySelector('#layer-'+key).closest('label');row.classList.toggle('current',i===step-1);row.classList.toggle('pending',i>=step);row.querySelector('.count').textContent=i<step?'✓':'—';});
- document.querySelector('#step').textContent=step===6?'Cała skrzynia':step===0?'Początek':layers[step-1][1];
+ layers.forEach(([key],i)=>{groups.get(key).visible=i<step&&document.querySelector('#layer-'+key).checked;const row=document.querySelector('#layer-'+key).closest('label');row.classList.toggle('current',i===step-1);row.classList.toggle('pending',i>=step);row.querySelector('.count').textContent=groups.get(key).visible?'✓':'—';});
+ document.querySelector('#step').textContent=step===layers.length?(layers.every(([key])=>groups.get(key).visible)?'Cała skrzynia':'Wybrane warstwy'):step===0?'Początek':layers[step-1][1];
  document.querySelector('#play').textContent=playing?'❚❚ Pauza':'▶ Odtwórz';
 }
 function stop(){playing=false;clearInterval(timer);visible();}
@@ -32,9 +31,13 @@ async function init(){
  scene.add(new THREE.HemisphereLight(0xffffff,0x91a0a4,2.4));
  const key=new THREE.DirectionalLight(0xffffff,3);key.position.set(2,-3,5);scene.add(key);
  const fill=new THREE.DirectionalLight(0xc1d8df,1.5);fill.position.set(-3,2,2);scene.add(fill);
- scene.add(modelGroup);for(const group of groups.values())modelGroup.add(group);
+ scene.add(modelGroup);
  const data=await fetch('./model.json').then(r=>{if(!r.ok)throw Error('Brak modelu');return r.json();});
  if(data.kind!=='ironcad_native_mesh')throw Error('Nieznany format geometrii');
+ if(data.registry?.version!==1)throw Error('Eksport wymaga wspólnego rejestru v1');
+ const stages=data.registry.stages;layers=stages.map(s=>[s.id,s.label]);palette=stages.map(s=>s.color);
+ for(const [key] of layers){const group=new THREE.Group();groups.set(key,group);modelGroup.add(group);}
+ document.querySelector('#progress').max=layers.length;document.querySelector('#progress').value=layers.length;
  const binary=await fetch('./geometry.bin').then(r=>{if(!r.ok)throw Error('Brak bufora geometrii');return r.arrayBuffer();});
  const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',binary)),v=>v.toString(16).padStart(2,'0')).join('');
  if(hash!==data.geometry_sha256)throw Error('Niezgodna suma kontrolna geometrii');
@@ -47,7 +50,8 @@ async function init(){
   for(const group of row.materials){geometry.addGroup(start,group.count,mats.length);mats.push(material(group.color));start+=group.count;}
   const mesh=new THREE.Mesh(geometry,mats);mesh.matrix.fromArray(row.matrix);mesh.matrixAutoUpdate=false;
   mesh.userData={id:row.node_id,root:row.root_id,originalMaterials:mats};
-  const target=groups.get(row.layer);if(!target)throw Error('Nieprzypisana warstwa: '+row.layer);target.add(mesh);
+  if(data.registry.families[row.family_id]!==row.stage_id || row.stage_id!==row.layer)throw Error('Niezgodna rodzina / etap');
+  const target=groups.get(row.stage_id);if(!target)throw Error('Nieprzypisana warstwa: '+row.layer);target.add(mesh);
   // Feature edges only; no triangulation wireframe across curved faces.
   const line=new THREE.LineSegments(new THREE.EdgesGeometry(geometry,35),new THREE.LineBasicMaterial({color:0x294348,transparent:true,opacity:.24}));
   mesh.add(line);edges.push(line);triangles+=row.floats/9;
@@ -62,13 +66,14 @@ async function init(){
   const row=document.createElement('label');row.className='layer';row.style.borderLeft='5px solid '+palette[layers.findIndex(v=>v[0]===key)];const input=document.createElement('input');input.type='checkbox';input.id='layer-'+key;input.checked=true;input.onchange=visible;
   const count=document.createElement('span');count.className='count';count.textContent=groups.get(key).children.length;row.append(input,document.createTextNode(String(layers.findIndex(v=>v[0]===key)+1).padStart(2,'0')+' · '+label),count);document.querySelector('#layers').append(row);
  }
+ document.querySelector('.badge').textContent='Rejestr v'+data.registry.version+' · model '+(data.source_ics_sha256||'brak SHA').slice(0,12);
  status.textContent=`${data.elements.length} siatek · ${Math.round(triangles/1000)} tys. trójkątów\nEksport oryginalnej geometrii. Bez zmiany modelu ICS. ${data.missing_export_meshes?.length||0} węzły bez siatki w eksporcie.`;
  document.querySelector('#progress').oninput=()=>{stop();visible();};
  document.querySelector('#play').onclick=()=>{
   if(playing){stop();return;}playing=true;document.querySelector('#progress').value=0;visible();
-  timer=setInterval(()=>{const p=document.querySelector('#progress');p.value=Number(p.value)+1;visible();if(Number(p.value)===6)stop();},950);
+  timer=setInterval(()=>{const p=document.querySelector('#progress');p.value=Number(p.value)+1;visible();if(Number(p.value)===layers.length)stop();},950);
  };
- document.querySelector('#all').onclick=()=>{stop();for(const [key] of layers)document.querySelector('#layer-'+key).checked=true;document.querySelector('#progress').value=6;visible();};
+ document.querySelector('#all').onclick=()=>{stop();for(const [key] of layers)document.querySelector('#layer-'+key).checked=true;document.querySelector('#progress').value=layers.length;visible();};
  document.querySelector('#fit').onclick=()=>showCamera();document.querySelector('#front').onclick=()=>showCamera();document.querySelector('#back').onclick=()=>showCamera(true);
  document.querySelector('#colors').onchange=e=>{layers.forEach(([key],i)=>groups.get(key).children.forEach(mesh=>{mesh.material=e.target.checked?material(new THREE.Color(palette[i]).getHex()):mesh.userData.originalMaterials;}));};
  document.querySelector('#edges').onchange=e=>edges.forEach(line=>line.visible=e.target.checked);

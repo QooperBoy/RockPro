@@ -1,5 +1,6 @@
 """Rigid H7159 on opposing side walls, perpendicular to the rear hinge wall."""
 from .profile_rules import value
+from ..part_registry import metadata
 
 
 def side_handle_rules(values, per_wall=2):
@@ -19,4 +20,5 @@ def side_handle_rules(values, per_wall=2):
         for i,y in enumerate(slots):
             rows.append(dict(id=f'handles/{side}/{i+1}',side=side,kind='handles',
                              rotation=rotation,position=[x,y,'RP_BaseHeight/2']))
+    for row in rows:row.update(metadata("handles"))
     return rows

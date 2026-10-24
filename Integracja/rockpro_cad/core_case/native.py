@@ -13,6 +13,7 @@ import re
 import uuid
 
 from ..cad_lock import cad_writer_lock
+from ..part_registry import family_id, metadata
 from ..parts.native import NativePartsAdapter, file_sha256, same_document_path
 from .native_reader import NativePoseAdapter, validate_matrix, transform_bbox
 
@@ -61,6 +62,7 @@ def preflight_plan(plan):
     # The planner marks lid occurrences through presentation positions. The
     # closed model remains the native physical artifact; view offset is separate.
     for part in parts:
+        if family_id(part.get("family")):part.update(metadata(part["family"]))
         part["native_matrix_mm"] = plan_matrix(part)
         bounds = part.get("local_bounds")
         if (not isinstance(bounds, list) or len(bounds) != 2

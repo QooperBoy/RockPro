@@ -8,6 +8,8 @@ import math
 from pathlib import Path
 import sqlite3
 
+from .part_registry import STAGES as PART_STAGES, stage_for
+
 LIMIT=8*1024*1024
 LABELS={'case.capture':'Kopia źródła', 'case.create':'Wykonawca SDK (czas łączny)',
         'case.measure':'Kontrola pomiarów', 'case.save_reopen':'Kontrola pliku mostu',
@@ -18,14 +20,9 @@ LABELS={'case.capture':'Kopia źródła', 'case.create':'Wykonawca SDK (czas ł�
 
 
 STAGES = [
-    ('source', '01 · Przygotowanie źródła', '#dce8f2'),
-    ('sdk', '02 · Montaż SDK — czas łączny', '#e6e9ed'),
-    ('plywood', '03 · Sklejka', '#d3e9e5'),
-    ('profiles', '04 · Profile', '#d9eafa'),
-    ('corners', '05 · Narożniki i wzmocnienia', '#f4e8ce'),
-    ('closures', '06 · Zamki i zawiasy', '#e8def4'),
-    ('handles', '07 · Uchwyty', '#f5dfe6'),
-    ('wheels', '08 · Koła', '#dfe4ed'),
+    ('source', 'A · Przygotowanie źródła', '#dce8f2'),
+    ('sdk', 'B · Montaż SDK — czas łączny', '#e6e9ed'),
+    *[(r['id'], f"{r['order']:02} · {r['label']}", r['background']) for r in PART_STAGES],
     ('checks', '09 · Regeneracja i kontrola', '#deeddb'),
     ('save', '10 · Zapis i ponowne otwarcie', '#dcebee'),
     ('receipt', '11 · Integralność i potwierdzenie', '#e8edda'),
@@ -37,12 +34,7 @@ def stage_key(row):
     if operation == 'case.capture': return 'source'
     if operation == 'case.create': return 'sdk'
     if operation == 'native.create':
-        name = (str(row.get('family', '')) + ' ' + str(row.get('occurrence_id', ''))).lower()
-        for key, words in [('plywood', ('plate','panel','plywood')), ('profiles', ('profile',)),
-                           ('corners', ('corner','brace','socket')), ('closures', ('hinge','latch','lock')),
-                           ('handles', ('handle',)), ('wheels', ('wheel','caster'))]:
-            if any(word in name for word in words): return key
-        return 'other'
+        return stage_for(row.get('family_id') or row.get('family') or row.get('occurrence_id'))
     if operation in ('native.save','native.reopen','case.save_reopen'): return 'save'
     if operation in ('case.source_check','case.receipt'): return 'receipt'
     if operation in ('native.regenerate','native.measure','case.measure','case.verify'): return 'checks'

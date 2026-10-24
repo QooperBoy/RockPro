@@ -3,6 +3,7 @@
 Prototype registration, not wheel SKU, load, collision or stacking approval.
 """
 from .profile_rules import validate_values
+from ..part_registry import metadata
 
 I=[[1,0,0],[0,1,0],[0,0,1]]
 
@@ -54,6 +55,8 @@ def make_rules(catalog):
                 local_anchor_mm=mount,anchor=[f'({x}) + ({dx:.15g} mm)',y,
                     'RP_BaseHeight + RP_LidHeight + RP_DisplayGap']))
     for row in rows:
+        row.update(metadata(row['kind']))
+        if row.get('pair'):row['stacking_interface_id']='caster100/'+row['pair']
         R=row['rotation'];det=sum(R[0][i]*(R[1][(i+1)%3]*R[2][(i+2)%3]-R[1][(i+2)%3]*R[2][(i+1)%3]) for i in range(3))
         if det!=1:raise ValueError('Reflection/scaling refused')
     return rows

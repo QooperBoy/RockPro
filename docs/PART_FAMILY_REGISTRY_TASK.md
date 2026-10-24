@@ -1,6 +1,6 @@
 # Zadanie: wspólny rejestr rodzin części i zgodność CAD / obserwator / 3D
 
-Status: specyfikacja do realizacji, 2026-10-24. Nie jest wdrożeniem.
+Status: wdrożenie pierwszego przyrostu, 2026-10-24. Szczegóły poniżej; pozostałe punkty zachowują status planu.
 Linear: zapis przez konektor niedostępny — ROC-42 i ROC-44 nie zostały odnalezione.
 
 ## Problem i rezultat
@@ -76,3 +76,49 @@ jeżeli zależności montażowe wymagają innej kolejności; dziennik zachowuje 
 Nowe modele okuć, automatyczna aprobata nośności piętrowania, animacja otwierania
 na zawiasach oraz streamowanie siatek w trakcie każdego wywołania COM.
 Geometryczna zgodność gniazd i kół nie jest potwierdzeniem nośności konstrukcji.
+
+
+## Wdrożony przyrost
+
+- part_registry.py jest wspólnym źródłem rodzin, etapów, kolejności i palety.
+- Reguły uchwytów, profili, transportu i preflight syntetycznego wykonawcy
+  dołączają family_id, stage_id i registry_version. Koła oraz gniazda zachowują
+  odrębne rodziny, lecz wspólny etap 06 i stacking_interface_id dla każdej pary.
+- Podpory kół również należą do etapu 06. Nie zmieniono koloru materiału ICS.
+- Obserwator odczytuje rodzinę przez rejestr. Konstrukcyjne etapy 01–06 mają
+  wspólną numerację z viewerem; przygotowanie i nadrzędny czas SDK to A i B.
+- Eksporter zapisuje kontrakt rejestru; viewer pobiera etykiety, paletę i warstwy
+  z eksportu, zamiast utrzymywać drugą definicję grup w JavaScript.
+- Opcjonalny --bindings przyjmuje natywny registry_report.json i sprawdza hashe
+  ICS/eksportu oraz wersję rejestru. Powiązania opierają się wtedy na node_id,
+  occurrence_id i stacking_interface_id; nazwa użytkownika nie steruje warstwą.
+- Migracja wcześniejszych nazw jest ograniczona do rozpoznanych nazw prototypu
+  RockPro. Nieznana rodzina eksportu blokuje konwersję, zamiast znikać po cichu.
+- Każdy eksport powstaje w nowym folderze. Podgląd pokazuje wersję rejestru i
+  skrócony hash modelu; nie udaje synchronizacji na żywo.
+
+Pozostaje: automatyczne odświeżanie eksportu po każdej rewizji w produkcyjnym
+przepływie, pełne project_id/revision_id/operation_id end-to-end, obsługa
+wyłączania kół oraz różnych skrzyń i orientacji piętrowania. Nie zatwierdzono
+nośności, kompletnego pasowania ani kolizji całego złożenia dwóch skrzyń.
+
+
+## Dowody odbioru przyrostu
+
+- Natywny raport: artifacts/registry-native-20261024-01/registry_report.json.
+  PASS: source_copy, resized (850 × 620, korpus 350, pokrywa 90 mm), restored,
+  saved_reopened. Cztery pary; największa odchyłka XY < 0.000001 mm przy tolerancji
+  testu 0.05 mm. Źródło niezmienione, własne dokumenty zamknięte.
+- Nowy plik: artifacts/registry-native-20261024-01/RockPro_Epson_registry.ics.
+  66 korzeni: 4 koła, 4 gniazda, 2 podpory w etapie 06. Eksport viewer/ zawiera
+  240 siatek; zachowuje informację o 4 węzłach zawiasów bez siatki.
+- Testy rejestru, natywnych równań po zmianie wymiarów, wiązania eksportu przez
+  ID oraz odmowy użycia niezgodnego ICS: PASS. Testy nie zastępują kontroli nośności.
+- Odbiór przeglądarki: PASS — po wyłączeniu etapu 06 znikają koła i gniazda,
+  pozostają narożniki. Przy włączeniu wyłącznie 06 widoczne 4 gniazda na górze,
+  4 koła i 2 podpory na dole, wspólny kolor.
+- Próba regresji 20261024T210934083966Z: FAIL z powodu zajętej blokady przez
+  wykonywany równolegle test natywny. Nie zmieniano blokady ani nie pomijano testów;
+  właściwy wynik to ponowienie po zwolnieniu blokady, odnotowane w raporcie końcowym.
+
+Pełna regresja po zwolnieniu CAD: PASS, artifacts/verification/20261024T211139402003Z/results.json.

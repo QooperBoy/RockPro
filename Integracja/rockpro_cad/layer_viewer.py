@@ -7,6 +7,7 @@ from pathlib import Path
 import secrets
 from urllib.parse import urlsplit
 import webbrowser
+from .part_registry import contract
 
 STATIC=Path(__file__).with_name('viewer3d')
 
@@ -14,6 +15,7 @@ STATIC=Path(__file__).with_name('viewer3d')
 def make_handler(dataset,token):
     dataset=Path(dataset).resolve(strict=True)
     model=json.loads((dataset/'model.json').read_text(encoding='utf-8'))
+    if model.get('registry') and model['registry']!=contract():raise ValueError('Registry mismatch; regenerate export')
     if model.get('kind')!='ironcad_native_mesh':raise ValueError('Unknown dataset')
     if hashlib.sha256((dataset/'geometry.bin').read_bytes()).hexdigest()!=model['geometry_sha256']:
         raise ValueError('Geometry checksum mismatch')

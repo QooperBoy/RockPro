@@ -12,21 +12,22 @@ from pathlib import Path
 import zipfile
 
 
-def layer(name):
-    name=name.lower()
-    if 'wheel' in name: return 'wheels'
-    if 'eg0113' in name or 'eg0500' in name: return 'profiles'
-    if 'h7159' in name or 'handle' in name: return 'handles'
-    if 'hinge' in name or '17251' in name: return 'closures'
-    if '410429' in name or 'brace' in name or 'socket' in name: return 'corners'
-    if any(s in name for s in ('base ', 'lid ', 'dno', 'wieko', 'pad')): return 'plywood'
-    return 'other'
+import sys
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'Integracja'))
+from rockpro_cad.part_registry import contract, metadata, legacy_export_family
 
 
-def convert(source,output,ics=None):
+def convert(source,output,ics=None,bindings=None):
     source=Path(source).resolve(strict=True);output=Path(output).resolve()
     if output.exists(): raise ValueError('Use a new output directory')
-    rows=[];mapping={}
+    rows=[];mapping={};bound={}
+    receipt=json.loads(Path(bindings).read_text(encoding='utf-8')) if bindings else None
+    if receipt:
+        if receipt.get('passed') is not True or receipt['source_export_sha256']!=hashlib.sha256(source.read_bytes()).hexdigest():raise ValueError('Export binding mismatch')
+        if not ics or receipt['result_sha256']!=hashlib.sha256(Path(ics).read_bytes()).hexdigest():raise ValueError('ICS binding mismatch')
+        if receipt['registry']!=contract():raise ValueError('Registry binding mismatch')
+        bound={r['node_id']:r for r in receipt['bindings']}
+        if len(bound)!=len(receipt['bindings']):raise ValueError('Duplicate bindings')
     with zipfile.ZipFile(source) as archive:
         if sum(i.file_size for i in archive.infolist())>512*1024*1024: raise ValueError('Export too large')
         tree=json.loads(archive.read('tree.json'))
@@ -44,6 +45,9 @@ def convert(source,output,ics=None):
                 raw=json.loads(archive.read(name));ident=int(raw['id'])
                 if ident not in mapping:raise ValueError('Unmapped exported mesh')
                 node,top=mapping[ident]
+                binding=bound.get(top['id'])
+                if receipt and binding is None:raise ValueError('Missing native root binding')
+                family=binding['family_id'] if binding else legacy_export_family(top['n'])
                 vertices=raw['v'];normals=raw['n'];matrix=raw['p']
                 if not vertices or len(vertices)%9 or len(normals)!=len(vertices) or len(matrix)!=16:
                     raise ValueError('Unsupported mesh structure')
@@ -55,9 +59,12 @@ def convert(source,output,ics=None):
                     bgr=int(group['c'],16);rgb=((bgr&255)<<16)|(bgr&0xff00)|((bgr>>16)&255)
                     materials.append(dict(count=group['t'],color=rgb))
                 rows.append(dict(id=ident,node_id=node['id'],root_id=top['id'],name=top['n'],
-                                 layer=layer(top['n']),offset=offset,floats=len(vertices),matrix=matrix,materials=materials))
+                                 layer=metadata(family)['stage_id'],occurrence_id=binding['occurrence_id'] if binding else 'native/'+str(top['id']),
+                                 stacking_interface_id=binding.get('stacking_interface_id') if binding else None,
+                                 **metadata(family),offset=offset,floats=len(vertices),matrix=matrix,materials=materials))
     missing=[dict(mesh_id=i,node_id=mapping[i][0]['id'],root=mapping[i][1]['n']) for i in sorted(set(mapping)-{r['id'] for r in rows})]
     model=dict(schema_version=1,kind='ironcad_native_mesh',units='m',title='RockPro · Epson EB-L630U',
+               registry=contract(), classification='native ID receipt' if receipt else 'explicit legacy RockPro name migration',
                source_export_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),
                source_ics_sha256=hashlib.sha256(Path(ics).read_bytes()).hexdigest() if ics else None,
                geometry_sha256=hashlib.sha256((output/'geometry.bin').read_bytes()).hexdigest(),
@@ -70,4 +77,5 @@ def convert(source,output,ics=None):
 
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--export',required=True,type=Path);p.add_argument('--output',required=True,type=Path);p.add_argument('--source-ics',type=Path)
-    a=p.parse_args();convert(a.export,a.output,a.source_ics)
+    p.add_argument('--bindings',type=Path)
+    a=p.parse_args();convert(a.export,a.output,a.source_ics,a.bindings)
