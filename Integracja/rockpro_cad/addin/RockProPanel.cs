@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections;
 using System.Drawing;
@@ -23,21 +23,19 @@ internal static class Rpc {
   var psi=new ProcessStartInfo(Path.GetFullPath(Path.Combine(Addin.Root,"..",".venv","Scripts","python.exe")),"\""+Path.Combine(Addin.Root,"mcp","server.py")+"\"");
   psi.UseShellExecute=false;psi.CreateNoWindow=true;psi.RedirectStandardInput=true;psi.RedirectStandardOutput=true;psi.RedirectStandardError=true;
   psi.StandardOutputEncoding=Encoding.UTF8;psi.StandardErrorEncoding=Encoding.UTF8;psi.EnvironmentVariables["PYTHONUTF8"]="1";
-  using(var p=Process.Start(psi)) {
-   var errors=p.StandardError.ReadToEndAsync();var input=new StreamWriter(p.StandardInput.BaseStream,new UTF8Encoding(false));input.AutoFlush=true;
+  using(var session=new RpcProcessSession(psi)) {
+   var input=session.Input;
    input.WriteLine(j.Serialize(new {jsonrpc="2.0",id=1,method="initialize",@params=new {protocolVersion="2025-06-18",capabilities=new {},clientInfo=new {name="rockpro-desktop",version="0.2"}}}));input.Flush();
-   Read(p);
+   session.Read();
    input.WriteLine(j.Serialize(new {jsonrpc="2.0",method="notifications/initialized"}));
    input.WriteLine(j.Serialize(new {jsonrpc="2.0",id=2,method="tools/call",@params=new {name=tool,arguments=args}}));input.Flush();
-   var reply=Rpc.Obj(j.DeserializeObject(Read(p)));input.Close();
-   if(!p.WaitForExit(5000))p.Kill();
+   var reply=Rpc.Obj(j.DeserializeObject(session.Read()));input.Close();
    if(reply.ContainsKey("error"))throw new Exception(j.Serialize(reply["error"]));
    var r=Obj(reply["result"]);var items=Rows(r["content"]);string text=Str(Obj(items[0]),"text");
    if(r.ContainsKey("isError") && Convert.ToBoolean(r["isError"]))throw new Exception(text);
    return Obj(j.DeserializeObject(text));
   }
  }
- static string Read(Process p) {var t=p.StandardOutput.ReadLineAsync();if(!t.Wait(180000)){try{p.Kill();}catch{}throw new TimeoutException(UiText.T("MCP przekroczyło 180 s. Sprawdź IronCAD i historię operacji przed ponowną próbą.","MCP did not respond within 180 seconds. Check IronCAD and operation history before retrying."));}if(t.Result==null)throw new Exception(UiText.T("MCP zamknęło połączenie bez odpowiedzi.","MCP closed the connection without a response."));return t.Result;}
 }
 // Shared conflict presentation: never changes a revision token unless the user explicitly reloads.
 [ComVisible(false)]

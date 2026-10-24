@@ -100,6 +100,23 @@ def inspect_project(source=None):
     return result
 
 
+def cleanup_owned_revisions(documents, api, folder):
+    errors=[]
+    for document in reversed(documents):
+        try:
+            if document.Modified:
+                recovery=(Path(folder)/('owned_recovery_'+uuid.uuid4().hex+'.ics')).resolve()
+                scene=document.QueryInterface(api.IZSceneDoc)
+                scene.Update()
+                scene.SaveAs(str(recovery),api.Z_LINKS_COPY_ALL,False)
+                if not recovery.is_file() or Path(document.Name).resolve()!=recovery or document.Modified:
+                    raise RuntimeError('Recovery save not confirmed; document retained in host')
+            document.Close()
+        except Exception as exc:
+            errors.append(str(exc))
+    if errors: raise RuntimeError('; '.join(errors))
+
+
 def _change_dimensions_on_copy(changes, source=None):
     """Native snapshot preserves unsaved source geometry; edits apply only to new document."""
     from ironcad_adapter import connect, ICAPI
@@ -119,6 +136,7 @@ def _change_dimensions_on_copy(changes, source=None):
     report = {"source": str(path), "copy": str(target), "changes_mm": changes,
               "before": before, "source_sha256_before": original_hash, "passed": False,
               "stage": "snapshot"}
+    owned = []
     try:
         # This API is available in installed ICAPI and previously exercised by prepare_wholecase.
         # No SaveAs or original-document Save fallback is permitted.
@@ -129,6 +147,7 @@ def _change_dimensions_on_copy(changes, source=None):
         copy_doc = base.OpenFile(str(target), False)
         if Path(copy_doc.Name).resolve() != target.resolve():
             raise RuntimeError("IronCAD did not open the requested revision")
+        owned.append(copy_doc)
         copy_scene = copy_doc.QueryInterface(ICAPI.IZSceneDoc)
         report["stage"] = "change_parameters"
         for name, value in changes.items():
@@ -140,10 +159,12 @@ def _change_dimensions_on_copy(changes, source=None):
         report["stage"] = "save_copy"
         copy_doc.Save()
         copy_doc.Close()
+        owned.remove(copy_doc)
         report["stage"] = "reopen_copy"
         reopened = base.OpenFile(str(target), False)
         if Path(reopened.Name).resolve() != target.resolve():
             raise RuntimeError("IronCAD reopened a different document")
+        owned.append(reopened)
         report["stage"] = "validate_after_reopen"
         report["after_reopen"] = measure(reopened.QueryInterface(ICAPI.IZSceneDoc), manifest)
         actual = report["after_reopen"]["measurements"]["parameters_mm"]
@@ -166,6 +187,14 @@ def _change_dimensions_on_copy(changes, source=None):
             report["source_verification_error"] = str(exc)
         if not report["source_unchanged"]:
             report["passed"] = False
+        if not report["passed"]:
+            try:
+                cleanup_owned_revisions(owned, ICAPI, folder)
+                report["cleanup"] = {"status": "closed_owned_documents"}
+            except Exception as cleanup_error:
+                report["cleanup"] = {"status": "failed_preserved_in_host", "error": str(cleanup_error)}
+        else:
+            report["cleanup"] = {"status": "delivery_handed_to_user", "path": str(target)}
         (folder/"report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2),
                                          encoding="utf-8")
     if not report["passed"]:

@@ -4,6 +4,7 @@ UI and MCP use this same service. A receipt proves a synthetic prototype only;
 it never promotes source inventory, changes the project's source, or grants CAD
 production approval. External I/O is confined to the configured Integracja root.
 """
+from rockpro_cad.cad_lock import CadBusyError
 import copy
 import hashlib
 import json
@@ -446,6 +447,10 @@ def execute_case_plan(project_id, plan_id, operation_id, expected_revision):
             _stage(project_id, operation_id, 'failed', dict(code='NATIVE_EXECUTION_FAILED', message='Native executor returned a failed receipt'))
             return get_case_operation(project_id, operation_id)
         return _register(project_id, operation_id, receipt)
+    except CadBusyError as exc:
+        _stage(project_id, operation_id, 'failed', dict(code='CAD_BUSY_NOT_STARTED',
+               message=str(exc), execution_started=False))
+        return get_case_operation(project_id, operation_id)
     except Exception as exc:
         diagnostic = getattr(exc, 'details', dict(code='NATIVE_OUTCOME_UNKNOWN', message=str(exc)))
         _stage(project_id, operation_id, 'outcome_unknown', diagnostic)

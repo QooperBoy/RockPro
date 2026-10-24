@@ -145,7 +145,7 @@ class IronCADPrototypeDriver:
         bridge_source = Path(__file__).with_name("NativeSceneBridge.cs")
         build = subprocess.run([str(compiler), "/nologo", "/target:exe", "/platform:x64",
             "/out:"+str(executable), "/reference:"+str(vendor), "/reference:System.Web.Extensions.dll",
-            "/reference:Microsoft.CSharp.dll", str(bridge_source)], capture_output=True, text=True,
+            "/reference:Microsoft.CSharp.dll", str(bridge_source), str(bridge_source.with_name("OwnedDocumentScope.cs"))], capture_output=True, text=True,
             creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         if build.returncode:
             raise NativeExecutionError("Official SDK bridge compilation failed: "+(build.stdout+build.stderr)[-2000:])
@@ -197,18 +197,26 @@ def execute_plan(plan, *, output_dir, source=None, operation_id=None, _adapter_f
         destination.mkdir(exist_ok=False)
         output = destination / "case_prototype.ics"
         snapshot = destination / "source_snapshot.ics"
+        from .trace import PhaseTrace
+        trace = PhaseTrace(destination, parts, operation_id)
         driver = (_adapter_factory or IronCADPrototypeDriver)(source_path)
         try:
-            provenance = driver.capture(snapshot)
-            driver.create(parts)
-            before = driver.measure()
-            compare_measurements(parts, before)
-            driver.save_reopen(output)
-            reopened = driver.measure()
-            checks = compare_measurements(parts, reopened)
+            with trace.phase('capture'):
+                provenance = driver.capture(snapshot)
+            with trace.phase('create'):
+                driver.create(parts)
+            with trace.phase('measure'):
+                before = driver.measure()
+                compare_measurements(parts, before)
+            with trace.phase('save_reopen'):
+                driver.save_reopen(output)
+            with trace.phase('verify'):
+                reopened = driver.measure()
+                checks = compare_measurements(parts, reopened)
             if {p["occurrence_id"]: p["cad_node_id"] for p in before} != {p["occurrence_id"]: p["cad_node_id"] for p in reopened}:
                 raise NativeExecutionError("native node IDs changed after reopening")
-            driver.assert_source_unchanged()
+            with trace.phase('source_check'):
+                driver.assert_source_unchanged()
             receipt = {"schema_version": 1, "passed": True, "operation_id": operation_id,
                        "output_path": str(output), "output_sha256": file_sha256(output),
                        "source": provenance, "source_unchanged": True,
@@ -219,7 +227,11 @@ def execute_plan(plan, *, output_dir, source=None, operation_id=None, _adapter_f
                        "physical_occurrences": len(parts), "checks": checks,
                        "presentation": copy.deepcopy(plan.get("presentation")),
                        "measurements": reopened}
-            write_receipt_once(destination / "native_receipt.json", receipt)
+            receipt['process_trace'] = str(trace.logger.path)
+            receipt['process_preview'] = str(destination/'process_preview.json')
+            receipt['timing_note'] = 'create includes SDK build, native generation and save/reopen; save_reopen phase here only checks the bridge output'
+            with trace.phase('receipt'):
+                write_receipt_once(destination / "native_receipt.json", receipt)
             return receipt
         finally:
             driver.assert_source_unchanged()

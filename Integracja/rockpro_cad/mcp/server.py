@@ -30,8 +30,8 @@ def schema(name, description, properties, required=(), readonly=False):
 S={"type":"string"}
 REV={"type":"integer","minimum":0}
 PROVENANCE={"actor":S,"change_source":S}
-from layout import DEFAULT
-layout_spec={"type":"object","additionalProperties":False,"properties":{k:{"type":"string" if isinstance(v,str) else "integer" if k=="count" else "number"} for k,v in DEFAULT.items()}}
+from layout import LAYOUT_PROPERTIES
+layout_spec={"type":"object","additionalProperties":False,"properties":LAYOUT_PROPERTIES}
 SCHEMAS += [
  schema("preview_layout","Calculate device envelopes, partitions and accessory space in mm; no CAD edits",{"spec":layout_spec},["spec"],True),
  schema("get_layout","Read current or historical immutable layout; revision 0 means unsaved",{"project_id":S,"revision":{"type":"integer","minimum":1}},["project_id"],True),

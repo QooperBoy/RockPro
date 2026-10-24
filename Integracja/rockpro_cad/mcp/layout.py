@@ -11,8 +11,16 @@ DEFAULT = dict(name="Urządzenie", x=345.4, y=241.9, z=88.2, count=2,
                separator=0, side="none", side_width=80, side_depth=300,
                side_height=50, side_name="Kable", thickness=9, lid_height=50)
 
+# Public field contract includes optional policy fields without opting legacy
+# saved layouts into the new policy merely by loading them.
+LAYOUT_PROPERTIES = {k: {'type': 'string' if isinstance(v, str) else 'integer' if k == 'count' else 'number'}
+                     for k, v in DEFAULT.items()}
+LAYOUT_PROPERTIES.update(lid_hardware_width={'type': 'number', 'minimum': 0, 'maximum': 1000},
+                         lid_hinge_height={'type': 'number', 'minimum': 0, 'maximum': 1000},
+                         lid_constructor_override={'type': 'boolean'})
+
 def _calculate_layout(spec):
-    if not isinstance(spec, dict) or set(spec)-(set(DEFAULT)|{'lid_hardware_width','lid_hinge_height','lid_constructor_override'}):
+    if not isinstance(spec, dict) or set(spec)-set(LAYOUT_PROPERTIES):
         raise ValueError("Nieznane pola układu")
     s = DEFAULT | spec
     s.setdefault('lid_hardware_width',0)

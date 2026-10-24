@@ -22,6 +22,23 @@ class LidPolicyTests(unittest.TestCase):
         with self.assertRaises(ValueError):calculate_layout(dict(z=300,count=1,lid_hinge_height=30,lid_height=80))
         r=calculate_layout(dict(z=300,count=1,lid_hinge_height=80,lid_height=81,lid_constructor_override=True))
         self.assertTrue(r['lid_policy']['constructor_override'])
+    def test_mcp_published_schema_and_policy_roundtrip(self):
+        import server
+        schemas = server.handle({'id': 1, 'method': 'tools/list'})['result']['tools']
+        spec = dict(z=300, count=1, lid_hinge_height=80, lid_height=81, lid_constructor_override=True)
+        result = calculate_layout(spec)
+        for tool in ('preview_layout', 'save_layout'):
+            schema = next(t for t in schemas if t['name'] == tool)['inputSchema']['properties']['spec']
+            self.assertFalse(schema['additionalProperties'])
+            self.assertTrue(set(result['spec']) <= set(schema['properties']))
+            self.assertEqual(schema['properties']['lid_constructor_override']['type'], 'boolean')
+            self.assertEqual(schema['properties']['lid_hinge_height']['type'], 'number')
+        self.assertEqual(calculate_layout(result['spec'])['parameters'], result['parameters'])
+        with self.assertRaises(ValueError):
+            calculate_layout(spec | {'lid_constructor_override': False})
+        with self.assertRaises(ValueError):
+            calculate_layout(spec | {'lid_constructor_override': 1})
+
     def test_legacy_geometry_and_green_are_preserved(self):
         r=calculate_layout(dict(x=100,y=200,z=300,count=1,clearance=10,thickness=9,lid_height=50))
         self.assertEqual(r['external'],[138,238,338])

@@ -20,7 +20,8 @@ _EVENTS = frozenset(("operation_started", "node_read", "read_error", "limit_reac
                      "operation_finished", "logging_limit_reached", "source_checked",
                      "inventory_written"))
 _OPERATIONS = frozenset(("parts.inspect", "parts.inventory", "parts.native_test",
-                         "parts.read", "parts.cli"))
+                         "parts.read", "parts.cli", "case.capture", "case.create", "case.measure",
+                         "case.save_reopen", "case.verify", "case.source_check", "case.receipt"))
 _STATUSES = frozenset(("started", "success", "passed", "failed", "partial", "error",
                        "complete", "completed", "skipped", "not_run", "limited"))
 _COUNTERS = frozenset(("max_depth", "max_nodes", "max_seconds", "node_count",
