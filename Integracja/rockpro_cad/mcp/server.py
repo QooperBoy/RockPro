@@ -100,6 +100,15 @@ SCHEMAS += [
 ]
 
 
+SCHEMAS += [schema('preview_device_layouts','Propose up to three allowed layouts from cited device dimensions with collision and conservative vertical removal checks; constructor edits/saves separately',
+    {'record':{'type':'object'},'spec':{'type':'object','additionalProperties':False,'properties':{k:v for k,v in LAYOUT_PROPERTIES.items() if k not in ('x','y','z')}},
+     'allowed_orientations':{'type':'array','minItems':1,'maxItems':6,'items':{'enum':['XYZ','XZY','YXZ','YZX','ZXY','ZYX']}},
+     'allowed_arrangements':{'type':'array','minItems':1,'maxItems':3,'items':{'enum':['X','Y','Z']}},
+     'removal_clearance_mm':{'type':'number','minimum':0,'maximum':500},
+     'max_external_mm':{'type':'array','minItems':3,'maxItems':3,'items':{'type':'number','exclusiveMinimum':0,'maximum':10000}}},
+    ['record','spec','allowed_orientations','allowed_arrangements'],True)]
+
+
 def handle(request):
     ident = request.get("id")
     if ident is None:

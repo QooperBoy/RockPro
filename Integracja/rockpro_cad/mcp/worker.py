@@ -234,6 +234,11 @@ def create_snapshot(project_id,label="Snapshot",note=""):
 
 
 def dispatch(name, arguments):
+    if name=='preview_device_layouts':
+        keys={'record','spec','allowed_orientations','allowed_arrangements','removal_clearance_mm','max_external_mm'}
+        if not isinstance(arguments,dict) or set(arguments)-keys:raise ValueError('Invalid device layout tool argument')
+        from layout_variants import preview_device_layouts
+        return preview_device_layouts(**arguments)
     recommendation_keys={'recommend_case_families': {'query','families'},'benchmark_case_recommendations': {'families','cases'}}
     if name in recommendation_keys:
         if not isinstance(arguments,dict) or set(arguments)-recommendation_keys[name]:raise ValueError('Invalid recommendation tool argument')
