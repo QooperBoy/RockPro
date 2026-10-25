@@ -85,5 +85,50 @@ class MaterialRevisionTests(unittest.TestCase):
         self.assertEqual(report['changes'][0]['reuse_candidate_quantity'],0)
         self.assertEqual(report['unallocated_produced_total'],6)
 
+    def test_changed_progress_is_not_used_for_reuse_or_expense(self):
+        self.plan();revisions.start_material_plan('plan-1',1)
+        event=dict(type='produced',group_index=0,quantity=1)
+        revisions.record_material_progress('plan-1','actual',event,2)
+        self.plan('plan-2','plan-1')
+        with store.db() as conn:conn.execute('UPDATE material_progress SET event_json=? WHERE id=?',
+                                           (json.dumps(event|dict(quantity=999)),'actual'))
+        with self.assertRaisesRegex(ValueError,'PROGRESS_INTEGRITY'):revisions.get_material_plan('plan-1')
+        with self.assertRaisesRegex(ValueError,'PROGRESS_INTEGRITY'):revisions.compare_material_plans('plan-1','plan-2')
+        with self.assertRaisesRegex(ValueError,'PROGRESS_INTEGRITY'):revisions.record_material_progress('plan-1','actual',event,2)
+
+    def test_registered_snapshot_mismatch_is_stale_and_blocks_new_plan(self):
+        archive=self.root/'snapshot.ics';archive.write_bytes(b'synthetic snapshot only')
+        # An isolated schema fixture; this is not a native CAD validation receipt.
+        with store.db() as conn:
+            conn.execute('INSERT INTO snapshots(id,project_id,created_at,label,note,path,source,sha256,parameters,validation,report_path) VALUES(?,?,?,?,?,?,?,?,?,?,?)',
+                ('qa-snapshot',self.project,store.now(),'Synthetic fixture','not native',str(archive),str(self.source),revisions.file_hash(archive),'{}','synthetic_test','not-native'))
+        original=self.plan();archive.write_bytes(b'changed snapshot')
+        read=revisions.get_material_plan('plan-1');self.assertTrue(read['stale'])
+        self.assertEqual(read['payload_sha256'],original['payload_sha256'])
+        self.assertIn('SNAPSHOT_INTEGRITY_MISMATCH',{d['code'] for d in read['input_diagnostics']})
+        with self.assertRaisesRegex(ValueError,'INPUT_INTEGRITY'):self.plan('plan-2')
+        with self.assertRaisesRegex(ValueError,'OUTDATED'):revisions.start_material_plan('plan-1',1)
+
+    def test_metadata_pages_do_not_claim_file_freshness_or_rehash_models(self):
+        self.plan('plan-a');self.plan('plan-b','plan-a')
+        with patch.object(revisions,'file_hash',side_effect=AssertionError('Metadata must not hash CAD files')):
+            first=worker.dispatch('list_material_plans',dict(limit=1))
+            second=revisions.list_material_plans(limit=1,after_plan_id=first['next_cursor'])
+        self.assertTrue(first['has_more']);self.assertFalse(second['has_more'])
+        self.assertEqual([p['id'] for p in first['plans']+second['plans']],['plan-a','plan-b'])
+        self.assertTrue(all(p['freshness_checked'] is False for p in first['plans']+second['plans']))
+        self.assertEqual(second['plans'][0]['supersedes_plan_id'],'plan-a')
+
+    def test_synthetic_production_cannot_be_reused_by_a_source_input_plan(self):
+        self.plan();revisions.start_material_plan('plan-1',1)
+        revisions.record_material_progress('plan-1','test-output',dict(type='produced',group_index=0,quantity=2),2)
+        document=fixture(self.project,'R2',per_case_quantity=1)
+        # Isolated domain-boundary test; this does not approve any client BOM.
+        document['scope']='source_input';document['approval']['content_sha256']=materials.approval_payload_hash(document)
+        path=self.root/'imports/bom.json';path.write_text(json.dumps(document),encoding='utf-8')
+        materials.import_bom_file(self.project,path,1,materials.preview_bom_file(path)['source_sha256'])
+        self.plan('plan-2','plan-1')
+        with self.assertRaisesRegex(ValueError,'SCOPE_MISMATCH'):revisions.compare_material_plans('plan-1','plan-2')
+
 
 if __name__=='__main__':unittest.main()

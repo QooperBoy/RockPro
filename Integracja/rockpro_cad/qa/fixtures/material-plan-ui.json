@@ -1,0 +1,455 @@
+{
+  "synthetic_test": true,
+  "production_approved": false,
+  "listing": {
+    "plans": [
+      {
+        "id": "plan-new",
+        "revision": 1,
+        "recorded_status": "ready",
+        "created_at": "2026-10-25T13:27:28.584974+00:00",
+        "project_ids": [
+          "5789062ff6754fc0ba21d5db5241a96f"
+        ],
+        "scope": "synthetic_test",
+        "supersedes_plan_id": "plan-old",
+        "payload_sha256": "8f405cda6e4b2a22744421a44d74538d5f25a5f8027b660de6ec90bd992f8804",
+        "freshness_checked": false,
+        "production_approved": false
+      },
+      {
+        "id": "plan-old",
+        "revision": 4,
+        "recorded_status": "started",
+        "created_at": "2026-10-25T13:27:28.561972+00:00",
+        "project_ids": [
+          "5789062ff6754fc0ba21d5db5241a96f"
+        ],
+        "scope": "synthetic_test",
+        "supersedes_plan_id": null,
+        "payload_sha256": "3e19eb8aec6478dd5b6c045df85051339d71ba4b600095329565c341bb32e665",
+        "freshness_checked": false,
+        "production_approved": false
+      }
+    ],
+    "has_more": false,
+    "next_cursor": null,
+    "production_approved": false
+  },
+  "old": {
+    "id": "plan-old",
+    "revision": 4,
+    "status": "started",
+    "effective_status": "changed_in_progress",
+    "stale": true,
+    "payload": {
+      "cut_plan": {
+        "input_sha256": "b9dec45c411b61fd014fafd6d1546ae9b99c9091261e580d4eaeecf699eb0d23",
+        "sheets": [
+          {
+            "sheet_id": "synthetic-board",
+            "tree": {
+              "at_mm": 600,
+              "axis": "X",
+              "first": {
+                "group_index": 0,
+                "rotated": false,
+                "type": "part"
+              },
+              "second": {
+                "at_mm": 600,
+                "axis": "X",
+                "first": {
+                  "group_index": 0,
+                  "rotated": false,
+                  "type": "part"
+                },
+                "second": {
+                  "at_mm": 600,
+                  "axis": "X",
+                  "first": {
+                    "group_index": 0,
+                    "rotated": false,
+                    "type": "part"
+                  },
+                  "second": {
+                    "at_mm": 600,
+                    "axis": "X",
+                    "first": {
+                      "group_index": 0,
+                      "rotated": false,
+                      "type": "part"
+                    },
+                    "second": {
+                      "at_mm": 600,
+                      "axis": "X",
+                      "first": {
+                        "group_index": 0,
+                        "rotated": false,
+                        "type": "part"
+                      },
+                      "second": {
+                        "at_mm": 600,
+                        "axis": "X",
+                        "first": {
+                          "group_index": 0,
+                          "rotated": false,
+                          "type": "part"
+                        },
+                        "second": {
+                          "type": "waste"
+                        },
+                        "type": "cut"
+                      },
+                      "type": "cut"
+                    },
+                    "type": "cut"
+                  },
+                  "type": "cut"
+                },
+                "type": "cut"
+              },
+              "type": "cut"
+            }
+          }
+        ]
+      },
+      "demand": {
+        "bindings": [
+          {
+            "document_sha256": "60c2924dc3fe7ab11e66ef123d4021415c0e9dd90097b506f990b5535ad5de5d",
+            "model_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "project_id": "5789062ff6754fc0ba21d5db5241a96f",
+            "revision": 1,
+            "source_revision": "R1"
+          }
+        ],
+        "demand_sha256": "6fa6d01856a5cf01b8332462610978cf7b3f3fa8f5a0ea5e590a60a6144a1f9f",
+        "groups": [
+          {
+            "cut_length_mm": 600,
+            "cut_width_mm": 400,
+            "finish": "green",
+            "grain_axis": "X",
+            "material_id": "plywood-test",
+            "quantity": 6,
+            "required_date": "2026-11-01",
+            "rotation_allowed": false,
+            "sources": [
+              {
+                "cases": 3,
+                "per_case_quantity": 2,
+                "project_id": "5789062ff6754fc0ba21d5db5241a96f",
+                "quantity": 6,
+                "row_id": "floor",
+                "source_revision": "R1"
+              }
+            ],
+            "technology_id": "test-saw",
+            "thickness_mm": 9
+          }
+        ],
+        "production_approved": false,
+        "scope": "synthetic_test",
+        "total_parts": 6
+      },
+      "input_state": [
+        {
+          "bom_revision": 1,
+          "bom_sha256": "60c2924dc3fe7ab11e66ef123d4021415c0e9dd90097b506f990b5535ad5de5d",
+          "card_revision": 1,
+          "layout_revision": null,
+          "project_id": "5789062ff6754fc0ba21d5db5241a96f",
+          "quantity": 1,
+          "snapshot": null,
+          "source_file": {
+            "sha256": "dc7299a5dd1289ef57bac22a5c720a2089af8cbcf437bb7a5b8f9751af02a19d"
+          }
+        }
+      ],
+      "sheets": [
+        {
+          "available_date": "2026-10-01",
+          "finish": "green",
+          "grain_axis": "X",
+          "id": "synthetic-board",
+          "length_mm": 4000,
+          "material_id": "plywood-test",
+          "technology_id": "test-saw",
+          "thickness_mm": 9,
+          "width_mm": 400
+        }
+      ],
+      "supersedes_plan_id": null,
+      "technology": {
+        "cut_type": "guillotine",
+        "id": "test-saw",
+        "kerf_mm": 3,
+        "profile_revision": "TEST-ONLY",
+        "trim_mm": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "verification_sha256": "9b9b3699db09b2a5e445db1fb99773530d92634885976b2a3a07a930d73c6bbc"
+    },
+    "payload_sha256": "3e19eb8aec6478dd5b6c045df85051339d71ba4b600095329565c341bb32e665",
+    "progress": [
+      {
+        "id": "qa-produced",
+        "created_at": "2026-10-25T13:27:28.570052+00:00",
+        "event": {
+          "group_index": 0,
+          "quantity": 4,
+          "type": "produced"
+        }
+      },
+      {
+        "id": "qa-order",
+        "created_at": "2026-10-25T13:27:28.574837+00:00",
+        "event": {
+          "arrival_date": "2026-11-02",
+          "currency": "PLN",
+          "item_id": "plywood-test",
+          "quantity": 1,
+          "reference": "QA-PO",
+          "total_gross": "123.00",
+          "type": "committed_order"
+        }
+      }
+    ],
+    "current_input_state": [
+      {
+        "project_id": "5789062ff6754fc0ba21d5db5241a96f",
+        "card_revision": 1,
+        "quantity": 1,
+        "bom_revision": 2,
+        "bom_sha256": "017df5695cdd62dcf2e8f0fdb021e6a3ebcc64acbdedcb9812fb43c28301b6d6",
+        "layout_revision": null,
+        "source_file": {
+          "sha256": "dc7299a5dd1289ef57bac22a5c720a2089af8cbcf437bb7a5b8f9751af02a19d"
+        },
+        "snapshot": null
+      }
+    ],
+    "input_diagnostics": [],
+    "production_approved": false
+  },
+  "new": {
+    "id": "plan-new",
+    "revision": 1,
+    "status": "ready",
+    "effective_status": "ready",
+    "stale": false,
+    "payload": {
+      "cut_plan": {
+        "input_sha256": "839aefed041086f409e2020b227bc123bee4bc4fdc8220e65ccd69be9fd183da",
+        "sheets": [
+          {
+            "sheet_id": "synthetic-board",
+            "tree": {
+              "at_mm": 600,
+              "axis": "X",
+              "first": {
+                "group_index": 0,
+                "rotated": false,
+                "type": "part"
+              },
+              "second": {
+                "at_mm": 600,
+                "axis": "X",
+                "first": {
+                  "group_index": 0,
+                  "rotated": false,
+                  "type": "part"
+                },
+                "second": {
+                  "at_mm": 600,
+                  "axis": "X",
+                  "first": {
+                    "group_index": 0,
+                    "rotated": false,
+                    "type": "part"
+                  },
+                  "second": {
+                    "type": "waste"
+                  },
+                  "type": "cut"
+                },
+                "type": "cut"
+              },
+              "type": "cut"
+            }
+          }
+        ]
+      },
+      "demand": {
+        "bindings": [
+          {
+            "document_sha256": "017df5695cdd62dcf2e8f0fdb021e6a3ebcc64acbdedcb9812fb43c28301b6d6",
+            "model_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "project_id": "5789062ff6754fc0ba21d5db5241a96f",
+            "revision": 2,
+            "source_revision": "R2"
+          }
+        ],
+        "demand_sha256": "10e8c0bc02b7cb199e8448a261d422ca140d8c078c5af8bf88c82232cc9434db",
+        "groups": [
+          {
+            "cut_length_mm": 600,
+            "cut_width_mm": 400,
+            "finish": "green",
+            "grain_axis": "X",
+            "material_id": "plywood-test",
+            "quantity": 3,
+            "required_date": "2026-11-01",
+            "rotation_allowed": false,
+            "sources": [
+              {
+                "cases": 3,
+                "per_case_quantity": 1,
+                "project_id": "5789062ff6754fc0ba21d5db5241a96f",
+                "quantity": 3,
+                "row_id": "floor",
+                "source_revision": "R2"
+              }
+            ],
+            "technology_id": "test-saw",
+            "thickness_mm": 9
+          }
+        ],
+        "production_approved": false,
+        "scope": "synthetic_test",
+        "total_parts": 3
+      },
+      "input_state": [
+        {
+          "bom_revision": 2,
+          "bom_sha256": "017df5695cdd62dcf2e8f0fdb021e6a3ebcc64acbdedcb9812fb43c28301b6d6",
+          "card_revision": 1,
+          "layout_revision": null,
+          "project_id": "5789062ff6754fc0ba21d5db5241a96f",
+          "quantity": 1,
+          "snapshot": null,
+          "source_file": {
+            "sha256": "dc7299a5dd1289ef57bac22a5c720a2089af8cbcf437bb7a5b8f9751af02a19d"
+          }
+        }
+      ],
+      "sheets": [
+        {
+          "available_date": "2026-10-01",
+          "finish": "green",
+          "grain_axis": "X",
+          "id": "synthetic-board",
+          "length_mm": 4000,
+          "material_id": "plywood-test",
+          "technology_id": "test-saw",
+          "thickness_mm": 9,
+          "width_mm": 400
+        }
+      ],
+      "supersedes_plan_id": "plan-old",
+      "technology": {
+        "cut_type": "guillotine",
+        "id": "test-saw",
+        "kerf_mm": 3,
+        "profile_revision": "TEST-ONLY",
+        "trim_mm": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "verification_sha256": "493a3d9bb6189f84252dbd8aae65f704c0dc267c911e9615bf5059f548380607"
+    },
+    "payload_sha256": "8f405cda6e4b2a22744421a44d74538d5f25a5f8027b660de6ec90bd992f8804",
+    "progress": [],
+    "current_input_state": [
+      {
+        "project_id": "5789062ff6754fc0ba21d5db5241a96f",
+        "card_revision": 1,
+        "quantity": 1,
+        "bom_revision": 2,
+        "bom_sha256": "017df5695cdd62dcf2e8f0fdb021e6a3ebcc64acbdedcb9812fb43c28301b6d6",
+        "layout_revision": null,
+        "source_file": {
+          "sha256": "dc7299a5dd1289ef57bac22a5c720a2089af8cbcf437bb7a5b8f9751af02a19d"
+        },
+        "snapshot": null
+      }
+    ],
+    "input_diagnostics": [],
+    "production_approved": false
+  },
+  "comparison": {
+    "old_plan_id": "plan-old",
+    "new_plan_id": "plan-new",
+    "old_revision": 4,
+    "new_revision": 1,
+    "old_payload_sha256": "3e19eb8aec6478dd5b6c045df85051339d71ba4b600095329565c341bb32e665",
+    "new_payload_sha256": "8f405cda6e4b2a22744421a44d74538d5f25a5f8027b660de6ec90bd992f8804",
+    "old_progress_sha256": "6c0ac661fcbcbbae0c69036cd123cf094cb096ae30fe083d6ef3523b6c765d1d",
+    "new_progress_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "scope": "synthetic_test",
+    "old_status": "changed_in_progress",
+    "new_status": "ready",
+    "changes": [
+      {
+        "new_group": {
+          "cut_length_mm": 600,
+          "cut_width_mm": 400,
+          "finish": "green",
+          "grain_axis": "X",
+          "material_id": "plywood-test",
+          "quantity": 3,
+          "required_date": "2026-11-01",
+          "rotation_allowed": false,
+          "sources": [
+            {
+              "cases": 3,
+              "per_case_quantity": 1,
+              "project_id": "5789062ff6754fc0ba21d5db5241a96f",
+              "quantity": 3,
+              "row_id": "floor",
+              "source_revision": "R2"
+            }
+          ],
+          "technology_id": "test-saw",
+          "thickness_mm": 9
+        },
+        "required_quantity": 3,
+        "reuse_candidate_quantity": 3,
+        "shortage_without_reuse": 3,
+        "shortage_if_reuse_accepted": 0,
+        "reuse_approved": false,
+        "quality_and_term_check_required": true
+      }
+    ],
+    "produced_total": 4,
+    "unallocated_produced_total": 1,
+    "committed_orders_preserved": [
+      {
+        "arrival_date": "2026-11-02",
+        "currency": "PLN",
+        "item_id": "plywood-test",
+        "quantity": 1,
+        "reference": "QA-PO",
+        "total_gross": "123.00",
+        "type": "committed_order"
+      }
+    ],
+    "committed_expense_by_currency": {
+      "PLN": "123.00"
+    },
+    "incremental_cost": null,
+    "incremental_cost_status": "requires_current_pricing_and_reuse_acceptance",
+    "delivery_impact": "compare_new_required_dates_with_preserved_order_arrivals; no automatic expedite",
+    "inventory_reversed": false,
+    "orders_cancelled": false,
+    "production_approved": false
+  }
+}

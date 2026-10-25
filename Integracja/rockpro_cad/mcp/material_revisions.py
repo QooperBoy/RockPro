@@ -58,13 +58,27 @@ def _load(conn,plan_id):
     data=json.loads(row['payload_json'])
     if digest(data)!=row['payload_sha256']:raise ValueError('MATERIAL_PLAN_INTEGRITY_FAILED')
     current=input_state(conn,[b['project_id'] for b in data['demand']['bindings']])
-    stale=current!=data['input_state']
-    progress=[dict(id=r['id'],created_at=r['created_at'],event=json.loads(r['event_json']))
-              for r in conn.execute('SELECT * FROM material_progress WHERE plan_id=? ORDER BY created_at,id',(plan_id,))]
+    diagnostics=input_diagnostics(current)
+    stale=current!=data['input_state'] or bool(diagnostics)
+    progress=[]
+    for progress_row in conn.execute('SELECT * FROM material_progress WHERE plan_id=? ORDER BY created_at,rowid',(plan_id,)):
+        event=json.loads(progress_row['event_json'])
+        if digest(dict(plan_id=plan_id,event=event))!=progress_row['event_sha256']:raise ValueError('MATERIAL_PROGRESS_INTEGRITY_FAILED')
+        progress.append(dict(id=progress_row['id'],created_at=progress_row['created_at'],event=event))
     effective=('outdated' if row['status']=='ready' else 'changed_in_progress') if stale else row['status']
     return dict(id=plan_id,revision=row['revision'],status=row['status'],effective_status=effective,
                 stale=stale,payload=data,payload_sha256=row['payload_sha256'],progress=progress,
-                current_input_state=current,production_approved=False)
+                current_input_state=current,input_diagnostics=diagnostics,production_approved=False)
+
+
+def input_diagnostics(state):
+    result=[]
+    for item in state:
+        if item['source_file'].get('error'):result.append(dict(project_id=item['project_id'],code='SOURCE_FILE_UNAVAILABLE'))
+        snapshot=item['snapshot']
+        if snapshot and (snapshot['file'].get('error') or snapshot['file'].get('sha256')!=snapshot['registered_sha256']):
+            result.append(dict(project_id=item['project_id'],code='SNAPSHOT_INTEGRITY_MISMATCH'))
+    return result
 
 
 def save_material_plan(plan_id,project_ids,sheets,technology,cut_plan,supersedes_plan_id=None):
@@ -73,8 +87,7 @@ def save_material_plan(plan_id,project_ids,sheets,technology,cut_plan,supersedes
     with store.db() as conn:
         conn.execute('BEGIN IMMEDIATE');ensure(conn)
         current=input_state(conn,project_ids)
-        if any(s['source_file'].get('error') or (s['snapshot'] and s['snapshot']['file'].get('error')) for s in current):
-            raise ValueError('Material plan needs stable source/snapshot files')
+        if input_diagnostics(current):raise ValueError('MATERIAL_INPUT_INTEGRITY: stable source and matching registered snapshot required')
         expected={b['project_id']:(b['revision'],b['document_sha256']) for b in demand['bindings']}
         if any(expected[s['project_id']]!=(s['bom_revision'],s['bom_sha256']) for s in current):raise ValueError('BOM_CHANGED_DURING_PLANNING')
         if supersedes_plan_id is not None:
@@ -94,6 +107,26 @@ def save_material_plan(plan_id,project_ids,sheets,technology,cut_plan,supersedes
 def get_material_plan(plan_id):
     with store.db() as conn:
         conn.execute('BEGIN');ensure(conn);return _load(conn,plan_id)
+
+
+def list_material_plans(limit=100,after_plan_id=None):
+    """Bounded metadata only. File freshness requires an explicit get/read."""
+    if type(limit) is not int or not 1<=limit<=100:raise ValueError('Material plan list limit 1..100 required')
+    if after_plan_id is not None:token(after_plan_id,'plan cursor')
+    with store.db() as conn:
+        conn.execute('BEGIN');ensure(conn)
+        rows=conn.execute('SELECT * FROM material_plans WHERE id>? ORDER BY id LIMIT ?',
+                          (after_plan_id or '',limit+1)).fetchall()
+        has_more=len(rows)>limit;rows=rows[:limit];plans=[]
+        for row in rows:
+            payload=json.loads(row['payload_json'])
+            if digest(payload)!=row['payload_sha256']:raise ValueError('MATERIAL_PLAN_INTEGRITY_FAILED')
+            plans.append(dict(id=row['id'],revision=row['revision'],recorded_status=row['status'],created_at=row['created_at'],
+                project_ids=[b['project_id'] for b in payload['demand']['bindings']],
+                scope=payload['demand']['scope'],
+                supersedes_plan_id=payload['supersedes_plan_id'],payload_sha256=row['payload_sha256'],
+                freshness_checked=False,production_approved=False))
+    return dict(plans=plans,has_more=has_more,next_cursor=plans[-1]['id'] if has_more else None,production_approved=False)
 
 
 def start_material_plan(plan_id,expected_revision):
@@ -141,6 +174,7 @@ def compare_material_plans(old_plan_id,new_plan_id):
     with store.db() as conn:
         conn.execute('BEGIN');ensure(conn);old=_load(conn,old_plan_id);new=_load(conn,new_plan_id)
     if {s['project_id'] for s in old['payload']['input_state']}!={s['project_id'] for s in new['payload']['input_state']}:raise ValueError('Plan project sets differ')
+    if old['payload']['demand']['scope']!=new['payload']['demand']['scope']:raise ValueError('MATERIAL_SCOPE_MISMATCH: synthetic and source plans cannot share reuse candidates')
     key_fields=('material_id','finish','technology_id','thickness_mm','grain_axis','rotation_allowed','cut_length_mm','cut_width_mm')
     def key(g):return tuple(g[k] for k in key_fields)
     produced=Counter();orders=[]
@@ -157,6 +191,8 @@ def compare_material_plans(old_plan_id,new_plan_id):
     totals={}
     for order in orders:totals[order['currency']]=totals.get(order['currency'],money(0))+money(order['total_gross'])
     return dict(old_plan_id=old_plan_id,new_plan_id=new_plan_id,old_revision=old['revision'],new_revision=new['revision'],
+        old_payload_sha256=old['payload_sha256'],new_payload_sha256=new['payload_sha256'],
+        old_progress_sha256=digest(old['progress']),new_progress_sha256=digest(new['progress']),scope=new['payload']['demand']['scope'],
         old_status=old['effective_status'],new_status=new['effective_status'],changes=changes,
         produced_total=sum(initial.values()),unallocated_produced_total=sum(produced.values()),
         committed_orders_preserved=orders,committed_expense_by_currency={k:monetary_text(v) for k,v in totals.items()},

@@ -226,3 +226,20 @@ istniejące material_revisions/MCP. Najpierw odczytać wymagania z
 raporty/ROC-33_BEFORE_NIGHT_UPDATE.txt i MATERIAL_PLAN_REVISIONS.md.
 Nie cofać zużycia/rezerwacji po zmianie BOM i nie wymyślać kosztu delta bez
 realnej wyceny. Odbiór magazynu/zakupów, nowa DLL i pełny CAD pozostają NOT RUN.
+
+
+Heartbeat 25.10 13:16Z: snapshot obecny, rozpoczęto z e271977. ROC-33:
+lista wersji, jawny odczyt aktualności, różnice i eksport w źródłowym WinForms.
+FIX_FIRST: weryfikacja hashy postępu, odmowa niezgodnego snapshotu i rozdzielenie
+syntetycznego wykonania od source_input. 9 testów backendu; pełny harness/build/UI
+PASS 20261025T133758293539Z. Ekran PL/EN 100/150 oraz zakładki obejrzane na
+syntetycznych danych. Szczegóły i ograniczenia w MATERIAL_PLAN_REVISIONS.md.
+Koszt delta nieznany bez wyceny; nie zaakceptowano reuse ani produkcji.
+Żadnych zmian modeli, bazy klienta, wdrożenia DLL ani statusów w Linear.
+Host 20328 nadal nie odpowiada; native pozostaje NOT RUN.
+
+Następny krok: przegląd pozostałej zachowanej kolejki i raport przekazania z
+konkretnymi blokerami danych/odbiorów. Nie wymyślać kolejnych funkcji zamiast
+spełnienia wymaganych dowodów. Weryfikacja technicznego przyrostu nie oznacza
+zamknięcia ROC-31/32/33 ani odbiorów ROC-34–38. Dostęp Rock_Pro nadal wymaga
+narzędzia właściwego workspace lub zalogowanej przeglądarki.

@@ -264,7 +264,7 @@ def dispatch(name, arguments):
         return getattr(handle_decision_service,name)(**arguments)
     revision_keys={
         'save_material_plan':{'plan_id','project_ids','sheets','technology','cut_plan','supersedes_plan_id'},
-        'get_material_plan':{'plan_id'},'start_material_plan':{'plan_id','expected_revision'},
+        'get_material_plan':{'plan_id'},'list_material_plans':{'limit','after_plan_id'},'start_material_plan':{'plan_id','expected_revision'},
         'record_material_progress':{'plan_id','event_id','event','expected_revision'},
         'compare_material_plans':{'old_plan_id','new_plan_id'},
     }
