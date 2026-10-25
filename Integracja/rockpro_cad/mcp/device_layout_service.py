@@ -123,9 +123,10 @@ def preview_bound_device_layout(binding,spec):
     return result|dict(device_binding=binding,device_source_info=summary)
 
 
-def preview_catalog_layouts(catalog_id,spec,constraints):
+def preview_catalog_layouts(catalog_id,spec,constraints,expected_device_revision=None):
     if not isinstance(spec,dict):raise ValueError('Layout spec required')
     data=catalog.get_device_record(catalog_id)
+    if expected_device_revision is not None and (type(expected_device_revision) is not int or expected_device_revision!=data['revision']):raise ValueError('DEVICE_REVISION_CONFLICT: reload the catalog and compare source data')
     binding=dict(catalog_id=catalog_id,device_revision=data['revision'],record_sha256=data['record_sha256'],constraints=_constraints(constraints))
     proposals=preview_device_layouts(data['record'],{k:v for k,v in spec.items() if k not in ('x','y','z')},**constraints)
     return proposals|dict(device_binding=binding,device_source_info={k:v for k,v in data.items() if k!='record'})

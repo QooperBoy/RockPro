@@ -38,6 +38,7 @@ Onboarding ROC-1–4 nie należy do projektu CAD. ROC-5–10 to epiki. ROC-15/43
 | ROC-24 | Filtry/ranking i evaluator benchmarku PASS; pełny historyczny odbiór zablokowany etykietami | 5 testów, harness PASS 20261024T214444139483Z; rzeczywista trafność historyczna NOT RUN, brak zamrożonego oznaczonego zbioru. docs/FAMILY_RECOMMENDATIONS.md. |
 | ROC-25 | Backend wariantów i kontroli wyjmowania PASS; harness PASS 20261024T214830686049Z | Do 3 odrębnych układów, jawne orientacje/kierunki, AABB toru +Z, blokada niepotwierdzonych danych dla wydania. 5 testów PASS, 2 propozycje rzeczywistego rekordu Epson. Pełny UI nowej ścieżki NOT RUN. docs/DEVICE_LAYOUT_VARIANTS.md. |
 | ROC-25 dalszy przyrost | Źródło urządzenia przypięte do wersji układu; backend PASS | 9 testów i pełny harness PASS 20261025T080355557794Z. CAS źródła/układu w jednej transakcji, chronione XYZ, jawne odłączenie, dezaktualizacja etapów i odmowa starego CAD; kopia powstała w wyścigu zachowana bez rejestracji. Następny krok: katalog/propozycje w WinForms i edycja ze źródłem. |
+| ROC-25 WinForms | Wybór katalogu → do 3 propozycji → edycja ze źródłem PASS | Brak automatycznego wyboru/zapisu, XYZ chronione, jawne odłączenie, zachowanie starego CAS i pól po konflikcie. Pełny harness/build/UI PL/EN 100/150 PASS 20261025T083832608703Z; dodatkowy backend 10/10. Naprawiony wątek WinForms w obu oknach. Host/nowa DLL i natywne wnętrze NOT RUN. |
 | ROC-26 | Bramka propozycji z budżetami i logami PASS; harness PASS 20261024T215341335976Z | agent_server.py ma statyczną allowlistę bez zapisów/zgód/CAD. Czas rzeczywisty, tokeny/koszt jawnie niedostępne. Zewnętrzny model/pilotaż H0–H6 NOT RUN. configure.py zmienione w źródle; istniejące mcp-config.local.json przepięte wyłącznie na agent_server.py po zachowaniu kopii, bez resetu demo. docs/AGENT_RUN_POLICY.md. |
 | ROC-27 | Audyt lokalny i dokumentacja producenta wykonane; próba produkcyjna zablokowana dostępem | WoodLAB PLAN nie znaleziono w lokalnych instalacjach. Dokumentowany ASCII/Excel, resztki, rzaz i grain; preferowany istniejący PLAN po próbie na stanowisku. Technologia rzeczywista null/nieznana. docs/MATERIAL_INTEGRATION_AUDIT.md. |
 | ROC-28 | Indeks źródeł i macierz braków gotowe; pięć zakończonych zleceń NOT RUN | docs/CUTTING_BOM_IMPORT.md. Brak kompletnych cen, rzeczywistego rozkroju i kosztów; nie zastępować pięcioma kartami SQLite. |
@@ -54,9 +55,23 @@ Onboarding ROC-1–4 nie należy do projektu CAD. ROC-5–10 to epiki. ROC-15/43
 
 ## Następna czynność
 
-ROC-18/23 Done w Linear. ROC-21/24/25/26/27/28/29/30/31/32/33/37 mają zapisany przyrost i In Progress po reload (zrzuty/AX w raporty nadrzędnego workspace). ROC-40: odsadzenia, zapis decyzji i ekran ukończone w tym przyroście; pełny harness/build/UI PASS 20261025T071930707045Z, dodatkowy UI-only PASS w handle-ui/ui-checks-current.log. Natywny proof offsetu PASS w handle-offset-native-01. Nocny harness 20261024T224305666132Z nie ma końcowego raportu, nie zaliczać go jako pełnego PASS. Pozostałość izolowanego testu przeniesiona z parts/tmpt6n079zc do ignorowanego artifacts/overnight-20261024/interrupted-parts-fixture-tmpt6n079zc. Następne: aktualizacja Linear ROC-40 (brak obecnie narzędzia przeglądarki; konektor wcześniej widział inne workspace), pełne podłączenie guardu do wykonawcy i kolejka ROC-19/20/22 oraz możliwe przygotowania 39/41/44. Prace materiałowe są w commitach 988fa6d/79627c1/08a528e/557b221, odtworzenie snapshotu w 0f757d7. Pilotaże/odbiór konstruktora pozostają jawnie otwarte. Po każdym sprawdzonym przyroście
-uzupełnić ten dziennik, dowody i commit. Pełny zakres zakończony tylko wtedy,
-gdy istnieją dowody dla kryteriów zadania; blokery to osobna lista na rano.
+ROC-18/23 Done w Linear. Dotychczasowe przyrosty ROC-21/24/25/26/27/28/29/30/31/32/33/37
+zapisano w Linear wcześniej. Nowe dc00210 (pomiar/świeżość H7159), 025ddaf
+(powiązanie urządzenia z układem) i bieżący przyrost WinForms są lokalne;
+aktualizacja Linear oczekuje na dostęp Rock_Pro. Konektor ponownie zwrócił
+wyłącznie MOD; narzędzie zalogowanej przeglądarki jest niedostępne.
+
+Bieżący backend/build/UI PASS 20261025T083832608703Z. Dodatkowy test CAS katalogu
+PASS 10/10. Host PID 20328 uruchomiony raz, brak dostępnego COM; próba native-01
+zatrzymana przed otwarciem dokumentu. Nie uruchamiać kolejnych instancji
+ani nie rejestrować DLL bez rozpoznania hosta. Native offset H7159 z wcześniejszego
+przyrostu nadal jest dowodem historycznym, nie pomiarem SDK nowego formularza.
+
+Następne niezależne prace: integracja źródłowych propozycji z ograniczonym
+klientem AI ROC-26 oraz brakujące przepływy ROC-19/20/22. Pełne natywne dowody
+wymagają działającego hosta; pilotaże/odbiór konstruktora pozostają otwarte.
+Po każdym sprawdzonym przyroście uzupełniać dowody i commit. Nie zaliczać
+nieukończonych przebiegów harnessu ani odbiorów bez dowodów.
 
 
 Dodatkowy FIX_FIRST ROC-20 zakończony: catalog_native cleanup ma potwierdzony

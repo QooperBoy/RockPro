@@ -170,7 +170,7 @@ SCHEMAS += [
  schema('list_device_records','Page through current device variants with units and confirmation statuses; variants remain distinct',
         {'limit':{'type':'integer','minimum':1,'maximum':100},'after_catalog_id':S},readonly=True),
  schema('preview_catalog_layouts','Propose up to three constrained layouts from a saved catalog revision, retaining its source binding',
-        {'catalog_id':S,'spec':layout_spec,'constraints':{'type':'object'}},['catalog_id','spec','constraints'],True),
+        {'catalog_id':S,'spec':layout_spec,'constraints':{'type':'object'},'expected_device_revision':{'type':'integer','minimum':1}},['catalog_id','spec','constraints'],True),
  schema('preview_bound_device_layout','Recheck a constructor-edited layout against pinned current device data, allowed choices and removal access',
         {'binding':{'type':'object'},'spec':layout_spec},['binding','spec'],True),
  schema('save_bound_device_layout','Atomically save the edited layout and immutable catalog source binding with independent source/layout checks; draft only',

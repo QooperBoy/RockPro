@@ -24,10 +24,9 @@ production_approved. Nie ma automatycznego zapisu ani wyboru.
 
 Konstruktor może zmienić spec/orientację w istniejącym konfiguratorze lub
 odrzucić wszystkie propozycje. Zapis wybranego/zmienionego spec korzysta ze
-zwykłego save_layout z odczytanym expected_revision. Nie odświeżamy rewizji
-w tle. Nowe ograniczenia są dostępne w MCP; aktualnie otwarta DLL nie została
-przeładowana i jej starszy przycisk minimum 18 kombinacji nie udaje nowego
-sprawdzenia dostępu. Odbiór nowej pełnej ścieżki UI pozostaje osobnym krokiem.
+źródłowego save_bound_device_layout z odczytanym expected_revision (przyrost
+25.10 opisany poniżej zastępuje dawny zapis bez powiązania). Nie odświeżamy
+rewizji w tle. Starsza załadowana DLL nie otrzymuje nowych funkcji przez sam build.
 
 PASS w pięciu testach: limit trzech / pojedynczy wariant, jawne dozwolone
 orientacje i gabaryty, blokada piętrowania i niewystarczającego luzu chwytu,
@@ -66,6 +65,51 @@ Zapis nie stanowi zgody produkcyjnej ani nie oznacza potwierdzenia przez produce
 PASS: 9 testów transakcji/CAS, jednostek i źródeł, dopuszczonych wyborów,
 niepotwierdzonych danych, jawnego odłączenia i odmowy rozpoczęcia CAD.
 Pełny harness PASS: artifacts/verification/20261025T080355557794Z/results.json.
-Nowa ścieżka UI i natywne wnętrze pozostają do podłączenia/odbioru.
+UI opisano w kolejnym przyroście; natywne wnętrze pozostaje do implementacji/odbioru.
 
 Pełny harness po przyroście: PASS, artifacts/verification/20261024T214830686049Z/results.json.
+
+
+## 25.10 — wybór i edycja w WinForms
+
+W panelu Układ urządzeń przycisk „Wybierz wariant z katalogu” otwiera
+DeviceVariantsForm. Formularz czyta tę samą SQLite przez MCP, pokazuje wariant,
+jednostki, potwierdzenie każdego wymiaru i wersję urządzenia. Źródła wymiarów
+można przeczytać w osobnym oknie. Kolejne strony katalogu wczytuje się jawnie.
+
+Konstruktor ustawia liczbę, luzy, przegrody, pokrywę, dozwolone orientacje
+oraz osie i opcjonalny limit gabarytu. Do trzech propozycji trafia do tabeli;
+wybrany wiersz pokazuje obrysy w istniejącym podglądzie. Nic nie wybiera się
+ani nie zapisuje automatycznie. Zmiana wejść usuwa poprzednie propozycje.
+Kontrola wyjmowania dotyczy obrysów +Z przy otwartej lub zdjętej pokrywie;
+nie obejmuje zawiasów, przewodów, pianek, okuć ani wytrzymałości.
+
+Wybrana propozycja otwiera LayoutForm do edycji. XYZ są zablokowane przy
+powiązaniu ze źródłem; pozostałe pola można zmienić i ponownie sprawdzić.
+Zapis i zastosowanie do kopii używają source-bound backendu. Ręczne XYZ
+wymagają przycisku „Odłącz źródło urządzenia” i nowej wersji historii.
+Stara wersja zachowuje źródło. Ranking uwzględnia jedynie dozwolone warianty.
+
+Numer wersji układu jest pobierany przed wyborem propozycji i pozostaje
+niezmieniony przy otwieraniu edytora, nawet jeśli ktoś w międzyczasie zapisze
+nową wersję. Zapis zgłasza konflikt i zachowuje pola; nie ponawia się w tle.
+Podobnie expected_device_revision chroni przed obliczeniem na innym rekordzie
+niż ten wyświetlony w katalogu. Dopiero jawne wczytanie pozwala wybrać nowe dane.
+
+Naprawiono potwierdzony błąd asynchroniczny: kontynuacje obsługi tych dwóch
+okien muszą wracać na wątek WinForms, także przy osadzeniu w natywnym hoście.
+Testy mają włączone wykrywanie dostępu do kontrolek z innego wątku.
+
+PASS: pełny harness, build DLL i testy okien PL/EN przy skali 100/150:
+artifacts/verification/20261025T083832608703Z/results.json.
+Dodatkowy test backendu po tej regresji: 10/10 test_device_layout_service,
+w tym odmowa podmiany wyświetlonej wersji katalogu. Zrzuty prób izolowanych:
+artifacts/device-layout-ui-20261025/catalog-{pl,en}-{100,150}.png.
+Fixture qa/fixtures/device-layout-ui.json jest jawnie syntetyczny, bez bazy
+klienta i bez zgody produkcyjnej. Mockowane okno nie dowodzi połączenia z CAD.
+
+NOT RUN: nowy formularz w rzeczywistym hoście i natywne wnętrze. DLL zbudowana,
+niezarejestrowana i niezaładowana; host nie udostępnił COM (0x800401E3),
+jak odnotowano przy ROC-40. Aktualizacja Linear czeka na dostęp do Rock_Pro;
+obecnie konektor widzi tylko MOD, a narzędzie zalogowanej przeglądarki nie jest
+dostępne. Całego ROC-25 nie oznaczono Done.

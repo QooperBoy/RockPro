@@ -243,7 +243,7 @@ def create_snapshot(project_id,label="Snapshot",note=""):
 
 def dispatch(name, arguments):
     device_layout_keys={
-        'preview_catalog_layouts':{'catalog_id','spec','constraints'},
+        'preview_catalog_layouts':{'catalog_id','spec','constraints','expected_device_revision'},
         'preview_bound_device_layout':{'binding','spec'},
         'save_bound_device_layout':{'project_id','spec','binding','expected_revision','actor','change_source'},
         'unlink_layout_device':{'project_id','expected_revision','actor','change_source'},

@@ -114,5 +114,19 @@ class BoundDeviceLayoutTests(unittest.TestCase):
         records=first['devices']+second['devices'];self.assertEqual(len({r['catalog_id'] for r in records}),2)
         self.assertEqual([r['revision'] for r in records if r['catalog_id']==self.device['catalog_id']],[2])
 
+    def test_catalog_preview_does_not_silently_replace_the_selected_source_revision(self):
+        request=dict(catalog_id=self.device['catalog_id'],spec=self.base,
+                     constraints=self.constraints,expected_device_revision=1)
+        result=worker.dispatch('preview_catalog_layouts',request)
+        self.assertEqual(result['device_binding']['device_revision'],1)
+        self.change_device()
+        with self.assertRaisesRegex(ValueError,'DEVICE_REVISION_CONFLICT'):
+            worker.dispatch('preview_catalog_layouts',request)
+        self.assertFalse(layout.get_layout(self.project)['saved'])
+        request['expected_device_revision']=2
+        updated=worker.dispatch('preview_catalog_layouts',request)
+        self.assertEqual(updated['device_binding']['device_revision'],2)
+        self.assertNotEqual(updated['device_binding']['record_sha256'],result['device_binding']['record_sha256'])
+
 
 if __name__=='__main__':unittest.main()
