@@ -237,7 +237,8 @@ def dispatch(name, arguments):
     handle_decision_keys={
         'preview_handle_reconciliation':{'evidence','choice','prior_state'},
         'get_handle_reconciliation':{'project_id'},
-        'save_handle_reconciliation':{'project_id','evidence','choice','expected_revision','expected_project_revision','review_sha256','decision_reference','prior_state'},
+        'measure_handle_reconciliation':{'project_id','expected_revision','expected_project_revision','target_values'},
+        'save_handle_reconciliation':{'project_id','evidence','choice','expected_revision','expected_project_revision','review_sha256','decision_reference','prior_state','measurement_id'},
     }
     if name in handle_decision_keys:
         if not isinstance(arguments,dict) or set(arguments)-handle_decision_keys[name]:raise ValueError('Invalid handle decision tool argument')

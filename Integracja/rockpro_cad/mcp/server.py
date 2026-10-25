@@ -155,11 +155,13 @@ SCHEMAS += [
 HANDLE_EVIDENCE={'type':'object'}
 HANDLE_CHOICE={'enum':['preserve_absolute','restore_rule','adopt_offset','leave_manual']}
 SCHEMAS += [
+ schema('measure_handle_reconciliation','Observe bound H7159 in the already-open project source, preserving active context; persist an observation token, no CAD edits',
+        {'project_id':S,'expected_revision':REV,'expected_project_revision':REV,'target_values':{'type':'object'}},['project_id','expected_revision','expected_project_revision']),
  schema('preview_handle_reconciliation','Preview explicit whole-group H7159 decisions and fit at new anchors; evidence is a caller claim until native capture verifies it',
         {'evidence':HANDLE_EVIDENCE,'choice':HANDLE_CHOICE,'prior_state':{'type':'object'}},['evidence'],True),
  schema('get_handle_reconciliation','Read the latest durable constructor decision for bound handles; not full-case approval',{'project_id':S},['project_id'],True),
  schema('save_handle_reconciliation','Record an operator decision with review hash and independent project/decision CAS; does not edit CAD',
-        {'project_id':S,'evidence':HANDLE_EVIDENCE,'choice':HANDLE_CHOICE,'prior_state':{'type':'object'},'expected_revision':REV,'expected_project_revision':REV,'review_sha256':S,'decision_reference':S},
+        {'project_id':S,'evidence':HANDLE_EVIDENCE,'choice':HANDLE_CHOICE,'prior_state':{'type':'object'},'expected_revision':REV,'expected_project_revision':REV,'review_sha256':S,'decision_reference':S,'measurement_id':S},
         ['project_id','evidence','choice','expected_revision','expected_project_revision','review_sha256','decision_reference']),
 ]
 

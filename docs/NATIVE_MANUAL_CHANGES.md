@@ -143,3 +143,38 @@ odrębnej bazie QA → wyrażenia kotew → zapis/otwarcie → zmiana L/D/B → 
 zapis/otwarcie. Źródło bez zmian, własne dokumenty zamknięte, kontekst użytkownika
 zachowany. Wynik nie jest decyzją konstruktora ani pełnym odbiorem B/C i ROC-40.
 Powtarzalny runner: scripts/prove_handle_offset_decision.py; bez --native tylko plan.
+
+## 25.10 — pomiar SDK w oknie decyzji
+
+Dodano „Zmierz uchwyty z IronCAD” i `measure_handle_reconciliation`. Operacja
+używa bazy i mapy stabilnych ID z wcześniejszej zapisanej decyzji; nie zgaduje
+pierwszego powiązania i nie wyszukuje podobnego modelu po nazwie.
+`core_case/handle_measurement.py` dołącza wyłącznie do już otwartego pliku o
+pełnej ścieżce i zgodnym GUID. Nie uruchamia, otwiera, zapisuje, zamyka ani
+aktywuje dokumentów. Zbiera pozycje dwukrotnie i odrzuca zmianę w trakcie.
+Flaga niezapisanych zmian jest zachowana i pokazana w oknie.
+
+Pomiar dostaje niezmienny identyfikator w SQLite, związany z kartą, rewizją
+decyzji, bazą, pozycjami i hashem pliku. Zapis z tym identyfikatorem ponownie
+mierzy scenę. Zmiana pozycji, danych pomiaru, pliku lub rewizji blokuje zapis;
+UI nie ponawia operacji ani nie odświeża tokenów. Nieaktualny pomiar wymaga
+ponownego użycia przycisku. Zapisy offline nadal są oświadczeniem operatora,
+bez flagi potwierdzonego odczytu SDK. Żaden zapis decyzji nie stosuje jej w CAD.
+
+Fingerprint pomiaru zaokrągla translację do 0,001 mm i obrót do 1e-9, aby
+szum COM nie udawał edycji. To token świeżości obserwacji, nie podpis geometrii.
+Nie blokuje człowieka przed dalszą edycją; przyszły wykonawca nadal musi zrobić
+kontrolę bezpośrednio przed zastosowaniem. Zakres pozostaje ograniczony do H7159.
+
+PASS: 5 testów czytnika, 7 SQLite/MCP, pełny harness/build/UI
+artifacts/verification/20261025T074755934057Z/results.json. Okna PL/EN 100/150
+obejmują brak automatycznej decyzji, przeniesienie identyfikatora pomiaru,
+odmowę starego odczytu, brak ponowienia i unieważnienie dowodu po błędzie.
+
+NOT RUN: świeża próba tej ścieżki w hoście. Runner
+scripts/prove_handle_live_measurement.py przygotował wyłącznie odrębną kopię
+modelu/bazy w artifacts/handle-live-measurement-20261025/native-01. Próba
+zatrzymała się przy dołączeniu do aplikacji (GetActiveObject, 0x800401E3),
+przed otwarciem dokumentu. Uruchomiony pojedynczy host nie udostępnił COM;
+nie powielano instancji ani rejestracji. Wcześniejszy natywny PASS odsadzenia
+nie zastępuje tego dowodu. Nowa DLL nie została wdrożona do hosta.

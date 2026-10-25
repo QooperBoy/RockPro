@@ -8,6 +8,7 @@ import project_store as store
 import worker
 import handle_decision_service as service
 from rockpro_cad.core_case.test_native_changes import four_handles
+from rockpro_cad.core_case.handle_measurement import snapshot_fingerprint
 
 
 class HandleDecisionServiceTests(unittest.TestCase):
@@ -53,6 +54,48 @@ class HandleDecisionServiceTests(unittest.TestCase):
         (self.root/'source.ics').write_bytes(b'concurrent saved edit')
         with self.assertRaisesRegex(ValueError,'SOURCE_CHANGED'):self.save()
         self.assertEqual(service.get_handle_reconciliation(self.project)['revision'],0)
+
+    def measurement(self):
+        return dict(snapshot=self.evidence['current'],source_sha256=self.evidence['observed_source_sha256'],
+            snapshot_sha256=snapshot_fingerprint(self.evidence['current']),
+            provenance=dict(modified=True,file_guid=self.evidence['current']['file_guid']),native_read_only=True)
+
+    def test_native_measurement_token_is_bound_and_rechecked_before_save(self):
+        self.save()
+        with patch.object(service,'capture_handle_measurement',return_value=self.measurement()) as reader:
+            measured=service.measure_handle_reconciliation(self.project,1,1)
+            args=dict(project_id=self.project,evidence=measured['evidence'],choice='adopt_offset',expected_revision=1,
+                expected_project_revision=1,decision_reference='QA-ONLY',prior_state=measured['prior_state'],measurement_id=measured['measurement_id'])
+            preview=service.preview_handle_reconciliation(args['evidence'],args['choice'],args['prior_state'])
+            saved=service.save_handle_reconciliation(**args,review_sha256=preview['review_sha256'])
+        self.assertEqual(reader.call_count,2);self.assertTrue(saved['result']['native_capture_verified_by_service'])
+        self.assertEqual(saved['revision'],2);self.assertTrue(measured['document_modified']);self.assertFalse(saved['cad_changed'])
+
+    def test_stale_native_measurement_and_changed_ticket_data_do_not_save(self):
+        self.save()
+        with patch.object(service,'capture_handle_measurement',return_value=self.measurement()):
+            measured=service.measure_handle_reconciliation(self.project,1,1)
+        args=dict(project_id=self.project,evidence=measured['evidence'],choice='adopt_offset',expected_revision=1,
+            expected_project_revision=1,decision_reference='QA-ONLY',prior_state=measured['prior_state'],measurement_id=measured['measurement_id'])
+        preview=service.preview_handle_reconciliation(args['evidence'],args['choice'],args['prior_state'])
+        changed=self.measurement();changed['snapshot_sha256']='f'*64
+        with patch.object(service,'capture_handle_measurement',return_value=changed):
+            with self.assertRaisesRegex(ValueError,'MEASUREMENT_STALE'):
+                service.save_handle_reconciliation(**args,review_sha256=preview['review_sha256'])
+        evidence=copy.deepcopy(args['evidence']);evidence['target_values']['RP_Depth']=550
+        preview=service.preview_handle_reconciliation(evidence,args['choice'],args['prior_state'])
+        with self.assertRaisesRegex(ValueError,'MEASUREMENT_BINDING_CONFLICT'):
+            service.save_handle_reconciliation(**(args|dict(evidence=evidence)),review_sha256=preview['review_sha256'])
+        self.assertEqual(service.get_handle_reconciliation(self.project)['revision'],1)
+
+    def test_native_measurement_does_not_invent_a_baseline_or_refresh_cas(self):
+        with patch.object(service,'capture_handle_measurement') as reader:
+            with self.assertRaisesRegex(ValueError,'BASELINE_REQUIRED'):service.measure_handle_reconciliation(self.project,0,1)
+            reader.assert_not_called()
+        self.save()
+        with patch.object(service,'capture_handle_measurement') as reader:
+            with self.assertRaisesRegex(ValueError,'REVISION_CONFLICT'):service.measure_handle_reconciliation(self.project,0,1)
+            reader.assert_not_called()
 
 
 if __name__=='__main__':unittest.main()
