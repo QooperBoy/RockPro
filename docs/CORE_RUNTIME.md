@@ -136,3 +136,20 @@ artifacts/verification/20261025T084838344110Z/results.json.
 To izolowane próby formularzy z backendem testowym, bez wywołania natywnego CAD.
 Nowej DLL nie rejestrowano i nie załadowano. Native host pozostaje niedostępny;
 pełna akceptacja konstruktora i wydania ROC-22 pozostaje NOT RUN.
+
+
+## 25.10 — kontynuacje panelu głównego (ROC-20/22)
+
+Ten sam błąd bez zastanego kontekstu hosta odtworzono osobno w RockProPanel.Run:
+artifacts/verification/20261025T094747597593Z/ui-checks.log, FAIL dostępu
+między wątkami. Naprawa wymaga wątku właściciela i ustawia kontekst WinForms
+przed rozpoczęciem async pracy. Nie zmienia backendu, CAS, akceptacji ani danych.
+
+Test tworzy uchwyty kontrolek bez pokazywania panelu, żeby Shown nie połączył
+się z prawdziwą bazą. Kontrolowane zakończenie pracy na wątku roboczym jest
+zwalniane dopiero po zawieszeniu await; eliminuje przypadkowy sukces szybkiego
+zadania. Wykrywanie dostępu między wątkami pozostaje włączone. Sprawdzane są
+wynik, zakończenie stanu busy, odblokowanie akcji i zachowanie niezapisanej uwagi.
+Bez wywołań MCP, SQLite i CAD. PASS pełnego harnessu/build/UI:
+artifacts/verification/20261025T094844067175Z/results.json.
+To nie jest dowód nowej DLL załadowanej w IronCAD; native nadal NOT RUN.

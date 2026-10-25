@@ -103,3 +103,17 @@ Następny konkretny checkpoint: podobny Run w RockProPanel; potwierdzić
 zachowanie po async bez kontekstu hosta na izolowanej próbie, przed ewentualną
 zmianą. Pozostałe okna mają już odpowiedni guard. Nie powtarzać zakończonych
 przyrostów ROC-25/26/21 ani testów natywnych przy niezmienionym blokerze COM.
+
+
+Heartbeat 25.10 09:46Z: snapshot obecny, checkout był czysty na 09e1d43.
+RockProPanel.Run: potwierdzony błąd między wątkami, naprawa i pełny
+harness/build/UI PASS 20261025T094844067175Z. Szczegóły CORE_RUNTIME.md.
+Zamknięto ten techniczny checkpoint wszystkich głównych okien; nie oznacza
+to odbioru ROC-22 ani nowego wdrożenia. Nie powtarzać ukończonych sprawdzeń.
+
+Następny niezablokowany przyrost: ROC-31 — udostępnić istniejący rejestr
+magazynu i historię operatorowi w źródłowym UI, używając tych samych narzędzi
+MCP/SQLite. Rzeczywiste wymagania zachowane w raporty/ROC-31_BEFORE_NIGHT_UPDATE.txt
+workspace nadrzędnego, kontrakt w INVENTORY_CONTRACT.md. Nie wprowadzać
+fikcyjnych stanów klienta; próby wyłącznie na izolowanych danych. Produkcyjny
+pilot pozostaje zablokowany brakującym BOM/technologią i odbiorem magazynu.

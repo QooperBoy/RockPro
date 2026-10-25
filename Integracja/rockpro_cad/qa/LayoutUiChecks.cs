@@ -60,10 +60,38 @@ class LayoutUiChecks {
   Console.WriteLine("PASS: revision conflicts classify, preserve draft/token, show three-way values, capture independent row baselines");
   Console.WriteLine("PASS: depth buffer in both orders; number and choice wheel suppression; form scrolling");
   LanguageChecks();
+  PanelOwnerThreadChecks();
   CasePlanUiChecks.Run();
   HandleDecisionUiChecks.Run();
   DeviceVariantsUiChecks.Run();
   }finally{UiText.SetLanguage(previousLanguage,false);}
+ }
+ static void PanelOwnerThreadChecks(){
+  var flags=BindingFlags.Instance|BindingFlags.NonPublic;
+  var previousContext=System.Threading.SynchronizationContext.Current;bool previousCheck=Control.CheckForIllegalCrossThreadCalls;
+  Control.CheckForIllegalCrossThreadCalls=true;
+  try{using(var panel=new RockProPanel(null)){
+   // Do not show the real panel: Shown connects to the actual project database.
+   foreach(string name in new[]{"nav","body","chooser","refresh","language","progress","bottom","connection","summary"}){
+    var control=(Control)typeof(RockProPanel).GetField(name,flags).GetValue(panel);IntPtr handle=control.Handle;
+   }
+   var summary=(Label)typeof(RockProPanel).GetField("summary",flags).GetValue(panel);
+   var notes=(TextBox)typeof(RockProPanel).GetField("notes",flags).GetValue(panel);notes.Text="UI-only unsaved note";
+   int calls=0,owner=System.Threading.Thread.CurrentThread.ManagedThreadId;
+   var completion=new System.Threading.Tasks.TaskCompletionSource<bool>();
+   System.Threading.SynchronizationContext.SetSynchronizationContext(null);
+   var work=new Func<System.Threading.Tasks.Task>(async delegate{
+    await completion.Task;
+    summary.Text="UI-ONLY-NO-BACKEND";
+   });
+   var task=(System.Threading.Tasks.Task)typeof(RockProPanel).GetMethod("Run",flags).Invoke(panel,new object[]{"UI-ONLY",work});
+   // Release only after Run has suspended, from a worker rather than the owner.
+   var worker=System.Threading.Tasks.Task.Run(delegate{if(System.Threading.Thread.CurrentThread.ManagedThreadId==owner)throw new Exception("Panel work blocked the UI thread");calls++;completion.SetResult(true);});
+   var watch=System.Diagnostics.Stopwatch.StartNew();while(!task.IsCompleted){if(watch.ElapsedMilliseconds>15000)throw new TimeoutException("Panel UI operation did not finish");Application.DoEvents();System.Threading.Thread.Sleep(5);}task.GetAwaiter().GetResult();
+   worker.GetAwaiter().GetResult();if(calls!=1||(bool)typeof(RockProPanel).GetField("busy",flags).GetValue(panel)||summary.Text!="UI-ONLY-NO-BACKEND"||notes.Text!="UI-only unsaved note")throw new Exception("Panel lost the result/draft or retried its work");
+   foreach(string name in new[]{"nav","body","chooser","refresh","language"})if(!((Control)typeof(RockProPanel).GetField(name,flags).GetValue(panel)).Enabled)throw new Exception("Panel stayed busy: "+name);
+  }}finally{System.Threading.SynchronizationContext.SetSynchronizationContext(previousContext);Control.CheckForIllegalCrossThreadCalls=previousCheck;}
+  Console.WriteLine("PASS: main panel owner-thread continuation without ambient WinForms context; draft retained, no backend or CAD call");
  }
  static void LayoutLanguageChecks(){
   var flags=BindingFlags.Instance|BindingFlags.NonPublic;
