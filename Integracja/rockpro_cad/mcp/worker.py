@@ -234,6 +234,15 @@ def create_snapshot(project_id,label="Snapshot",note=""):
 
 
 def dispatch(name, arguments):
+    handle_decision_keys={
+        'preview_handle_reconciliation':{'evidence','choice','prior_state'},
+        'get_handle_reconciliation':{'project_id'},
+        'save_handle_reconciliation':{'project_id','evidence','choice','expected_revision','expected_project_revision','review_sha256','decision_reference','prior_state'},
+    }
+    if name in handle_decision_keys:
+        if not isinstance(arguments,dict) or set(arguments)-handle_decision_keys[name]:raise ValueError('Invalid handle decision tool argument')
+        import handle_decision_service
+        return getattr(handle_decision_service,name)(**arguments)
     revision_keys={
         'save_material_plan':{'plan_id','project_ids','sheets','technology','cut_plan','supersedes_plan_id'},
         'get_material_plan':{'plan_id'},'start_material_plan':{'plan_id','expected_revision'},

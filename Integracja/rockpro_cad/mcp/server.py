@@ -152,6 +152,18 @@ SCHEMAS += [
 ]
 
 
+HANDLE_EVIDENCE={'type':'object'}
+HANDLE_CHOICE={'enum':['preserve_absolute','restore_rule','adopt_offset','leave_manual']}
+SCHEMAS += [
+ schema('preview_handle_reconciliation','Preview explicit whole-group H7159 decisions and fit at new anchors; evidence is a caller claim until native capture verifies it',
+        {'evidence':HANDLE_EVIDENCE,'choice':HANDLE_CHOICE,'prior_state':{'type':'object'}},['evidence'],True),
+ schema('get_handle_reconciliation','Read the latest durable constructor decision for bound handles; not full-case approval',{'project_id':S},['project_id'],True),
+ schema('save_handle_reconciliation','Record an operator decision with review hash and independent project/decision CAS; does not edit CAD',
+        {'project_id':S,'evidence':HANDLE_EVIDENCE,'choice':HANDLE_CHOICE,'prior_state':{'type':'object'},'expected_revision':REV,'expected_project_revision':REV,'review_sha256':S,'decision_reference':S},
+        ['project_id','evidence','choice','expected_revision','expected_project_revision','review_sha256','decision_reference']),
+]
+
+
 def handle(request):
     ident = request.get("id")
     if ident is None:

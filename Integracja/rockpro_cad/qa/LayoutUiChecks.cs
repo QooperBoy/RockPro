@@ -61,6 +61,7 @@ class LayoutUiChecks {
   Console.WriteLine("PASS: depth buffer in both orders; number and choice wheel suppression; form scrolling");
   LanguageChecks();
   CasePlanUiChecks.Run();
+  HandleDecisionUiChecks.Run();
   }finally{UiText.SetLanguage(previousLanguage,false);}
  }
  static void LayoutLanguageChecks(){

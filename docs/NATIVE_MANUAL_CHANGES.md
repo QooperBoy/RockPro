@@ -103,3 +103,43 @@ handles/right/2 powoduje konflikt przed i po zapisie/otwarciu. Stan ręczny
 zachowany, widoczny prototyp i aktywny kontekst bez zmian, własne dokumenty
 zamknięte. Dla nowej szerokości powstaje tylko podgląd kotew, bez zapisu CAD.
 PASS pełny harness: artifacts/verification/20261024T184304320032Z/results.json.
+
+## 25.10 — trwałe decyzje i parametryczne odsadzenie H7159
+
+`core_case/handle_decisions.py` porównuje bazę, aktualny zapisany pomiar oraz
+nowe kotwy całej przypiętej grupy. Dostępne decyzje: zachowanie bezwzględnych
+pozycji, powrót do reguły, przyjęcie zmierzonych odsadzeń albo pozostawienie
+elementu ręcznego. Nie ma domyślnej akceptacji konfliktu. Przyjęte odsadzenie
+jest dodawane do wyrażenia kotwy, a nie zamieniane na nieruchomą współrzędną.
+
+Kontrola odmówi odsunięcia od płaszczyzny montażu, braku marginesu lub zbyt
+małego rozstawu. Obrót wymaga osobnej kontroli; wykonawca translacji nie resetuje
+obróconego ręcznie uchwytu. Element pozostawiony ręczny nadal wymaga zatwierdzonej
+kotwy przed pełnym odbiorem. Stan nie obejmuje nieznanych dodatków ani innych rodzin.
+
+`mcp/handle_decision_service.py` zapisuje niezmienne wersje decyzji i dowody w
+tej samej SQLite co UI. Wymaga hasha podglądu, niezależnych rewizji karty/decyzji,
+referencji decyzji oraz zgodnego hasha zapisanego źródła. Nie odświeża tokenów
+po konflikcie. To oświadczenie operatora, nie uwierzytelniona zgoda produkcyjna.
+Narzędzie zapisu nie jest dostępne przez bramkę propozycji AI.
+
+WinForms `HandleDecisionForm` jest dostępny w źródle panelu Układ urządzeń pod
+przyciskiem „Porównaj ręczne zmiany”. Pokazuje bazowe, zmierzone i proponowane
+pozycje, wyróżnia zmianę ręczną i wymaga jawnej decyzji oraz uwagi konstruktora.
+Wczytuje zapisany pomiar JSON lub wcześniejszą decyzję. Nie jest to bieżący odczyt
+otwartej sceny; zapis nie wykonuje ruchu CAD. Automatyczne zebranie pomiaru w tym
+oknie oraz pełne podłączenie do wykonawcy całej skrzyni pozostają NOT RUN.
+
+PASS: 5 testów logiki odsadzeń, 4 testy SQLite/MCP (trwałość, oba CAS, hash
+źródła/podglądu, brak uprawnień zapisu AI). PASS: pełny harness, kompilacja i
+okna PL/EN 100/150 — artifacts/verification/20261025T071930707045Z/results.json.
+Osobna kontrola okna z czterema uchwytami na obu ścianach: log i obrazy w
+artifacts/overnight-20261024/handle-ui/. Nowa DLL nie została załadowana do hosta.
+
+PASS natywny mechanizmu odsadzeń:
+artifacts/overnight-20261024/handle-offset-native-01/verification.json.
+Próba na nowej kopii zachowała ręczne 12 mm prawego uchwytu: zapis decyzji w
+odrębnej bazie QA → wyrażenia kotew → zapis/otwarcie → zmiana L/D/B → ponowny
+zapis/otwarcie. Źródło bez zmian, własne dokumenty zamknięte, kontekst użytkownika
+zachowany. Wynik nie jest decyzją konstruktora ani pełnym odbiorem B/C i ROC-40.
+Powtarzalny runner: scripts/prove_handle_offset_decision.py; bez --native tylko plan.
