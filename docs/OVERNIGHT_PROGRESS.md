@@ -34,6 +34,7 @@ Onboarding ROC-1–4 nie należy do projektu CAD. ROC-5–10 to epiki. ROC-15/43
 | ROC-20/22/19 | Implementacje i dowody istnieją, pozostają integracja pełnych okuć i odbiór | Nie zamykać całych zadań na podstawie syntetycznej próby. |
 | ROC-11–14,27–28,34–39 | Wymagania trzeba rozpatrzyć, zależne od danych/licencji/użytkownika | Nie tworzyć fikcyjnych cenników, zakupów, licencji ani odbiorów klienta. Wykonać dostępne przygotowanie techniczne, zapisać dokładne braki. |
 | ROC-21 | Pakiet rewizji i wykrywanie dezaktualizacji PASS; pełny odbiór wymaga dokumentów | release_bundle.py, 5 testów, rzeczywisty draft pakietu w artifacts/overnight-20261024/release-prototype-03. Rysunki/produkcja pending, zakupowy BOM/materiał NOT RUN. docs/REVISION_RELEASE_BUNDLE.md. |
+| ROC-21 kontrola spójności | Odmowa obcej kopii ICS i niepełnych kontroli PASS | MODEL_BINDING_MISMATCH/MODEL_COPY_COUNT, walidacja ról i niepustych unikalnych kontroli także przy odczycie. 9 testów; pełny harness PASS 20261025T084401784804Z. Istniejący pakiet sprawdzony offline i niezmieniony, nadal draft. |
 | ROC-23 | Done w Linear, potwierdzony zapis po reload; implementacja PASS | Commit 39c8479, pełny harness PASS 20261024T214134912003Z. Per-field units/source/status, warianty/null/conflict, projekt zapytania bez wysyłki. Lokalny PDF/EML i Epson odczytane. Screenshot raporty/ROC23_DONE_NOC.png w workspace nadrzędnym. |
 | ROC-24 | Filtry/ranking i evaluator benchmarku PASS; pełny historyczny odbiór zablokowany etykietami | 5 testów, harness PASS 20261024T214444139483Z; rzeczywista trafność historyczna NOT RUN, brak zamrożonego oznaczonego zbioru. docs/FAMILY_RECOMMENDATIONS.md. |
 | ROC-25 | Backend wariantów i kontroli wyjmowania PASS; harness PASS 20261024T214830686049Z | Do 3 odrębnych układów, jawne orientacje/kierunki, AABB toru +Z, blokada niepotwierdzonych danych dla wydania. 5 testów PASS, 2 propozycje rzeczywistego rekordu Epson. Pełny UI nowej ścieżki NOT RUN. docs/DEVICE_LAYOUT_VARIANTS.md. |
@@ -58,7 +59,8 @@ Onboarding ROC-1–4 nie należy do projektu CAD. ROC-5–10 to epiki. ROC-15/43
 
 ROC-18/23 Done w Linear. Dotychczasowe przyrosty ROC-21/24/25/26/27/28/29/30/31/32/33/37
 zapisano w Linear wcześniej. Nowe dc00210 (pomiar/świeżość H7159), 025ddaf
-(powiązanie urządzenia z układem) i bieżący przyrost WinForms są lokalne;
+(powiązanie urządzenia z układem), a49fde7 (WinForms), 8e9885c
+(bramka propozycji AI) i przyrost spójności ROC-21 są lokalne;
 aktualizacja Linear oczekuje na dostęp Rock_Pro. Konektor ponownie zwrócił
 wyłącznie MOD; narzędzie zalogowanej przeglądarki jest niedostępne.
 
@@ -70,7 +72,9 @@ przyrostu nadal jest dowodem historycznym, nie pomiarem SDK nowego formularza.
 
 Źródłowe propozycje są już podłączone do bramki AI ROC-26 i sprawdzone
 w pełnym harnessie 20261025T084149875582Z. Następne niezależne prace:
-spójność pakietów ROC-21 oraz brakujące przepływy ROC-19/20/22. Pełne natywne dowody
+brakujące przepływy ROC-19/20/22. Spójność pakietów ROC-21 naprawiona
+i sprawdzona w harnessie 20261025T084401784804Z; historyczny pakiet draft
+pozostał niezmieniony. Szczegóły w REVISION_RELEASE_BUNDLE.md. Pełne natywne dowody
 wymagają działającego hosta; pilotaże/odbiór konstruktora pozostają otwarte.
 Po każdym sprawdzonym przyroście uzupełniać dowody i commit. Nie zaliczać
 nieukończonych przebiegów harnessu ani odbiorów bez dowodów.

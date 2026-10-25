@@ -32,3 +32,29 @@ powstał lokalnie w artifacts/overnight-20261024/release-prototype-03; kontrola
 hashy PASS, rysunki/produkcja pending, materiał i BOM zakupowy NOT RUN.
 
 Pełny harness po wdrożeniu: PASS, artifacts/verification/20261024T213454896201Z/results.json.
+
+
+## 25.10 — kontrola spójności przy ponownym odczycie
+
+Odtworzono i naprawiono błędny wynik kontroli: podmiana model.ics wraz z nowym
+hashem wpisanym do plików manifestu mogła przejść inspect_bundle mimo innego
+model_sha256 w przypiętej rewizji. Teraz dokładnie jedna kopia ICS musi mieć
+hash zgodny z wiązaniem rewizji; rozbieżność daje MODEL_BINDING_MISMATCH,
+a więcej niż jeden model MODEL_COPY_COUNT. Pozostałe role i metadane plików
+są jawnie walidowane podczas odczytu, nie tylko przy tworzeniu pakietu.
+
+Ponowny odczyt wymaga niepustej, ograniczonej listy kontroli o unikalnych
+nazwach i statusach PASS/FAIL/NOT RUN. Pusta lista nie może dać odbioru przez
+all([]). Niejednoznaczne lub nieznane kontrole są odrzucane. Prawidłowy pakiet
+z FAIL albo NOT RUN zachowuje draft i brak ready_for_review; żaden wynik nie
+nadaje production_approved.
+
+PASS: dziewięć testów pakietu. Nowe regresje najpierw odtworzyły pięć błędnych
+asercji starego kodu, następnie przeszły po naprawie. Pełny harness PASS:
+artifacts/verification/20261025T084401784804Z/results.json.
+Ponownie sprawdzono istniejący zapisany pakiet rzeczywistego prototypu:
+artifacts/release-integrity-20261025/inspection.json. Wszystkie pliki pozostały
+bitowo identyczne; pakiet jest draft, rysunki/produkcja pending, zakupowy BOM
+i materiał NOT RUN. To kontrola dyskowa, bez ponownej operacji natywnego CAD.
+Hashy nie traktujemy jako podpisu ani autoryzacji konstruktora. Historycznych
+pakietów nie przepisano i nie oznaczono całego ROC-21 Done.

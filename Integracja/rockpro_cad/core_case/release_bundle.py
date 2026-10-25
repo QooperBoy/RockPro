@@ -33,15 +33,24 @@ def _binding(binding):
     return dict(binding)
 
 
+def _checks(checks):
+    if not isinstance(checks,list) or not 1<=len(checks)<=100:raise ValueError('Explicit bounded check results required')
+    names=set()
+    for check in checks:
+        if (not isinstance(check,dict) or set(check)!={'name','status'} or
+            not isinstance(check['name'],str) or not check['name'].strip() or len(check['name'])>200 or
+            check['status'] not in ('PASS','FAIL','NOT RUN')):raise ValueError('Invalid check')
+        name=check['name'].strip().casefold()
+        if name in names:raise ValueError('Duplicate check name')
+        names.add(name)
+
+
 def create_bundle(model,output,binding,artifacts,checks,manual_steps=None):
     binding=_binding(binding);model=Path(model).resolve(strict=True);output=Path(output).resolve()
     if output.exists():raise ValueError('Release directory already exists; use a new revision')
     if sha(model)!=binding['model_sha256']:raise ValueError('Model changed before release')
     if not isinstance(artifacts,list) or len(artifacts)>100:raise ValueError('Bounded artifacts required')
-    if not isinstance(checks,list) or not checks:raise ValueError('Explicit check results required')
-    for check in checks:
-        if (not isinstance(check,dict) or set(check)!={'name','status'} or
-            not isinstance(check['name'],str) or check['status'] not in ('PASS','FAIL','NOT RUN')):raise ValueError('Invalid check')
+    _checks(checks)
     prepared=[];seen=set()
     for artifact in artifacts:
         if set(artifact)!={'role','path','model_sha256','revision_id'}:raise ValueError('Exact artifact binding required')
@@ -79,8 +88,13 @@ def inspect_bundle(manifest_path,current_model):
     data=json.loads(manifest_path.read_text(encoding='utf-8'))
     if data.get('kind')!='rockpro_draft_release' or data.get('schema_version')!=1:raise ValueError('Unknown release manifest')
     binding=_binding(data['binding']);errors=[];names=set()
+    _checks(data.get('checks'))
     if not isinstance(data.get('files'),list) or not 1<=len(data['files'])<=101:raise ValueError('Invalid release files')
     for row in data['files']:
+        if not isinstance(row,dict) or set(row)!={'role','path','sha256','bytes','revision_id','model_sha256'}:raise ValueError('Exact release file metadata required')
+        if row['role'] not in ROLES:raise ValueError('Unknown release file role')
+        if type(row['bytes']) is not int or row['bytes']<0:raise ValueError('Invalid release file size')
+        if not isinstance(row['sha256'],str) or not re.fullmatch('[0-9a-f]{64}',row['sha256']):raise ValueError('Invalid release file checksum')
         name=row['path']
         if (not isinstance(name,str) or Path(name).name!=name or '/' in name or '\\' in name or
                 name in ('.','..') or name.lower() in names):raise ValueError('Unsafe or duplicate release path')
@@ -88,12 +102,15 @@ def inspect_bundle(manifest_path,current_model):
         if not path.is_relative_to(folder):raise ValueError('Release path escapes package')
         if row['model_sha256']!=binding['model_sha256'] or row['revision_id']!=binding['revision_id']:
             errors.append(dict(path=name,code='REVISION_MISMATCH'))
+        if row['role']=='ics' and row['sha256']!=binding['model_sha256']:
+            errors.append(dict(path=name,code='MODEL_BINDING_MISMATCH'))
         if not path.is_file():errors.append(dict(path=name,code='FILE_MISSING'))
         elif path.stat().st_size!=row['bytes'] or sha(path)!=row['sha256']:errors.append(dict(path=name,code='FILE_CHANGED'))
     stale=sha(current_model)!=binding['model_sha256']
     if stale:errors.append(dict(path=None,code='MODEL_REVISION_CHANGED'))
     roles={r['role'] for r in data['files']}
     if 'ics' not in roles:errors.append(dict(path=None,code='MODEL_COPY_MISSING'))
+    if sum(r['role']=='ics' for r in data['files'])!=1:errors.append(dict(path=None,code='MODEL_COPY_COUNT'))
     pending=[role for role in ('bom','drawing','production') if role not in roles]
     return dict(valid=not errors,status='outdated' if stale else 'invalid' if errors else 'draft',
         revision_id=binding['revision_id'],errors=errors,pending_roles=pending,
