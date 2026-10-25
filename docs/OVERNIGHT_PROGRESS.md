@@ -40,6 +40,7 @@ Onboarding ROC-1–4 nie należy do projektu CAD. ROC-5–10 to epiki. ROC-15/43
 | ROC-25 dalszy przyrost | Źródło urządzenia przypięte do wersji układu; backend PASS | 9 testów i pełny harness PASS 20261025T080355557794Z. CAS źródła/układu w jednej transakcji, chronione XYZ, jawne odłączenie, dezaktualizacja etapów i odmowa starego CAD; kopia powstała w wyścigu zachowana bez rejestracji. Następny krok: katalog/propozycje w WinForms i edycja ze źródłem. |
 | ROC-25 WinForms | Wybór katalogu → do 3 propozycji → edycja ze źródłem PASS | Brak automatycznego wyboru/zapisu, XYZ chronione, jawne odłączenie, zachowanie starego CAS i pól po konflikcie. Pełny harness/build/UI PL/EN 100/150 PASS 20261025T083832608703Z; dodatkowy backend 10/10. Naprawiony wątek WinForms w obu oknach. Host/nowa DLL i natywne wnętrze NOT RUN. |
 | ROC-26 | Bramka propozycji z budżetami i logami PASS; harness PASS 20261024T215341335976Z | agent_server.py ma statyczną allowlistę bez zapisów/zgód/CAD. Czas rzeczywisty, tokeny/koszt jawnie niedostępne. Zewnętrzny model/pilotaż H0–H6 NOT RUN. configure.py zmienione w źródle; istniejące mcp-config.local.json przepięte wyłącznie na agent_server.py po zachowaniu kopii, bez resetu demo. docs/AGENT_RUN_POLICY.md. |
+| ROC-26 dalszy przyrost | Źródłowe propozycje przez tę samą bramkę AI PASS | 3 jawne narzędzia odczytu/propozycji, bez zapisów i CAD; hash polityki obejmuje schematy. 8 testów z prawdziwą izolowaną SQLite i niezmiennością SHA, handshake stdio; pełny harness PASS 20261025T084149875582Z. Zewnętrzny model/pilot i koszt nadal NOT RUN. |
 | ROC-27 | Audyt lokalny i dokumentacja producenta wykonane; próba produkcyjna zablokowana dostępem | WoodLAB PLAN nie znaleziono w lokalnych instalacjach. Dokumentowany ASCII/Excel, resztki, rzaz i grain; preferowany istniejący PLAN po próbie na stanowisku. Technologia rzeczywista null/nieznana. docs/MATERIAL_INTEGRATION_AUDIT.md. |
 | ROC-28 | Indeks źródeł i macierz braków gotowe; pięć zakończonych zleceń NOT RUN | docs/CUTTING_BOM_IMPORT.md. Brak kompletnych cen, rzeczywistego rozkroju i kosztów; nie zastępować pięcioma kartami SQLite. |
 | ROC-29 | Import i agregacja backendu PASS | 7 testów; pełny harness PASS 20261024T220828460477Z. Niezmienne źródła, CAS, powtórzenia bez duplikacji, nowa rewizja zastępuje popyt, oddzielne technologie/daty/grain. Rzeczywisty zatwierdzony BOM klienta NOT RUN. |
@@ -67,8 +68,9 @@ zatrzymana przed otwarciem dokumentu. Nie uruchamiać kolejnych instancji
 ani nie rejestrować DLL bez rozpoznania hosta. Native offset H7159 z wcześniejszego
 przyrostu nadal jest dowodem historycznym, nie pomiarem SDK nowego formularza.
 
-Następne niezależne prace: integracja źródłowych propozycji z ograniczonym
-klientem AI ROC-26 oraz brakujące przepływy ROC-19/20/22. Pełne natywne dowody
+Źródłowe propozycje są już podłączone do bramki AI ROC-26 i sprawdzone
+w pełnym harnessie 20261025T084149875582Z. Następne niezależne prace:
+spójność pakietów ROC-21 oraz brakujące przepływy ROC-19/20/22. Pełne natywne dowody
 wymagają działającego hosta; pilotaże/odbiór konstruktora pozostają otwarte.
 Po każdym sprawdzonym przyroście uzupełniać dowody i commit. Nie zaliczać
 nieukończonych przebiegów harnessu ani odbiorów bez dowodów.

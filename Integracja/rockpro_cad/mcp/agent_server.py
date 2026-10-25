@@ -21,6 +21,7 @@ ALLOWLIST=frozenset((
     'recommend_case_families','benchmark_case_recommendations','preview_device_layouts',
     'get_device_record','get_layout','get_project','get_history','get_case_request',
     'get_case_operation','list_case_operations','list_projects','list_snapshots',
+    'list_device_records','preview_catalog_layouts','preview_bound_device_layout',
 ))
 
 
@@ -30,7 +31,7 @@ class Policy:
     max_seconds:float=120
     max_retries:int=2
     schema_version:int=1
-    prompt_version:str='proposal-only-v1'
+    prompt_version:str='proposal-only-v2'
 
     def __post_init__(self):
         if type(self.max_tool_calls) is not int or not 1<=self.max_tool_calls<=100:raise ValueError('Invalid call budget')
@@ -68,13 +69,15 @@ class AgentSession:
         self.run_id=uuid.uuid4().hex;self.log_dir=Path(log_dir) if log_dir is not None else Path(__file__).resolve().parents[3]/'artifacts/agent-runs'
         self.log_dir.mkdir(parents=True,exist_ok=True);self.log_path=self.log_dir/(self.run_id+'.jsonl')
         self.log_path.touch(exist_ok=False);self.stop_path=self.log_dir/(self.run_id+'.stop')
-        self.policy_sha=hashlib.sha256(json.dumps(self.policy.__dict__,sort_keys=True).encode()).hexdigest()
+        # Bind the run to the actual exposed contracts, not only numeric budgets.
+        self.toolset_sha=hashlib.sha256(json.dumps(self.schemas,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+        self.policy_sha=hashlib.sha256(json.dumps(dict(policy=self.policy.__dict__,toolset_sha256=self.toolset_sha),sort_keys=True).encode()).hexdigest()
 
     def _log(self,tool,argument_sha,status,duration,code=None):
         row=dict(schema_version=1,run_id=self.run_id,timestamp_utc=datetime.now(timezone.utc).isoformat(),
             event='operation_finished',operation='agent.tool',actor='agent',
             tool=tool if tool in self.schemas else 'denied',arguments_sha256=argument_sha,
-            policy_sha256=self.policy_sha,prompt_version=self.policy.prompt_version,
+            policy_sha256=self.policy_sha,toolset_sha256=self.toolset_sha,prompt_version=self.policy.prompt_version,
             result={'status':status},duration_ms=duration,tool_calls=self.calls,error_code=code,
             model=None,reasoning_effort=None,tokens=None,cost=None,usage_status='unavailable',
             provenance='local tool execution; not model decision authorship')

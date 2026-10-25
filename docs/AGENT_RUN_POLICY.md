@@ -17,7 +17,7 @@ konfiguracji projektu ani demo. Aktywne klienty muszą odświeżyć proces/list�
 ## Polityka przebiegu
 
 Wersjonowana Policy v1: max_tool_calls=30, max_seconds=120, max_retries=2,
-prompt_version=proposal-only-v1. Sesja ma UUID i hash polityki. Argumenty są
+prompt_version=proposal-only-v2. Sesja ma UUID i hash polityki. Argumenty są
 sprawdzane względem schematów znanych narzędzi, z ograniczeniem rozmiaru i głębokości.
 Nieznane narzędzie, błędne jednostki lub instrukcja ukryta w referencji dokumentu
 nie zwiększają uprawnień. Błędna próba zużywa budżet wywołań.
@@ -47,3 +47,32 @@ zmierzony czas przy nieznanym koszcie oraz rzeczywisty handshake stdio i odmowa
 execute_case_plan. Model testu jest deterministycznym klientem, nie ukrytym LLM.
 
 Pełny harness: PASS, artifacts/verification/20261024T215341335976Z/results.json.
+
+
+## 25.10 — źródłowe propozycje współdzielone z UI
+
+Statyczna allowlista zawiera teraz także list_device_records,
+preview_catalog_layouts i preview_bound_device_layout. Agent odczytuje jednostki,
+status i konkretną wersję katalogu, oblicza do trzech wariantów oraz sprawdza
+zmieniony wariant tym samym kodem co formularz konstruktora. Wersja wyświetlona
+w katalogu jest przypinana przez expected_device_revision; zmiana danych daje
+odmowę, a nie podmianę wymiarów w tle.
+
+Zapisy source-bound layoutu, odłączenie źródła, pomiar SDK, decyzje uchwytów,
+zmiany wymiarów CAD, akceptacje i odzyskiwanie pozostają niedostępne AI.
+Lista nie jest budowana z podobieństwa nazw ani rozszerzana automatycznie
+przez dodanie narzędzia do operatorowego server.py.
+
+Hash polityki obejmuje teraz hash rzeczywiście udostępnionych schematów.
+Log zawiera toolset_sha256 i policy_sha256. Pozwala to odróżnić przebiegi
+z innymi uprawnieniami mimo identycznych limitów liczbowych. Nie zapisuje
+argumentów ani treści katalogu. Brak kosztu modelu nadal oznacza null.
+
+PASS: osiem testów bramki, w tym prawdziwy dispatcher z izolowaną SQLite,
+wybór → propozycje → sprawdzenie, odmowa starego źródła i identyczny SHA pliku
+bazy przed/po propozycjach. Rzeczywisty stdio potwierdza widoczność nowych
+odczytów i odmowę wykonania CAD. Pełny harness PASS:
+artifacts/verification/20261025T084149875582Z/results.json.
+Nie uruchomiono zewnętrznego modelu ani pilotażu klienta; test nie oznacza
+ukończenia H0–H6 ani całego ROC-26. Aktywne klienty MCP wymagają odświeżenia
+procesu/listy narzędzi; ich połączeń nie przeładowano automatycznie.
