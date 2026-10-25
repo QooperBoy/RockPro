@@ -32,6 +32,7 @@ Onboarding ROC-1–4 nie należy do projektu CAD. ROC-5–10 to epiki. ROC-15/43
 | ROC-40 dalszy przyrost | Pomiar SDK i kontrola świeżości w oknie zaimplementowane; native NOT RUN | 5 testów czytnika, 7 SQLite/MCP, pełny harness/build/UI PASS 20261025T074755934057Z. Jedna próba hosta PID 20328 zatrzymana na COM 0x800401E3, przed otwarciem sceny; zachowane native-01. Nie uruchamiać kolejnych instancji/nie rejestrować w ciemno. Pełny guard innych rodzin i zastosowanie nadal otwarte. |
 | ROC-18 | Done w Linear po zapisie dowodów | XLSX, 3 przykłady, walidacja jednostek, trwałe wersje źródeł w tej samej SQLite, atomowy CAS i idempotencja. 9 nowych testów PASS; pełny harness/build/UI PASS 20261024T213039539715Z. Wrapper PowerShell PASS. docs/EXCEL_CONFIGURATION_INPUT.md. |
 | ROC-20/22/19 | Implementacje i dowody istnieją, pozostają integracja pełnych okuć i odbiór | Nie zamykać całych zadań na podstawie syntetycznej próby. |
+| ROC-20/22 dalszy przyrost | Naprawiony wątek okna odzyskiwania PASS | Regresja bez zastanego kontekstu odtworzyła InvalidOperationException, potem PASS odczytu/odzyskania/błędu z zachowaniem ID i bez ponawiania CAD. Pełny harness/build/UI PASS 20261025T084838344110Z. Host/akceptacja nadal NOT RUN. |
 | ROC-11–14,27–28,34–39 | Wymagania trzeba rozpatrzyć, zależne od danych/licencji/użytkownika | Nie tworzyć fikcyjnych cenników, zakupów, licencji ani odbiorów klienta. Wykonać dostępne przygotowanie techniczne, zapisać dokładne braki. |
 | ROC-21 | Pakiet rewizji i wykrywanie dezaktualizacji PASS; pełny odbiór wymaga dokumentów | release_bundle.py, 5 testów, rzeczywisty draft pakietu w artifacts/overnight-20261024/release-prototype-03. Rysunki/produkcja pending, zakupowy BOM/materiał NOT RUN. docs/REVISION_RELEASE_BUNDLE.md. |
 | ROC-21 kontrola spójności | Odmowa obcej kopii ICS i niepełnych kontroli PASS | MODEL_BINDING_MISMATCH/MODEL_COPY_COUNT, walidacja ról i niepustych unikalnych kontroli także przy odczycie. 9 testów; pełny harness PASS 20261025T084401784804Z. Istniejący pakiet sprawdzony offline i niezmieniony, nadal draft. |
@@ -84,3 +85,11 @@ Dodatkowy FIX_FIRST ROC-20 zakończony: catalog_native cleanup ma potwierdzony
 SaveAs i zatrzymuje własność przy nieudanym zachowaniu. Native PASS po błędzie:
 artifacts/overnight-20261024/catalog-cleanup-native/verification.json.
 Pełny harness PASS 20261024T215741060210Z.
+
+
+Heartbeat 25.10 08:46Z: snapshot obecny, checkout był czysty na a742ed4.
+Nie powtarzano ukończonych zadań ani natywnych operacji. Nowy przyrost dotyczy
+potwierdzonego błędu CasePlanForm, opisany w CORE_RUNTIME.md. Aktualizacja
+Linear nadal oczekuje na dostęp do Rock_Pro. Kolejna możliwa praca: sprawdzić
+czy obsługa asynchroniczna HandleDecisionForm zachowuje wątek właściciela
+przy braku kontekstu hosta; nie rozszerzać poprawki bez reprodukcji.
