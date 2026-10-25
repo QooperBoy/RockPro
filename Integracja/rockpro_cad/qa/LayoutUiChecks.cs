@@ -66,6 +66,7 @@ class LayoutUiChecks {
   DeviceVariantsUiChecks.Run();
   InventoryUiChecks.Run();
   InventoryCommandUiChecks.Run();
+  PurchaseUiChecks.Run();
   }finally{UiText.SetLanguage(previousLanguage,false);}
  }
  static void PanelOwnerThreadChecks(){

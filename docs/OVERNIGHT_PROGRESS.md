@@ -209,3 +209,20 @@ Dodano globalne offer_issues bez wymyślania danych; 8 testów zakupów i pełny
 harness PASS 20261025T125223511578Z. PURCHASE_PROPOSALS.md opisuje granice.
 Kontynuować operatorowy podgląd wejść/ofert i opcji; żadne zamówienie ani
 akceptacja klienta nie zostały wykonane. Dane magazynu i CAD pozostają nietknięte.
+
+
+Dalszy przyrost tego heartbeat 12:46Z — ROC-32 WinForms: wczytanie własnych
+wymagań/ofert/polityki, porównanie pełnych kosztów, pokrycia, braków i progów,
+edytowalne limity oraz eksport nowego szkicu bez zamówienia. Przykład jest
+syntetyczny i nie zasila magazynu. Pełny harness/build/UI PASS
+20261025T131118330552Z; zrzuty i granice w PURCHASE_PROPOSALS.md.
+Backend dispatch na prawdziwej izolowanej SQLite potwierdza bieżący odczyt,
+75/100 i brak zapisu. UI sprawdzono oddzielnie z backendem testowym.
+Host 20328 nadal nie odpowiada, bez nowej próby CAD/uruchomienia/instalacji.
+
+Następne niezablokowane zadanie: ROC-33 — źródłowy ekran wersji planów
+materiałowych, zmian wejść, stanu wykonania i ponownego użycia resztek, przez
+istniejące material_revisions/MCP. Najpierw odczytać wymagania z
+raporty/ROC-33_BEFORE_NIGHT_UPDATE.txt i MATERIAL_PLAN_REVISIONS.md.
+Nie cofać zużycia/rezerwacji po zmianie BOM i nie wymyślać kosztu delta bez
+realnej wyceny. Odbiór magazynu/zakupów, nowa DLL i pełny CAD pozostają NOT RUN.

@@ -1,0 +1,49 @@
+{
+  "requirements": {
+    "scope": "synthetic_test",
+    "bindings": [
+      {
+        "bom_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    ],
+    "lines": [
+      {
+        "id": "locks-1",
+        "item_id": "lock-test",
+        "unit": "piece",
+        "quantity": 120,
+        "required_date": "2026-11-05"
+      }
+    ]
+  },
+  "offers": [
+    {
+      "id": "offer",
+      "item_id": "lock-test",
+      "unit": "piece",
+      "supplier": "test-supplier",
+      "currency": "PLN",
+      "quote_date": "2026-10-20",
+      "valid_until": "2026-11-10",
+      "pack_size": 25,
+      "moq": 25,
+      "lead_days": 3,
+      "available_quantity": 1000,
+      "price_breaks": [
+        {
+          "min_quantity": 1,
+          "unit_net": "10"
+        }
+      ],
+      "shipping_net": "20",
+      "tax_percent": "23"
+    }
+  ],
+  "policy": {
+    "as_of_date": "2026-10-25",
+    "currency": "PLN",
+    "max_surplus_units": 50,
+    "max_cash_gross": "10000",
+    "approved_substitutes": {}
+  }
+}

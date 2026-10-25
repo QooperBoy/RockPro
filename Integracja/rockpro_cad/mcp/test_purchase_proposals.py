@@ -1,5 +1,9 @@
 import copy
+from pathlib import Path
+import hashlib
+import tempfile
 import unittest
+from unittest.mock import patch
 from purchase_proposals import calculate_purchases
 
 
@@ -78,6 +82,28 @@ class PurchaseTests(unittest.TestCase):
         self.assertEqual(result['lines'][0]['preferred_option']['quantity'],75)
         self.assertEqual(result['offer_issues'],[dict(offer_index=1,offer_id='unrelated-incomplete',
             reason='incomplete_offer',missing_fields=['item_id','supplier'])])
+
+    def test_operator_preview_reads_current_shared_inventory_without_writing(self):
+        import inventory_service as inv
+        import project_store as store
+        import worker
+        with tempfile.TemporaryDirectory() as temp,patch.object(store,'DB_PATH',Path(temp)/'qa.sqlite3'):
+            stock=dict(id='stock-test',item_id='lock-test',unit='piece',location='rack-test',on_hand=30,
+                       dimensions_mm=None,condition='usable',scope='synthetic_test')
+            inv.inventory_command(dict(action='register',lot=stock),'qa-register',0)
+            hold=dict(action='reserve',lot_id='stock-test',reservation_id='qa-held',plan_id='qa-plan',quantity=10)
+            inv.inventory_command(hold,'qa-hold',1)
+            inv.inventory_command(dict(action='delivery',delivery=dict(id='supply-test',item_id='lock-test',unit='piece',
+                quantity=30,due_date='2026-11-01',confirmation_reference='QA-PO',scope='synthetic_test')),'qa-delivery',0)
+            req,_,offers,policy=inputs();before=hashlib.sha256(store.DB_PATH.read_bytes()).hexdigest()
+            result=worker.dispatch('preview_purchases',dict(requirements=req,offers=offers,policy=policy))
+            self.assertEqual(result['lines'][0]['preferred_option']['quantity'],75)
+            self.assertEqual(hashlib.sha256(store.DB_PATH.read_bytes()).hexdigest(),before)
+            inv.inventory_command(hold|dict(reservation_id='qa-other'),'qa-other-hold',2)
+            changed=worker.dispatch('preview_purchases',dict(requirements=req,offers=offers,policy=policy))
+            self.assertEqual(changed['lines'][0]['preferred_option']['quantity'],100)
+            self.assertNotEqual(result['input_sha256'],changed['input_sha256'])
+            self.assertFalse(changed['orders_placed'])
 
 
 if __name__=='__main__':unittest.main()

@@ -53,3 +53,58 @@ odtworzyły błędy starej wersji. Pełny harness PASS:
 artifacts/verification/20261025T125223511578Z/results.json.
 Brak ofert klienta i odbioru zakupów nadal pozostaje jawny. Następny krok to
 operatorowy podgląd wejść, ograniczeń, braków i opcji z tego samego solvera.
+
+
+## 25.10 — operatorowy podgląd propozycji w WinForms
+
+W widoku Magazyn przycisk „Propozycje zakupowe” otwiera PurchaseProposalForm.
+Okno wczytuje wybrany zestaw UTF-8 JSON (z BOM lub bez, maks. 2 MiB) z dokładnie
+trzema polami: requirements, offers i policy według powyższego kontraktu.
+Import nie uruchamia solvera ani nie zapisuje stanów. Przykład wyłącznie
+syntetyczny: Integracja/rockpro_cad/examples/purchase-input.synthetic.json.
+Nie zasila magazynu — wynik zależy od bieżących danych o tym samym scope.
+Oczekiwane 75/100 wymaga także opisanego stanu 20 i dostawy 30; pusty magazyn
+nie jest zastępowany fixturem.
+
+Po jawnym przeliczeniu preview_purchases odczytuje wspólny magazyn ROC-31.
+C# nie powtarza obliczeń pieniężnych: pokazuje wyniki tego samego solvera.
+Tabela wymagań zawiera niedobór, termin i ilość opcji danego wiersza. Jawny
+wybór wiersza pokazuje opcje z pełnym netto/brutto/transportem, ilością,
+nadwyżką, datą i ograniczeniami oraz rozliczenie źródeł zapasu/dostaw.
+Nie ma automatycznego wyboru ani akceptacji całego koszyka.
+
+Dalsze zakładki pokazują niepełne/odrzucone oferty, źródłowe warunki ofert
+(MOQ, paczki, ważność, czas, dostępność i czytelne progi cenowe), powiązania
+oraz hashe źródła/wyniku i politykę faktycznie użytą. Brak dostawcy lub ID
+nie zmienia się w fikcyjną ofertę. Pozycja oferty w pliku jest numerowana dla
+człowieka od 1; surowy offer_index w kontrakcie/eksporcie pozostaje od 0.
+Nazwy brakujących pól są przetłumaczone.
+
+Data bilansu, waluta i limity są jawnie edytowalne po imporcie. Zmiana pola
+unieważnia wynik i eksport; nie przelicza niczego w tle. Magazyn pochodzi
+z odczytu bieżącego, nie z historycznego odtworzenia na datę polityki.
+Limit gotówki i transport nadal dotyczą opcji, bez potwierdzenia globalnego
+budżetu/konsolidacji. Informacja jest stale widoczna w oknie.
+
+Eksport tworzy wyłącznie nowy szkic JSON (CreateNew), z hashami, wejściami,
+polityką użytą i wynikiem proposal_only. Nie nadpisuje starego pliku. Nie
+wystawia zamówienia, nie zmienia magazynu i nie nadaje production_approved.
+Błąd lub odpowiedź sprzeczna z zakresem propozycji blokuje wynik. Niepełna
+struktura wejścia jest odrzucana przed aktywacją formularza; nie wywołuje
+backendu i nie zostawia starego wyniku po zmianie języka.
+
+PASS: pełny harness/build/UI PL/EN przy skali 100/150:
+artifacts/verification/20261025T131118330552Z/results.json.
+Dziewięć testów backendu zakupów obejmuje teraz też prawdziwy dispatch MCP
+na izolowanej SQLite: 75 przy zadanych stanach, 100 po nowej rezerwacji,
+nowy input_sha i identyczny SHA bazy po samym podglądzie. Testy okien mają
+backend testowy i jawne syntetyczne dane; obejmują 75/100, pełny koszt,
+null dostawcy, błędy, zmiany polityki, zakres proposal_only, UTF-8/BOM oraz
+odmowę nadpisania eksportu. Zrzuty głównego widoku i zakładek sprawdzone w
+artifacts/purchase-ui-20261025/.
+
+NOT RUN: nowa DLL w rzeczywistym IronCAD, oferty/BOM klienta, uzgodnione limity
+i odbiór zakupów. Nie instalowano dodatku i nie wykonywano operacji CAD.
+Ostatni odczyt procesu hosta: PID 20328 nadal Responding=false, bez tytułu okna;
+nie uruchamiano kolejnego. Konektor Linear nadal nie udostępnia Rock_Pro.
+Całego ROC-32 nie oznaczono Done.
