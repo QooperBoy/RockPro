@@ -156,3 +156,57 @@ Nie rozszerzano statycznej allowlisty agenta.
 Formularz poleceń jest następnym przyrostem. Obecny ekran InventoryForm nadal
 wyłącznie czyta dane. Nie wykonywano poleceń na magazynie klienta, operacji
 CAD ani rejestracji DLL. Pełny pilot ROC-31 pozostaje NOT RUN.
+
+
+## 25.10 — formularz operatora dla rezerwacji i wydań
+
+W widoku Magazyn dodano osobny przycisk „Polecenia magazynowe”. Nowy
+InventoryCommandForm korzysta z tych samych trwałych żądań w SQLite i wspólnego
+MCP. InventoryForm pozostaje oddzielnym podglądem bez zapisów.
+
+Pierwszy zakres formularza: reserve, issue, cancel rezerwacji, consume oraz
+return niewykorzystanego wydania. Partie/rezerwacje pochodzą z get_inventory;
+filtr statusu pokazuje held dla wydania/anulowania i issued dla zużycia/zwrotu.
+Rewizja dotyczy powiązanej partii, nie rekordu rezerwacji. Przed zapisem jest
+widoczna ilość/jednostka, źródło i stan z ostatniego odczytu; dane syntetyczne
+pozostają oznaczone. Plan, ID rezerwacji i uwaga operatora są jawne.
+
+„Zapisz żądanie” utrwala polecenie i odczytaną rewizję. Pola zostają zablokowane;
+„Wykonaj żądanie” jest osobną akcją. Nie ma automatycznego wykonania. Przyjęcie
+żądania nie oznacza zapewnienia dostępności ani zgody produkcyjnej. Serwer
+wykonania ponownie sprawdza CAS i reguły magazynu.
+
+Po utracie odpowiedzi ID, pola i rewizja pozostają bez zmian; nowe wykonanie
+oraz nowy ID są zablokowane do odczytu wyniku. „Sprawdź wynik” wyłącznie czyta
+get_inventory_intent. Otworzenie formularza wczytuje listę ostatnich 100 żądań,
+bez automatycznego wyboru. Starsze żądanie można jawnie otworzyć po wpisaniu ID.
+W ten sposób przygotowane i zakończone żądania można odnaleźć po zamknięciu okna.
+
+Jeśli zapis samego przygotowania nie dotarł do serwera, odczyt NOT_FOUND
+udostępnia jawne ponowienie przygotowania dokładnie tego samego ID i payloadu.
+Nie wykonuje to transakcji magazynowej. Nie ma ponowienia w tle, zmiany rewizji
+ani generowania zastępczego ID. Błędne lokalne identyfikatory są zgłaszane przed
+przypięciem ID, więc pozostają edytowalne. Anulowanie żądania jest oddzielne od
+anulowania rezerwacji magazynowej; nie cofa fizycznego wydania.
+
+Po konflikcie żądanie zachowuje przypięte dane. Odczyt rejected umożliwia
+jawny nowy szkic; formularz nie dopasowuje zapisu do nowszej rewizji. Zmiana
+języka nie zmienia uwagi, liczby, ID ani danych żądania. Rejestracja partii,
+potwierdzenie dostawy i przyjęcie (register/delivery/receive) wymagają następnego
+przyrostu formularza; istniejące żądania tych typów można odczytać lub anulować,
+ale nie wykonać z tego okna.
+
+PASS: pełny harness/build/UI PL/EN przy skali 100/150:
+artifacts/verification/20261025T115706065935Z/results.json.
+Dodatkowa kompilacja i próba UI obejmująca jawne ponowienie przygotowania
+tego samego ID/payloadu po NOT_FOUND: PASS,
+artifacts/inventory-command-ui-20261025/retry-proof-20261025T120008Z/ui-checks.log.
+Obejrzano zrzuty PL/EN 100/150 w artifacts/inventory-command-ui-20261025/.
+Próby okien mają backend testowy i dane syntetyczne. Nie udają fizycznej operacji
+na rzeczywistym magazynie; trwałość/atomowość backendu są osobno sprawdzone
+w test_inventory_intents i test_inventory_service.
+
+NOT RUN: nowa DLL w IronCAD, rzeczywisty magazyn i odbiór magazyniera. Nie
+rejestrowano dodatku ani nie uruchamiano natywnego CAD. Całe ROC-31 pozostaje
+otwarte do pozostałych formularzy i pilotażu; aktualizacja Linear nadal oczekuje
+na dostęp do Rock_Pro.

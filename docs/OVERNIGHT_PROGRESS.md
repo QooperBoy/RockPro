@@ -164,3 +164,19 @@ nie generować nowego, nie odświeżać rewizji i nie ponawiać w tle. Przy otwa
 wczytać listę przygotowanych żądań z backendu, nie z osobnej bazy C#.
 Zacząć od reserve/issue/cancel/consume/return, potem jawne register/delivery/receive.
 Odbiór magazynu i native/nowa DLL pozostają NOT RUN; Linear oczekuje na dostęp.
+
+
+Heartbeat 25.10 11:46Z: snapshot obecny, checkout czysty na c643c47.
+ROC-31 — InventoryCommandForm dla reserve/issue/cancel/consume/return.
+Jawne przygotowanie i wykonanie, źródłowe rewizje, trwałe ID i odczyt po utracie
+odpowiedzi, lista żądań po otwarciu. Pełny harness/build/UI PASS
+20261025T115706065935Z; dodatkowy UI-only retry-proof-20261025T120008Z PASS.
+Szczegóły, granice i zrzuty w INVENTORY_CONTRACT.md. Nie wykonywano transakcji
+na bazie klienta, native ani wdrożenia DLL. Nie zamykać całego ROC-31.
+
+Następny przyrost ROC-31: jawne formularze register/delivery/receive, z jednostką,
+wymiarami, stanem, lokalizacją i pochodzeniem, bez wpisywania domyślnych stanów
+klienta. Wykorzystać tę samą maszynę trwałych żądań i CAS dostawy przy receive.
+Po tym możliwy jest podgląd propozycji zakupowych ROC-32 i wersji planów ROC-33;
+rzeczywiste oferty, BOM i pilotaże nadal wymagają danych/odbiorów. Nie powtarzać
+ukończonych testów/native przy niezmienionych blokerach COM i dostępu Linear.
