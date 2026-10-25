@@ -49,6 +49,7 @@ Onboarding ROC-1–4 nie należy do projektu CAD. ROC-5–10 to epiki. ROC-15/43
 | ROC-29 | Import i agregacja backendu PASS | 7 testów; pełny harness PASS 20261024T220828460477Z. Niezmienne źródła, CAS, powtórzenia bez duplikacji, nowa rewizja zastępuje popyt, oddzielne technologie/daty/grain. Rzeczywisty zatwierdzony BOM klienta NOT RUN. |
 | ROC-30 | Referencyjny rozkrój, neutralny eksport i niezależny checker PASS | 5 testów, docs/CUTTING_PLAN_CONTRACT.md. PLAN/maszyna/realna technologia NOT RUN. Nie deklarować optimum ani produkcji. |
 | ROC-31 | Transakcyjny backend magazynu PASS | 6 testów, także wyścig o tę samą resztkę; brak podwójnego odejmowania i cofania zużycia. docs/INVENTORY_CONTRACT.md. Ekran/pilotaż klienta NOT RUN. |
+| ROC-31 WinForms odczyt | Wspólny magazyn, rezerwacje, dostawy i kwity PASS | Cztery zakładki, fizyczne/rezerwowane/wolne z jednostkami i pochodzeniem, limit historii, ostrzeżenia starego odczytu. Pełny harness/build/UI PL/EN 100/150 PASS 20261025T102449640088Z; zrzuty w inventory-ui-20261025. Ten ekran nie zapisuje; transakcje UI i pilot magazynu nadal otwarte. |
 | ROC-32 | Terminowe bilanse i propozycje backendu PASS | 6 testów; 120/20/30/paczka25 → 75, spóźniona → 100. docs/PURCHASE_PROPOSALS.md. Brak faktycznych ofert/limitów/odbioru; wspólny budżet i transport wielopozycyjny nieoptymalizowane. |
 | ROC-33 | Niezmienne plany, kontrola starych wejść i raport reuse PASS | 5 testów; start odmówiony po zmianie, rozpoczęty plan zachowuje wykonanie i zobowiązania, bez cofania zapasu. docs/MATERIAL_PLAN_REVISIONS.md. Koszt delta null do realnej wyceny, UI/pilotaż NOT RUN. |
 | ROC-34–36,38 | Odbiory pozostają otwarte | Kryteria odczytane. Wymagają Tomasza/użytkownika/produkcji i realnych pilotaży. ROC-38: Done dopiero po OK. Nie zastępować testem agenta. |
@@ -117,3 +118,18 @@ MCP/SQLite. Rzeczywiste wymagania zachowane w raporty/ROC-31_BEFORE_NIGHT_UPDATE
 workspace nadrzędnego, kontrakt w INVENTORY_CONTRACT.md. Nie wprowadzać
 fikcyjnych stanów klienta; próby wyłącznie na izolowanych danych. Produkcyjny
 pilot pozostaje zablokowany brakującym BOM/technologią i odbiorem magazynu.
+
+
+Heartbeat 25.10 10:16Z: snapshot obecny, checkout był czysty na 37171d6.
+ROC-31: dodano podgląd wspólnego magazynu w źródłowym WinForms; szczegóły,
+granice i dowody w INVENTORY_CONTRACT.md. Pełny harness/build/UI PASS
+20261025T102449640088Z; wszystkie zakładki obejrzane na syntetycznych danych.
+Nowa DLL niewdrożona, brak modyfikacji modeli i danych klienta.
+
+Następny niezablokowany przyrost ROC-31: jawne operacje operatora z odczytaną
+rewizją partii/dostawy, zachowaniem operation_id po niepewnej odpowiedzi i
+odczytem kwitu bez ponawiania skutków. Najpierw uzupełnić odczyt pojedynczego
+kwitu oraz powiązanie receive z dostawą w nowych kwitach (historyczne pozostają
+bez domyślania). Następnie formularz polecenia/rezerwacji i test konfliktu oraz
+braku podwójnego odjęcia. Prawdziwe stany/dostawy i pilot wymagają danych magazynu.
+Nie oznaczać przyrostu odczytu jako pełnego ROC-31 Done.

@@ -1,0 +1,413 @@
+{
+  "synthetic_test": true,
+  "production_approved": false,
+  "inventory": {
+    "lots": [
+      {
+        "condition": "usable",
+        "dimensions_mm": null,
+        "id": "locks-test",
+        "item_id": "locks-test",
+        "location": "rack-A",
+        "on_hand": 8,
+        "scope": "synthetic_test",
+        "unit": "piece",
+        "revision": 5,
+        "reserved": 3,
+        "free": 5
+      },
+      {
+        "condition": "usable",
+        "dimensions_mm": [
+          1000,
+          600,
+          9
+        ],
+        "id": "offcut-test",
+        "item_id": "plywood-test",
+        "location": "rack-A",
+        "on_hand": 1,
+        "scope": "synthetic_test",
+        "unit": "offcut",
+        "revision": 2,
+        "reserved": 1,
+        "free": 0
+      },
+      {
+        "condition": "quarantine",
+        "dimensions_mm": [
+          1000,
+          600,
+          9
+        ],
+        "id": "quarantine-test",
+        "item_id": "plywood-test",
+        "location": "rack-A",
+        "on_hand": 2,
+        "scope": "synthetic_test",
+        "unit": "sheet",
+        "revision": 1,
+        "reserved": 0,
+        "free": 0
+      },
+      {
+        "condition": "usable",
+        "dimensions_mm": null,
+        "id": "received-test",
+        "item_id": "locks-test",
+        "location": "rack-A",
+        "on_hand": 5,
+        "scope": "synthetic_test",
+        "unit": "piece",
+        "revision": 1,
+        "reserved": 0,
+        "free": 5
+      }
+    ],
+    "reservations": [
+      {
+        "id": "held-offcut",
+        "lot_id": "offcut-test",
+        "plan_id": "plan-test-B",
+        "quantity": 1,
+        "status": "held",
+        "returned": 0
+      },
+      {
+        "id": "held-test",
+        "lot_id": "locks-test",
+        "plan_id": "plan-test-B",
+        "quantity": 3,
+        "status": "held",
+        "returned": 0
+      },
+      {
+        "id": "issued-test",
+        "lot_id": "locks-test",
+        "plan_id": "plan-test-A",
+        "quantity": 4,
+        "status": "issued",
+        "returned": 2
+      }
+    ],
+    "deliveries": [
+      {
+        "confirmation_reference": "SYNTHETIC-TEST-ONLY",
+        "due_date": "2026-11-01",
+        "id": "delivery-test",
+        "item_id": "locks-test",
+        "quantity": 30,
+        "scope": "synthetic_test",
+        "unit": "piece",
+        "received": 5,
+        "revision": 2,
+        "outstanding": 25
+      }
+    ],
+    "production_approved": false
+  },
+  "history": {
+    "events": [
+      {
+        "operation_id": "ui-operation-9",
+        "created_at": "2026-10-25T10:20:21.974829+00:00",
+        "command_sha256": "a529cfabe2461bb7f118e6e3c3eda08ca6846215a135d85d8a674a4b68a65184",
+        "result": {
+          "action": "delivery",
+          "delivery": {
+            "confirmation_reference": "SYNTHETIC-TEST-ONLY",
+            "due_date": "2026-11-01",
+            "id": "delivery-test",
+            "item_id": "locks-test",
+            "quantity": 30,
+            "received": 0,
+            "revision": 1,
+            "scope": "synthetic_test",
+            "unit": "piece"
+          },
+          "identity_verified": false,
+          "operation_id": "ui-operation-9",
+          "production_approved": false,
+          "replayed": false
+        }
+      },
+      {
+        "operation_id": "ui-operation-8",
+        "created_at": "2026-10-25T10:20:21.974829+00:00",
+        "command_sha256": "91f68b8b4338654ca33741f4f1a3f16eb97cd6113a5f46cdc1c08a25d405744f",
+        "result": {
+          "action": "register",
+          "identity_verified": false,
+          "lot": {
+            "condition": "quarantine",
+            "dimensions_mm": [
+              1000,
+              600,
+              9
+            ],
+            "free": 0,
+            "id": "quarantine-test",
+            "item_id": "plywood-test",
+            "location": "rack-A",
+            "on_hand": 2,
+            "reserved": 0,
+            "revision": 1,
+            "scope": "synthetic_test",
+            "unit": "sheet"
+          },
+          "operation_id": "ui-operation-8",
+          "production_approved": false,
+          "replayed": false
+        }
+      },
+      {
+        "operation_id": "ui-operation-10",
+        "created_at": "2026-10-25T10:20:21.974829+00:00",
+        "command_sha256": "12fea82f7b80a6fa0f1a8a88180b15bd2a995fcd8e24f7fd5a61b65ee67d5c59",
+        "result": {
+          "action": "receive",
+          "identity_verified": false,
+          "lot": {
+            "condition": "usable",
+            "dimensions_mm": null,
+            "free": 5,
+            "id": "received-test",
+            "item_id": "locks-test",
+            "location": "rack-A",
+            "on_hand": 5,
+            "reserved": 0,
+            "revision": 1,
+            "scope": "synthetic_test",
+            "unit": "piece"
+          },
+          "operation_id": "ui-operation-10",
+          "production_approved": false,
+          "replayed": false
+        }
+      },
+      {
+        "operation_id": "ui-operation-7",
+        "created_at": "2026-10-25T10:20:21.971933+00:00",
+        "command_sha256": "8ec3754c6f9b6c8d57ceb0c3bd06f9d6146021dc880b3f6679fd947a49dec5cc",
+        "result": {
+          "action": "reserve",
+          "identity_verified": false,
+          "lot": {
+            "condition": "usable",
+            "dimensions_mm": [
+              1000,
+              600,
+              9
+            ],
+            "free": 0,
+            "id": "offcut-test",
+            "item_id": "plywood-test",
+            "location": "rack-A",
+            "on_hand": 1,
+            "reserved": 1,
+            "revision": 2,
+            "scope": "synthetic_test",
+            "unit": "offcut"
+          },
+          "operation_id": "ui-operation-7",
+          "production_approved": false,
+          "replayed": false,
+          "reservation": {
+            "id": "held-offcut",
+            "lot_id": "offcut-test",
+            "plan_id": "plan-test-B",
+            "quantity": 1,
+            "returned": 0,
+            "status": "held"
+          }
+        }
+      },
+      {
+        "operation_id": "ui-operation-6",
+        "created_at": "2026-10-25T10:20:21.968684+00:00",
+        "command_sha256": "03293e9abf5a4169bee0fedac78f1e4d0ddf741b464ecbda22467edd16392bbc",
+        "result": {
+          "action": "register",
+          "identity_verified": false,
+          "lot": {
+            "condition": "usable",
+            "dimensions_mm": [
+              1000,
+              600,
+              9
+            ],
+            "free": 1,
+            "id": "offcut-test",
+            "item_id": "plywood-test",
+            "location": "rack-A",
+            "on_hand": 1,
+            "reserved": 0,
+            "revision": 1,
+            "scope": "synthetic_test",
+            "unit": "offcut"
+          },
+          "operation_id": "ui-operation-6",
+          "production_approved": false,
+          "replayed": false
+        }
+      },
+      {
+        "operation_id": "ui-operation-5",
+        "created_at": "2026-10-25T10:20:21.964148+00:00",
+        "command_sha256": "8a95657a799cd0719619005bfb161105a64adaa50bb543a9c6841c837b62b842",
+        "result": {
+          "action": "reserve",
+          "identity_verified": false,
+          "lot": {
+            "condition": "usable",
+            "dimensions_mm": null,
+            "free": 5,
+            "id": "locks-test",
+            "item_id": "locks-test",
+            "location": "rack-A",
+            "on_hand": 8,
+            "reserved": 3,
+            "revision": 5,
+            "scope": "synthetic_test",
+            "unit": "piece"
+          },
+          "operation_id": "ui-operation-5",
+          "production_approved": false,
+          "replayed": false,
+          "reservation": {
+            "id": "held-test",
+            "lot_id": "locks-test",
+            "plan_id": "plan-test-B",
+            "quantity": 3,
+            "returned": 0,
+            "status": "held"
+          }
+        }
+      },
+      {
+        "operation_id": "ui-operation-4",
+        "created_at": "2026-10-25T10:20:21.960295+00:00",
+        "command_sha256": "bc38542d1093250838a5373b931de39b4f4d55ab6f22de90c5ef03a1eca71bc0",
+        "result": {
+          "action": "return",
+          "identity_verified": false,
+          "lot": {
+            "condition": "usable",
+            "dimensions_mm": null,
+            "free": 8,
+            "id": "locks-test",
+            "item_id": "locks-test",
+            "location": "rack-A",
+            "on_hand": 8,
+            "reserved": 0,
+            "revision": 4,
+            "scope": "synthetic_test",
+            "unit": "piece"
+          },
+          "operation_id": "ui-operation-4",
+          "production_approved": false,
+          "replayed": false,
+          "reservation": {
+            "id": "issued-test",
+            "lot_id": "locks-test",
+            "plan_id": "plan-test-A",
+            "quantity": 4,
+            "returned": 2,
+            "status": "issued"
+          }
+        }
+      },
+      {
+        "operation_id": "ui-operation-3",
+        "created_at": "2026-10-25T10:20:21.944597+00:00",
+        "command_sha256": "6c34e33491c005d1d65fc1453db941146704a81f5c65579798938c80884597a8",
+        "result": {
+          "action": "issue",
+          "identity_verified": false,
+          "lot": {
+            "condition": "usable",
+            "dimensions_mm": null,
+            "free": 6,
+            "id": "locks-test",
+            "item_id": "locks-test",
+            "location": "rack-A",
+            "on_hand": 6,
+            "reserved": 0,
+            "revision": 3,
+            "scope": "synthetic_test",
+            "unit": "piece"
+          },
+          "operation_id": "ui-operation-3",
+          "production_approved": false,
+          "replayed": false,
+          "reservation": {
+            "id": "issued-test",
+            "lot_id": "locks-test",
+            "plan_id": "plan-test-A",
+            "quantity": 4,
+            "returned": 0,
+            "status": "issued"
+          }
+        }
+      },
+      {
+        "operation_id": "ui-operation-2",
+        "created_at": "2026-10-25T10:20:21.944597+00:00",
+        "command_sha256": "fef031c1c19bed1d73c1351298793994b079eaf5eaa5d081941ffddc1b6352f0",
+        "result": {
+          "action": "reserve",
+          "identity_verified": false,
+          "lot": {
+            "condition": "usable",
+            "dimensions_mm": null,
+            "free": 6,
+            "id": "locks-test",
+            "item_id": "locks-test",
+            "location": "rack-A",
+            "on_hand": 10,
+            "reserved": 4,
+            "revision": 2,
+            "scope": "synthetic_test",
+            "unit": "piece"
+          },
+          "operation_id": "ui-operation-2",
+          "production_approved": false,
+          "replayed": false,
+          "reservation": {
+            "id": "issued-test",
+            "lot_id": "locks-test",
+            "plan_id": "plan-test-A",
+            "quantity": 4,
+            "returned": 0,
+            "status": "held"
+          }
+        }
+      },
+      {
+        "operation_id": "ui-operation-1",
+        "created_at": "2026-10-25T10:20:21.944597+00:00",
+        "command_sha256": "404404c11639729f4da53dfc498e74896069eee93bc9fe66e26505a9d87647a7",
+        "result": {
+          "action": "register",
+          "identity_verified": false,
+          "lot": {
+            "condition": "usable",
+            "dimensions_mm": null,
+            "free": 10,
+            "id": "locks-test",
+            "item_id": "locks-test",
+            "location": "rack-A",
+            "on_hand": 10,
+            "reserved": 0,
+            "revision": 1,
+            "scope": "synthetic_test",
+            "unit": "piece"
+          },
+          "operation_id": "ui-operation-1",
+          "production_approved": false,
+          "replayed": false
+        }
+      }
+    ]
+  }
+}

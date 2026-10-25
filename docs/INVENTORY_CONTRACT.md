@@ -28,8 +28,52 @@ Confirmation_reference jest zachowanym oświadczeniem, nie dowodem od dostawcy.
 
 `get_inventory` rozdziela on_hand/reserved/free i outstanding dostaw.
 `get_inventory_history` pokazuje kwity operacji; limity odpowiedzi są jawne.
-Brak nowego ekranu magazynowego: API/MCP i testy są gotowe, UI i pilotaż magazynu NOT RUN.
+API/MCP i testy backendu są gotowe. Przyrost ekranu odczytu opisano poniżej;
+operacje magazynowe w UI i pilotaż rzeczywistego magazynu pozostają NOT RUN.
 
 PASS: sześć testów izolowanej SQLite, w tym dwóch równoczesnych rezerwujących
 tę samą resztkę (jeden zwycięzca), brak podwójnego odejmowania, odmowa cofnięcia
 zużycia, częściowy zwrot, replay, dostawa/przyjęcie i kwarantanna.
+
+
+## 25.10 — podgląd magazynu w źródłowym dodatku
+
+Nowa pozycja Magazyn w panelu otwiera InventoryForm. Jest dostępna niezależnie
+od wybrania projektu, bo magazyn jest wspólny. Czyta te same get_inventory
+oraz get_inventory_history przez operatorowy MCP; nie ma drugiej bazy w C#.
+Nie wpisano stanów klienta ani dostaw na podstawie przykładów.
+
+Cztery zakładki pokazują partie/resztki z fizycznym, zarezerwowanym i wolnym
+stanem, rezerwacje/wydania, potwierdzone dostawy z przyjętą i oczekującą ilością
+oraz historię kwitów. Każda partia ma jednostkę, wymiary, lokalizację, warunek,
+rewizję i jawne pochodzenie. Zielony wyróżnia dodatni stan wolny, pomarańczowy
+brak wolnego, czerwony kwarantannę/złom. Stany rezerwacji mają podpis i kolor.
+Nie sumujemy arkuszy, sztuk i resztek ani nie odejmujemy rezerwacji drugi raz.
+
+Historia pokazuje stan zapisany w chwili operacji, nie bieżące saldo. UTC jest
+czytelne w dwóch wierszach, pełny znacznik pozostaje w tooltipie. Wybrany kwit
+można odczytać wraz z hashem polecenia; to dane operatora, nie uwierzytelniona
+akceptacja. Domyślny limit to 100 ostatnich wpisów, jawnie zmieniany do 500.
+
+Nowe dane trafiają do tabel dopiero po powodzeniu obu odczytów. Błąd historii
+nie miesza nowego salda ze starą historią: pozostawia poprzedni widok z ostrzeżeniem
+o nieaktualności. Zmiana języka nie usuwa tego ostrzeżenia ani nie ponawia
+odczytu. Są to dwa sekwencyjne zapytania; nie deklarujemy atomowego snapshotu
+współbieżnie zmienianego magazynu. Przed decyzją należy odświeżyć widok.
+
+Ten przyrost wyłącznie odczytuje. Rejestrowanie, rezerwowanie, wydawanie,
+zużywanie, zwroty i przyjmowanie dostaw przez przyciski UI są dalszym krokiem;
+backend operatora ma te transakcje, lecz okno ich nie wykonuje.
+
+PASS: pełny harness/build/UI PL/EN przy skali 100/150, artifacts/verification/20261025T102449640088Z/results.json.
+Izolowane okna sprawdzają 8 fizycznie / 3 zarezerwowane / 5 wolne,
+kwarantannę bez wolnego stanu, osobne 25 oczekujących dostawy, historię,
+pochodzenie syntetyczne, brak zapisów, obsługę pustej bazy/błędu oraz kontynuacje
+na wątku właściciela. Dane qa/fixtures/inventory-ui.json wygenerowano rzeczywistymi
+transakcjami backendu w tymczasowej SQLite, nie z bazy klienta.
+Zrzuty wszystkich zakładek sprawdzono w artifacts/inventory-ui-20261025/.
+
+NOT RUN: nowa DLL w rzeczywistym IronCAD i odbiór magazyniera. Nie rejestrowano
+DLL ani nie dotykano modeli, prywatnej bazy czy zachowanego wdrożenia. Zmian
+nie przesłano do Linear — dostępny konektor nadal nie widzi Rock_Pro.
+Nie oznaczono całego ROC-31 Done.
