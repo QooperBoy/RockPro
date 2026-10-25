@@ -135,6 +135,12 @@ SCHEMAS += [
  schema('get_inventory_history','Read bounded immutable inventory operation receipts; caller identity is unverified',{'limit':{'type':'integer','minimum':1,'maximum':500}},readonly=True),
  schema('get_inventory_operation','Read one preserved inventory receipt by operation ID without retrying; optionally verify the exact pending command and revision. Missing is only a point-in-time observation',
         {'operation_id':S,'command':{'type':'object'},'expected_revision':REV},['operation_id'],True),
+ schema('prepare_inventory_command','Operator-only durable request; does not reserve or change stock. Execution rechecks pinned lot/delivery revision',
+        {'command':{'type':'object'},'operation_id':S,'expected_revision':REV,'decision_reference':S,'actor':S},['command','operation_id','expected_revision','decision_reference']),
+ schema('execute_inventory_intent','Operator-only execution of the exact stored request; stock and committed state change atomically and retries never duplicate effects',{'operation_id':S},['operation_id']),
+ schema('cancel_inventory_intent','Operator-only cancellation of an unexecuted request; cannot undo committed stock use',{'operation_id':S,'command_sha256':S},['operation_id','command_sha256']),
+ schema('get_inventory_intent','Read a durable operator request and its preserved outcome without executing it',{'operation_id':S},['operation_id'],True),
+ schema('list_inventory_intents','Read durable requests after restart; prepared does not mean stock availability or approval',{'state':{'type':'string','enum':['all','prepared','committed','rejected','cancelled']},'limit':{'type':'integer','minimum':1,'maximum':100}},readonly=True),
 ]
 
 

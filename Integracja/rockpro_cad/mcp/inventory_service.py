@@ -8,6 +8,11 @@ import json
 import project_store as store
 from material_service import digest, encode, positive, token
 
+COMMAND_FIELDS={'register':{'action','lot'},'reserve':{'action','lot_id','reservation_id','plan_id','quantity'},
+                'issue':{'action','reservation_id'},'cancel':{'action','reservation_id'},
+                'consume':{'action','reservation_id'},'return':{'action','reservation_id','quantity'},
+                'delivery':{'action','delivery'},'receive':{'action','delivery_id','lot'}}
+
 
 def ensure(conn):
     statements=[
@@ -75,14 +80,12 @@ def inventory_command(command, operation_id, expected_revision):
     if type(expected_revision) is not int or expected_revision<0:raise ValueError('Inventory expected_revision required')
     if not isinstance(command,dict):raise ValueError('Inventory command required')
     action=command.get('action')
-    fields={'register':{'action','lot'},'reserve':{'action','lot_id','reservation_id','plan_id','quantity'},
-            'issue':{'action','reservation_id'},'cancel':{'action','reservation_id'},
-            'consume':{'action','reservation_id'},'return':{'action','reservation_id','quantity'},
-            'delivery':{'action','delivery'},'receive':{'action','delivery_id','lot'}}
-    if action not in fields or set(command)!=fields[action]:raise ValueError('Unknown inventory action/fields')
+    if action not in COMMAND_FIELDS or set(command)!=COMMAND_FIELDS[action]:raise ValueError('Unknown inventory action/fields')
     command_hash=digest(dict(command=command,expected_revision=expected_revision))
     with store.db() as conn:
         conn.execute('BEGIN IMMEDIATE');ensure(conn)
+        from inventory_intents import guard_intent
+        intent=guard_intent(conn,operation_id,command_hash)
         previous=conn.execute('SELECT * FROM inventory_journal WHERE operation_id=?',(operation_id,)).fetchone()
         if previous:
             if previous['command_sha256']!=command_hash:raise ValueError('INVENTORY_OPERATION_ID_REUSED')
@@ -152,6 +155,8 @@ def inventory_command(command, operation_id, expected_revision):
             result=dict(lot=_balance(conn,ident),reservation=dict(conn.execute('SELECT * FROM inventory_reservations WHERE id=?',(command['reservation_id'],)).fetchone()))
         result.update(operation_id=operation_id,action=action,replayed=False,identity_verified=False,production_approved=False)
         conn.execute('INSERT INTO inventory_journal VALUES (?,?,?,?)',(operation_id,command_hash,encode(result),store.now()))
+        if intent is not None:
+            conn.execute("UPDATE inventory_intents SET state='committed',diagnostic=NULL,updated_at=? WHERE operation_id=?",(store.now(),operation_id))
     return result
 
 

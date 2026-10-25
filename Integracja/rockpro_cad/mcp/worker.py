@@ -276,6 +276,13 @@ def dispatch(name, arguments):
         if not isinstance(arguments,dict) or set(arguments)-{'requirements','offers','policy'}:raise ValueError('Invalid purchase tool argument')
         from purchase_proposals import preview_purchases
         return preview_purchases(**arguments)
+    intent_keys={'prepare_inventory_command':{'command','operation_id','expected_revision','decision_reference','actor'},
+                 'execute_inventory_intent':{'operation_id'},'cancel_inventory_intent':{'operation_id','command_sha256'},
+                 'get_inventory_intent':{'operation_id'},'list_inventory_intents':{'state','limit'}}
+    if name in intent_keys:
+        if not isinstance(arguments,dict) or set(arguments)-intent_keys[name]:raise ValueError('Invalid inventory intent argument')
+        import inventory_intents
+        return getattr(inventory_intents,name)(**arguments)
     inventory_keys={'inventory_command': {'command','operation_id','expected_revision'},
                     'get_inventory':set(),'get_inventory_history':{'limit'},
                     'get_inventory_operation':{'operation_id','command','expected_revision'}}

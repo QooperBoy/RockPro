@@ -112,3 +112,47 @@ kwitu bez zmiany sald. Pełny harness PASS:
 artifacts/verification/20261025T104845768001Z/results.json.
 UI poleceń, odtworzenie oczekującego polecenia po restarcie oraz pilot
 magazyniera nadal pozostają następnym krokiem; nie jest to pełny ROC-31 Done.
+
+
+## 25.10 — trwałe żądania operatora przed transakcją
+
+Nowy inventory_intents.py zapisuje w tej samej SQLite niezmienne polecenie,
+operation_id, expected_revision, hash oraz deklarowane actor/decision_reference.
+prepare_inventory_command tworzy prepared bez rezerwowania lub zmiany stanu.
+Potwierdza kształt żądania, nie przyszłą dostępność materiału. Właściwe reguły
+magazynu i CAS są ponownie sprawdzane dopiero przy wykonaniu.
+
+execute_inventory_intent używa istniejącego inventory_command. Zmiana salda,
+kwit i stan committed są zapisywane w jednej transakcji. Powtórzenie identycznego
+ID zwraca zapisany wynik, bez ponownego skutku. Dwa równoczesne wykonania nie
+rezerwują resztki dwa razy. Również stara ścieżka inventory_command odmawia
+wykonania ID anulowanego/odrzuconego żądania oraz podmiany treści pod tym ID.
+Bezpośrednie historyczne operacje pozostają czytelne i nie są przepisywane.
+
+get_inventory_intent i list_inventory_intents pozwalają odnaleźć żądanie po
+zamknięciu formularza lub restarcie klienta. Utrata odpowiedzi po commit daje
+przy odczycie committed z kwitem; błąd o nieznanym wyniku przed commit pozostawia
+prepared. Odczyt nie uruchamia żadnego wykonania. Nie nadajemy nowego ID w tle.
+Stan prepared jest obserwacją, nie zapewnieniem, że inny proces nie wykonuje
+właśnie transakcji.
+
+Jednoznaczna odmowa biznesowa/CAS daje rejected z diagnostyką, bez zmiany
+pierwotnego polecenia ani rewizji. cancel_inventory_intent wymaga hasha i
+anuluje wyłącznie niewykonane prepared; nie cofa zapasu, wydania ani zużycia.
+Wyścig anulowania z wykonaniem ma jeden wynik końcowy. Zmiana danych wymaga
+jawnego nowego żądania; zatwierdzonych stanów nie poprawiamy automatycznie.
+Uszkodzona treść/wiązanie lub niespójność committed/kwitu blokuje odczyt i replay.
+Są to kontrole kontraktu, a nie podpisy ani uwierzytelnione zgody produkcyjne.
+
+PASS: 10 testów trwałych żądań oraz 10 dotychczasowego magazynu. Obejmują
+przygotowanie bez skutku, odczyt przez nowe połączenie, dwa wykonania, utratę
+odpowiedzi przed/po commit, CAS, anulowanie, wyścig cancel/execute, korupcję oraz
+SQL trigger odmawiający zapisu kwitu: saldo wycofane, committed niewykazane.
+Pełny harness PASS: artifacts/verification/20261025T112059746286Z/results.json.
+Dodatkowy zestaw 28/28 inventory_intents + inventory_service + agent_server
+PASS po doprecyzowaniu regresji; nowe operacje zapisu są jawnie odmawiane AI.
+Nie rozszerzano statycznej allowlisty agenta.
+
+Formularz poleceń jest następnym przyrostem. Obecny ekran InventoryForm nadal
+wyłącznie czyta dane. Nie wykonywano poleceń na magazynie klienta, operacji
+CAD ani rejestracji DLL. Pełny pilot ROC-31 pozostaje NOT RUN.

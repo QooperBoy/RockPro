@@ -20,7 +20,8 @@ class AgentPolicyTests(unittest.TestCase):
         dispatch=Mock();session=self.session(dispatcher=dispatch)
         names={s['name'] for s in session.handle({'id':1,'method':'tools/list'})['result']['tools']}
         for tool in ('set_stage','save_project','save_layout','execute_case_plan','recover_case_operation','import_excel_configuration','save_device_record',
-                     'save_bound_device_layout','unlink_layout_device','measure_handle_reconciliation','save_handle_reconciliation','change_dimensions_on_copy'):
+                     'save_bound_device_layout','unlink_layout_device','measure_handle_reconciliation','save_handle_reconciliation','change_dimensions_on_copy',
+                     'inventory_command','prepare_inventory_command','execute_inventory_intent','cancel_inventory_intent'):
             self.assertNotIn(tool,names)
             self.assertEqual(self.code(session.call(tool,{})),'AGENT_TOOL_DENIED')
         dispatch.assert_not_called()

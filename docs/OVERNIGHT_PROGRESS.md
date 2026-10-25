@@ -148,3 +148,19 @@ restarcie, zamiast polegać wyłącznie na pamięci formularza. Brak kwitu nie m
 sam zwalniać nowego ID ani ponawiać skutków. Wspólna SQLite pozostaje źródłem;
 nie dodawać niezależnej bazy stanów w C#. Nie wpisywać rzeczywistego magazynu
 z przykładów. Native/nowa DLL, dane klienta i odbiory pozostają bez zmian.
+
+
+Heartbeat 25.10 11:16Z: snapshot obecny, checkout czysty na 4e45554.
+ROC-31 — trwałe żądania w tej samej SQLite, prepare/get/list/execute/cancel.
+Stock + kwit + committed atomowo; dawna ścieżka nie omija anulowania. Żądanie
+odnajdywalne po restarcie; odczyt nie ponawia skutków ani nie zmienia ID.
+Pełny harness PASS 20261025T112059746286Z, dodatkowy zestaw 28/28 PASS.
+Szczegóły w INVENTORY_CONTRACT.md. Stany klienta i CAD nietknięte.
+
+Następny przyrost: InventoryCommandForm korzystający z trwałych żądań,
+wybierany z partii/rezerwacji i listy istniejących żądań. Oddzielić jawne
+przygotowanie od wykonania. Po niepewnej odpowiedzi odczytać ten sam ID;
+nie generować nowego, nie odświeżać rewizji i nie ponawiać w tle. Przy otwarciu
+wczytać listę przygotowanych żądań z backendu, nie z osobnej bazy C#.
+Zacząć od reserve/issue/cancel/consume/return, potem jawne register/delivery/receive.
+Odbiór magazynu i native/nowa DLL pozostają NOT RUN; Linear oczekuje na dostęp.
