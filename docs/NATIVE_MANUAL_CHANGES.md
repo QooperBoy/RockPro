@@ -178,3 +178,22 @@ zatrzymała się przy dołączeniu do aplikacji (GetActiveObject, 0x800401E3),
 przed otwarciem dokumentu. Uruchomiony pojedynczy host nie udostępnił COM;
 nie powielano instancji ani rejestracji. Wcześniejszy natywny PASS odsadzenia
 nie zastępuje tego dowodu. Nowa DLL nie została wdrożona do hosta.
+
+
+## 25.10 — wątek okna decyzji przy braku kontekstu hosta
+
+Regresja HandleDecisionForm odtworzyła dostęp do kontrolek z wątku roboczego
+przy braku zastanego kontekstu WinForms. Konkretny FAIL w UpdateButtons:
+artifacts/verification/20261025T091728777515Z/ui-checks.log.
+Run wymaga teraz wątku właściciela i instaluje kontekst WinForms przed await.
+Backend nadal działa poza wątkiem interfejsu. Zakres dotyczy obsługi okna;
+nie zmienia algorytmu CAD, decyzji konstruktora ani uprawnień narzędzi.
+
+PASS: pomiar, zapis i błąd pomiaru bez zastanego kontekstu, przy włączonym
+wykrywaniu dostępu między wątkami. Test potwierdza pojedyncze wywołanie,
+zachowanie rewizji karty/decyzji i uwagi konstruktora, brak automatycznej decyzji
+po pomiarze oraz usunięcie starego tokenu i podglądu po błędzie odczytu.
+Pełny harness/build/UI PL/EN 100/150 PASS:
+artifacts/verification/20261025T091815069926Z/results.json.
+To izolowane próby z backendem testowym, bez SDK, SQLite klienta i ruchu CAD.
+Nowa DLL w hoście i świeży odczyt natywny nadal NOT RUN.

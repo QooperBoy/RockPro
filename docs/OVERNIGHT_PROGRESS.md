@@ -30,6 +30,7 @@ Onboarding ROC-1–4 nie należy do projektu CAD. ROC-5–10 to epiki. ROC-15/43
 | ROC-16/17 | Gotowe działające prototypy; brak pełnego odbioru rodziny | Profile, okucia, uchwyty i pary kół/gniazd są natywne i parametryczne, dowody w docs/CASE_HANDLES_V3.md i PART_FAMILY_REGISTRY_TASK.md. H2026 i pełny źródłowy szablon niezatwierdzone. |
 | ROC-40 | Trwałe decyzje H7159, ekran i native offset PASS | 5 testów logiki i 4 SQLite/MCP; pełny harness/build/UI PASS 20261025T071930707045Z. Odsadzenie 12 mm przetrwało native zapis/otwarcie i resize L/D/B na kopii. Nowa DLL niezaładowana; automatyczny pomiar w oknie i pełny guard innych rodzin/dodatków nadal otwarte. docs/NATIVE_MANUAL_CHANGES.md. |
 | ROC-40 dalszy przyrost | Pomiar SDK i kontrola świeżości w oknie zaimplementowane; native NOT RUN | 5 testów czytnika, 7 SQLite/MCP, pełny harness/build/UI PASS 20261025T074755934057Z. Jedna próba hosta PID 20328 zatrzymana na COM 0x800401E3, przed otwarciem sceny; zachowane native-01. Nie uruchamiać kolejnych instancji/nie rejestrować w ciemno. Pełny guard innych rodzin i zastosowanie nadal otwarte. |
+| ROC-40 wątek okna | Pomiar i zapis wracają na wątek właściciela PASS | Potwierdzona regresja bez kontekstu hosta i naprawa HandleDecisionForm. Pomiar/zapis/błąd zachowują CAS i uwagę, nie ponawiają operacji ani decyzji. Pełny harness/build/UI PASS 20261025T091815069926Z. Native/nowa DLL nadal NOT RUN. |
 | ROC-18 | Done w Linear po zapisie dowodów | XLSX, 3 przykłady, walidacja jednostek, trwałe wersje źródeł w tej samej SQLite, atomowy CAS i idempotencja. 9 nowych testów PASS; pełny harness/build/UI PASS 20261024T213039539715Z. Wrapper PowerShell PASS. docs/EXCEL_CONFIGURATION_INPUT.md. |
 | ROC-20/22/19 | Implementacje i dowody istnieją, pozostają integracja pełnych okuć i odbiór | Nie zamykać całych zadań na podstawie syntetycznej próby. |
 | ROC-20/22 dalszy przyrost | Naprawiony wątek okna odzyskiwania PASS | Regresja bez zastanego kontekstu odtworzyła InvalidOperationException, potem PASS odczytu/odzyskania/błędu z zachowaniem ID i bez ponawiania CAD. Pełny harness/build/UI PASS 20261025T084838344110Z. Host/akceptacja nadal NOT RUN. |
@@ -93,3 +94,12 @@ potwierdzonego błędu CasePlanForm, opisany w CORE_RUNTIME.md. Aktualizacja
 Linear nadal oczekuje na dostęp do Rock_Pro. Kolejna możliwa praca: sprawdzić
 czy obsługa asynchroniczna HandleDecisionForm zachowuje wątek właściciela
 przy braku kontekstu hosta; nie rozszerzać poprawki bez reprodukcji.
+
+
+Heartbeat 25.10 09:16Z: snapshot obecny, checkout był czysty na 9232d31.
+Potwierdzono i naprawiono wątek HandleDecisionForm; dowody w
+NATIVE_MANUAL_CHANGES.md. Nie dotykano hosta, źródeł CAD ani danych klienta.
+Następny konkretny checkpoint: podobny Run w RockProPanel; potwierdzić
+zachowanie po async bez kontekstu hosta na izolowanej próbie, przed ewentualną
+zmianą. Pozostałe okna mają już odpowiedni guard. Nie powtarzać zakończonych
+przyrostów ROC-25/26/21 ani testów natywnych przy niezmienionym blokerze COM.

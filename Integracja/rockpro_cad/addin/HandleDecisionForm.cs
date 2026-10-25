@@ -12,6 +12,7 @@ namespace RockPro.CAD {
 internal sealed class HandleDecisionForm : Form {
  readonly string projectId;
  readonly Func<string,object,Dictionary<string,object>> backend;
+ readonly int uiThread=System.Threading.Thread.CurrentThread.ManagedThreadId;
  readonly DataGridView differences=new DataGridView();
  readonly ComboBox choice=new ScrollSafeChoice {DropDownStyle=ComboBoxStyle.DropDownList};
  readonly Button load=new Button(),measurement=new Button(),readCad=new Button(),preview=new Button(),save=new Button();
@@ -54,7 +55,10 @@ internal sealed class HandleDecisionForm : Form {
   RefreshLanguage(null,EventArgs.Empty);UpdateButtons();
  }
  async Task<Dictionary<string,object>> Call(string name,object args){return await Task.Run(()=>backend(name,args));}
- async Task Run(Func<Task> action){if(busy)return;busy=true;UpdateButtons();try{await action();}catch(Exception ex){status.ForeColor=Color.Firebrick;status.Text=ex.Message+T("\nNie ponowiono zapisu ani nie odświeżono rewizji. Twoje wybory pozostają w oknie.","\nNo retry or revision refresh. Your choices remain in the window.")+(ex.Message.Contains("HANDLE_MEASUREMENT_")?T("\nZmierz uchwyty ponownie przed kolejnym podglądem i zapisem.","\nMeasure the handles again before previewing and saving."):"");}finally{busy=false;if(!IsDisposed)UpdateButtons();}}
+ async Task Run(Func<Task> action){
+  if(System.Threading.Thread.CurrentThread.ManagedThreadId!=uiThread)throw new InvalidOperationException("Handle UI operation must start on its owner thread");
+  System.Threading.SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+  if(busy)return;busy=true;UpdateButtons();try{await action();}catch(Exception ex){status.ForeColor=Color.Firebrick;status.Text=ex.Message+T("\nNie ponowiono zapisu ani nie odświeżono rewizji. Twoje wybory pozostają w oknie.","\nNo retry or revision refresh. Your choices remain in the window.")+(ex.Message.Contains("HANDLE_MEASUREMENT_")?T("\nZmierz uchwyty ponownie przed kolejnym podglądem i zapisem.","\nMeasure the handles again before previewing and saving."):"");}finally{busy=false;if(!IsDisposed)UpdateButtons();}}
  void UpdateButtons(){if(IsDisposed)return;load.Enabled=measurement.Enabled=!busy;readCad.Enabled=!busy&&revision>0;choice.Enabled=!busy&&evidence!=null;
   preview.Enabled=!busy&&evidence!=null&&choice.SelectedIndex>=0;
   save.Enabled=!busy&&review!=null&&choice.SelectedIndex>=0&&reference.Text.Trim().Length>0;reference.Enabled=!busy;}
