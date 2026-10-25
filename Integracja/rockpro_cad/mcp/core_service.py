@@ -120,7 +120,9 @@ def _layout_binding(conn, project_id, request):
     expected = f"prototype-layout:{project_id}:{row['revision']}:{row['sha256']}" if row else None
     _require(reference == expected and json.loads(row['spec']) == request['spec']['layout'],
              'LAYOUT_CONFLICT', 'Prepared request no longer matches the saved layout')
-    return dict(project_id=project_id, revision=row['revision'], sha256=row['sha256'])
+    from device_layout_service import assert_current_device_binding
+    device_binding=assert_current_device_binding(conn,project_id,row['revision'])
+    return dict(project_id=project_id, revision=row['revision'], sha256=row['sha256'])|({'device_binding':device_binding} if device_binding else {})
 
 
 def save_case_request(project_id, request, expected_revision, actor='unspecified', change_source='unspecified'):
@@ -151,6 +153,7 @@ def save_case_request(project_id, request, expected_revision, actor='unspecified
 def prepare_case_request(project_id, expected_layout_revision):
     import layout
     saved = layout.get_layout(project_id)
+    _require(saved.get('device_source_status') not in ('stale','unavailable'),'DEVICE_REVISION_CONFLICT','The layout device source changed; choose and review it again')
     _require(saved['saved'] and type(expected_layout_revision) is int and expected_layout_revision == saved['revision'],
              'LAYOUT_CONFLICT', 'Read the current saved layout before preparing a case request')
     spec = copy.deepcopy(saved['spec'])

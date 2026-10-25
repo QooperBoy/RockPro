@@ -95,7 +95,27 @@ def save_device_record(record,expected_revision):
             return dict(saved=True,reused=True,revision=revision,**result)
         if revision!=expected_revision:raise ValueError('DEVICE_REVISION_CONFLICT: Device data changed; compare current source evidence')
         conn.execute('INSERT INTO device_record_versions VALUES (?,?,?,?,?)',(catalog_id,revision+1,result['record_sha256'],payload,store.now()))
-    return dict(saved=True,reused=False,revision=revision+1,**result)
+        from device_layout_service import invalidate_device_layouts
+        affected=invalidate_device_layouts(conn,catalog_id)
+    return dict(saved=True,reused=False,revision=revision+1,invalidated_projects=affected,**result)
+
+
+def list_device_records(limit=100,after_catalog_id=None):
+    if type(limit) is not int or not 1<=limit<=100:raise ValueError('Device list limit 1..100 required')
+    if after_catalog_id is not None and (not isinstance(after_catalog_id,str) or not re.fullmatch('[0-9a-f]{64}',after_catalog_id)):raise ValueError('Invalid device page cursor')
+    with store.db() as conn:
+        conn.execute('BEGIN');_ensure(conn)
+        rows=conn.execute('''SELECT d.* FROM device_record_versions d WHERE d.revision=
+            (SELECT MAX(v.revision) FROM device_record_versions v WHERE v.catalog_id=d.catalog_id)
+            AND (? IS NULL OR d.catalog_id>?) ORDER BY d.catalog_id LIMIT ?''',(after_catalog_id,after_catalog_id,limit+1)).fetchall()
+    devices=[]
+    for row in rows[:limit]:
+        summary=preview_device_record(json.loads(row['record_json']))
+        if summary['record_sha256']!=row['record_sha256']:raise ValueError('DEVICE_RECORD_INTEGRITY_FAILED')
+        devices.append(dict(catalog_id=summary['catalog_id'],revision=row['revision'],identity=summary['identity'],
+                            fields={k:{f:summary['fields'][k][f] for f in ('value','unit','status')} for k in FIELDS},
+                            dimensions_ready=summary['dimensions_ready'],record_sha256=summary['record_sha256']))
+    return dict(devices=devices,has_more=len(rows)>limit,next_cursor=devices[-1]['catalog_id'] if len(rows)>limit else None)
 
 
 def get_device_record(catalog_id,revision=None):

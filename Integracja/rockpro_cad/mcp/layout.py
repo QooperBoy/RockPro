@@ -154,10 +154,12 @@ def get_layout(project_id,revision=None):
             if row is None: raise ValueError('Layout revision not found')
         else:
             row=conn.execute('SELECT * FROM layout_versions WHERE project_id=? ORDER BY revision DESC LIMIT 1',(project_id,)).fetchone()
-    return dict(saved=bool(row),revision=row['revision'] if row else 0,sha256=row['sha256'] if row else None,updated_at=row['created_at'] if row else None,**calculate_layout(json.loads(row['spec']) if row else {}))
+        from device_layout_service import source_for_layout
+        device_source=source_for_layout(conn,project_id,row['revision'] if row else 0)
+    return dict(saved=bool(row),revision=row['revision'] if row else 0,sha256=row['sha256'] if row else None,updated_at=row['created_at'] if row else None,**device_source,**calculate_layout(json.loads(row['spec']) if row else {}))
 
 
-def save_layout_in_transaction(conn,project_id,result,expected_revision,actor,change_source):
+def save_layout_in_transaction(conn,project_id,result,expected_revision,actor,change_source,*,device_binding_update=False):
     """Shared CAS write; caller owns BEGIN IMMEDIATE and the transaction."""
     if type(expected_revision) is not int or expected_revision<0: raise ValueError('expected_revision must be a nonnegative integer; read get_layout first')
     stamp=now();payload,digest=encode_spec(result['spec'])
@@ -165,6 +167,10 @@ def save_layout_in_transaction(conn,project_id,result,expected_revision,actor,ch
     current=conn.execute('SELECT COALESCE(MAX(revision),0) FROM layout_versions WHERE project_id=?',(project_id,)).fetchone()[0]
     if current!=expected_revision:
         raise ValueError('LAYOUT_CONFLICT: Układ zmienił inny użytkownik lub AI. Odczytana wersja '+str(expected_revision)+', aktualna '+str(current)+'. Pobierz aktualny układ i porównaj zmiany przed ponownym zapisem.')
+    if not device_binding_update:
+        from device_layout_service import binding_for_layout
+        if binding_for_layout(conn,project_id,current) is not None:
+            raise ValueError('DEVICE_LAYOUT_BOUND: użyj zapisu z powiązaniem urządzenia lub jawnie odłącz dane źródłowe')
     revision=current+1
     conn.execute('INSERT INTO layout_versions VALUES (?,?,?,?,?)',(project_id,revision,payload,digest,stamp))
     conn.execute("INSERT OR REPLACE INTO layouts VALUES (?,?,?)",(project_id,payload,stamp))

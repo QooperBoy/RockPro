@@ -37,4 +37,35 @@ XYZ/YXZ i X/Y przy granicy 650×500×381 mm. Dowód offline:
 artifacts/overnight-20261024/epson-layout-variants.json. To gabaryty propozycji
 solverowej; nie jest to zmiana ukończonego modelu CAD.
 
+## 25.10 — trwałe powiązanie z wersją urządzenia
+
+`device_layout_service.py` dodaje wybór wariantów z zapisanego katalogu,
+sprawdzenie edytowanego układu i atomowy zapis z numerem wersji układu oraz
+wersją/SHA rekordu urządzenia. Ograniczenia orientacji, kierunków, gabarytu
+i luzu wyjmowania pozostają przy powiązaniu; ranking obejmuje wyłącznie
+dozwolone i wykonalne kombinacje. Wymiary XYZ nie mogą zostać podmienione
+przy zachowanym opisie źródła producenta.
+
+`list_device_records` stronicuje bieżące warianty bez scalania podobnych nazw.
+`preview_catalog_layouts`, `preview_bound_device_layout` i
+`save_bound_device_layout` używają tych samych kontroli, co propozycje offline.
+Powiązanie jest zapisane w tej samej transakcji i SQLite co layout_versions.
+Niepotwierdzone wymiary zachowują blokadę wydania, choć można zapisać draft.
+
+Zmiana rekordu urządzenia dezaktualizuje powiązane etapy projektu. Stara
+propozycja nie może zostać zapisana ani użyta do przygotowania/wykonania CAD.
+Jeśli źródło zmieni się podczas tworzenia kopii, jej raport zachowuje użyte
+powiązanie i informację o dezaktualizacji; kopia nie jest rejestrowana jako
+aktualny wynik projektu. Oryginał pozostaje zachowany.
+
+Zwykły save_layout nie odłącza źródła po cichu. `unlink_layout_device` wymaga
+jawnego wywołania z expected_revision, tworzy nową wersję i zapisuje zdarzenie.
+Poprzednie wersje zachowują powiązanie. Dopiero potem można zapisać ręczne XYZ.
+Zapis nie stanowi zgody produkcyjnej ani nie oznacza potwierdzenia przez producenta.
+
+PASS: 9 testów transakcji/CAS, jednostek i źródeł, dopuszczonych wyborów,
+niepotwierdzonych danych, jawnego odłączenia i odmowy rozpoczęcia CAD.
+Pełny harness PASS: artifacts/verification/20261025T080355557794Z/results.json.
+Nowa ścieżka UI i natywne wnętrze pozostają do podłączenia/odbioru.
+
 Pełny harness po przyroście: PASS, artifacts/verification/20261024T214830686049Z/results.json.

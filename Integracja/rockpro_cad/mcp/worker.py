@@ -213,10 +213,18 @@ def change_dimensions_on_copy(changes, source=None, project_id=None, label=None,
         from layout import get_layout
         if not project_id: raise ValueError('layout_revision requires project_id')
         binding=get_layout(project_id,layout_revision)
+        if binding.get('device_source_status') in ('stale','unavailable'):raise ValueError('DEVICE_REVISION_CONFLICT: source data changed after the layout was saved')
         if changes != binding['parameters']: raise ValueError('CAD parameters do not match the pinned layout revision')
     report = _change_dimensions_on_copy(changes,source)
     if binding:
         report['layout_binding']={k:binding[k] for k in ('revision','sha256','spec')}
+        if binding.get('device_binding'):
+            report['layout_binding']['device_binding']=binding['device_binding']
+            current=get_layout(project_id,layout_revision)
+            if current['device_source_status']!='current':
+                report['device_source_outdated']=True
+                (Path(report['copy']).parent/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+                raise ValueError('DEVICE_REVISION_CONFLICT: source changed during CAD; unregistered copy retained at '+str(report['copy']))
         (Path(report['copy']).parent/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
     if project_id:
         report.update(register_snapshot(project_id,report,label or "Zmiana wymiarów",advance=True))
@@ -234,6 +242,16 @@ def create_snapshot(project_id,label="Snapshot",note=""):
 
 
 def dispatch(name, arguments):
+    device_layout_keys={
+        'preview_catalog_layouts':{'catalog_id','spec','constraints'},
+        'preview_bound_device_layout':{'binding','spec'},
+        'save_bound_device_layout':{'project_id','spec','binding','expected_revision','actor','change_source'},
+        'unlink_layout_device':{'project_id','expected_revision','actor','change_source'},
+    }
+    if name in device_layout_keys:
+        if not isinstance(arguments,dict) or set(arguments)-device_layout_keys[name]:raise ValueError('Invalid device layout argument')
+        import device_layout_service
+        return getattr(device_layout_service,name)(**arguments)
     handle_decision_keys={
         'preview_handle_reconciliation':{'evidence','choice','prior_state'},
         'get_handle_reconciliation':{'project_id'},
@@ -293,7 +311,7 @@ def dispatch(name, arguments):
         return getattr(family_recommendation,name)(**arguments)
     device_keys={
         'preview_device_record': {'record'},'save_device_record': {'record','expected_revision'},
-        'get_device_record': {'catalog_id','revision'},'draft_device_inquiry': {'record'},
+        'get_device_record': {'catalog_id','revision'},'draft_device_inquiry': {'record'},'list_device_records':{'limit','after_catalog_id'},
     }
     if name in device_keys:
         if not isinstance(arguments,dict) or set(arguments)-device_keys[name]:raise ValueError('Invalid device tool argument')
