@@ -55,6 +55,21 @@ def _balance(conn, ident):
                        free=row['on_hand']-held if result['condition']=='usable' else 0)
 
 
+def _receipt(row):
+    """Read preserved receipts without relabelling their historical balances."""
+    try:
+        result=json.loads(row['result_json'])
+        if (not isinstance(result,dict) or result.get('operation_id')!=row['operation_id'] or
+            result.get('production_approved') is not False or result.get('identity_verified') is not False or
+            result.get('replayed') is not False or result.get('action') not in
+            ('register','reserve','issue','consume','return','cancel','delivery','receive')):
+            raise ValueError('Stored receipt metadata differs')
+    except (ValueError,TypeError) as error:
+        raise ValueError('INVENTORY_RECEIPT_INTEGRITY: stored receipt is invalid') from error
+    return dict(operation_id=row['operation_id'],created_at=row['created_at'],
+                command_sha256=row['command_sha256'],result=result)
+
+
 def inventory_command(command, operation_id, expected_revision):
     token(operation_id,'operation ID')
     if type(expected_revision) is not int or expected_revision<0:raise ValueError('Inventory expected_revision required')
@@ -71,7 +86,7 @@ def inventory_command(command, operation_id, expected_revision):
         previous=conn.execute('SELECT * FROM inventory_journal WHERE operation_id=?',(operation_id,)).fetchone()
         if previous:
             if previous['command_sha256']!=command_hash:raise ValueError('INVENTORY_OPERATION_ID_REUSED')
-            return json.loads(previous['result_json'])|dict(replayed=True)
+            return _receipt(previous)['result']|dict(replayed=True)
         if action in ('register','receive'):
             lot=command['lot'];validate_lot(lot)
             if action=='register':
@@ -86,6 +101,10 @@ def inventory_command(command, operation_id, expected_revision):
                 conn.execute('UPDATE inventory_deliveries SET received=received+?,revision=revision+1 WHERE id=?',(lot['on_hand'],command['delivery_id']))
             conn.execute('INSERT INTO inventory_lots VALUES (?,?,?,1)',(lot['id'],encode(lot),lot['on_hand']))
             result=dict(lot=_balance(conn,lot['id']))
+            if action=='receive':
+                received=delivery['received']+lot['on_hand']
+                result['delivery']=data|dict(received=received,outstanding=data['quantity']-received,
+                                             revision=delivery['revision']+1)
         elif action=='delivery':
             d=command['delivery']
             if not isinstance(d,dict) or set(d)!={'id','item_id','unit','quantity','due_date','confirmation_reference','scope'}:raise ValueError('Exact confirmed delivery fields required')
@@ -95,7 +114,7 @@ def inventory_command(command, operation_id, expected_revision):
             if date.fromisoformat(d['due_date']).isoformat()!=d['due_date']:raise ValueError('ISO delivery date required')
             if expected_revision!=0:raise ValueError('DELIVERY_REVISION_CONFLICT')
             conn.execute('INSERT INTO inventory_deliveries VALUES (?,?,0,1)',(d['id'],encode(d)))
-            result=dict(delivery=d|dict(received=0,revision=1))
+            result=dict(delivery=d|dict(received=0,outstanding=d['quantity'],revision=1))
         else:
             reservation=None
             if action=='reserve':
@@ -151,5 +170,29 @@ def get_inventory():
 def get_inventory_history(limit=100):
     if type(limit) is not int or not 1<=limit<=500:raise ValueError('History limit 1..500 required')
     with store.db() as conn:
-        ensure(conn);rows=[dict(r) for r in conn.execute('SELECT * FROM inventory_journal ORDER BY created_at DESC,operation_id DESC LIMIT ?',(limit,))]
-    return dict(events=[dict(operation_id=r['operation_id'],created_at=r['created_at'],command_sha256=r['command_sha256'],result=json.loads(r['result_json'])) for r in rows])
+        ensure(conn);rows=[dict(r) for r in conn.execute('SELECT * FROM inventory_journal ORDER BY created_at DESC,rowid DESC LIMIT ?',(limit,))]
+    return dict(events=[_receipt(row) for row in rows])
+
+
+def get_inventory_operation(operation_id,command=None,expected_revision=None):
+    """Inspect one committed outcome; never executes or retries a stock command.
+
+    Optional pending command/revision must be supplied together. This verifies
+    that a recovered receipt belongs to exactly that caller's intended command.
+    Absence is only a point-in-time observation, not permission to change the ID.
+    """
+    token(operation_id,'operation ID')
+    expected_hash=None
+    if command is not None or expected_revision is not None:
+        if not isinstance(command,dict) or type(expected_revision) is not int or expected_revision<0:
+            raise ValueError('Pending command and expected_revision must be supplied together')
+        expected_hash=digest(dict(command=command,expected_revision=expected_revision))
+    with store.db() as conn:
+        ensure(conn)
+        row=conn.execute('SELECT * FROM inventory_journal WHERE operation_id=?',(operation_id,)).fetchone()
+    if row is None:
+        return dict(operation_id=operation_id,found=False,receipt=None,command_matches=None,production_approved=False)
+    if expected_hash is not None and row['command_sha256']!=expected_hash:
+        raise ValueError('INVENTORY_RECEIPT_COMMAND_MISMATCH: operation ID belongs to a different command or revision')
+    return dict(operation_id=operation_id,found=True,receipt=_receipt(row),
+                command_matches=True if expected_hash is not None else None,production_approved=False)

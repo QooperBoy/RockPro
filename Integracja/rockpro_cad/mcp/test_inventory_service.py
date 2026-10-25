@@ -67,7 +67,10 @@ class InventoryTests(unittest.TestCase):
         self.cmd(dict(action='delivery',delivery=delivery),0)
         snapshot=inv.get_inventory();self.assertEqual(len(snapshot['lots']),1);self.assertEqual(snapshot['deliveries'][0]['outstanding'],30)
         receipt=lot('received',20,'piece');receipt['item_id']='locks'
-        self.cmd(dict(action='receive',delivery_id='delivery-1',lot=receipt),1)
+        accepted=self.cmd(dict(action='receive',delivery_id='delivery-1',lot=receipt),1,'receive-test')
+        self.assertEqual((accepted['delivery']['id'],accepted['delivery']['received'],accepted['delivery']['outstanding'],accepted['delivery']['revision']),('delivery-1',20,10,2))
+        preserved=inv.get_inventory_operation('receive-test')['receipt']['result']
+        self.assertEqual(preserved,accepted)
         self.assertEqual(inv.get_inventory()['deliveries'][0]['outstanding'],10)
         with self.assertRaises(ValueError):self.cmd(dict(action='receive',delivery_id='delivery-1',lot=receipt|dict(id='over')),2)
 
@@ -75,6 +78,46 @@ class InventoryTests(unittest.TestCase):
         self.cmd(dict(action='register',lot=lot('quarantine')|dict(condition='quarantine')),0)
         with self.assertRaisesRegex(ValueError,'FREE_STOCK'):self.reserve('q','plan',1,'quarantine')
         with self.assertRaisesRegex(ValueError,'unique'):self.cmd(dict(action='register',lot=lot('duplicate',2)),0)
+
+    def test_receipt_recovery_checks_exact_pending_command_without_reexecuting(self):
+        command=dict(action='reserve',lot_id='offcut-1',reservation_id='h',plan_id='p',quantity=1)
+        result=self.cmd(command,1,'lost-reply')
+        before=inv.get_inventory()
+        recovered=worker.dispatch('get_inventory_operation',dict(operation_id='lost-reply',command=command,expected_revision=1))
+        self.assertTrue(recovered['found']);self.assertTrue(recovered['command_matches'])
+        self.assertEqual(recovered['receipt']['result'],result)
+        with self.assertRaisesRegex(ValueError,'COMMAND_MISMATCH'):
+            inv.get_inventory_operation('lost-reply',command|dict(quantity=2),1)
+        with self.assertRaisesRegex(ValueError,'COMMAND_MISMATCH'):
+            inv.get_inventory_operation('lost-reply',command,2)
+        self.assertEqual(inv.get_inventory(),before)
+        self.assertFalse(recovered['production_approved'])
+        for args in ({'command':command},{'expected_revision':1},{'command':command,'expected_revision':True}):
+            with self.assertRaisesRegex(ValueError,'together'):inv.get_inventory_operation('lost-reply',**args)
+
+    def test_receipt_missing_is_read_only_and_not_limited_to_recent_history(self):
+        missing=inv.get_inventory_operation('not-recorded')
+        self.assertFalse(missing['found']);self.assertIsNone(missing['receipt']);self.assertIsNone(missing['command_matches'])
+        self.reserve(op='new-operation')
+        self.assertNotIn('op-1',[r['operation_id'] for r in inv.get_inventory_history(1)['events']])
+        found=inv.get_inventory_operation('op-1')
+        self.assertTrue(found['found']);self.assertIsNone(found['command_matches'])
+        self.assertEqual(len(inv.get_inventory_history()['events']),2)
+
+    def test_equal_timestamps_follow_recording_order_instead_of_lexical_ids(self):
+        with patch.object(store,'now',return_value='2030-01-01T00:00:00+00:00'):
+            self.cmd(dict(action='register',lot=lot('stock-a')),0,'operation-9')
+            self.cmd(dict(action='register',lot=lot('stock-b')),0,'operation-10')
+        self.assertEqual([r['operation_id'] for r in inv.get_inventory_history(2)['events']],['operation-10','operation-9'])
+
+    def test_corrupt_receipt_blocks_recovery_history_and_replay_without_stock_changes(self):
+        before=inv.get_inventory()
+        with store.db() as conn:
+            conn.execute("UPDATE inventory_journal SET result_json='{}' WHERE operation_id='op-1'")
+        for action in (lambda:inv.get_inventory_operation('op-1'),lambda:inv.get_inventory_history(),
+                       lambda:self.cmd(dict(action='register',lot=lot()),0,'op-1')):
+            with self.assertRaisesRegex(ValueError,'RECEIPT_INTEGRITY'):action()
+        self.assertEqual(inv.get_inventory(),before)
 
 
 if __name__=='__main__':unittest.main()

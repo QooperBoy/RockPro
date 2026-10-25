@@ -77,3 +77,38 @@ NOT RUN: nowa DLL w rzeczywistym IronCAD i odbiór magazyniera. Nie rejestrowano
 DLL ani nie dotykano modeli, prywatnej bazy czy zachowanego wdrożenia. Zmian
 nie przesłano do Linear — dostępny konektor nadal nie widzi Rock_Pro.
 Nie oznaczono całego ROC-31 Done.
+
+
+## 25.10 — odczyt pojedynczego wyniku i powiązanie przyjęcia
+
+get_inventory_operation(operation_id, command=None, expected_revision=None)
+odczytuje konkretny zachowany kwit niezależnie od limitu listy historii. Nie
+uruchamia polecenia ponownie. Opcjonalne command i expected_revision należy
+podać razem; serwer oblicza ten sam hash co zapis i odmawia obcego polecenia
+lub rewizji (INVENTORY_RECEIPT_COMMAND_MISMATCH). Klient C# nie musi odtwarzać
+kanonizacji JSON ani SHA w osobnej implementacji.
+
+found=false i receipt=null oznaczają brak zapisu w chwili odczytu. Nie oznacza
+to zgody na nowy operation_id: wcześniejsza operacja może nadal czekać na commit.
+command_matches=true występuje tylko przy znalezionym kwicie i porównaniu
+pełnego polecenia/rewizji; bez danych porównawczych pozostaje null.
+To narzędzie operatora readonly; statycznej allowlisty agenta nie rozszerzano.
+
+Nowe kwity receive zawierają powiązaną dostawę z ID, received, outstanding
+i rewizją po przyjęciu. Kwit delivery pokazuje outstanding już od utworzenia.
+Nie modyfikujemy starych kwitów ani nie dopisujemy domyślnych referencji do
+historycznych przyjęć bez powiązania. Odczyt kwitu, historia i idempotentny
+replay odmawiają uszkodzonej struktury/tożsamości/pól zatwierdzenia. To kontrola
+kontraktu danych, nie podpis ani ochrona przed skoordynowaną edycją całej bazy.
+
+Przy identycznym created_at historia używa kolejności zapisu w dzienniku,
+a nie leksykograficznego ID (operation-10 nie jest starsze od operation-9).
+Nie zmienia to zapisanych znaczników czasu ani historycznych danych.
+
+PASS: 10 testów backendu magazynu, w tym odczyt starego wyniku poza limitem
+historii, porównanie polecenia/rewizji, brak ponownego skutku po utracie
+odpowiedzi, powiązanie dostawy, kolejność równych czasów i odmowa uszkodzonego
+kwitu bez zmiany sald. Pełny harness PASS:
+artifacts/verification/20261025T104845768001Z/results.json.
+UI poleceń, odtworzenie oczekującego polecenia po restarcie oraz pilot
+magazyniera nadal pozostają następnym krokiem; nie jest to pełny ROC-31 Done.

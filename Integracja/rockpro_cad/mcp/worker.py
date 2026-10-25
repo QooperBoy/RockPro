@@ -277,7 +277,8 @@ def dispatch(name, arguments):
         from purchase_proposals import preview_purchases
         return preview_purchases(**arguments)
     inventory_keys={'inventory_command': {'command','operation_id','expected_revision'},
-                    'get_inventory':set(),'get_inventory_history':{'limit'}}
+                    'get_inventory':set(),'get_inventory_history':{'limit'},
+                    'get_inventory_operation':{'operation_id','command','expected_revision'}}
     if name in inventory_keys:
         if not isinstance(arguments,dict) or set(arguments)-inventory_keys[name]:raise ValueError('Invalid inventory tool argument')
         import inventory_service

@@ -133,6 +133,8 @@ SCHEMAS += [
         {'command':{'type':'object'},'operation_id':S,'expected_revision':REV},['command','operation_id','expected_revision']),
  schema('get_inventory','Read physical, held and free stock without double subtraction; confirmed unreceived deliveries are separate',{},readonly=True),
  schema('get_inventory_history','Read bounded immutable inventory operation receipts; caller identity is unverified',{'limit':{'type':'integer','minimum':1,'maximum':500}},readonly=True),
+ schema('get_inventory_operation','Read one preserved inventory receipt by operation ID without retrying; optionally verify the exact pending command and revision. Missing is only a point-in-time observation',
+        {'operation_id':S,'command':{'type':'object'},'expected_revision':REV},['operation_id'],True),
 ]
 
 

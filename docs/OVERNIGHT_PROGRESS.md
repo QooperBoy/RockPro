@@ -133,3 +133,18 @@ kwitu oraz powiązanie receive z dostawą w nowych kwitach (historyczne pozostaj
 bez domyślania). Następnie formularz polecenia/rezerwacji i test konfliktu oraz
 braku podwójnego odjęcia. Prawdziwe stany/dostawy i pilot wymagają danych magazynu.
 Nie oznaczać przyrostu odczytu jako pełnego ROC-31 Done.
+
+
+Heartbeat 25.10 10:46Z: snapshot obecny, checkout czysty na bb8dbf5.
+ROC-31 — get_inventory_operation odczytuje pojedynczy kwit i weryfikuje
+opcjonalne dokładne polecenie/rewizję bez ponawiania skutków. Nowe receive
+zachowuje powiązaną dostawę. Odczyt/replay odmawia uszkodzonego kwitu, remisy
+czasu sortowane kolejnością zapisu. 10 testów i pełny harness PASS
+20261025T104845768001Z. Szczegóły i ograniczenia w INVENTORY_CONTRACT.md.
+
+Następny krok: polecenia operatora w UI z trwałym ID i niezmienionymi danymi po
+niepewnej odpowiedzi. Zapewnić możliwość odnalezienia oczekującego polecenia po
+restarcie, zamiast polegać wyłącznie na pamięci formularza. Brak kwitu nie może
+sam zwalniać nowego ID ani ponawiać skutków. Wspólna SQLite pozostaje źródłem;
+nie dodawać niezależnej bazy stanów w C#. Nie wpisywać rzeczywistego magazynu
+z przykładów. Native/nowa DLL, dane klienta i odbiory pozostają bez zmian.
