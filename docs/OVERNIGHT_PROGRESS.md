@@ -1,5 +1,11 @@
 # Nocna kolejka RockPro — rozpoczęta 24.10.2026
 
+**Aktualne przekazanie 25.10:** [OVERNIGHT_HANDOFF_20261025.md](OVERNIGHT_HANDOFF_20261025.md).
+Przyrosty źródłowe do cfe9d67 sprawdzone; ostatni pełny harness/build/UI PASS
+20261025T133758293539Z. Pozostałe odbiory mają opisane blokery hosta, danych i
+ludzi. Tabela poniżej oraz wpisy są dziennikiem historycznym — późniejsze wpisy
+uzupełniają starszy stan. Nie powtarzać ukończonych przyrostów.
+
 Polecenie użytkownika: snapshot, zadania z Linear po kolei, rutynowe decyzje
 samodzielnie, pytania na rano. Nie oznaczamy niewykonanych odbiorów jako Done.
 
@@ -243,3 +249,10 @@ konkretnymi blokerami danych/odbiorów. Nie wymyślać kolejnych funkcji zamiast
 spełnienia wymaganych dowodów. Weryfikacja technicznego przyrostu nie oznacza
 zamknięcia ROC-31/32/33 ani odbiorów ROC-34–38. Dostęp Rock_Pro nadal wymaga
 narzędzia właściwego workspace lub zalogowanej przeglądarki.
+
+Przegląd pozostałych rzeczywistych wymagań zakończony: konkretne blokery
+i dowody w OVERNIGHT_HANDOFF_20261025.md. Konektor ponownie potwierdził tylko
+MOD/Modivo, includeArchived=true i hasNextPage=false; narzędzia przeglądarki
+nadal brak. Dalsze odbiory wymagają danych, hosta lub człowieka, nie kolejnych
+syntetycznych PASS. Automatyzacja ustawiona przez narzędzie aplikacji na PAUSED.
+Nie oznaczono wszystkich zadań jako ukończonych i nie wykonano push.
