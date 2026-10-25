@@ -121,5 +121,19 @@ class InventoryIntentTests(unittest.TestCase):
         self.assertEqual(rejected['state'],'rejected');self.assertIsNone(rejected['receipt'])
         self.assertEqual(inventory.get_inventory(),before)
 
+    def test_prepared_receipt_is_bound_to_delivery_revision_and_cannot_overreceive(self):
+        supply=dict(id='supply-test',item_id='locks-test',unit='piece',quantity=20,due_date='2030-01-01',
+                    confirmation_reference='SYNTHETIC-PO',scope='synthetic_test')
+        inventory.inventory_command(dict(action='delivery',delivery=supply),'supply-create',0)
+        receipt=lot('receipt-test',10,'piece')|dict(item_id='locks-test')
+        command=dict(action='receive',delivery_id='supply-test',lot=receipt)
+        self.prepare('receive-request',command,1)
+        inventory.inventory_command(dict(action='receive',delivery_id='supply-test',lot=receipt|dict(id='other-receipt',on_hand=5)),'other-receive',1)
+        before=inventory.get_inventory()
+        with self.assertRaisesRegex(ValueError,'DELIVERY_REVISION_CONFLICT'):intents.execute_inventory_intent('receive-request')
+        rejected=intents.get_inventory_intent('receive-request')
+        self.assertEqual(rejected['state'],'rejected');self.assertEqual(rejected['expected_revision'],1)
+        self.assertEqual(inventory.get_inventory(),before)
+
 
 if __name__=='__main__':unittest.main()

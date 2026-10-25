@@ -180,3 +180,23 @@ klienta. Wykorzystać tę samą maszynę trwałych żądań i CAS dostawy przy r
 Po tym możliwy jest podgląd propozycji zakupowych ROC-32 i wersji planów ROC-33;
 rzeczywiste oferty, BOM i pilotaże nadal wymagają danych/odbiorów. Nie powtarzać
 ukończonych testów/native przy niezmienionych blokerach COM i dostępu Linear.
+
+
+Heartbeat 25.10 12:16Z: snapshot obecny, checkout czysty na 2bb8770.
+ROC-31 — register/delivery/receive w InventoryCommandForm; cały techniczny
+zakres ośmiu akcji dostępny w źródle. Jawne ilości/jednostki/pochodzenie/termin,
+CAS dostawy przy receive, wspólna maszyna trwałych żądań. Pełny harness/build/UI
+PASS 20261025T122725573565Z; obejrzane nowe tryby PL/EN 100/150. Poprawiono
+potwierdzony wizualnie problem etykiet przy dynamicznym układzie. Szczegóły
+INVENTORY_CONTRACT.md. Pilot magazyniera/nowa DLL nadal NOT RUN.
+
+Ponowna kontrola konektora Linear: tylko zespół MOD/Modivo, hasNextPage=false.
+Nie ma narzędzia zalogowanej przeglądarki, więc aktualizacje ROC są nadal lokalne.
+Nie wykonywano operacji CAD ani transakcji na danych klienta.
+
+Następne niezablokowane zadanie: ROC-32 — operatorowy podgląd wymagań/ofert,
+limitów i propozycji zakupowych przez istniejące preview_purchases, z jawnymi
+brakami i bez zakupu. Czytać rzeczywisty zakres z zachowanego
+raporty/ROC-32_BEFORE_NIGHT_UPDATE.txt i PURCHASE_PROPOSALS.md. Nie tworzyć
+ofert/cen klienta ani zgód zamienników z domysłów. Potem UI planów ROC-33.
+Odbiory, pełny CAD, licencje i historyczne dane nadal są jawnie zablokowane.

@@ -210,3 +210,51 @@ NOT RUN: nowa DLL w IronCAD, rzeczywisty magazyn i odbiór magazyniera. Nie
 rejestrowano dodatku ani nie uruchamiano natywnego CAD. Całe ROC-31 pozostaje
 otwarte do pozostałych formularzy i pilotażu; aktualizacja Linear nadal oczekuje
 na dostęp do Rock_Pro.
+
+
+## 25.10 — rejestracja partii, potwierdzenia i przyjęcia dostaw w UI
+
+InventoryCommandForm obejmuje teraz wszystkie osiem operacji operatora.
+register, delivery i receive korzystają z tego samego przygotowania trwałego
+żądania, osobnego wykonania i odczytu wyniku. Nie mają drugiego wykonawcy ani
+osobnej bazy. Zakres poprzedniego przyrostu pięciu operacji pozostaje zachowany.
+
+Rejestracja wymaga jawnego ID, SKU, jednostki, fizycznej ilości, lokalizacji,
+stanu i pochodzenia. Arkusze/resztki wymagają dodatnich L/W/T w mm; sztuki mają
+dimensions_mm=null. Fizyczna resztka wymaga ilości 1 i własnego ID. Formularz
+odmawia błędnej ilości, zamiast korygować ją automatycznie. Początkowa ilość
+0 oznacza niewprowadzone dane w szkicu i nie pozwala przygotować polecenia.
+Jednostka, stan i pochodzenie nie mają domyślnej zaakceptowanej wartości.
+
+Potwierdzenie dostawy wymaga ilości, jednostki, SKU, pochodzenia, referencji
+potwierdzenia i jawnie zaznaczonego terminu. Niezaznaczona data nie staje się
+potwierdzonym terminem przez sam domyślny widok kalendarza. Niczego nie zamawia
+u dostawcy — zapisuje wejściowe oświadczenie operatora.
+
+Przyjęcie wybiera istniejącą dostawę z ilością outstanding > 0. SKU, jednostka
+i pochodzenie są pobierane z jej rekordu i zablokowane do ręcznej podmiany.
+Operator określa nowy identyfikator partii, ilość przyjmowaną, lokalizację,
+stan i ewentualne wymiary. expected_revision jest przypiętą rewizją dostawy,
+nie rewizją nowej partii. Ponowny odczyt danych nie odświeża już przygotowanego
+żądania. Zmiana dostawy wymaga porównania i nowego żądania po odrzuceniu starego.
+
+Podsumowanie pokazuje zagnieżdżone dane partii/dostawy jako podpisane wiersze,
+jednostki, pochodzenie i przypiętą wersję, zamiast jednego długiego JSON.
+Naprawiono wykryte wizualnie rozdzielanie etykiet od pól po zmianie widoczności:
+każda para ma teraz wspólny kontener. Regresja sprawdza etykietę nad właściwym
+polem także po przełączaniu operacji i skali; dłuższe formularze są przewijane.
+
+PASS: pełny harness/build/UI PL/EN przy skali 100/150:
+artifacts/verification/20261025T122725573565Z/results.json.
+Próby UI obejmują osiem akcji, brak wymyślonych ilości/pochodzenia/terminu,
+wymiary resztki, odmowę cichej zmiany ilości, dane z dostawy i konflikt jej
+przypiętej rewizji. Backend dostał niezależną regresję: przygotowane receive
+po częściowym przyjęciu przez kogoś innego odmawia na CAS, zachowuje starą
+wersję i nie zmienia sald. Zrzuty wszystkich nowych trybów PL/EN 100/150:
+artifacts/inventory-stock-ui-20261025/ (sprawdzone wizualnie).
+
+NOT RUN: rzeczywiste transakcje na bazie klienta, formularz w załadowanej DLL
+IronCAD oraz odbiór magazyniera. Testy okien używają backendu testowego, a testy
+serwisu osobnej SQLite. Nie zmieniano źródłowych modeli ani prywatnego wdrożenia.
+Konektor Linear ponownie sprawdzony: nadal wyłącznie Modivo, brak narzędzia
+zalogowanej przeglądarki. Całego ROC-31 nie oznaczono Done.

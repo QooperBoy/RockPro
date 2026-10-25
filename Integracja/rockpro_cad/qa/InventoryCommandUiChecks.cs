@@ -83,7 +83,34 @@ internal static class InventoryCommandUiChecks {
     if(!Field<Button>(form,"prepare").Enabled||Field<Button>(form,"fresh").Enabled||missing.Prepares!=1||Field<TextBox>(form,"reference").Enabled)throw new Exception("Missing preparation was retried or allowed changing its ID/payload");
     Run(form,"Prepare");if(missing.Prepares!=2||missing.Executes!=0||id!=Field<TextBox>(form,"operation").Text||Convert.ToInt64(missing.Submitted["expected_revision"])!=Convert.ToInt64(submitted["expected_revision"])||Rpc.Str(missing.Submitted,"decision_reference")!=Rpc.Str(submitted,"decision_reference"))throw new Exception("Explicit preparation retry changed its binding or executed stock");form.Close();
    }
-   Console.WriteLine("PASS: inventory commands PL/EN 100/150, explicit prepare/execute separation, pinned CAS, five actions, lost replies/conflict recovery, no retries and stored requests after reopening");
+   StockEntryChecks(Rpc.Obj(fixture["inventory"]));
+   Console.WriteLine("PASS: inventory commands PL/EN 100/150, eight actions, explicit prepare/execute separation, lot/delivery CAS, explicit stock metadata, lost replies/conflict recovery, no retries and stored requests after reopening");
   }finally{SynchronizationContext.SetSynchronizationContext(context);Control.CheckForIllegalCrossThreadCalls=oldCheck;UiText.SetLanguage(oldLanguage,false);}
+ }
+ static void StockDraft(InventoryCommandForm form,int index){
+  Field<ComboBox>(form,"action").SelectedIndex=index;Field<TextBox>(form,"reference").Text="UI-only stock instruction";
+  if(index==7){Choose(Field<ComboBox>(form,"deliveryChoice"),"delivery-test");Field<TextBox>(form,"stockLotId").Text="ui-received";Field<TextBox>(form,"stockLocation").Text="rack-qa";Field<NumericUpDown>(form,"stockQuantity").Value=5;Field<ComboBox>(form,"stockCondition").SelectedIndex=0;return;}
+  Field<TextBox>(form,"stockItem").Text=index==5?"qa-plywood":"qa-locks";Field<ComboBox>(form,"stockUnit").SelectedIndex=index==5?2:0;Field<ComboBox>(form,"stockScope").SelectedIndex=1;
+  Field<NumericUpDown>(form,"stockQuantity").Value=index==5?1:30;
+  if(index==5){Field<TextBox>(form,"stockLotId").Text="ui-offcut";Field<TextBox>(form,"stockLocation").Text="rack-qa";Field<NumericUpDown>(form,"stockLength").Value=1000;Field<NumericUpDown>(form,"stockWidth").Value=600;Field<NumericUpDown>(form,"stockThickness").Value=9;Field<ComboBox>(form,"stockCondition").SelectedIndex=0;}
+  else{Field<TextBox>(form,"newDeliveryId").Text="ui-delivery";Field<TextBox>(form,"confirmation").Text="QA-PO";Field<DateTimePicker>(form,"dueDate").Value=new DateTime(2030,1,1);Field<DateTimePicker>(form,"dueDate").Checked=true;}
+ }
+ static void StockEntryChecks(Dictionary<string,object> inventory){
+  foreach(bool english in new[]{false,true})foreach(float scale in new[]{1f,1.5f})for(int index=5;index<8;index++){
+   UiText.SetLanguage(english,false);var backend=new Backend {Inventory=inventory};
+   using(var form=Open(backend)){form.Scale(new SizeF(scale,scale));Application.DoEvents();Field<ComboBox>(form,"action").SelectedIndex=index;
+    if(Field<NumericUpDown>(form,"stockQuantity").Value!=0||Field<ComboBox>(form,"stockScope").SelectedIndex!=-1||Field<DateTimePicker>(form,"dueDate").Checked||Field<Button>(form,"prepare").Enabled)throw new Exception("Stock entry invented quantity, scope or confirmation date");
+    StockDraft(form,index);Run(form,"Prepare");var command=Rpc.Obj(backend.Submitted["command"]);
+    foreach(var pair in Field<Dictionary<Control,Control>>(form,"inputGroups")){var group=(TableLayoutPanel)pair.Value;if(!group.Visible)continue;var label=group.GetControlFromPosition(0,0);if(label==null||group.GetControlFromPosition(0,1)!=pair.Key||label.Bottom>pair.Key.Top)throw new Exception("Stock input separated from its label after dynamic layout");}
+    if(backend.Prepares!=1||backend.Executes!=0||Convert.ToInt64(backend.Submitted["expected_revision"])!=(index==7?2:0)||!Field<Button>(form,"execute").Enabled)throw new Exception("Stock preparation executed or used wrong lot/delivery revision");
+    if(index==6){var delivery=Rpc.Obj(command["delivery"]);if(Rpc.Str(delivery,"due_date")!="2030-01-01"||Rpc.Str(delivery,"confirmation_reference")!="QA-PO"||Convert.ToInt32(delivery["quantity"])!=30)throw new Exception("Delivery confirmation fields lost");}
+    else{var lot=Rpc.Obj(command["lot"]);if(Rpc.Str(lot,"scope")!="synthetic_test"||Rpc.Str(lot,"condition")!="usable"||Convert.ToInt32(lot["on_hand"])!=(index==5?1:5))throw new Exception("Physical stock fields invented or dropped");
+     if(index==5&&Rpc.Rows(lot["dimensions_mm"]).Length!=3)throw new Exception("Offcut dimensions missing");if(index==7&&(Rpc.Str(lot,"item_id")!="locks-test"||Rpc.Str(lot,"unit")!="piece"||lot["dimensions_mm"]!=null||Field<ComboBox>(form,"stockScope").Enabled||Field<TextBox>(form,"stockItem").Enabled))throw new Exception("Receipt could override confirmed delivery metadata");}
+    string folder=Environment.GetEnvironmentVariable("ROCKPRO_UI_EVIDENCE");if(!String.IsNullOrEmpty(folder))using(var bitmap=new Bitmap(form.Width,form.Height)){form.DrawToBitmap(bitmap,new Rectangle(Point.Empty,form.Size));bitmap.Save(Path.Combine(folder,"inventory-stock-"+index+"-"+(english?"en":"pl")+"-"+(scale>1?"150":"100")+".png"));}
+    string payload=new JavaScriptSerializer().Serialize(backend.Submitted);UiText.SetLanguage(!english,false);if(payload!=new JavaScriptSerializer().Serialize(backend.Submitted)||backend.Prepares!=1)throw new Exception("Language switch changed stock payload");form.Close();
+   }
+  }
+  var invalid=new Backend {Inventory=inventory};using(var form=Open(invalid)){StockDraft(form,5);Field<NumericUpDown>(form,"stockQuantity").Value=2;Run(form,"Prepare");if(invalid.Prepares!=0||Field<TextBox>(form,"operation").Text!=""||Field<NumericUpDown>(form,"stockQuantity").Value!=2)throw new Exception("Offcut count was silently changed or invalid request persisted");form.Close();}
+  var stale=new Backend {Inventory=RevisionUi.Clone(inventory)};using(var form=Open(stale)){StockDraft(form,7);Run(form,"Prepare");foreach(var value in Rpc.Rows(stale.Inventory["deliveries"]))Rpc.Obj(value)["revision"]=3;Run(form,"LoadData");stale.Failure="conflict";Run(form,"Execute");Run(form,"Read");if(Convert.ToInt64(stale.Submitted["expected_revision"])!=2||stale.Executes!=1||!Field<Button>(form,"fresh").Enabled)throw new Exception("Receipt refreshed its delivery CAS or retried after conflict");form.Close();}
  }
 }
