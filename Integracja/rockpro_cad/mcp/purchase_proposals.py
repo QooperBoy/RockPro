@@ -48,6 +48,12 @@ def calculate_purchases(requirements, inventory, offers, policy):
         if not isinstance(values,list) or len(values)>100:raise ValueError('Bounded substitution list required')
         for value in values:token(value,'approved substitute')
     if not isinstance(offers,list) or len(offers)>200:raise ValueError('Offer limit 200')
+    offer_fields={'id','item_id','unit','supplier','currency','quote_date','valid_until','pack_size','moq','lead_days','available_quantity','price_breaks','shipping_net','tax_percent'}
+    offer_issues=[];missing_by_offer=[]
+    for index,offer in enumerate(offers):
+        if not isinstance(offer,dict) or set(offer)!=offer_fields:raise ValueError('Exact offer fields required; use null for missing data')
+        missing=sorted(k for k in offer_fields if offer[k] is None);missing_by_offer.append(missing)
+        if missing:offer_issues.append(dict(offer_index=index,offer_id=offer['id'],reason='incomplete_offer',missing_fields=missing))
     supplies=[]
     for lot in inventory['lots']:
         if lot['scope']==requirements['scope'] and lot['condition']=='usable' and lot['free']>0:
@@ -57,7 +63,6 @@ def calculate_purchases(requirements, inventory, offers, policy):
             supplies.append(dict(id=delivery['id'],item_id=delivery['item_id'],unit=delivery['unit'],quantity=delivery['outstanding'],date=delivery['due_date'],kind='confirmed_delivery'))
     supplies.sort(key=lambda s:(s['date'],s['kind'],s['id']))
     results=[]
-    offer_fields={'id','item_id','unit','supplier','currency','quote_date','valid_until','pack_size','moq','lead_days','available_quantity','price_breaks','shipping_net','tax_percent'}
     for line in sorted(lines,key=lambda r:(r['required_date'],r['id'])):
         missing=line['quantity'];allocations=[]
         for supply in supplies:
@@ -67,13 +72,12 @@ def calculate_purchases(requirements, inventory, offers, policy):
             supply['quantity']-=used;missing-=used
         options=[];rejections=[]
         allowed={line['item_id'],*substitutes.get(line['item_id'],[])}
-        for offer in offers:
-            if not isinstance(offer,dict) or set(offer)!=offer_fields:raise ValueError('Exact offer fields required; use null for missing data')
+        for index,offer in enumerate(offers):
             if offer['item_id'] not in allowed or offer['unit']!=line['unit']:continue
-            token(offer['id'],'offer ID');token(offer['supplier'],'supplier')
-            incomplete=[k for k in offer_fields if offer[k] is None]
+            incomplete=missing_by_offer[index]
             if incomplete:
-                rejections.append(dict(offer_id=offer['id'],reason='incomplete_offer',missing_fields=sorted(incomplete)));continue
+                rejections.append(dict(offer_id=offer['id'],reason='incomplete_offer',missing_fields=incomplete));continue
+            token(offer['id'],'offer ID');token(offer['supplier'],'supplier')
             if offer['currency']!=currency:
                 rejections.append(dict(offer_id=offer['id'],reason='currency_conversion_not_configured'));continue
             quote=iso(offer['quote_date']);valid=iso(offer['valid_until'])
@@ -111,7 +115,7 @@ def calculate_purchases(requirements, inventory, offers, policy):
         options.sort(key=lambda o:(not o['feasible'],Decimal(o['total_gross']),o['surplus'],o['arrival_date'],o['offer_id']))
         results.append(dict(requirement=line,allocations=allocations,shortage=missing,options=options,
                             rejected_offers=rejections,preferred_option=next((o for o in options if o['feasible']),None)))
-    result=dict(lines=results,bindings=requirements['bindings'],scope=requirements['scope'],
+    result=dict(lines=results,bindings=requirements['bindings'],scope=requirements['scope'],offer_issues=offer_issues,
         input_sha256=digest(dict(requirements=requirements,inventory=inventory,offers=offers,policy=policy)),
         shipping_basis='per_requirement_offer; consolidated shipping not optimized',
         lead_time_basis='calendar_days',cash_limit_basis='per_option; combined cash not approved',

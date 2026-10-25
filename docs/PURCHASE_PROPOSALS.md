@@ -32,3 +32,24 @@ PASS: 6 testów. Przykład odbioru: 120 zamków − 20 wolnych − 30 na czas = 
 paczka 25 → zakup 75. Dostawa spóźniona → zakup 100. Sprawdzone także koszty
 transportu/VAT, progi, limity, brakujące oferty, zamienniki i brak podwójnego
 bilansowania stanów/dostaw.
+
+
+## 25.10 — niepełne tożsamości ofert
+
+Przed podłączeniem UI odtworzono błąd: null w id lub supplier przerywał całe
+obliczenie przed klasyfikacją niepełnej oferty. Brak item_id/unit mógł usuwać
+ofertę z widoku bez informacji o przyczynie. Nowe globalne offer_issues pokazuje
+każdą niepełną ofertę, jej oryginalny indeks w tablicy, zachowane ID (także null)
+i brakujące pola. Nie wymyślamy ID, SKU, dostawcy ani jednostki.
+
+Oferty dające się przypisać do wymagań zachowują także dotychczasowy
+rejected_offers. Niepełna obca oferta nie zatrzymuje poprawnej propozycji
+z kompletnego źródła. Tokeny identyfikatorów są sprawdzane po wykryciu null;
+nieprawidłowa struktura/nieznane pola nadal dają błąd kontraktu.
+
+PASS: 8 testów zakupów, w tym regresje braków ID/dostawcy/SKU/jednostki,
+niepełnej obcej oferty i zachowanie przykładu 75/100. Nowe przypadki najpierw
+odtworzyły błędy starej wersji. Pełny harness PASS:
+artifacts/verification/20261025T125223511578Z/results.json.
+Brak ofert klienta i odbioru zakupów nadal pozostaje jawny. Następny krok to
+operatorowy podgląd wejść, ograniczeń, braków i opcji z tego samego solvera.

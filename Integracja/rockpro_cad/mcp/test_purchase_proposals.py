@@ -61,5 +61,23 @@ class PurchaseTests(unittest.TestCase):
         self.assertIsNone(line['preferred_option'])
         self.assertEqual(set(line['options'][0]['restrictions']),{'late_arrival','insufficient_confirmed_availability'})
 
+    def test_missing_identity_supplier_or_unit_is_reported_without_inventing_an_offer(self):
+        for field in ('id','supplier','item_id','unit'):
+            with self.subTest(field=field):
+                requirements,stock,offers,policy=inputs();offers[0][field]=None
+                result=calculate_purchases(requirements,stock,offers,policy)
+                self.assertIsNone(result['lines'][0]['preferred_option'])
+                self.assertEqual(result['offer_issues'][0]['offer_index'],0)
+                self.assertIn(field,result['offer_issues'][0]['missing_fields'])
+                self.assertFalse(result['orders_placed']);self.assertFalse(result['production_approved'])
+
+    def test_incomplete_unrelated_offer_stays_visible_without_blocking_a_valid_quote(self):
+        requirements,stock,offers,policy=inputs()
+        offers.append(offers[0]|dict(id='unrelated-incomplete',item_id=None,supplier=None))
+        result=calculate_purchases(requirements,stock,offers,policy)
+        self.assertEqual(result['lines'][0]['preferred_option']['quantity'],75)
+        self.assertEqual(result['offer_issues'],[dict(offer_index=1,offer_id='unrelated-incomplete',
+            reason='incomplete_offer',missing_fields=['item_id','supplier'])])
+
 
 if __name__=='__main__':unittest.main()

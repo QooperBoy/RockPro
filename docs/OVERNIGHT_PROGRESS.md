@@ -200,3 +200,12 @@ brakami i bez zakupu. Czytać rzeczywisty zakres z zachowanego
 raporty/ROC-32_BEFORE_NIGHT_UPDATE.txt i PURCHASE_PROPOSALS.md. Nie tworzyć
 ofert/cen klienta ani zgód zamienników z domysłów. Potem UI planów ROC-33.
 Odbiory, pełny CAD, licencje i historyczne dane nadal są jawnie zablokowane.
+
+
+Heartbeat 25.10 12:46Z: snapshot obecny, checkout czysty na e1f65e1.
+ROC-32 wymagania ponownie odczytane z zachowanego opisu Linear. FIX_FIRST:
+null id/supplier blokował klasyfikację, a brak SKU/jednostki znikał z wyniku.
+Dodano globalne offer_issues bez wymyślania danych; 8 testów zakupów i pełny
+harness PASS 20261025T125223511578Z. PURCHASE_PROPOSALS.md opisuje granice.
+Kontynuować operatorowy podgląd wejść/ofert i opcji; żadne zamówienie ani
+akceptacja klienta nie zostały wykonane. Dane magazynu i CAD pozostają nietknięte.
