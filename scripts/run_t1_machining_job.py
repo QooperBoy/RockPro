@@ -7,6 +7,33 @@ from rockpro_cad.cad_lock import cad_writer_lock
 from rockpro_cad.icapi_runtime import selected_year, installation_dir
 def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
+def existing_legacy_app(context):
+    """Attach through one exact open document when the generic ROT entry is absent."""
+    import ctypes as ct
+    import comtypes.client
+    from comtypes import HRESULT
+    from comtypes.automation import IDispatch
+    from rockpro_cad.icapi_runtime import ICAPI
+    from rockpro_cad.parts.native import same_document_path
+    source=Path(context).resolve(strict=True)
+    ole=ct.OleDLL('ole32')
+    rot=ct.POINTER(ICAPI.IRunningObjectTable)();bind=ct.POINTER(ICAPI.IBindCtx)()
+    ole.GetRunningObjectTable.argtypes=[ct.c_ulong,ct.POINTER(type(rot))]
+    ole.GetRunningObjectTable.restype=HRESULT
+    ole.CreateBindCtx.argtypes=[ct.c_ulong,ct.POINTER(type(bind))]
+    ole.CreateBindCtx.restype=HRESULT
+    ole.GetRunningObjectTable(0,ct.byref(rot));ole.CreateBindCtx(0,ct.byref(bind))
+    iterator=rot.EnumRunning()
+    while True:
+        moniker,count=iterator.RemoteNext(1)
+        if not count:break
+        try:name=moniker.GetDisplayName(bind,None)
+        except Exception:continue
+        if same_document_path(name,source):
+            document=comtypes.client.GetBestInterface(rot.GetObject(moniker).QueryInterface(IDispatch))
+            return document.Application
+    raise RuntimeError('Exact existing ROT document required; no launch or activation')
+
 def cleanup_owned_addon(collection,owner,count_before):
     """Remove only the sole owned entry, using its observed collection position.
 
@@ -68,7 +95,7 @@ def run(folder,source,request):
     (folder/'request.json').write_text(json.dumps(request,ensure_ascii=False,indent=2),encoding='utf-8')
     import comtypes.client
     IronCAD=comtypes.client.GetModule(str(installation_dir()/"bin/IronCad.tlb"))
-    app=comtypes.client.GetActiveObject('IronCAD.Application',dynamic=True)
+    app=existing_legacy_app(request['context_path']) if request.get('context_path') else comtypes.client.GetActiveObject('IronCAD.Application',dynamic=True)
     collection=app.AddOns;raw=collection._comobj
     def disp(x):return x._comobj if hasattr(x,'_comobj') else x
     owner='RockProMachining_'+uuid.uuid4().hex
