@@ -1,11 +1,13 @@
 import copy
+import hashlib
+import json
 from pathlib import Path
 import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from rockpro_cad.core_case.t2_family import (
-    FAMILY, JOINTS, blockers, draft_from_reference, validate_t2_family)
+    FAMILY, JOINTS, blockers, draft_from_reference, draft_with_source_frames, validate_t2_family)
 from rockpro_cad.core_case.contracts import ValidationError
 
 
@@ -97,6 +99,77 @@ class T2FamilyTests(unittest.TestCase):
         reference['parts'].append(dict(source_id=6, source_path='root/6',
             source_type='Z_ELEMENT_ASSEMBLY', role='removable_rack'))
         with self.assertRaises(ValidationError): draft_from_reference(reference)
+
+
+class T2MeasuredFrameTests(unittest.TestCase):
+    def setUp(self):
+        draft = fixture()
+        roles = dict(base='structural_base', hood='removable_hood',
+                     front_cap='removable_front_cap', rack='removable_rack')
+        parts, rows = [], []
+        for role, component in draft['components'].items():
+            node = component['source_node_id']
+            path = 'root/' + '/'.join(map(str, component['cad_path']))
+            parts.append(dict(source_id=node, source_path=path,
+                              source_type='Z_ELEMENT_ASSEMBLY', role=roles[role]))
+            # Row-vector rotation + translation: translation must not be transposed.
+            rows.append(dict(id=node, path=path, type='Z_ELEMENT_ASSEMBLY',
+                world_mm=[[0, 1, 0, 0], [-1, 0, 0, 0], [0, 0, 1, 0], [10, 20, 30, 1]]))
+        pairs = [dict(upper_owner=a, upper_source_id=p[a], lower_owner=b, lower_source_id=p[b])
+                 for key, (a, b, _) in JOINTS.items() for p in draft['joints'][key]['latch_pairs']]
+        self.reference = dict(schema='rockpro.reference-analysis/1', state='inventory_draft',
+            family_candidate=FAMILY, source_sha256='a' * 64, executable_template=False,
+            production_approved=False, parts=parts, latch_pairs=pairs)
+        self.inventory = dict(source_sha256='a' * 64, rows=rows)
+
+    def encoded(self):
+        raw = json.dumps(self.inventory).encode('utf-8')
+        self.reference['inventory_sha256'] = hashlib.sha256(raw).hexdigest()
+        return raw
+
+    def test_measured_row_vector_frame_keeps_joint_unknown(self):
+        raw = self.encoded(); original = copy.deepcopy(self.reference)
+        draft = draft_with_source_frames(self.reference, raw)['draft']
+        self.assertEqual(draft['components']['rack']['frame'],
+                         dict(origin=[10, 20, 30], u=[0, 1, 0], v=[-1, 0, 0], n=[0, 0, 1]))
+        self.assertEqual(draft['components']['rack']['cad_path'], [2, 4])
+        self.assertFalse(any(b.startswith('component_frame_missing:') for b in blockers(draft)))
+        self.assertIn('joint_frame_missing:base_hood', blockers(draft))
+        self.assertIn('joint_clearance_missing:base_hood', blockers(draft))
+        self.assertEqual(self.reference, original)
+
+    def test_tampered_bytes_or_different_model_revision_rejected(self):
+        raw = self.encoded()
+        with self.assertRaises(ValidationError): draft_with_source_frames(self.reference, raw + b' ')
+        self.inventory['source_sha256'] = 'b' * 64
+        with self.assertRaises(ValidationError): draft_with_source_frames(self.reference, self.encoded())
+
+    def test_path_id_duplicates_and_non_assembly_are_rejected(self):
+        for key, value in (('id', 99), ('path', 'root/99'), ('type', 'Z_ELEMENT_PART')):
+            old = self.inventory['rows'][0][key]
+            self.inventory['rows'][0][key] = value
+            with self.assertRaises(ValidationError): draft_with_source_frames(self.reference, self.encoded())
+            self.inventory['rows'][0][key] = old
+        self.inventory['rows'].append(copy.deepcopy(self.inventory['rows'][0]))
+        with self.assertRaises(ValidationError): draft_with_source_frames(self.reference, self.encoded())
+
+    def test_no_invented_identity_or_normalization_of_bad_frame(self):
+        row = self.inventory['rows'][0]
+        for matrix in (None,
+                       [[2, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]):
+            row['world_mm'] = matrix
+            with self.assertRaises(ValidationError): draft_with_source_frames(self.reference, self.encoded())
+        del row['world_mm']
+        with self.assertRaises(ValidationError): draft_with_source_frames(self.reference, self.encoded())
+
+    def test_mirrored_source_stays_raw_and_does_not_become_mounting_frame(self):
+        matrix = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [10, 20, 30, 1]]
+        self.inventory['rows'][0]['world_mm'] = matrix
+        result = draft_with_source_frames(self.reference, self.encoded())
+        self.assertIsNone(result['draft']['components']['base']['frame'])
+        self.assertEqual(result['source_frames']['base']['world_mm'], matrix)
+        self.assertIn('component_frame_missing:base', blockers(result['draft']))
+        self.assertTrue(result['source_frames']['base']['status'].startswith('mirrored_'))
 
 
 if __name__ == '__main__': unittest.main()

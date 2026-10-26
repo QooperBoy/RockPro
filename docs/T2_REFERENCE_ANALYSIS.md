@@ -168,3 +168,25 @@ hosta, potem ponowna próba; nie potrzeba z tego powodu nowej rewizji od konstru
 Nie nadpisano ani nie konwertowano oryginału. Próba i kopia:
 `artifacts/ironcad2023-compatibility/python-t2-original/`; metadane:
 `artifacts/ironcad2023-compatibility/file-version-metadata.json`.
+
+### T2-02: zmierzone ramy zespołów
+
+`draft_with_source_frames` sprawdza SHA dokładnych bajtów inwentarza zapisane
+w przejrzanej mapie, SHA modelu, ścieżkę wystąpienia, ID i typ zespołu.
+Przenosi rzeczywiste macierze `world_mm` do ram komponentów. To układy osi
+zespołów źródła, nie automatycznie rozpoznane płaszczyzny styku lub kierunki
+wyjmowania. Złącza i ich luzy pozostają nieustalone.
+
+Na zachowanym odczycie wzorca: spód, czapka i rack mają poprawne prawoskrętne
+ramy. **Klapa ma lustrzany układ osi**. Pierwsza ścisła próba prawidłowo
+odrzuciła go jako zwykłą ramę; importer zachowuje teraz pełną macierz
+w dowodach i pozostawia `front_cap.frame=null` z jawnym statusem
+`mirrored_source_axes_require_explicit_mounting_frame`. Nie odwraca znaku
+osi ani nie przebudowuje geometrii, żeby sztucznie przejść walidację.
+
+PASS: 12 testów kontraktu T2, w tym hash inwentarza, rewizja modelu,
+przesunięta/obrócona rama, błędne ID/ścieżki, skala oraz odbicie.
+Dowody rzeczywistej mapy: `family_draft_measured_frames.json` (draft i macierze)
+oraz `family_measured_frames_validation.json` w katalogu analizy T2.
+To przetworzenie wcześniejszego odczytu 2027, **bez nowej operacji CAD**.
+Pełny prototyp T2 i jego otwarcie w 2023 nadal nie są potwierdzone.

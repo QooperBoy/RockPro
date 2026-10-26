@@ -4,6 +4,8 @@ No CAD operations, inferred manufacturing approvals, or T1 lid assumptions.
 Joint frames/clearances may remain unknown in this non-executable draft.
 """
 import copy
+import hashlib
+import json
 import re
 
 from .contracts import ValidationError, validate_wall_frame
@@ -139,3 +141,51 @@ def draft_from_reference(reference):
     return validate_t2_family(dict(schema_version=1, family_id=FAMILY,
         source_sha256=reference['source_sha256'], state='reference_draft',
         components=components, joints=joints, device_fit_confirmed=False))
+
+
+def draft_with_source_frames(reference, inventory_bytes):
+    """Import measured component frames from the exact reviewed inventory bytes.
+
+    These are source assembly coordinate systems, not mating planes or an
+    inferred extraction direction. Joint frames and clearances remain unknown.
+    Returns draft + provenance. Mirrored source axes are preserved in evidence;
+    they do not become a fabricated right-handed mounting frame.
+    """
+    from .native_reader import validate_matrix
+
+    draft = draft_from_reference(reference)
+    expected = reference.get('inventory_sha256')
+    if (not isinstance(inventory_bytes, bytes) or not isinstance(expected, str)
+            or hashlib.sha256(inventory_bytes).hexdigest() != expected):
+        fail('T2_INVENTORY_HASH', '$', 'Inventory must match the reviewed byte revision')
+    inventory = json.loads(inventory_bytes.decode('utf-8-sig'))
+    if inventory.get('source_sha256') != draft['source_sha256']:
+        fail('T2_INVENTORY_SOURCE', '$', 'Inventory belongs to a different model revision')
+    rows = inventory.get('rows')
+    if not isinstance(rows, list):
+        fail('T2_INVENTORY_ROWS', '$', 'Expected explicit native inventory rows')
+    evidence = {}
+    for role, component in draft['components'].items():
+        path = 'root/' + '/'.join(map(str, component['cad_path']))
+        matches = [r for r in rows if r.get('id') == component['source_node_id']
+                   or r.get('path') == path]
+        if (len(matches) != 1 or matches[0].get('id') != component['source_node_id']
+                or matches[0].get('path') != path
+                or matches[0].get('type') != 'Z_ELEMENT_ASSEMBLY'):
+            fail('T2_INVENTORY_IDENTITY', '$.components.' + role,
+                 'Exact unique source ID, path and assembly type required')
+        try:
+            matrix = validate_matrix(matches[0]['world_mm'], allow_reflection=True)
+        except (KeyError, ValueError) as exc:
+            fail('T2_COMPONENT_FRAME', '$.components.' + role, str(exc))
+        evidence[role] = dict(source_id=component['source_node_id'], source_path=path,
+                              world_mm=copy.deepcopy(matrix), status='measured_source_frame')
+        try:
+            validate_matrix(matrix)
+        except ValueError:
+            evidence[role]['status'] = 'mirrored_source_axes_require_explicit_mounting_frame'
+            continue
+        component['frame'] = dict(origin=matrix[3][:3], u=matrix[0][:3],
+                                  v=matrix[1][:3], n=matrix[2][:3])
+    return dict(draft=validate_t2_family(draft), source_frames=evidence,
+                inventory_sha256=expected)
