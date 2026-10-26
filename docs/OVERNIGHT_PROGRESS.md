@@ -1,5 +1,16 @@
 # Nocna kolejka RockPro — rozpoczęta 24.10.2026
 
+**Kontynuacja 26.10 — analiza T2:**
+[T2_REFERENCE_ANALYSIS.md](T2_REFERENCE_ANALYSIS.md). Przejrzano mail, 3 PDF,
+5 zdjęć i model na ukrytej kopii. Natywny odczyt 449 węzłów PASS,
+335 liczbowo poprawnych obrysów, 6 jednoznacznych par początków ram zamków.
+Prywatna mapa wszystkich węzłów, kandydaci obróbek i 9 rozbieżności są w
+`artifacts/t2-analysis-20261026/`; integralność i audyt repo PASS.
+Kontekst użytkownika zachowany, własna kopia zamknięta. Parametryzacja T2,
+pasowanie i produkcja NOT RUN. Kolejny przyrost: kontrakt osobnej rodziny
+ze zdejmowaną czapką/klapą, wyjmowanym rackiem i transportem teleskopowym.
+Stała dostępność dodatku pozostaje oddzielnym otwartym zadaniem.
+
 **Aktualne przekazanie 25.10:** [OVERNIGHT_HANDOFF_20261025.md](OVERNIGHT_HANDOFF_20261025.md).
 Przyrosty źródłowe do cfe9d67 sprawdzone; ostatni pełny harness/build/UI PASS
 20261025T133758293539Z. Pozostałe odbiory mają opisane blokery hosta, danych i

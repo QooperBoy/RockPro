@@ -41,6 +41,11 @@ przyrost ma osobny, przypięty do źródeł adapter prototypu:
 [T1_MACHINING_PROTOTYPE.md](T1_MACHINING_PROTOTYPE.md). Nie rozszerza automatycznie
 allowlisty dotychczasowego wykonawcy MCP ani zainstalowanego dodatku.
 
+Analiza kolejnej rodziny: [T2_REFERENCE_ANALYSIS.md](T2_REFERENCE_ANALYSIS.md).
+T2 ma zdejmowaną czapkę/klapę, wyjmowany rack i transport teleskopowy.
+Mapa źródła pozostaje szkicem w prywatnych artifacts; nie jest szablonem T1
+ani dowodem działającej parametryzacji nowej rodziny.
+
 ROC-43: [specyfikacja testów i instrukcja uruchomienia](ROC43_TDD.md).
 Zwykły harness uruchamia `core-design` w trybie `all`: zamrożone wymagania
 generatora oraz testy obliczeń układu i niezależnego weryfikatora oczekiwań.
