@@ -49,14 +49,16 @@ def grouped_events(rows):
 
 def bounded_json(path):
     path=Path(path)
-    if path.stat().st_size>LIMIT: raise ValueError('Plik przekracza limit 8 MB')
-    return json.loads(path.read_text(encoding='utf-8-sig'))
+    with path.open('rb') as stream:data=stream.read(LIMIT+1)
+    if len(data)>LIMIT: raise ValueError('Plik przekracza limit 8 MB')
+    return json.loads(data.decode('utf-8-sig'))
 
 
 def read_lines(path):
     path=Path(path)
-    if path.stat().st_size>LIMIT: raise ValueError('Ślad przekracza limit 8 MB')
-    data=path.read_bytes(); lines=data.splitlines(keepends=True); rows=[]; warnings=[]
+    with path.open('rb') as stream:data=stream.read(LIMIT+1)
+    if len(data)>LIMIT: raise ValueError('Ślad przekracza limit 8 MB')
+    lines=data.splitlines(keepends=True); rows=[]; warnings=[]
     for i,line in enumerate(lines):
         if i==len(lines)-1 and not line.endswith(b'\n'):
             warnings.append('Niepełny ostatni wpis — oczekiwanie na zapis'); break
@@ -75,6 +77,7 @@ def valid_elements(preview):
     if not isinstance(items,list) or len(items)>1000: raise ValueError('Limit elementów')
     ids=set()
     for row in items:
+        if not isinstance(row,dict):raise ValueError('Niepoprawny element podglądu')
         b=row.get('bounds'); ident=row.get('id')
         if not isinstance(ident,str) or len(ident)>160 or ident in ids: raise ValueError('Niepoprawne ID podglądu')
         ids.add(ident)
@@ -85,22 +88,49 @@ def valid_elements(preview):
 
 
 def read_trace(path):
-    path=Path(path); rows,warnings=read_lines(path); elements=[]
+    path=Path(path); rows,warnings=read_lines(path); elements=[]; preview_identity=None
     folder=path.parent.parent if path.parent.name=='trace' else path.parent
     preview=folder/'process_preview.json'
     if preview.exists():
-        data=preview.read_bytes()
+        with preview.open('rb') as stream:data=stream.read(LIMIT+1)
         if len(data)>LIMIT: raise ValueError('Zbyt duży podgląd')
-        expected={r.get('refs',{}).get('inventory_sha256') for r in rows if r.get('refs',{}).get('inventory_sha256')}
+        expected={r['refs'].get('inventory_sha256') for r in rows
+                  if isinstance(r.get('refs'),dict) and isinstance(r['refs'].get('inventory_sha256'),str)}
         if not expected or expected!={hashlib.sha256(data).hexdigest()}:
             warnings.append('Podgląd niepowiązany z hashem śladu; rysunek wyłączony')
-        else: elements=valid_elements(json.loads(data))
+        else:
+            preview_data=json.loads(data)
+            elements=valid_elements(preview_data)
+            preview_identity=(preview_data.get('operation_id'),hashlib.sha256(data).hexdigest())
     native=folder/'native_progress.jsonl'
     if native.exists() and native!=path:
         extra,notes=read_lines(native); rows+=extra; warnings+=notes
+    bound_runs={row['run_id'] for row in rows if preview_identity and
+                isinstance(row.get('run_id'),str) and isinstance(row.get('refs'),dict) and
+                row['refs'].get('inventory_sha256')==preview_identity[1] and
+                str(row.get('operation','')).startswith('case.')}
+    unbound=False;unbound_coarse=False
+    for row in rows:
+        if str(row.get('operation','')).startswith('case.'):
+            bound=bool(isinstance(row.get('run_id'),str) and len(bound_runs)==1 and row['run_id'] in bound_runs)
+            row['_observer_evidence_bound']=bound
+            unbound_coarse=unbound_coarse or not bound
+        if str(row.get('operation','')).startswith('native.'):
+            refs=row.get('refs') if isinstance(row.get('refs'),dict) else {}
+            bound=bool(preview_identity and preview_identity[0]
+                       and row.get('operation_id')==preview_identity[0]
+                       and refs.get('inventory_sha256')==preview_identity[1])
+            row['_observer_evidence_bound']=bound
+            unbound=unbound or not bound
+    if unbound:
+        warnings.append('Ślad natywny bez zgodnego ID operacji i SHA podglądu — zdarzenia widoczne, lecz nie są dowodem utworzenia części tego modelu')
+    if unbound_coarse:
+        warnings.append('Etapy case.* nie należą do jednego przebiegu powiązanego z SHA podglądu — niepowiązane wpisy nie potwierdzają utworzenia modelu')
     def stamp(r):
-        try: return datetime.fromisoformat(r.get('timestamp_utc','').replace('Z','+00:00')).timestamp()
-        except (ValueError,TypeError): return 0
+        try:
+            value=datetime.fromisoformat(r.get('timestamp_utc','').replace('Z','+00:00'))
+            return value.timestamp() if value.tzinfo is not None else 0
+        except (ValueError,TypeError,AttributeError,OverflowError,OSError): return 0
     rows.sort(key=stamp)
     return rows,elements,warnings
 
@@ -128,11 +158,94 @@ def read_report(path):
 
 
 def visible_elements(rows,elements):
-    ids={r.get('occurrence_id') for r in rows if r.get('operation')=='native.create' and r.get('result',{}).get('status')=='passed'}
+    detailed=[r for r in rows if r.get('operation')=='native.create']
+    states={}
+    for row in detailed:
+        if row.get('_observer_evidence_bound') is False:continue
+        ident=row.get('occurrence_id')
+        if isinstance(ident,str):states[ident]=event_status(row)
+    ids={ident for ident,status in states.items() if status=='passed'}
     # A completed coarse create phase is sufficient only when no detailed part
     # stream exists. Never invent per-part timestamps for an old report.
-    complete=any(r.get('operation')=='case.create' and r.get('result',{}).get('status')=='passed' for r in rows)
-    return elements if complete else [e for e in elements if e['id'] in ids]
+    coarse=[r for r in rows if r.get('operation')=='case.create' and r.get('_observer_evidence_bound') is not False]
+    complete=bool(coarse and event_status(coarse[-1])=='passed')
+    return elements if complete and not detailed else [e for e in elements if e['id'] in ids]
+
+
+def event_status(row):
+    result=row.get('result')
+    return result.get('status') if isinstance(result,dict) else None
+
+
+def stage_state(events,index):
+    """Observed failure cannot be erased by a later successful sibling operation."""
+    observed=[row for i,row in events if i<=index]
+    if not observed:return 'oczekuje'
+    if any(event_status(row) in ('failed','error') for row in observed):return 'BŁĄD'
+    if any(row.get('event')=='logging_limit_reached' or
+           event_status(row) in ('unknown','partial','limited','skipped','not_run')
+           for row in observed):return 'niepełny'
+    if any(row.get('_observer_evidence_bound') is False for row in observed):return 'niepowiązany'
+    pending={};finished=0
+    for row in observed:
+        identity_fields=('run_id','operation_id','operation','occurrence_id')
+        if any(row.get(k) is not None and not isinstance(row[k],str) for k in identity_fields):return 'niepełny'
+        key=tuple(row.get(k) for k in identity_fields)
+        if row.get('event')=='operation_started':pending[key]=pending.get(key,0)+1
+        elif row.get('event')=='operation_finished':
+            if event_status(row) not in ('passed','success','complete','completed'):return 'niepełny'
+            pending[key]=max(0,pending.get(key,0)-1);finished+=1
+    if finished and not any(pending.values()) and all(i<=index for i,_ in events):return 'OK'
+    return 'w toku'
+
+
+def summarize_events(rows,warnings=()):
+    """Measured samples, not inferred CAD success, agent cost or automation ratio.
+
+    A duration sum is recorded work within one category. It is deliberately not
+    an elapsed/CPU time: parent SDK phases and child operations can overlap.
+    """
+    import statistics
+    stamps=[];invalid_stamps=0;actors={};slowest=[];invalid_durations=0
+    def duration(row):
+        value=row.get('duration_ms')
+        return value if type(value) in (int,float) and 0<=value<=1e12 and math.isfinite(value) else None
+    for row in rows:
+        try:
+            stamp=datetime.fromisoformat(row.get('timestamp_utc','').replace('Z','+00:00'))
+            if stamp.tzinfo is None:raise ValueError('Timezone required')
+            stamps.append(stamp.timestamp())
+        except (ValueError,TypeError,AttributeError,OverflowError,OSError):invalid_stamps+=1
+        if row.get('event')!='operation_finished':continue
+        actor=row.get('actor') if row.get('actor') in ('script','agent','human') else 'unknown'
+        actors[actor]=actors.get(actor,0)+1
+        measured=duration(row)
+        if measured is None:invalid_durations+=1
+        else:slowest.append(dict(operation=row.get('operation'),occurrence_id=row.get('occurrence_id'),
+                                 duration_ms=measured,status=event_status(row),
+                                 evidence_bound=row.get('_observer_evidence_bound')))
+    stages=[]
+    for key,title,color,events in grouped_events(rows):
+        finished=[r for _,r in events if r.get('event')=='operation_finished']
+        times=[duration(r) for r in finished if duration(r) is not None]
+        stages.append(dict(stage_id=key,label=title,state=stage_state(events,len(rows)-1),
+                           finished_count=len(finished),measured_count=len(times),
+                           failed_count=sum(event_status(r) in ('failed','error') for r in finished),
+                           recorded_work_ms=sum(times) if times else None,
+                           median_ms=statistics.median(times) if times else None,
+                           max_ms=max(times) if times else None,
+                           parent_wrapper=key=='sdk'))
+    return dict(schema='rockpro.process-summary/1',scope='read-only recorded execution evidence',
+                event_count=len(rows),warnings=list(warnings),stages=stages,
+                observed_window_ms=(max(stamps)-min(stamps))*1000 if len(stamps)>=2 else None,
+                invalid_timestamp_count=invalid_stamps,missing_or_invalid_duration_count=invalid_durations,
+                finished_by_executor=actors,
+                unbound_native_events=sum(r.get('_observer_evidence_bound') is False and
+                                         str(r.get('operation','')).startswith('native.') for r in rows),
+                slowest_recorded_operations=sorted(slowest,key=lambda r:r['duration_ms'],reverse=True)[:10],
+                time_semantics='Stage sums overlap. Observed window is first-to-last timestamp, not full process or CPU time.',
+                automation_percent=None,agent_intervention_count=None,model_tokens=None,model_cost=None,
+                authorship_status='unavailable; executor is not decision author',production_approved=False)
 
 
 class Observer:
@@ -154,6 +267,8 @@ class Observer:
         self.follow=tk.BooleanVar(value=True);ttk.Checkbutton(bar,text='Śledź nowe wpisy',variable=self.follow).pack(side='left',padx=15)
         self.caption=tk.StringVar(value='Wybierz lokalny ślad JSONL lub raport prototypu.')
         ttk.Label(root,textvariable=self.caption,padding=10,wraplength=1180).pack(fill='x')
+        self.metrics=tk.StringVar(value='Pomiary: brak śladu.')
+        ttk.Label(root,textvariable=self.metrics,padding=(10,0,10,8),wraplength=1180).pack(fill='x')
         book=ttk.Notebook(root);book.pack(fill='both',expand=True,padx=12)
         timeline=ttk.Frame(book);book.add(timeline,text='Etapy i podgląd')
         journal=ttk.Frame(book);book.add(journal,text='Dziennik operacji SQLite')
@@ -216,6 +331,14 @@ class Observer:
         if not self.path:return
         try:
             rows,elements,notes=read_trace(self.path) if self.path.suffix=='.jsonl' else read_report(self.path)
+            summary=summarize_events(rows,notes)
+            window=summary['observed_window_ms']
+            span=f'{window/1000:.2f} s' if window is not None else 'brak danych'
+            counts=summary['finished_by_executor']
+            self.metrics.set(f'Okno zarejestrowanych zdarzeń: {span} • zakończone wywołania: '
+                             f'skrypt {counts.get("script",0)}, agent {counts.get("agent",0)}, '
+                             f'pozostałe {counts.get("human",0)+counts.get("unknown",0)} • '
+                             'udział automatyzacji i liczba interwencji: brak danych')
             self.rows,self.elements=rows,elements;self.rebuilding=True
             expanded={key for key in self.tree.get_children() if self.tree.item(key,'open')}
             self.tree.delete(*self.tree.get_children());self.row_indices={}
@@ -224,7 +347,7 @@ class Observer:
                 parent='stage:'+key;self.row_indices[parent]=events[0][0]
                 self.tree.insert('', 'end',iid=parent,text=title,values=('—','szczegóły ↓',''),tags=(key,),open=parent in expanded)
                 for i,r in events:
-                    status=r.get('result',{}).get('status') or ('start' if r.get('event')=='operation_started' else r.get('event','?'))
+                    status=event_status(r) or ('start' if r.get('event')=='operation_started' else r.get('event','?'))
                     status={'passed':'OK','failed':'BŁĄD','unknown':'nieznany'}.get(status,status)
                     duration=r.get('duration_ms');time_label=f'{duration:.1f}' if type(duration) in (int,float) and math.isfinite(duration) else '—'
                     title=LABELS.get(r.get('operation'),r.get('operation','?'))
@@ -260,15 +383,11 @@ class Observer:
             for i,r in events:
                 if i>index:self.tree.item(str(i),values=('oczekuje','—',r.get('actor') or 'nieznany'))
                 else:
-                    status=r.get('result',{}).get('status') or ('start' if r.get('event')=='operation_started' else r.get('event','?'))
+                    status=event_status(r) or ('start' if r.get('event')=='operation_started' else r.get('event','?'))
                     status={'passed':'OK','failed':'BŁĄD','unknown':'nieznany'}.get(status,status)
                     duration=r.get('duration_ms');label=f'{duration:.1f}' if type(duration) in (int,float) and math.isfinite(duration) else '—'
                     self.tree.item(str(i),values=(status,label,r.get('actor') or 'nieznany'))
-            observed=[r for i,r in events if i<=index]
-            state='oczekuje'
-            if observed:
-                state='BŁĄD' if any(r.get('result',{}).get('status')=='failed' for r in observed) else 'w toku'
-                if all(i<=index for i,r in events) and observed[-1].get('result',{}).get('status')=='passed':state='OK'
+            state=stage_state(events,index)
             self.tree.item('stage:'+key,values=(state,'szczegóły ↓',''),tags=('failure',) if state=='BŁĄD' else ('active',) if key==active else (key,))
             if key==active:self.current.set('▶ '+title+'  •  '+state)
         row=self.rows[index] if index>=0 else {}
