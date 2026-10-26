@@ -32,6 +32,11 @@ Architektura i zakres docelowy (nie wszystkie moduły są gotowe produkcyjnie):
 [CORE_CASE_DESIGN.md](CORE_CASE_DESIGN.md) — pełna rodzina skrzyń, kotwy okuć,
 zachowanie ręcznej pracy i TDD. Pierwszy przyrost: ROC-43; plan nadrzędny: ROC-6.
 
+Nowe wymagania technologiczne z 26.10.2026:
+[ROC41_CUTOUTS_AND_JOINTS.md](ROC41_CUTOUTS_AND_JOINTS.md) — wycięcia powiązane
+z wystąpieniami okuć, złącza profili i obliczenia gabarytów przed CAD.
+To plan M01–M07; nie rozszerza jeszcze wykonawcy ani jego allowlisty.
+
 ROC-43: [specyfikacja testów i instrukcja uruchomienia](ROC43_TDD.md).
 Zwykły harness uruchamia `core-design` w trybie `all`: zamrożone wymagania
 generatora oraz testy obliczeń układu i niezależnego weryfikatora oczekiwań.
