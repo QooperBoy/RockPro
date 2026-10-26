@@ -7,6 +7,51 @@ from rockpro_cad.cad_lock import cad_writer_lock
 from rockpro_cad.icapi_runtime import selected_year, installation_dir
 def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
+def existing_legacy_app(context):
+    """Attach through one exact open document when the generic ROT entry is absent."""
+    import ctypes as ct
+    import comtypes.client
+    from comtypes import HRESULT
+    from comtypes.automation import IDispatch
+    from rockpro_cad.icapi_runtime import ICAPI
+    from rockpro_cad.parts.native import same_document_path
+    source=Path(context).resolve(strict=True)
+    ole=ct.OleDLL('ole32')
+    rot=ct.POINTER(ICAPI.IRunningObjectTable)();bind=ct.POINTER(ICAPI.IBindCtx)()
+    ole.GetRunningObjectTable.argtypes=[ct.c_ulong,ct.POINTER(type(rot))]
+    ole.GetRunningObjectTable.restype=HRESULT
+    ole.CreateBindCtx.argtypes=[ct.c_ulong,ct.POINTER(type(bind))]
+    ole.CreateBindCtx.restype=HRESULT
+    ole.GetRunningObjectTable(0,ct.byref(rot));ole.CreateBindCtx(0,ct.byref(bind))
+    iterator=rot.EnumRunning()
+    while True:
+        moniker,count=iterator.RemoteNext(1)
+        if not count:break
+        try:name=moniker.GetDisplayName(bind,None)
+        except Exception:continue
+        if same_document_path(name,source):
+            document=comtypes.client.GetBestInterface(rot.GetObject(moniker).QueryInterface(IDispatch))
+            return document.Application
+    raise RuntimeError('Exact existing ROT document required; no launch or activation')
+
+def cleanup_owned_addon(collection,owner,count_before):
+    """Remove only the sole owned entry, using its observed collection position.
+
+    IronCAD 2023 reports AddOn.Index=1 for Item(0); Remove expects zero-based
+    collection indices. Checking Count after removal prevents false success.
+    """
+    if int(collection.Count)!=1 or count_before!=0:
+        return {'removed':False,'reason':'Collection ownership is not exclusive'}
+    raw=collection._comobj
+    sole=raw._invoke(5,1,0,0)
+    sole=sole._comobj if hasattr(sole,'_comobj') else sole
+    if sole._invoke(3,2,0)!=owner:
+        return {'removed':False,'reason':'Sole entry is not owned'}
+    raw._invoke(4,1,0,0)
+    after=int(collection.Count)
+    if after!=0:raise RuntimeError('Owned AddOn removal did not empty the collection')
+    return {'removed':True,'count_after':after}
+
 def current_interop(folder):
     """2023 samples ship a stale 2018 wrapper; import the installed TLB locally."""
     install=installation_dir()
@@ -55,7 +100,7 @@ def run(folder,source,request):
     (folder/'request.json').write_text(json.dumps(request,ensure_ascii=False,indent=2),encoding='utf-8')
     import comtypes.client
     IronCAD=comtypes.client.GetModule(str(installation_dir()/"bin/IronCad.tlb"))
-    app=comtypes.client.GetActiveObject('IronCAD.Application',dynamic=True)
+    app=existing_legacy_app(request['context_path']) if request.get('context_path') else comtypes.client.GetActiveObject('IronCAD.Application',dynamic=True)
     collection=app.AddOns;raw=collection._comobj
     def disp(x):return x._comobj if hasattr(x,'_comobj') else x
     owner='RockProMachining_'+uuid.uuid4().hex
@@ -72,18 +117,14 @@ def run(folder,source,request):
             a._invoke(11,1,0)
         finally:
             # Only remove when this is the sole entry, so no index can touch another addon.
-            if a is not None and int(collection.Count)==1 and count==0:
-                sole=disp(raw._invoke(5,1,0,0))
-                if sole._invoke(3,2,0)==owner:
-                    index=int(sole._invoke(10,2,0))
-                    try:raw._invoke(4,1,0,index)
-                    except Exception as e:cleanup['index_error']=str(e)
-                    if int(collection.Count)==1 and disp(raw._invoke(5,1,0,0))._invoke(3,2,0)==owner:
-                        try:raw._invoke(4,1,0,0)
-                        except Exception as e:cleanup['zero_error']=str(e)
+            if a is not None:
+                try:cleanup.update(cleanup_owned_addon(collection,owner,count))
+                except Exception as e:cleanup['error']=str(e)
             cleanup['remaining_count']=int(collection.Count)
             cleanup['owner']=owner
             (folder/'addon_cleanup.json').write_text(json.dumps(cleanup),encoding='utf-8')
+    if cleanup.get('remaining_count')!=count:
+        raise RuntimeError('Temporary AddOn cleanup incomplete; reconcile addon_cleanup.json before another job')
     p=folder/'result.json'
     if not p.exists():raise RuntimeError('Missing managed result: '+(folder/'clr_result.json').read_text())
     result=json.loads(p.read_text(encoding='utf-8-sig'))

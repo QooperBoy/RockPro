@@ -7,6 +7,14 @@
   rzeczywistych operacji po wykonaniu. Brak informacji o wycięciu blokuje
   przyjęcie nowego SKU. Nie traktuj otworu L905/915 jako szablonu 27095.
 
+Przyrost T2 w gałęzi `codex/t2-parametryzacja`:
+[docs/T2_PARAMETRIC_PROTOTYPE.md](docs/T2_PARAMETRIC_PROTOTYPE.md).
+Sześć prób geometrii i poprawione odświeżenie przeszło w native-14; native-15-body
+potwierdził rzeczywiste obrysy sklejki po zmianie wymiarów i powrocie.
+Nie wywołuj Part.Update/Assembly.Update wewnątrz niezmienionych okuć T2 w celu
+samego odświeżenia grafiki. Sprawdzaj `native13-rejected.json` i nowsze wyniki.
+Szerokość T2 pozostaje stała dla tego wariantu racka; nie skalować katalogowych okuć.
+
 26.10.2026, późniejszy checkpoint: własna Scene14 w 2023 ma poprawiony montaż
 i polskie parametry; natywna zmiana wymiarów oraz powrót PASS. Czytaj
 [docs/T1_2023_MOUNTING_REPAIR.md](docs/T1_2023_MOUNTING_REPAIR.md).
