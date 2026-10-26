@@ -23,6 +23,7 @@ internal static class Rpc {
   var psi=new ProcessStartInfo(Path.GetFullPath(Path.Combine(Addin.Root,"..",".venv","Scripts","python.exe")),"\""+Path.Combine(Addin.Root,"mcp","server.py")+"\"");
   psi.UseShellExecute=false;psi.CreateNoWindow=true;psi.RedirectStandardInput=true;psi.RedirectStandardOutput=true;psi.RedirectStandardError=true;
   psi.StandardOutputEncoding=Encoding.UTF8;psi.StandardErrorEncoding=Encoding.UTF8;psi.EnvironmentVariables["PYTHONUTF8"]="1";
+  psi.EnvironmentVariables["ROCKPRO_IRONCAD_YEAR"]=Addin.HostYear.ToString(System.Globalization.CultureInfo.InvariantCulture);
   using(var session=new RpcProcessSession(psi)) {
    var input=session.Input;
    input.WriteLine(j.Serialize(new {jsonrpc="2.0",id=1,method="initialize",@params=new {protocolVersion="2025-06-18",capabilities=new {},clientInfo=new {name="rockpro-desktop",version="0.2"}}}));input.Flush();

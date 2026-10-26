@@ -4,7 +4,7 @@ from pathlib import Path
 import comtypes.client
 from comtypes import HRESULT
 from comtypes.automation import IDispatch
-from python_ironcad import ICAPI
+from rockpro_cad.icapi_runtime import ICAPI, assert_host
 WALK_WARNINGS = []
 
 def connect(source):
@@ -27,6 +27,7 @@ def connect(source):
         if name.lower() == str(source).lower():
             legacy = comtypes.client.GetBestInterface(rot.GetObject(moniker).QueryInterface(IDispatch))
             base = legacy.Application.ZIronCADApp.QueryInterface(ICAPI.IZBaseApp)
+            assert_host(base)
             doc = base.GetOpenDocByName(str(source))
             if Path(doc.Name).name.lower() != source.name.lower():
                 raise RuntimeError('Requested source must be active; refusing another document')

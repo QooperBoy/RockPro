@@ -136,13 +136,13 @@ class IronCADPrototypeDriver:
         import shutil
         import subprocess
         import os
-        from python_ironcad.core import install_dir
+        from ..icapi_runtime import install_dir
         folder = self.workdir / "sdk_bridge"
         folder.mkdir(exist_ok=False)
         vendor = Path(install_dir) / "ICAPI" / "Samples" / "C#" / "References" / "interop.ICApiIronCAD.dll"
         compiler = Path(os.environ.get("WINDIR", r"C:\Windows")) / "Microsoft.NET" / "Framework64" / "v4.0.30319" / "csc.exe"
         if not vendor.is_file() or not compiler.is_file():
-            raise NativeExecutionError("IronCAD 2027 official SDK interop or .NET Framework x64 compiler unavailable")
+            raise NativeExecutionError("Selected IronCAD official SDK interop or .NET Framework x64 compiler unavailable")
         executable = folder / "NativeSceneBridge.exe"
         bridge_source = Path(__file__).with_name("NativeSceneBridge.cs")
         build = subprocess.run([str(compiler), "/nologo", "/target:exe", "/platform:x64",

@@ -20,10 +20,11 @@ from .native_reader import validate_matrix
 class SavedSourceSession:
     def __init__(self):
         import comtypes.client
-        from python_ironcad import ICAPI
+        from ..icapi_runtime import ICAPI, assert_host
         self.api = ICAPI
         self.app = comtypes.client.GetActiveObject('IronCAD.Application', dynamic=True)
         self.base = self.app.ZIronCADApp.QueryInterface(ICAPI.IZBaseApp)
+        assert_host(self.base)
         self.document = None
 
     def open_owned(self, path):

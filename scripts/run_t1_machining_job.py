@@ -4,8 +4,11 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'Integracja'))
 from rockpro_cad.cad_lock import cad_writer_lock
+from rockpro_cad.icapi_runtime import selected_year, installation_dir
 def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 def run(folder,source,request):
+    request=dict(request)
+    request["expected_api_major"]=selected_year()-1998
     if request.get('mode')=='build':
         from rockpro_cad.core_case.machining_rules import validate_layout,validate_steps
         validate_layout(request['parameters'])
@@ -15,7 +18,7 @@ def run(folder,source,request):
     if sha(loader)!='0b83e25991b23a94ef723ad2fc58ac1e7e08e815913751c779cad891797d79cb':raise ValueError('Unrecognized native bridge')
     names=re.findall(r'LatchInProcess[^\x00]{0,90}\.dll',loader.read_bytes().decode('utf-16-le',errors='ignore'))
     if len(names)!=1:raise ValueError('Ambiguous fixed managed loader name')
-    vendor=Path('C:/Program Files/IronCAD/2027/ICAPI/Samples/C#/References/interop.ICApiIronCAD.dll')
+    vendor=installation_dir()/'ICAPI/Samples/C#/References/interop.ICApiIronCAD.dll'
     src=Path(source).resolve();built=folder/('Machining_'+sha(src)[:20]+'.dll')
     cmd=['C:/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe','/nologo','/target:library','/platform:x64','/out:'+str(built),'/reference:'+str(vendor),'/reference:System.Web.Extensions.dll','/reference:Microsoft.CSharp.dll',str(src)]
     c=subprocess.run(cmd+['/utf8output'],capture_output=True,text=True,encoding='utf-8',errors='replace')
@@ -24,7 +27,7 @@ def run(folder,source,request):
     shutil.copyfile(built,folder/names[0]);shutil.copyfile(vendor,folder/vendor.name);shutil.copyfile(loader,folder/loader.name)
     (folder/'request.json').write_text(json.dumps(request,ensure_ascii=False,indent=2),encoding='utf-8')
     import comtypes.client
-    from comtypes.gen import IronCAD
+    IronCAD=comtypes.client.GetModule(str(installation_dir()/"bin/IronCad.tlb"))
     app=comtypes.client.GetActiveObject('IronCAD.Application',dynamic=True)
     collection=app.AddOns;raw=collection._comobj
     def disp(x):return x._comobj if hasattr(x,'_comobj') else x

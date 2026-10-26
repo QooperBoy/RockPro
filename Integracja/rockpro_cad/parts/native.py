@@ -49,7 +49,7 @@ class NativePartsAdapter:
             import comtypes.client
             from comtypes import HRESULT
             from comtypes.automation import IDispatch
-            from python_ironcad import ICAPI
+            from ..icapi_runtime import ICAPI, assert_host
 
         source = Path(source).resolve(strict=True)
         ole = ct.OleDLL("ole32")
@@ -74,6 +74,7 @@ class NativePartsAdapter:
                 continue
             legacy = comtypes.client.GetBestInterface(rot.GetObject(moniker).QueryInterface(IDispatch))
             base = legacy.Application.ZIronCADApp.QueryInterface(ICAPI.IZBaseApp)
+            assert_host(base)
             document = base.GetOpenDocByName(str(source))
             # IZDoc.Name is the full saved filename in this API. A basename alone
             # cannot authorize a read of a similarly named document elsewhere.

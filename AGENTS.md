@@ -1,6 +1,6 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
-Najpierw przeczytaj docs/DEVELOPMENT.md. Bieżący zakres: LAYOUT.md; instalacja: HANDOVER.md i AUTOSTART.md. To natywny dodatek WinForms / .NET Framework x64 do IronCAD 2027 (29.0), Python MCP stdio i SQLite. Nie przenoś go na ASP.NET, React ani nowy .NET w ramach zwykłej zmiany funkcji.
+Najpierw przeczytaj docs/DEVELOPMENT.md. Bieżący zakres: LAYOUT.md; instalacja: HANDOVER.md i AUTOSTART.md. To natywny dodatek WinForms / .NET Framework x64, Python MCP stdio i SQLite. Docelowy host odbiorcy: IronCAD 2023 (25.0); historyczny host: 2027 (29.0). Build/autostart i podstawowy test natywny 2023 PASS; pełny generator T1 wymaga portowania i źródła zgodnego z 2023. Czytaj docs/IRONCAD_2023_COMPATIBILITY.md. Nie przenoś go na ASP.NET, React ani nowy .NET w ramach zwykłej zmiany funkcji.
 
 Priorytet użytkownika dla obecnego MVP (22.10.2026): szybki działający prototyp do ręcznego obejrzenia. Wykonuj podstawowe kontrole rozmieszczenia/symetrii całych okuć, zmiany wymiarów oraz zapisu/otwarcia; następnie przekaż model użytkownikowi. Nie dokładaj kolejnych zestawów testów, szczegółowych audytów BRep ani wielokrotnych pełnych regresji bez konkretnego błędu lub nowego wymagania. Zachowaj istniejące testy i ochronę źródeł, kopii oraz zapisów. Wygląd ocenia użytkownik; dalsze testowanie i debugowanie wynika z jego uwag.
 

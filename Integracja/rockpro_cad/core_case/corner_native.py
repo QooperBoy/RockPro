@@ -80,7 +80,7 @@ def produce_hidden_panels(context_source,parts,folder):
     folder=Path(folder).resolve();folder.mkdir(exist_ok=False)
     adapter=NativePartsAdapter.attach(context_source);guard=background_guard(adapter.base,folder)
     before=adapter.provenance();source_hash=file_sha256(context_source)
-    from python_ironcad.core import install_dir
+    from ..icapi_runtime import install_dir
     vendor=Path(install_dir)/'ICAPI'/'Samples'/'C#'/'References'/'interop.ICApiIronCAD.dll'
     compiler=Path(os.environ.get('WINDIR',r'C:\Windows'))/'Microsoft.NET'/'Framework64'/'v4.0.30319'/'csc.exe'
     bridge=Path(__file__).with_name('CornerSceneBridge.cs');exe=folder/'CornerSceneBridge.exe'
