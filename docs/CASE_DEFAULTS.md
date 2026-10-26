@@ -1,4 +1,4 @@
-# Ustalenia użytkownika — aktualizacja 24.10.2026
+# Ustalenia użytkownika — aktualizacja 26.10.2026
 
 Sklejka: RGB(64,128,128), #408080, ICAPI COLORREF 0x808040, zmierzone z T_1.
 
@@ -6,8 +6,10 @@ Sklejka: RGB(64,128,128), #408080, ICAPI COLORREF 0x808040, zmierzone z T_1.
 
 Pokrywa jest płytka, parametryczna. Zwykle ma 10–15% **wysokości korpusu**;
 planer przyjmuje 12%, a domyślny górny limit wynosi 15%.
-Minimum wynika z pionowego miejsca na zamontowanie zawiasu, złącza,
-grubości płyty i niezbędnych luzów. Nie liczymy 3 × szerokość okucia.
+Minimum wynika z pionowego miejsca na całe górne połówki zamków i zawiasów,
+złącza, górnego profilu, grubości płyty i niezbędnych odstępów.
+Nie liczymy 3 × szerokość okucia. Samo zmieszczenie zawiasu w płycie nie wystarcza:
+jego skraj nie może wejść w obszar górnego profilu lub narożnika.
 Szerokość gniazda na poziomym dachu nie wyznacza wysokości ściany pokrywy.
 
 Jeżeli wybrane okucia nie mieszczą się w limicie, zgłaszamy konflikt.
@@ -18,7 +20,7 @@ pozwala zmienić proporcję, ale nie pozwala naruszyć minimum montażowego.
 To zastępuje wcześniejszą, błędną zasadę 3 × szerokość i wynik 408 mm.
 Historyczne modele i raporty pozostają zachowane jako historia, nie domyślne.
 
-## Inspiracja rzeczywistym EB-L630U
+## Historyczna inspiracja EB-L630U — prototypy 02/03
 
 Odczyt płyt z kopii modelu T_1: ściana pokrywy 63,2 mm i dach 9,8 mm,
 czyli 73 mm; szczelina pomiędzy płytami korpusu i pokrywy około 8 mm.
@@ -31,6 +33,24 @@ Prototyp 02 ma więc 81 mm pokrywy, 300 mm korpusu, 381 mm obrysu płyt.
 To jawne odstępstwo (27%) inspirowane wzorcem, po poleceniu użytkownika,
 a nie nowy domyślny procent. Korpus nie został sztucznie powiększony.
 H2026 nadal nie jest zamontowany.
+
+## Korekta po ocenie użytkownika 26.10.2026 — prototyp 05
+
+Użytkownik wskazał nakładanie górnych połówek okuć na profil wieka i polecił
+podwyższyć pokrywę oraz dodać progi na przyszłość. Aktualny wariant ma pokrywę
+115 mm przy korpusie 300 mm (obrys płyt 415 mm). To jawnie dopuszczone odstępstwo;
+81 mm pozostaje wyłącznie wartością historycznych plików.
+
+Dla kompletu 17251S + 270836 + EG-0113 próg wynosi 110 mm:
+`ceil(max(69.854, 67.01) + 35 + 5)`. Bierzemy pełne okucia, górny profil i 5 mm
+odstępu między niezależnymi elementami. Wybrana pokrywa 115 mm daje około 10,15 mm
+nad zamkiem. Po zmianie katalogu należy podać zmierzone skraje nowego okucia;
+brak tych danych blokuje wyliczenie progu, zamiast przyjmować zero.
+
+Prototypowy generator stosuje `core_case/machining_rules.py`; nie zmienia to
+automatycznie już załadowanego dodatku ani nie blokuje ręcznego wpisania złej
+wartości w IronCADzie. Parametry edytowane ręcznie wymagają ponownej walidacji.
+Szczegóły i dowody: [T1_MACHINING_PROTOTYPE.md](T1_MACHINING_PROTOTYPE.md).
 
 ## Implementacja
 

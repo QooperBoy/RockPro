@@ -1,6 +1,10 @@
 # ROC-41 — wycięcia okuć i pasowanie profili
 
-Data: 26.10.2026. Status: wymagania i plan implementacji, bez zmiany kodu CAD.
+Data: 26.10.2026. Status: częściowo wdrożony prototyp natywny T1.
+48 obróbek, powiązania parametrów i testy zapisu/otwarcia opisuje
+[T1_MACHINING_PROTOTYPE.md](T1_MACHINING_PROTOTYPE.md).
+Poniższy plan nadal obejmuje szerszą bibliotekę, obsługę ręcznej edycji i podgląd;
+nie wszystkie jego kryteria odbioru są zakończone.
 Rozwinięcie [ROC-41](https://linear.app/rock-pro/issue/ROC-41/po-mvp-wyciecia-pod-okucia-i-styki-profili-aluminiowych)
 na podstawie trzech oznaczeń użytkownika i doprecyzowania o bibliotece oraz etapach.
 Identyfikatory M01–M08 i N01–N02 poniżej są
@@ -36,7 +40,8 @@ konstruktora. Dwie podane ścieżki są identyczne: to jeden wskazany plik, a ni
 dwa niezależne dowody. Zrzut opisuje role 1/2/3, ale nie daje wymiarów,
 tolerancji ani pewnego przypisania do rewizji pliku. Nie wyliczać ich z pikseli.
 Pełna ścieżka, hash i materiał graficzny pozostają w prywatnym
-`artifacts/roc41-planning-20261026/`. Odczyt geometrii aktualnej sesji: NOT RUN.
+`artifacts/roc41-planning-20261026/`. Aktualizacja: odczyt kopii T1 i zachowanej
+wersji z H7159 wykonany przez SDK w `artifacts/roc41-native-20261026/`.
 
 Zakres dotyczy obróbki płyt i wskazanych profili; gotowe uchwyty i zamki
 pozostają sztywne. Nie przebudowujemy historii wnętrza modeli katalogowych.

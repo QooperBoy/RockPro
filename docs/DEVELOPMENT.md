@@ -36,8 +36,10 @@ Nowe wymagania technologiczne z 26.10.2026:
 [ROC41_CUTOUTS_AND_JOINTS.md](ROC41_CUTOUTS_AND_JOINTS.md) — wycięcia powiązane
 z wystąpieniami okuć, złącza profili i obliczenia gabarytów przed CAD.
 To plan M01–M08 i przyszłe N01/N02; obejmuje bibliotekę informacji o wycięciach,
-strefy uchwyt–zawias oraz wspólne etapy okucia i jego obróbek. Nie rozszerza
-jeszcze wykonawcy ani jego allowlisty.
+strefy uchwyt–zawias oraz wspólne etapy okucia i jego obróbek. Pierwszy natywny
+przyrost ma osobny, przypięty do źródeł adapter prototypu:
+[T1_MACHINING_PROTOTYPE.md](T1_MACHINING_PROTOTYPE.md). Nie rozszerza automatycznie
+allowlisty dotychczasowego wykonawcy MCP ani zainstalowanego dodatku.
 
 ROC-43: [specyfikacja testów i instrukcja uruchomienia](ROC43_TDD.md).
 Zwykły harness uruchamia `core-design` w trybie `all`: zamrożone wymagania
