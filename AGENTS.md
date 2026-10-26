@@ -2,10 +2,11 @@
 
 Przyrost T2 w gałęzi `codex/t2-parametryzacja`:
 [docs/T2_PARAMETRIC_PROTOTYPE.md](docs/T2_PARAMETRIC_PROTOTYPE.md).
-Sześć prób geometrii przeszło; odbiór jest wstrzymany do potwierdzenia poprawki
-odświeżania, które wymusiło niepotrzebną regenerację historycznych zaokrągleń.
+Sześć prób geometrii i poprawione odświeżenie przeszło w native-14; native-15-body
+potwierdził rzeczywiste obrysy sklejki po zmianie wymiarów i powrocie.
 Nie wywołuj Part.Update/Assembly.Update wewnątrz niezmienionych okuć T2 w celu
 samego odświeżenia grafiki. Sprawdzaj `native13-rejected.json` i nowsze wyniki.
+Szerokość T2 pozostaje stała dla tego wariantu racka; nie skalować katalogowych okuć.
 
 26.10.2026, późniejszy checkpoint: własna Scene14 w 2023 ma poprawiony montaż
 i polskie parametry; natywna zmiana wymiarów oraz powrót PASS. Czytaj

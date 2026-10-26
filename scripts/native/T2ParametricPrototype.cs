@@ -19,7 +19,7 @@ static Dictionary<int,int> CatalogFaces=new Dictionary<int,int>();
 static Dictionary<int,IZElement> Elements=new Dictionary<int,IZElement>();
 static Dictionary<string,object> Obj(object x){return (Dictionary<string,object>)x;}
 static double[] N(object x){return ((Array)x).Cast<object>().Select(Convert.ToDouble).ToArray();}
-static string Hash(string path){using(var stream=File.OpenRead(path))using(var sha=System.Security.Cryptography.SHA256.Create())return BitConverter.ToString(sha.ComputeHash(stream)).Replace("-","").ToLowerInvariant();}
+static string Hash(string path){using(var stream=new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.ReadWrite|FileShare.Delete))using(var sha=System.Security.Cryptography.SHA256.Create())return BitConverter.ToString(sha.ComputeHash(stream)).Replace("-","").ToLowerInvariant();}
 static void Near(double a,double b,string message,double tolerance=.005){if(Double.IsNaN(a)||Math.Abs(a-b)>tolerance)throw new Exception(message+": "+a+" != "+b);}
 static string Expr(string text,int depth){foreach(string name in Parameters.Keys)text=System.Text.RegularExpressions.Regex.Replace(text,"\\b"+name+"\\b",m=>String.Concat(Enumerable.Repeat("Parent\\",depth))+"Params\\"+name);return text;}
 static void SetParameter(IZParameterMgr mgr,string name,string expression,string notes){
@@ -61,8 +61,20 @@ static object Check(Dictionary<string,object> test,Dictionary<string,object> req
   if(baseline||original["opaque_root"]!=null){var actual=N(((IZPart)e).GetBody(true).GetBoundingBox());var wanted=N(original["bounds_local_m"]);for(int j=0;j<6;j++)Near(actual[j]*1000,wanted[j]*1000,"Catalog/baseline geometry "+id+" axis "+j,.02);}
  }
  var values=Obj(test["parameters"]);bool closed=new[]{"RP_UniesienieCzapki","RP_OdsuniecieKlapy","RP_UniesienieRacka"}.All(n=>Convert.ToDouble(values[n])==0);
+ double[] plywoodEnvelope=null;
+ if(closed){
+  var points=new List<double[]>();
+  foreach(var node in ((object[])req["nodes"]).Select(Obj).Where(n=>(string)n["role"]=="outer_panel")){
+   var e=Elements[Convert.ToInt32(node["id"])];var bounds=N(((IZPart)e).GetBody(true).GetBoundingBox());var world=((IZSceneElement)e).GetTransformToGlobal();
+   for(int mask=0;mask<8;mask++)points.Add(Enumerable.Range(0,3).Select(j=>world.GetValue(3,j)*1000+Enumerable.Range(0,3).Sum(k=>bounds[k+(((mask>>k)&1)==1?3:0)]*1000*world.GetValue(k,j))).ToArray());
+  }
+  plywoodEnvelope=Enumerable.Range(0,3).Select(j=>points.Max(p=>p[j])-points.Min(p=>p[j])).ToArray();
+  Near(plywoodEnvelope[0],548,"Actual plywood width",.02);
+  Near(plywoodEnvelope[1],Convert.ToDouble(values["RP_GlebokoscObudowy"]),"Actual plywood depth",.02);
+  Near(plywoodEnvelope[2],Convert.ToDouble(values["RP_WysokoscObudowy"]),"Actual plywood height",.02);
+ }
  if(closed)foreach(object item in (object[])req["latch_pairs"]){var pair=Obj(item);var a=((IZSceneElement)Elements[Convert.ToInt32(pair["upper_source_id"])]).GetTransformToGlobal();var b=((IZSceneElement)Elements[Convert.ToInt32(pair["lower_source_id"])]).GetTransformToGlobal();for(int j=0;j<3;j++)Near(a.GetValue(3,j)*1000,b.GetValue(3,j)*1000,"Latch pair alignment");}
- return new{name=test["name"],nodes=((object[])test["nodes"]).Length,features=((object[])test["features"]).Length,parts=measurements.Count,rigid_catalog_geometry=true,closed_latch_pairs_checked=closed?6:0,passed=true};
+ return new{name=test["name"],nodes=((object[])test["nodes"]).Length,features=((object[])test["features"]).Length,parts=measurements.Count,rigid_catalog_geometry=true,closed_latch_pairs_checked=closed?6:0,actual_plywood_envelope_mm=plywoodEnvelope,passed=true};
 }
 static void Dirty(IZElement e){
  // Graphics invalidation only: Part.Update/Assembly.Update force a rebuild of
@@ -70,13 +82,14 @@ static void Dirty(IZElement e){
  var children=e.GetChildrenZArray();for(int i=0;i<e.GetChildrenCount();i++){object raw;children.Get(i,out raw);var child=(IZElement)raw;if(child.Type==eZElementType.Z_ELEMENT_PART||child.Type==eZElementType.Z_ELEMENT_ASSEMBLY)Dirty(child);}
  e.SetDirtyFlag(eZDirtyFlag.Z_DIRTY_GRAPHICS);
 }
-public static int Run(string folder){var result=new Dictionary<string,object>();IZDoc doc=null;IZBaseApp app=null;bool passed=false;try{
+public static int Run(string folder){var result=new Dictionary<string,object>();IZDoc doc=null,previous=null;IZBaseApp app=null;bool passed=false,validationOnly=false;try{
  var req=Obj(Json.DeserializeObject(File.ReadAllText(Path.Combine(folder,"request.json"))));
  if((string)req["contract"]!="rockpro-t2-parametric-prototype-v1"||(string)req["source_sha256"]!=SourceHash)throw new Exception("Unsupported T2 recipe");
  if(Convert.ToInt32(req["expected_pid"])!=System.Diagnostics.Process.GetCurrentProcess().Id)throw new Exception("Wrong process");
  string source=Path.GetFullPath((string)req["source"]);if(Hash(source)!=SourceHash)throw new Exception("T2 source revision changed");
  dynamic legacy=Marshal.GetActiveObject("IronCAD.Application");app=(IZBaseApp)legacy.ZIronCADApp;if(!app.ApiVersion.StartsWith("25."))throw new Exception("Expected IronCAD 2023");
- string copy=Path.Combine(folder,"RockPro_T2_parametryczny_IC2023.ics");File.Copy(source,copy,false);bool already;doc=app.OpenFile2(copy,false,true,out already);if(already)throw new Exception("Owned copy already open");
+ validationOnly=req.ContainsKey("validation_only")&&(bool)req["validation_only"];previous=app.ActiveDoc;
+ string copy=Path.Combine(folder,"RockPro_T2_parametryczny_IC2023.ics");File.Copy(source,copy,false);bool already;doc=app.OpenFile2(copy,false,!validationOnly,out already);if(already)throw new Exception("Owned copy already open");
  Scene=(IZSceneDoc)doc;Utility=(IZSceneDocUtility)doc;Parameters=Obj(req["parameters"]);Elements.Clear();BindingOffsets.Clear();CatalogFaces.Clear();int count=Walk(Scene.GetTopElement());if(count!=449)throw new Exception("T2 source hierarchy mismatch");
  foreach(object item in (object[])req["nodes"]){var spec=Obj(item);var e=Elements[Convert.ToInt32(spec["id"])];if(e.Name!=(string)spec["name"]||e.Type.ToString()!=(string)spec["type"])throw new Exception("T2 source identity mismatch");}
  foreach(object item in (object[])req["measurements"]){var r=Obj(item);if(r["opaque_root"]!=null){int id=Convert.ToInt32(r["id"]);CatalogFaces[id]=((Array)((IZPart)Elements[id]).GetBody(true).GetFaceIds()).Length;}}
@@ -115,16 +128,16 @@ public static int Run(string folder){var result=new Dictionary<string,object>();
  foreach(object item in (object[])req["nodes"]){var spec=Obj(item);if(spec.ContainsKey("label"))Elements[Convert.ToInt32(spec["id"])].Name=(string)spec["label"];if((string)spec["role"]=="outer_panel")((IZPart)Elements[Convert.ToInt32(spec["id"])]).SurfaceFinish.Color=0x808040;}
  Elements[4499].Name="RockPro T2 | Spód";Elements[7036].Name="RockPro T2 | Zdejmowana czapka";Elements[4601].Name="RockPro T2 | Zdejmowana klapa przednia";Elements[6366].Name="RockPro T2 | Niezależny rack";
  File.WriteAllText(Path.Combine(folder,"display-stage.json"),"{\"stage\":\"before_graphics_invalidation\"}");
- Dirty(Scene.GetTopElement());app.ActiveDoc=doc;
+ if(!validationOnly){Dirty(Scene.GetTopElement());app.ActiveDoc=doc;
  File.WriteAllText(Path.Combine(folder,"display-stage.json"),"{\"stage\":\"before_graphics_update\"}");
- Scene.UpdateGraphics(0);Scene.AdjustCameraToFitShapeInRect(1280,800);Scene.Redraw();
+ Scene.UpdateGraphics(0);Scene.AdjustCameraToFitShapeInRect(1280,800);Scene.Redraw();}
  foreach(var pair in CatalogFaces)Near(((Array)((IZPart)Elements[pair.Key]).GetBody(true).GetFaceIds()).Length,pair.Value,"Catalog after graphics "+pair.Key,0);
- File.WriteAllText(Path.Combine(folder,"display-stage.json"),"{\"stage\":\"graphics_and_catalog_topology_passed\"}");
+ File.WriteAllText(Path.Combine(folder,"display-stage.json"),Json.Serialize(new{stage=validationOnly?"catalog_topology_passed_without_graphics":"graphics_and_catalog_topology_passed"}));
  result["catalog_parts_topology_checked"]=CatalogFaces.Count;
  if(Hash(source)!=SourceHash||Hash(copy)!=SourceHash)throw new Exception("Unexpected disk modification");
- result["checks"]=checks;result["document"]=doc.Name;result["modified"]=doc.Modified;result["saved"]=false;result["source_unchanged"]=true;result["production_approved"]=false;passed=true;
+ result["checks"]=checks;result["document"]=doc.Name;result["modified"]=doc.Modified;result["saved"]=false;result["source_unchanged"]=true;result["production_approved"]=false;result["graphics"]=validationOnly?"NOT RUN (background validation)":"PASS";passed=true;
  }catch(Exception e){result["error"]=e.ToString();}
- finally{if(!passed&&doc!=null){try{doc.Close();result["failed_copy_closed"]=true;}catch(Exception e){result["cleanup_error"]=e.ToString();}}result["passed"]=passed;File.WriteAllText(Path.Combine(folder,"result.json"),Json.Serialize(result));}
+ finally{if((!passed||validationOnly)&&doc!=null){try{doc.Close();result["owned_copy_closed"]=true;if(validationOnly&&previous!=null)app.ActiveDoc=previous;}catch(Exception e){result["cleanup_error"]=e.ToString();passed=false;}}result["passed"]=passed;File.WriteAllText(Path.Combine(folder,"result.json"),Json.Serialize(result));}
  return passed?0:1;
 }
 }}

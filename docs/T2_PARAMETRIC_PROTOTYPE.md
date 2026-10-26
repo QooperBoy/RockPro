@@ -58,7 +58,7 @@ obrysy cech, a nie sam tekst wyrażenia lub brak wyjątku.
 
 ## Pomiary
 
-Natywnie przeszło sześć prób geometrii w `native-13/progress.json`:
+Natywnie przeszło sześć prób geometrii w `native-14/progress.json`:
 
 1. Odtworzenie wzorca: zgodność 335 brył przed zmianą wymiarów.
 2. Głębokość 667 mm i wysokość 536,5 mm; zachowane przekroje profili/grubości.
@@ -80,12 +80,48 @@ nie jest dowodem poprawnego wyniku po tej operacji.
 
 Poprawiony kod unieważnia wyłącznie grafikę, bez `Part.Update`/`Assembly.Update`
 wewnątrz gotowych okuć. Dodatkowo porównuje liczbę powierzchni brył katalogowych
-przed operacją, w próbach i po odświeżeniu. Poprawka przeszła kompilację;
-ponowne wykonanie czeka na zamknięcie modalnego okna „Part Regeneration”.
+przed operacją, w próbach i po odświeżeniu. Po zamknięciu okna przez użytkownika
+`native-14/result.json` potwierdził PASS sześciu prób i grafiki oraz zachowanie
+liczby powierzchni wszystkich 269 części katalogowych.
 Nie należy usuwać ani edytować zaokrągleń w oryginalnych okuciach jako obejścia.
+
+Niezależna próba `native-15-body/result.json` mierzy rzeczywiste bryły 13 płyt,
+nie tylko położenia i rozmiary cech. Wyniki obrysu sklejki:
+548 × 627 × 506,5 → 548 × 667 × 536,5 → 548 × 627 × 506,5 mm.
+Źródło niezmienione; własna kopia kontrolna zamknięta. Grafika była w tej
+próbie celowo NOT RUN; jej dowód pochodzi z native-14.
+
+Użytkownik zmienił nazwę dostarczonej sceny na wariant `...v1_bezszer`.
+Końcową kontrolę wymiarów wykonano na osobnej ukrytej kopii, zachowując tę wersję.
+Nie wykonano zapisu CAD przez agenta ani ponownego otwarcia zapisanej przez
+użytkownika wersji jako dowodu trwałości parametrów.
+
+## Koordynacja i sprzątanie wykonawcy
+
+Podczas uzgadniania kolejności z T1 anulowanie kolejki zbiegło się z uruchomieniem
+native-14. Klient Python zakończył się, ale kod C# kończył pracę w hoście.
+Nie restartowano IronCADa ani nie uruchamiano równoległej mutacji. Oczekiwano
+na result.json i clr_result.json (managed_result=0), a następnie uzgodniono stan
+i usunięto wyłącznie własny tymczasowy AddOn. Dowód:
+`native-14/client-interruption-reconciliation.json`.
+
+Kolejka obsługuje teraz kooperacyjne anulowanie przed dispatch: plik
+`<katalog-wyjściowy>.cancel`. Po dispatch należy zaczekać na jednoznaczny wynik
+hosta. Nie przerywać klienta jako sposobu anulowania już wykonywanego C#.
+`run_t1_machining_job.py` usuwa jedyny własny wpis po pozycji kolekcji 0,
+zamiast mylącego AddOn.Index=1, i sprawdza rzeczywisty Count po usunięciu.
+Testy obejmują anulowanie przed startem, brak ponowienia wykonanego joba
+i zachowanie cudzych AddOnów. Cleanup native-15-body potwierdza Count=0.
 Dowody prywatne: `artifacts/t2-parametric-20261026/` w tym checkoutcie.
 
 ## Ograniczenia
+
+Końcowa weryfikacja offline: `artifacts/verification/20261026T190937202881Z/results.json`
+— PASS wszystkich siedmiu grup, w tym 242 testów kontraktów rdzenia.
+Poprzedni przebieg `20261026T190721892208Z` zakończył się błędem usuwania
+tymczasowego `Probe.exe` (WinError 5) po teście sprzątania. Powtórzenie bez
+zmiany kodu przeszło; przyczyna chwilowej blokady pliku nie została ustalona.
+Nie jest to dowód operacji natywnych CAD — te opisano osobno wyżej.
 
 NOT RUN: zapis/ponowne otwarcie parametrycznej kopii (obowiązuje zakaz zapisu),
 odbiór wizualny i produkcyjny, dobór do fizycznego urządzenia, nośność i bezkolizyjny
