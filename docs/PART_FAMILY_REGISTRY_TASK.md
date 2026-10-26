@@ -56,6 +56,17 @@ jeżeli zależności montażowe wymagają innej kolejności; dziennik zachowuje 
 6. Testy i odbiór: rejestr i grupowanie offline, potem montaż/zmiana wymiarów na
    nowej kopii ICS, zapis/otwarcie, eksport i kontrola obu widoków.
 
+## Rozszerzenie wymagań 26.10.2026 — okucie i jego wycięcia
+
+[Plan ROC-41, M07](ROC41_CUTOUTS_AND_JOINTS.md) rozszerza rejestr o wersjonowany
+graf etapów i powiązane operacje obróbki. Etap uchwytów pokazuje uchwyty razem
+z otworami; analogicznie kolejne rodziny. Wycięcie należy do właściciela,
+modyfikuje geometrię docelowej płyty/profilu i nie stanowi zakupowej części BOM.
+Tryb etapów budowy wymaga geometrii właściwej dla aktywnych operacji; filtr
+widoczności gotowego okucia pozostawia gotowy otwór. Nowa rodzina ma docierać
+do CAD, dodatku, obserwatora i viewera przez wspólny kontrakt. Zachować stabilne
+ID i dotychczasowy etap 6 dla kół/gniazd. To wymagania, nie wdrożony przyrost.
+
 ## Kryteria akceptacji
 
 - Dodanie obsługiwanej rodziny do rejestru ujawnia ją w dzienniku i viewerze bez

@@ -1,5 +1,12 @@
 # Następny etap: katalog części przed automatyzacją okuć
 
+Aktualizacja wymagań 26.10.2026 — [ROC-41: biblioteka montażowa](ROC41_CUTOUTS_AND_JOINTS.md):
+planowana kolumna „Wycięcie w sklejce” (tak/nie/zależy od montażu/brak danych),
+powiązanie SKU z wersją szablonu obróbki, reguły niekolidowania uchwytu z zawiasem
+i rozbudowa na kilku–kilkunastu gotowych wzorach. Stare wpisy bez danych nie
+oznaczają „nie”. Wspólna biblioteka zasila dodatek i podglądy; migracja danych
+i nowe pola nie są jeszcze wdrożone. Uchwyt teleskopowy i koła bagażowe to N01/N02.
+
 ## Kolejność
 
 1. Odczyt drzewa wskazanego modelu bez zmiany źródła: identyfikatory węzłów, ścieżki, liczba wystąpień, przynależność góra/dół. Oddzielne zestawienie zespołów i fizycznych elementów zapobiega podwójnemu liczeniu.

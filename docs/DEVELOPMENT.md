@@ -35,7 +35,9 @@ zachowanie ręcznej pracy i TDD. Pierwszy przyrost: ROC-43; plan nadrzędny: ROC
 Nowe wymagania technologiczne z 26.10.2026:
 [ROC41_CUTOUTS_AND_JOINTS.md](ROC41_CUTOUTS_AND_JOINTS.md) — wycięcia powiązane
 z wystąpieniami okuć, złącza profili i obliczenia gabarytów przed CAD.
-To plan M01–M07; nie rozszerza jeszcze wykonawcy ani jego allowlisty.
+To plan M01–M08 i przyszłe N01/N02; obejmuje bibliotekę informacji o wycięciach,
+strefy uchwyt–zawias oraz wspólne etapy okucia i jego obróbek. Nie rozszerza
+jeszcze wykonawcy ani jego allowlisty.
 
 ROC-43: [specyfikacja testów i instrukcja uruchomienia](ROC43_TDD.md).
 Zwykły harness uruchamia `core-design` w trybie `all`: zamrożone wymagania
