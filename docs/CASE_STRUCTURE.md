@@ -79,5 +79,14 @@ Ponowna faza `group` sprawdza istniejące grupy zamiast tworzyć duplikaty.
 Dowody lokalne: `artifacts/t1-structure-20261026/`.
 PASS: cztery wycięcia, ich ruch po zmianie parametrów i 4 pary sklejka–zawias
 bez kolizji w `native-cuts-06/result.json`. Kontrole obejmują też profile.
-Grupowanie i pełny test po grupowaniu: w trakcie weryfikacji.
+PASS: grupowanie oraz odbudowa powiązań po przeniesieniu części w
+`native-group-05/result.json`. Sześć grup zachowuje 72 wystąpienia. Trzy próby
+(docelowe wymiary, zmiana wymiarów/odsunięć, powrót) obejmują pozycje,
+orientacje, rozmiary płyt i podpór, 4 kontury 79 × 82 mm, ich powiązania,
+24 rzeczywiste operacje oraz kolizje zawiasów ze sklejką i profilami. Grafika PASS.
+Pełny harness PASS: `artifacts/verification/20261026T185311168179Z/results.json`.
+Scene14 pozostaje niezapisana, z korpusem 235 mm i pokrywą 115 mm.
+Próba dodatkowego końcowego odczytu ActiveDoc odmówiła działania, gdy drugi
+czat aktywował T2; nie zmieniła żadnej sceny. Dowodem odbioru T1 jest powyższy
+natywny raport przypięty do jej GUID, a nie nazwa aktywnej zakładki.
 Zapis/ponowne otwarcie i odbiór wizualny: NOT RUN na życzenie użytkownika.
