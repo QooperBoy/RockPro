@@ -15,6 +15,10 @@ ten sam FileGUID. Nie jest to jeszcze identyfikator wystąpienia w nowym projekc
 Planer potrafi wyliczyć przesunięcie komponentu wraz z potomkami, bez skalowania
 okuć i brył urządzeń. Rozróżnia geometrię ramy od natywnej kotwy/PositionTransform;
 wykonawca musi osobno uwzględnić offset kotwy i zweryfikować rzeczywisty CAD.
+Plan wymaga `inventory_bytes=...`: standard jest odbudowywany z przypiętego
+inwentarza i porównywany 1:1 przed użyciem. Sam SHA w edytowalnym standardzie
+nie wystarcza. Sprawdzana jest również zgodność lokalnych i światowych ram
+w całej hierarchii. [Naprawy i dowody](MOUNT_STANDARD_REVIEW_20261026.md).
 Obróbka wewnątrz przenoszonej części pozostaje w jej hierarchii. Powiązania
 między różnymi częściami wymagają jawnego właściciela — nie są zgadywane.
 

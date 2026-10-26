@@ -2,7 +2,7 @@ import copy
 import hashlib
 import json
 import unittest
-from rockpro_cad.core_case.working_mounts import build_working_standard,plan_component_translation
+from rockpro_cad.core_case.working_mounts import build_working_standard,plan_component_translation,validate_working_standard
 
 
 def fixture(source='a'*64):
@@ -16,8 +16,12 @@ def fixture(source='a'*64):
 
 
 def build(data):
-    raw=json.dumps(data).encode('utf-8')
+    raw=inventory_bytes(data)
     return build_working_standard(raw,data['source_sha256'],hashlib.sha256(raw).hexdigest())
+
+
+def inventory_bytes(data):
+    return json.dumps(data).encode('utf-8')
 
 
 class WorkingMountTests(unittest.TestCase):
@@ -34,9 +38,10 @@ class WorkingMountTests(unittest.TestCase):
 
     def test_translation_preserves_reflections_fixed_parts_and_original_data(self):
         data=fixture();data['rows'][1]['world_mm'][0][0]=-1
+        data['rows'][1]['parent_mm'][0][0]=-1
         data['rows'][2]['world_mm'][0][0]=-1
         before=copy.deepcopy(data);standard=build(data)
-        plan=plan_component_translation(standard,'root/2/3',[10,20,30])
+        plan=plan_component_translation(standard,'root/2/3',[10,20,30],inventory_bytes=inventory_bytes(data))
         self.assertEqual(plan['root_geometry_parent_translation_mm'],[-10,20,30])
         self.assertEqual(plan['targets'][2]['world_frame_mm'][0][0],-1)
         self.assertEqual(plan['targets'][2]['world_frame_mm'][3][:3],[10,20,30])
@@ -49,10 +54,47 @@ class WorkingMountTests(unittest.TestCase):
         data=fixture();data['rows'].pop(1)
         with self.assertRaisesRegex(ValueError,'hierarchy'):build(data)
         standard=build(fixture())
-        with self.assertRaisesRegex(ValueError,'Finite'):plan_component_translation(standard,'root/2',[0,float('nan'),0])
-        with self.assertRaisesRegex(ValueError,'explicit'):plan_component_translation(standard,'root/999',[0,0,0])
-        standard['nodes'][1]['world_frame_mm'][3][0]=1.7e308
-        with self.assertRaisesRegex(ValueError,'Finite'):plan_component_translation(standard,'root/2',[1.7e308,0,0])
+        raw=inventory_bytes(fixture())
+        with self.assertRaisesRegex(ValueError,'Finite'):plan_component_translation(standard,'root/2',[0,float('nan'),0],inventory_bytes=raw)
+        with self.assertRaisesRegex(ValueError,'explicit'):plan_component_translation(standard,'root/999',[0,0,0],inventory_bytes=raw)
+        data=fixture()
+        for index in (1,2):data['rows'][index]['world_mm'][3][0]=1.7e308
+        data['rows'][1]['parent_mm'][3][0]=1.7e308
+        with self.assertRaisesRegex(ValueError,'Finite'):
+            plan_component_translation(build(data),'root/2',[1.7e308,0,0],inventory_bytes=inventory_bytes(data))
+
+    def test_inconsistent_parent_and_world_frames_rejected(self):
+        data=fixture();data['rows'][2]['parent_mm'][3][0]=25
+        with self.assertRaisesRegex(ValueError,'frames disagree'):build(data)
+        data['rows'][2]['world_mm'][3][0]=25
+        # Native traversal order is not needed to validate a complete hierarchy.
+        data['rows'].reverse();standard=build(data)
+        plan=plan_component_translation(standard,'root/2/3',[5,0,0],inventory_bytes=inventory_bytes(data))
+        self.assertEqual(plan['root_geometry_parent_translation_mm'],[30,0,0])
+
+    def test_loaded_standard_revalidates_identity_hierarchy_and_frames(self):
+        raw=inventory_bytes(fixture())
+        standard=build(fixture())
+        standard['nodes'].append(copy.deepcopy(standard['nodes'][2]))
+        with self.assertRaisesRegex(ValueError,'differs from pinned inventory'):plan_component_translation(standard,'root/2',[0,0,1],inventory_bytes=raw)
+        standard=build(fixture());standard['nodes'][1]['source_reference_key']='b'*64+':root/2'
+        with self.assertRaisesRegex(ValueError,'differs from pinned inventory'):plan_component_translation(standard,'root/2',[0,0,1],inventory_bytes=raw)
+        standard=build(fixture());standard['nodes'][2]['parent_frame_mm'][3][0]=100
+        with self.assertRaisesRegex(ValueError,'differs from pinned inventory'):plan_component_translation(standard,'root/2',[0,0,1],inventory_bytes=raw)
+        data=fixture();data['rows'][1]['type']='Z_ELEMENT_PART'
+        with self.assertRaisesRegex(ValueError,'assembly source hierarchy'):build(data)
+
+    def test_coherent_geometry_edits_cannot_borrow_original_inventory_hash(self):
+        data=fixture();raw=inventory_bytes(data);standard=build(data)
+        self.assertEqual(validate_working_standard(standard,raw),standard)
+        standard['nodes'][2]['world_frame_mm'][3][0]=20
+        standard['nodes'][2]['parent_frame_mm'][3][0]=20
+        standard['nodes'][2]['body_bounds_local_m']=[0,0,0,100,100,100]
+        with self.assertRaisesRegex(ValueError,'differs from pinned inventory'):
+            plan_component_translation(standard,'root/2',[0,0,1],inventory_bytes=raw)
+        with self.assertRaisesRegex(ValueError,'Inventory revision'):
+            validate_working_standard(build(data),raw+b' ')
+        with self.assertRaises(TypeError):plan_component_translation(build(data),'root/2',[0,0,1])
 
 
 if __name__=='__main__':unittest.main()

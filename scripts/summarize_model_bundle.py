@@ -19,11 +19,17 @@ def code_candidate(name):
 def world_box(row):
     """Conservative world AABB transformed from body-local AABB; not a cut contour."""
     b=row.get('bounds_local_m');m=row.get('world_mm')
-    if b is None or m is None:return None
-    if len(b)!=6 or any(not math.isfinite(v) for v in b) or any(b[i]>b[i+3] for i in range(3)):
+    def finite_vector(v,n):
+        return isinstance(v,list) and len(v)==n and all(type(x) in (int,float) and math.isfinite(x) for x in v)
+    try:
+        if (not finite_vector(b,6) or any(b[i]>b[i+3] for i in range(3)) or
+                not isinstance(m,list) or len(m)!=4 or any(not finite_vector(r,4) for r in m) or
+                any(abs(m[i][3])>1e-8 for i in range(3)) or abs(m[3][3]-1)>1e-8):
+            return None
+        points=[[sum(p[i]*1000*m[i][j] for i in range(3))+m[3][j] for j in range(3)]
+                for p in itertools.product(*[(b[i],b[i+3]) for i in range(3)])]
+    except OverflowError:
         return None
-    points=[[sum(p[i]*1000*m[i][j] for i in range(3))+m[3][j] for j in range(3)]
-            for p in itertools.product(*[(b[i],b[i+3]) for i in range(3)])]
     if any(not math.isfinite(v) for p in points for v in p):return None
     return [min(p[i] for p in points) for i in range(3)]+[max(p[i] for p in points) for i in range(3)]
 
@@ -45,7 +51,8 @@ def summarize(data,key,known):
             'api_version':data['api_version'],'nodes':len(rows),'parts':len(parts),
             'assemblies':sum(r['type']=='Z_ELEMENT_ASSEMBLY' for r in rows),
             'valid_body_bounds':len(boxes),'read_errors':data['errors'],
-            'history_complete':not any(e['field']=='feature_metadata' for e in data['errors']),
+            'history_complete':bool(parts) and all(isinstance(r.get('features'),list) for r in parts) and
+                not any(e['field']=='feature_metadata' for e in data['errors']),
             'scene_envelope_conservative_mm':envelope,
             'scene_size_conservative_mm':None if envelope is None else [envelope[i+3]-envelope[i] for i in range(3)],
             'envelope_scope':'All scene parts including possible equipment/rendering/reference bodies; not certified case dimensions',
@@ -96,7 +103,10 @@ def build(manifest_path,native,output,baselines):
             'new_code_labels_vs_baselines':sorted({c['nazwa_w_CAD'] for c in candidates if c['nowa_etykieta_wzgledem_T1_T2']}),
             'production_approved':False,'executable_template':False}
     (output/'summary.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
-    write_csv(output/'czesci.csv',list(flat[0]),flat)
+    fields=list(flat[0]) if flat else ['model','id','sciezka_drzewa','nazwa','obrys_lokalny_mm',
+        'obrys_swiat_konserwatywny_mm','liczba_operacji','operacje_ujemne_wewnatrz_czesci',
+        'material_potwierdzony','rola_konstruktora']
+    write_csv(output/'czesci.csv',fields,flat)
     if candidates:write_csv(output/'kandydaci_biblioteki.csv',list(candidates[0]),candidates)
     return report
 
