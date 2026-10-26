@@ -1,5 +1,9 @@
 # T2 — analiza rodziny i plan parametryzacji
 
+Późniejszy przyrost: [parametryczny prototyp 2023](T2_PARAMETRIC_PROTOTYPE.md).
+Zmiana głębokości/wysokości i niezależne ruchy komponentów mają już próby natywne.
+Poniższa analiza zachowuje historyczny stan i nierozstrzygnięte kwestie produkcyjne.
+
 Stan: 26.10.2026. Wykonano odczyt wzorca i mapowanie, bez zmiany geometrii.
 To osobna rodzina transportowa do miksera z wyjmowanym rackiem, czapką i klapą.
 Nie jest jeszcze wykonywalnym szablonem ani źródłem zatwierdzonego BOM.

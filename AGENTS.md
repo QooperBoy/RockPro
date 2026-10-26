@@ -1,5 +1,12 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
+Przyrost T2 w gałęzi `codex/t2-parametryzacja`:
+[docs/T2_PARAMETRIC_PROTOTYPE.md](docs/T2_PARAMETRIC_PROTOTYPE.md).
+Sześć prób geometrii przeszło; odbiór jest wstrzymany do potwierdzenia poprawki
+odświeżania, które wymusiło niepotrzebną regenerację historycznych zaokrągleń.
+Nie wywołuj Part.Update/Assembly.Update wewnątrz niezmienionych okuć T2 w celu
+samego odświeżenia grafiki. Sprawdzaj `native13-rejected.json` i nowsze wyniki.
+
 26.10.2026, późniejszy checkpoint: własna Scene14 w 2023 ma poprawiony montaż
 i polskie parametry; natywna zmiana wymiarów oraz powrót PASS. Czytaj
 [docs/T1_2023_MOUNTING_REPAIR.md](docs/T1_2023_MOUNTING_REPAIR.md).
