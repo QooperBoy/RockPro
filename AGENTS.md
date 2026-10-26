@@ -1,5 +1,11 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
+Nowe siedem wzorców z 26.10.2026 rozwijamy decyzją użytkownika w 2027;
+odtworzenie od zera na 2023 jest późniejsze. Pytania Q01–Q26 zebrano w ROC-45
+na 27.10.2026; użytkownik odroczył odpowiedzi. Standard źródłowych ram:
+[docs/WORKING_MOUNT_STANDARD.md](docs/WORKING_MOUNT_STANDARD.md).
+To robocza baza montażu, nie ukończona parametryzacja W/D/H nowych rodzin.
+
 Przyrost T2 w gałęzi `codex/t2-parametryzacja`:
 [docs/T2_PARAMETRIC_PROTOTYPE.md](docs/T2_PARAMETRIC_PROTOTYPE.md).
 Sześć prób geometrii i poprawione odświeżenie przeszło w native-14; native-15-body

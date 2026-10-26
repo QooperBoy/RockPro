@@ -65,6 +65,11 @@ wykonawcę danej rodziny, lecz nie blokuje analizy wcześniej odczytanych danych
 
 ## Weryfikacja
 
+Roboczy standard źródłowych ram i planowania ruchu komponentów:
+[WORKING_MOUNT_STANDARD.md](WORKING_MOUNT_STANDARD.md). Pytania do wszystkich
+nowych rodzin zebrano w ROC-45 na 27.10.2026. Odroczenie odpowiedzi nie oznacza
+zatwierdzenia brakujących wymiarów, obróbek ani funkcji elementów.
+
 `scripts/test_model_bundle.py` sprawdza wykrycie edycji źródła, odtworzenie
 oryginału bez nadpisania pracy, brak dublowania identycznie nazwanej części
 i zespołu w liczniku kandydata oraz przeliczenie obrysu przy odbiciu.
