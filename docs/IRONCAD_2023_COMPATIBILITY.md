@@ -130,3 +130,6 @@ Dokładne ścieżki/hashe są w prywatnym raporcie, bez publikacji modeli.
 Następny przyrost: adapter starszego API + źródło otwieralne w 2023, dopiero
 potem pełna próba T1 (okucia, wycięcia, zmiana gabarytu, zapis i otwarcie).
 Analizę kontraktu T2 można kontynuować niezależnie od tych blokerów.
+
+T2: nowa kopia oryginału z T2.zip również została odrzucona przez lokalny
+2023 jako nowszy format. Szczegóły w T2_REFERENCE_ANALYSIS.md.

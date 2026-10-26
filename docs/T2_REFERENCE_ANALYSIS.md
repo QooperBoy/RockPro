@@ -130,3 +130,37 @@ Pełny harness/build nie był wymagany: w tym przyroście nie zmieniono kodu
 produktu, geometrii ani instalacji. Dokumentacja podlega audytowi repozytorium.
 Stała dostępność dodatku RockPro pozostaje osobnym niezakończonym zadaniem;
 odczyt przez tymczasowy most nie dowodzi autostartu zarządzanego dodatku.
+
+## Przyrost kontraktu T2-02 — 26.10.2026
+
+`core_case/t2_family.py` implementuje osobny kontrakt `reference_draft`.
+Ma cztery role: spód, czapka, klapa i rack. Zachowuje rzeczywistą ścieżkę CAD
+racka pod czapką, ale jego ruch pozostaje niezależnym demontażem. Dwa złącza
+są zdejmowane; nie tworzy się fikcyjnej osi zawiasu ani proporcji pokrywy T1.
+Walidacja wymaga czterech par zamków spód–czapka i dwóch czapka–klapa,
+unikalnych połówek oraz przypięcia całego kontraktu do SHA źródła.
+
+Ramy montażowe i luzy złączy pozostają `null`, dopóki nie zostaną zmierzone.
+Nie ma domyślnego zera. Lista blokerów jest generowana przez `blockers()`;
+kontrakt nie ma prawa oznaczać dopasowania urządzenia ani szablonu jako gotowego.
+Nie zastępuje jeszcze planera formatek ani wykonawcy CAD. T2-02 pozostaje
+przyrostem w toku do czasu uzupełnienia ram złączy.
+
+Importer sprawdzono na rzeczywistej mapie 449 węzłów. Powstały lokalne
+`family_draft_v1.json` oraz `family_contract_validation.json`; źródła pozostają
+prywatne. Testy obejmują niezależny rack, zachowanie braków, złączne pary,
+powtórzone ID, nieprawidłowe ramy/luzy i niejednoznaczne korzenie źródła.
+Pełny harness PASS: `artifacts/verification/20261026T144920685075Z/results.json`.
+Pierwsza próba harnessu kolidowała z aktywną blokadą odczytu CAD; po zamknięciu
+operacji wykonano kontrolę sekwencyjnie. Nie wyłączano blokady wykonawcy.
+
+Uściślenie etapów: wspólny `part_registry.py` definiuje **zamknięcia jako etap 4**,
+**uchwyty jako 5**, transport jako 6. Lista koncepcyjna powyżej nie zmienia
+tego rejestru. Rack i teleskop wymagają następnego rozszerzenia rejestru,
+wykonawcy i podglądu razem; nie dodano osobnego rozbieżnego rejestru dla T2.
+
+Natywna próba na nowej kopii oryginału z T2.zip w IronCAD 25.0.0.18479 zwróciła
+komunikat o nowszej wersji pliku, potem `Shape Load Failed`. Zachowany odczyt
+2027 pozostaje poprawnym źródłem analizy, ale nie jest dowodem otwieralności
+w 2023. Potrzebna rewizja zapisana w 2023; nie nadpisano ani nie konwertowano
+oryginału. Próba i kopia: `artifacts/ironcad2023-compatibility/python-t2-original/`.
