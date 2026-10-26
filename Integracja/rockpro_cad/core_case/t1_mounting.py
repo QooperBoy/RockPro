@@ -13,6 +13,19 @@ PROFILE_CENTER_INSET = 15.5
 PROFILE_INNER_EDGE = PROFILE_CENTER_INSET + PROFILE_LEG / 2
 DEFAULT_CLEARANCE = 2.
 
+# Manufacturer installation envelope: 79 x 82 mm, depth 8 mm.
+# Native dish corner centres are (+/-28.1, +/-29.6) mm in X/Z.
+# R=11.4 preserves these centres within the installation envelope. The CAD
+# cup wall has R8.4 plus the 3 mm transition into the mounting flange.
+# This is a mounting contour, not a rounded hardware bounding box.
+HINGE_27095_OPENING = dict(
+    sku='27095', revision='27095-opening-v1', shape='rounded_rectangle',
+    width_mm=79., height_mm=82., radius_mm=11.4, installation_depth_mm=8.,
+    requires_plywood_cut=True, requires_profile_cut=True,
+    source_url='https://www.adamhall.com/shop/en/27095-27095',
+    radius_source='Native cup corner centres and transition; prototype fit checked by CAD collision test',
+    production_approved=False)
+
 
 def support_dimensions(depth, clearance=DEFAULT_CLEARANCE):
     if not all(math.isfinite(x) for x in (depth, clearance)) or clearance < 0:

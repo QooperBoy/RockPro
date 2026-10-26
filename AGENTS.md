@@ -1,5 +1,12 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
+- Organizacja nowych scen: [docs/CASE_STRUCTURE.md](docs/CASE_STRUCTURE.md).
+  Stosuj sześć grup ze wspólnego rejestru; po grupowaniu odtwórz powiązania
+  z planu i sprawdź zmianę wymiarów. Dla T1 zawias wymaga wycięcia w sklejce
+  ORAZ przerwy w profilu. Wykonuj validate_t1_machining przed CAD i kontrolę
+  rzeczywistych operacji po wykonaniu. Brak informacji o wycięciu blokuje
+  przyjęcie nowego SKU. Nie traktuj otworu L905/915 jako szablonu 27095.
+
 26.10.2026, późniejszy checkpoint: własna Scene14 w 2023 ma poprawiony montaż
 i polskie parametry; natywna zmiana wymiarów oraz powrót PASS. Czytaj
 [docs/T1_2023_MOUNTING_REPAIR.md](docs/T1_2023_MOUNTING_REPAIR.md).

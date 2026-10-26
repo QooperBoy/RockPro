@@ -28,6 +28,11 @@ def current_interop(folder):
     return vendor
 def run(folder,source,request):
     request=dict(request)
+    if request.get('contract') in ('rockpro-t1-mounting-repair-v1','rockpro-t1-structure-v1'):
+        from rockpro_cad.core_case.scene_structure import validate_t1_machining
+        validate_t1_machining([p['key'] for p in request['parts']],request.get('operations',[]))
+        if request['contract']=='rockpro-t1-structure-v1' and sha(request['source'])!=request['source_sha256']:
+            raise ValueError('Constructor template source changed')
     request["expected_api_major"]=selected_year()-1998
     if request.get('mode')=='build':
         from rockpro_cad.core_case.machining_rules import validate_layout,validate_steps
