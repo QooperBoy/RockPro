@@ -35,6 +35,11 @@ def main():
                                 '--output',folder/'core-design.json']),
           ('core-contracts',[py,'-m','unittest','discover','-s',source/'core_case',
                              '-p','test_*.py','-v']),
+          ('model-bundle',[py,'-m','unittest','discover','-s',ROOT/'scripts','-p','test_model_bundle.py','-v']),
+          ('family-review',[py,'-m','unittest','discover','-s',ROOT/'scripts','-p','test_family_review.py','-v']),
+          ('process-report',[py,'-m','unittest','discover','-s',ROOT/'scripts','-p','test_report_process.py','-v']),
+          ('icapi-capabilities',[py,'-m','unittest','discover','-s',ROOT/'scripts','-p','test_icapi_capabilities.py','-v']),
+          ('mount-benchmark',[py,'-m','unittest','discover','-s',ROOT/'scripts','-p','test_mount_benchmark.py','-v']),
           ('qa',[py,'-m','unittest','discover','-s',source/'qa','-p','test_acceptance.py','-v']),
           ('harness',[py,'-m','unittest','discover','-s',ROOT/'scripts','-p','test_verification.py','-v'])]
     if args.build or args.ui:

@@ -1,5 +1,18 @@
 # RockPro CAD — kontrakt developerski
 
+## Przyrost niezależny od CAD — noc 26.10.2026
+
+[Raport pracy](NIGHT_WORK_20261026.md) wskazuje poprawki integralności montażu,
+importu i podglądu, [pomiary procesu](PROCESS_EVIDENCE_20261026.md) oraz
+[karty mapowania rodzin](FAMILY_REVIEW_PACKET.md). Plan standardu źródłowego
+wymaga ponownego powiązania z bajtami inwentarza. Dodatkowe kroki zwykłego
+harnessu: `model-bundle`, `family-review`, `process-report`, `icapi-capabilities`
+i `mount-benchmark`; bez CAD i instalacji. [Graf obróbek](MACHINING_DEPENDENCY_GRAPH.md)
+oddziela zależności obliczeń od warstw podglądu; nie ma jeszcze wykonawcy CAD.
+[Benchmark](OFFLINE_MOUNT_BENCHMARK.md) mierzy funkcje planera na przypiętych danych,
+a [raport ICAPI](ICAPI_CAPABILITY_REPORT.md) oddziela metadane od prób hosta.
+Research rynku/SDK opisuje przyszłe możliwości, nie rozszerza MCP ani zgód.
+
 ## Środowisko odbiorcy — nowe ustalenie 26.10.2026
 
 Tomasz pracuje w IronCAD 2023. Dotychczasowe testy natywne dotyczą 2027,

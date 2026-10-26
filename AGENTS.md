@@ -1,5 +1,11 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
+Nocny przegląd 26.10.2026: [docs/NIGHT_WORK_20261026.md](docs/NIGHT_WORK_20261026.md).
+Plan ruchu standardu wymaga oryginalnych bajtów inwentarza; nie przyjmuj edytowalnego
+JSON z samym SHA jako dowodu pochodzenia. Karty nowych rodzin służą mapowaniu,
+nie zatwierdzają SKU, wycięć ani produkcji. Niepowiązane historyczne logi CAD
+pozostają jawnie niepowiązane. Research rozszerzeń nie oznacza ich instalacji.
+
 Nowe siedem wzorców z 26.10.2026 rozwijamy decyzją użytkownika w 2027;
 odtworzenie od zera na 2023 jest późniejsze. Pytania Q01–Q26 zebrano w ROC-45
 na 27.10.2026; użytkownik odroczył odpowiedzi. Standard źródłowych ram:
