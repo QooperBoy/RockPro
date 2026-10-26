@@ -44,4 +44,14 @@ class TransportRulesTests(unittest.TestCase):
         with self.assertRaises(ValueError):make_rules(c)
         with self.assertRaises(ValueError):validate_transport_values(dict(self.v,RP_Length=400))
 
+    def test_supports_leave_clearance_at_both_edge_profiles(self):
+        for row in self.rules:
+            if row['kind']!='pad':continue
+            for depth in (500,3000):
+                values=dict(self.v,RP_Depth=depth)
+                length=value(row['dimensions'][1],values)
+                centre=value(row['anchor'][1],values)
+                self.assertAlmostEqual(centre-length/2-33,2)
+                self.assertAlmostEqual(depth-33-(centre+length/2),2)
+
 if __name__=='__main__':unittest.main()

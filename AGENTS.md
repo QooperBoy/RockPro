@@ -1,5 +1,12 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
+26.10.2026, późniejszy checkpoint: własna Scene14 w 2023 ma poprawiony montaż
+i polskie parametry; natywna zmiana wymiarów oraz powrót PASS. Czytaj
+[docs/T1_2023_MOUNTING_REPAIR.md](docs/T1_2023_MOUNTING_REPAIR.md).
+Nie używaj historycznego prepare_unsaved.py z artifacts jako poprawionego generatora.
+To wąski prototyp, nie rozszerzenie kontraktu MCP ani dowód otwierania każdego T1.
+Poniższy opis Shape Load Failed dotyczy wcześniejszej próby źródła.
+
 Najpierw przeczytaj docs/DEVELOPMENT.md. Bieżący zakres: LAYOUT.md; instalacja: HANDOVER.md i AUTOSTART.md. To natywny dodatek WinForms / .NET Framework x64, Python MCP stdio i SQLite. Docelowy host odbiorcy: IronCAD 2023 (25.0); historyczny host: 2027 (29.0). Build/autostart i podstawowy test natywny 2023 PASS; pełny generator T1 wymaga portowania. Lokalny host zaktualizowano do 2023 PU1 SP1 (25.0.12.18734). T2 przeszedł natywny odczyt i zapis/otwarcie; T1 nadal zgłasza Shape Load Failed mimo metadanych 18734. Nie uznawaj samych metadanych za dowód otwieralności. Czytaj docs/IRONCAD_2023_COMPATIBILITY.md. Nie przenoś go na ASP.NET, React ani nowy .NET w ramach zwykłej zmiany funkcji.
 
 Priorytet użytkownika dla obecnego MVP (22.10.2026): szybki działający prototyp do ręcznego obejrzenia. Wykonuj podstawowe kontrole rozmieszczenia/symetrii całych okuć, zmiany wymiarów oraz zapisu/otwarcia; następnie przekaż model użytkownikowi. Nie dokładaj kolejnych zestawów testów, szczegółowych audytów BRep ani wielokrotnych pełnych regresji bez konkretnego błędu lub nowego wymagania. Zachowaj istniejące testy i ochronę źródeł, kopii oraz zapisów. Wygląd ocenia użytkownik; dalsze testowanie i debugowanie wynika z jego uwag.

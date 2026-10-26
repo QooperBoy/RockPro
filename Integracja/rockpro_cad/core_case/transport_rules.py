@@ -4,6 +4,7 @@ Prototype registration, not wheel SKU, load, collision or stacking approval.
 """
 from .profile_rules import validate_values
 from ..part_registry import metadata
+from .t1_mounting import PROFILE_INNER_EDGE, DEFAULT_CLEARANCE
 
 I=[[1,0,0],[0,1,0],[0,0,1]]
 
@@ -42,7 +43,7 @@ def make_rules(catalog):
     for side in ('left','right'):
         x='150 mm' if side=='left' else 'RP_Length - 150 mm'
         rows.append(dict(id='pad/'+side,kind='pad',rotation=I,
-            dimensions=['120 mm','RP_Depth - 40 mm','18 mm'],
+            dimensions=['120 mm',f'RP_Depth - {2*(PROFILE_INNER_EDGE+DEFAULT_CLEARANCE):g} mm','18 mm'],
             anchor=[x,'RP_Depth/2','-18 mm']))
         R=[[-1,0,0],[0,0,1],[0,1,0]] if side=='left' else [[1,0,0],[0,0,1],[0,-1,0]]
         dx=sum(tread[k]*R[k][0] for k in range(3))
