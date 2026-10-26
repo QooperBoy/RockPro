@@ -1,5 +1,13 @@
 # RockPro CAD — kontrakt developerski
 
+## Środowisko odbiorcy — nowe ustalenie 26.10.2026
+
+Tomasz pracuje w IronCAD 2023. Dotychczasowe testy natywne dotyczą 2027,
+a zapisanych tam ICS nie można otworzyć w 2023. Przed kolejnym natywnym
+wydaniem dla firmy zastosuj [plan zgodności 2023](IRONCAD_2023_COMPATIBILITY.md).
+Obecny build, rejestracja i wykrywanie przez python-ironcad wymagają adaptacji;
+2023 nie jest jeszcze zweryfikowanym środowiskiem RockPro.
+
 ## Kontrakt i inwentarz części — ROC-15 / ROC-42
 
 Pakiet `Integracja/rockpro_cad/core_case` zawiera walidatory danych, generator
