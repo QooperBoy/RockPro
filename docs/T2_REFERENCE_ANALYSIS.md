@@ -162,5 +162,9 @@ wykonawcy i podglądu razem; nie dodano osobnego rozbieżnego rejestru dla T2.
 Natywna próba na nowej kopii oryginału z T2.zip w IronCAD 25.0.0.18479 zwróciła
 komunikat o nowszej wersji pliku, potem `Shape Load Failed`. Zachowany odczyt
 2027 pozostaje poprawnym źródłem analizy, ale nie jest dowodem otwieralności
-w 2023. Potrzebna rewizja zapisana w 2023; nie nadpisano ani nie konwertowano
-oryginału. Próba i kopia: `artifacts/ironcad2023-compatibility/python-t2-original/`.
+w lokalnym starszym buildzie. Późniejszy odczyt metadanych OLE potwierdził,
+że oryginał już zapisano w **2023 PU1 SP1, build 18734**. Najpierw aktualizacja
+hosta, potem ponowna próba; nie potrzeba z tego powodu nowej rewizji od konstruktora.
+Nie nadpisano ani nie konwertowano oryginału. Próba i kopia:
+`artifacts/ironcad2023-compatibility/python-t2-original/`; metadane:
+`artifacts/ironcad2023-compatibility/file-version-metadata.json`.

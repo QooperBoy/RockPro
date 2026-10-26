@@ -6,6 +6,26 @@ sys.path.insert(0,str(ROOT/'Integracja'))
 from rockpro_cad.cad_lock import cad_writer_lock
 from rockpro_cad.icapi_runtime import selected_year, installation_dir
 def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+
+def current_interop(folder):
+    """2023 samples ship a stale 2018 wrapper; import the installed TLB locally."""
+    install=installation_dir()
+    if selected_year()!=2023:
+        return install/'ICAPI/Samples/C#/References/interop.ICApiIronCAD.dll'
+    helper=ROOT/'scripts/native/GenerateLocalInterop.cs'
+    exe=folder/'GenerateLocalInterop.exe'
+    compiler='C:/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe'
+    built=subprocess.run([compiler,'/nologo','/platform:x64','/out:'+str(exe),str(helper)],capture_output=True,text=True,encoding='utf-8',errors='replace')
+    if built.returncode:raise RuntimeError(built.stdout+built.stderr)
+    tlb=install/'bin/ICApiIronCAD.tlb'
+    vendor=folder/'interop.ICApiIronCAD.dll'
+    result=subprocess.run([str(exe),str(tlb),str(vendor)],capture_output=True,text=True,encoding='utf-8',errors='replace')
+    evidence={'returncode':result.returncode,'stdout':result.stdout,'stderr':result.stderr,
+              'tlb_sha256':sha(tlb),'helper_sha256':sha(helper),'host_year':selected_year()}
+    if result.returncode==0:evidence['interop_sha256']=sha(vendor)
+    (folder/'interop-generation.json').write_text(json.dumps(evidence,indent=2),encoding='utf-8')
+    if result.returncode:raise RuntimeError('Local interop generation failed; see interop-generation.json')
+    return vendor
 def run(folder,source,request):
     request=dict(request)
     request["expected_api_major"]=selected_year()-1998
@@ -18,13 +38,15 @@ def run(folder,source,request):
     if sha(loader)!='0b83e25991b23a94ef723ad2fc58ac1e7e08e815913751c779cad891797d79cb':raise ValueError('Unrecognized native bridge')
     names=re.findall(r'LatchInProcess[^\x00]{0,90}\.dll',loader.read_bytes().decode('utf-16-le',errors='ignore'))
     if len(names)!=1:raise ValueError('Ambiguous fixed managed loader name')
-    vendor=installation_dir()/'ICAPI/Samples/C#/References/interop.ICApiIronCAD.dll'
+    vendor=current_interop(folder)
     src=Path(source).resolve();built=folder/('Machining_'+sha(src)[:20]+'.dll')
     cmd=['C:/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe','/nologo','/target:library','/platform:x64','/out:'+str(built),'/reference:'+str(vendor),'/reference:System.Web.Extensions.dll','/reference:Microsoft.CSharp.dll',str(src)]
     c=subprocess.run(cmd+['/utf8output'],capture_output=True,text=True,encoding='utf-8',errors='replace')
     (folder/'compile.json').write_text(json.dumps({'returncode':c.returncode,'stdout':c.stdout,'stderr':c.stderr,'source_sha256':sha(src),'loader_sha256':sha(loader)}),encoding='utf-8')
     if c.returncode:raise RuntimeError(c.stdout+c.stderr)
-    shutil.copyfile(built,folder/names[0]);shutil.copyfile(vendor,folder/vendor.name);shutil.copyfile(loader,folder/loader.name)
+    shutil.copyfile(built,folder/names[0])
+    if vendor.resolve()!=(folder/vendor.name).resolve():shutil.copyfile(vendor,folder/vendor.name)
+    shutil.copyfile(loader,folder/loader.name)
     (folder/'request.json').write_text(json.dumps(request,ensure_ascii=False,indent=2),encoding='utf-8')
     import comtypes.client
     IronCAD=comtypes.client.GetModule(str(installation_dir()/"bin/IronCad.tlb"))

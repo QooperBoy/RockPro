@@ -112,24 +112,84 @@ hostach, z kopią rejestru, a potem ponów test połączenia.
 
 ### Faktyczne blokery pełnego T1
 
-SDK 2023 nie udostępnia używanych w generatorze T1 metod `GetValue/SetValue`
-macierzy, `IZPart.GetBoundingBox`, `IZFeature.GetBoundingBox`,
-`PositionTransformComponentExpression`, wyrażeń wymiarów `IZSizeBox` ani
-`HasInterference`. To błędy kompilacji potwierdzone w `inspect-original/compile.json`,
-a nie przypuszczenie. Istnieją starsze `Matrix.Data`, `GetBody().GetBoundingBox()`
-i `CheckInterference`; trzeba zweryfikować ich semantykę i osobno odtworzyć
-wiązania geometrii. Nie usuwać kontroli kolizji ani zastępować wyrażeń samym
-jednorazowym ustawieniem pozycji, udając pełną parametryzację.
+Pierwsza kompilacja z `ICAPI/Samples/C#/References/interop.ICApiIronCAD.dll`
+nie znalazła metod macierzy, wyrażeń i kolizji (`inspect-original/compile.json`).
+Dalsza kontrola wykazała, że **ten przykładowy interop pochodzi z 2018 roku**,
+a zainstalowany `bin/ICApiIronCAD.tlb` 2023 udostępnia te funkcje.
+Nie utożsamiać błędu przykładowej biblioteki z brakiem funkcji hosta.
 
-Zachowana kopia źródła T1 (SHA zaczynający się `cd15d338`) również wyświetla w
-2023 komunikat o nowszej wersji pliku. Kopia z Downloads ma inny SHA
-(`66c81733`) i też nie otwiera się w 2023. Potrzebny jest oryginał zapisany
-w 2023 lub odtworzenie szablonu; neutralny eksport traci historię.
-Dokładne ścieżki/hashe są w prywatnym raporcie, bez publikacji modeli.
+`scripts/native/GenerateLocalInterop.cs` używa .NET `TypeLibConverter` i
+`LoadTypeLibEx(REGKIND_NONE)`: generuje osobny lokalny interop, bez zmiany
+plików producenta i bez rejestracji COM. Runner T1 dla 2023 generuje go w nowym
+katalogu operacji, zapisując hashe wejść i wynik konwersji. Ostrzeżenia
+importera są zachowane w `interop-generation.json` (dotyczą m.in. metod
+surowych wskaźników, których ten przyrost nie wywołuje).
 
-Następny przyrost: adapter starszego API + źródło otwieralne w 2023, dopiero
+Po dostosowaniu odczytu części do `GetBody(true).GetBoundingBox()` pełny
+`T1MachiningPrototype.cs` kompiluje się z tym interopem. To PASS kompilacji,
+nie dowód odtworzenia całej skrzyni. Czytnik Python korzysta ze starszego
+odczytu bryły tylko gdy interfejs nie ma nowszego getteru; nie maskuje
+wyjątków COM. Następna bramka: natywne wykonanie i pomiar na kopiach.
+
+Zachowana kopia źródła T1 (SHA zaczynający się `cd15d338`) wyświetla w
+buildzie 18479 komunikat o nowszej wersji pliku. Odczyt metadanych OLE wyjaśnił
+przyczynę: oryginały **T1 i T2 zapisano w IronCAD 2023 PU1 SP1, build 18734**.
+Nie jest to dowód zapisu tych oryginałów w 2027 ani konieczność ponownego
+pozyskania plików. Potrzebna jest aktualizacja lokalnego 2023 i ponowna próba.
+Kopia z Downloads ma inny SHA (`66c81733`); nie zastępuje zachowanego źródła.
+Dowód: `artifacts/ironcad2023-compatibility/file-version-metadata.json`.
+
+Następny przyrost: aktualizacja 2023 do PU1 SP1 + adapter starszego API, dopiero
 potem pełna próba T1 (okucia, wycięcia, zmiana gabarytu, zapis i otwarcie).
 Analizę kontraktu T2 można kontynuować niezależnie od tych blokerów.
 
-T2: nowa kopia oryginału z T2.zip również została odrzucona przez lokalny
-2023 jako nowszy format. Szczegóły w T2_REFERENCE_ANALYSIS.md.
+T2: nowa kopia oryginału z T2.zip również została odrzucona przez build 18479.
+Metadane potwierdzają ten sam wymagany PU1 SP1. Szczegóły w T2_REFERENCE_ANALYSIS.md.
+
+Oficjalny [instalator 2023 PU1 SP1](https://www.ironcad.com/product-update/2023pu1sp1/)
+udostępnia pełną instalację aktualizującą wydanie bazowe. Sam patch wymaga
+wcześniejszego PU1 i nie jest właściwą ścieżką dla obecnego wydania bazowego.
+
+### Natywne wyrażenie przez starsze API — dodatkowy dowód
+
+`scripts/probe_2023_legacy_binding.py`
+sprawdził rozwiązanie dla jednej brakującej funkcji: legacy `SizeBoxComponent`
+udostępnia `Variable(triHeight, 0).Expression`. Po `IZSizeBox.Reset(false)`
+przypisano `Parent\Params\RP_ProbeThickness`. Zmiana samego parametru sceny
+zmieniła geometrię 20 → 40 mm; po zapisaniu i otwarciu wyrażenie pozostało
+zachowane, a dalsze zmiany 40 → 60 → 20 mm działały bez ponownego ustawiania
+wymiaru bryły. Pomiar 100 × 50 mm pozostałych osi również przeszedł.
+
+PASS: `artifacts/ironcad2023-compatibility/legacy-expression-roundtrip/result.json`.
+Źródło i kontekst aktywnego dokumentu nie zmieniły się; kopie testowe zamknięto.
+To rzeczywiste natywne wiązanie, uzupełniające wcześniejszy test sterowania
+skryptem. Sprawdzono wyłącznie jedną diagnostyczną bryłę. Mapowanie wystąpień,
+wiązania pozycji i operacje wszystkich części T1 nadal wymagają adaptera.
+Identyfikatory `Shape.SystemID` legacy i `IZElement.Id` nie są zamienne.
+Nie przenoś mapowania jedynej bryły z diagnostyki na dowolną scenę.
+
+Uwaga implementacyjna: `IZSceneDoc.RegenerateParts` w tej próbie 2023 zwróciło
+`E_NOTIMPL`; działało `scene.GetTopElement().QueryInterface(IZAssembly).RegenerateParts`.
+Nie ukryto błędu — pierwsza próba jest w `legacy-expression-01`, a naprawiona
+próba i pełny zapis/otwarcie mają oddzielne dowody.
+
+### Checkpoint aktualizacji PU1 SP1
+
+Pobrano pełny `IC2023PU1SP1.exe` (3058622344 bajty) do lokalnego Downloads/IronCAD.
+Authenticode: **Valid, IronCAD, LLC**. Menedżer pobierania zakończył pobieranie,
+lecz zgłosił: „Uruchomienie pliku z podwyższonymi uprawnieniami nie powiodło się”.
+Aktualizacja **nie została zainstalowana**; ostatni potwierdzony host to 18479.
+Zamknięto przez SDK tylko zapisany własny model diagnostyczny, potem pusty host.
+Do użytkownika wysłano prośbę o uruchomienie pobranego instalatora jako administrator.
+IronCAD po instalacji należy uruchomić zwyczajnie, bez podwyższonych uprawnień.
+
+PASS po zmianach czytnika: pełny harness
+`artifacts/verification/20261026T151636458532Z/results.json`.
+PASS generowania interopu przez runner: `interop-runner-check/interop-generation.json`.
+Kompilacja pełnego generatora T1 z aktualnego TLB 2023 PASS; nie uruchomiono
+go jeszcze na skrzyni. Rzeczywiste kliknięcie panelu nadal NOT RUN.
+
+Prompt powrotu: „Wróć do zgodności IronCAD 2023. Użyj $rockpro-scope-check
+i $rockpro-verification. Sprawdź aktualizację PU1 SP1 i ApiVersion, otwórz nowe
+kopie zachowanych T1/T2, potwierdź odczyt oraz załadowaną DLL, a następnie
+odtwórz T1 z zasobów 2023. Zachowaj oryginały i jednego wykonawcę CAD”.
