@@ -6,6 +6,52 @@ Warstwa uruchomieniowa 2023 jest wdrożona i przetestowana (stan poniżej).
 Pełny generator T1 nadal wymaga portowania. Nie wysyłać ICS zapisanych w 2027
 jako plików dla 2023.
 
+## Aktualny wynik po aktualizacji PU1 SP1 — 26.10.2026
+
+**Zainstalowano i uruchomiono 25.0.12.18734.** RockPro został ponownie
+zbudowany i zarejestrowany przy zamkniętym hoście; log `InitSelf` potwierdza
+faktyczne załadowanie DLL z `bin-ic2023-pu1sp1-20261026`, SHA256
+`57f38ea16b31880f5c4bf6c5edc057e9f03bfe2676a51d8371775e43e5879085`.
+Kopie rejestru sprzed rejestracji zachowano. Host działa jako zwykły użytkownik.
+
+| Sprawdzenie w aktualnym hoście | Wynik |
+|---|---|
+| Autostart i identyfikacja załadowanej DLL | PASS |
+| Python/COM i natywne wyrażenie 20 → 40 → zapis/otwarcie → 60 → 20 mm | PASS |
+| Odczyt oryginału T2 na nowej kopii | PASS: 449 węzłów, 335 części |
+| T2 względem wcześniejszego odczytu 2027 | PASS: ID, nazwy, ścieżki, typy, macierze i obrysy bez różnic |
+| Zapis T2 w 2023 i ponowne otwarcie | PASS: hierarchia, geometria, macierze i liczby cech bez różnic |
+| Otwarcie końcowej kopii T2 z aktualizacją grafiki | PASS przez SDK; odbiór wizualny NOT RUN |
+| Odczyt zachowanego oryginału T1 na nowej kopii | FAIL: „Shape Load Failed”, API „Invalid file format” |
+| Kliknięcie panelu RockPro / pełny generator T1 w 2023 | NOT RUN |
+
+Ważna korekta wcześniejszej diagnozy: napis „2023 PU1 SP1” w metadanych T1
+nie dowodzi, że cała geometria jest otwieralna w tej wersji. Po aktualizacji
+T2 działa, natomiast T1 nadal nie ładuje kształtów. SHA T1 jest zgodne z wpisem
+w pierwotnym ZIP transferowym; nie jest to uszkodzenie kopii podczas migracji.
+Przyczyna odrzucenia geometrii pozostaje nierozstrzygnięta. Nie oznaczać T1
+jako zgodnego ani nie zmieniać przypiętych hashy/ID na inne źródło bez pomiaru.
+Następny krok T1: pozyskać lub odnaleźć egzemplarz faktycznie otwieralny w 2023,
+zmierzyć zasoby i odtworzyć generator z zachowaniem kontroli źródła.
+
+Prywatne dowody: `artifacts/ironcad2023-pu1sp1-validation/`:
+`t1-inspect/result.json`, `t2-inspect/inventory.json`,
+`t2-inventory-comparison.json`, `parameter-roundtrip/result.json`,
+`t2-roundtrip-03/result.json`, `presentation.json` i `summary.json`.
+Pierwsze dwie próby diagnostyki roundtrip T2 zakończyły się błędem czytnika
+podczas przechodzenia do węzłów innych niż części/złożenia; zapisano je osobno.
+Poprawiona próba `03` obejmuje wszystkie 449 węzłów modelu i 335 brył.
+Oryginały i aktywny kontekst zachowano, kopie testowe zamknięto. Na końcu
+otwarto wyłącznie kopię `t2-roundtrip-03/RockPro_T2_reference_IC2023.ics`.
+
+Przechwytywanie okna przez narzędzie pulpitu zgłaszało
+`encode latest capture frame failed: window crop is outside captured monitor`.
+Odczyt tekstu interfejsu działał; odświeżenie grafiki przez SDK również.
+Nie utożsamiać tego z wizualnym zatwierdzeniem modelu ani testem panelu.
+
+Poniższe checkpointy opisują wcześniejsze etapy migracji, w tym instalację
+bazową 18479 i oczekiwanie na instalator; nie są aktualnym stanem instalacji.
+
 ## Format modeli
 
 Producent jednoznacznie podaje, że zapis 2027 nie otwiera się w starszych

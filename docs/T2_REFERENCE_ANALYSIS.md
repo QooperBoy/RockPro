@@ -4,6 +4,17 @@ Stan: 26.10.2026. Wykonano odczyt wzorca i mapowanie, bez zmiany geometrii.
 To osobna rodzina transportowa do miksera z wyjmowanym rackiem, czapką i klapą.
 Nie jest jeszcze wykonywalnym szablonem ani źródłem zatwierdzonego BOM.
 
+Aktualizacja zgodności: po instalacji IronCAD 2023 PU1 SP1 (25.0.12.18734)
+ponowiono natywny odczyt na nowej kopii. Wszystkie 449 węzłów / 335 części
+zachowuje ID, nazwy, ścieżki, typy, macierze i obrysy poprzedniego odczytu.
+Zapis w 2023 i ponowne otwarcie również zachowują hierarchię, geometrię,
+macierze i liczby cech. Oryginał nie zmienił SHA. Dowody:
+`artifacts/ironcad2023-pu1sp1-validation/t2-inspect/`,
+`t2-inventory-comparison.json` i `t2-roundtrip-03/result.json`.
+Końcową kopię `RockPro_T2_reference_IC2023.ics` otwarto widocznie przez SDK
+z odświeżeniem grafiki. To potwierdzenie zgodności istniejącego wzorca,
+nie implementacja parametrycznego wykonawcy T2 ani zatwierdzenie pasowania.
+
 ## Zakres i dowody
 
 Przejrzano mail Temat II, wszystkie trzy PDF (8 stron łącznie), pięć zdjęć

@@ -6,9 +6,11 @@ Tomasz pracuje w IronCAD 2023. Dotychczasowe testy natywne dotyczą 2027,
 a zapisanych tam ICS nie można otworzyć w 2023. Przed kolejnym natywnym
 wydaniem dla firmy zastosuj [plan zgodności 2023](IRONCAD_2023_COMPATIBILITY.md).
 Build, rejestracja, jawny wybór hosta, autostart i podstawowy test natywny
-2023 są już potwierdzone. Pełny generator T1 wymaga portowania starszego API
-i aktualizacji hosta do PU1 SP1 (18734), w którym zapisano zachowane źródła
-T1/T2; szczegółowa macierz dowodów jest w planie zgodności.
+2023 są już potwierdzone. Aktualizacja PU1 SP1 jest zainstalowana: 25.0.12.18734.
+T2 przeszedł odczyt oraz zapis/ponowne otwarcie wszystkich 335 części.
+T1 nadal zgłasza „Shape Load Failed” mimo zgodności metadanych wersji;
+pełny generator wymaga otwieralnych zasobów 2023 i próby natywnej.
+Szczegółowa macierz dowodów jest w planie zgodności.
 
 ## Kontrakt i inwentarz części — ROC-15 / ROC-42
 
