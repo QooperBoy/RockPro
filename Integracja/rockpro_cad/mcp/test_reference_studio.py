@@ -93,13 +93,31 @@ class ReferenceStudioTests(unittest.TestCase):
         folder.mkdir()
         ref = next(v for f in self.catalog['families'] for v in f['variants'] if v['id'] == 'M04')
         model = dict(kind='workstation_native_preview', units='m', source_sha256=ref['source_sha256'],
-                     inventory_sha256=ref['inventory_sha256'], geometry_sha256=sha(b'original'))
+                     inventory_sha256=ref['inventory_sha256'], geometry_sha256=sha(b'original'), elements=[{}])
         (folder / 'model.json').write_text(json.dumps(model), encoding='utf-8')
         (folder / 'geometry.bin').write_bytes(b'original')
         self.assertEqual(load_preview(folder, self.catalog)[1], model)
         (folder / 'geometry.bin').write_bytes(b'changed')
         with self.assertRaisesRegex(ValueError, 'checksum'):
             load_preview(folder, self.catalog)
+
+    def test_other_family_previews_use_their_own_revision_and_motion_allowlist(self):
+        refs = {v['id']: v for f in self.catalog['families'] for v in f['variants']}
+        self.catalog['previews'] = {
+            key: dict(source_sha256=refs[key]['source_sha256'], baseline_external_mm=[2000, 400, 1200],
+                      motions={'hood': dict(min=0, max=700)}) for key in ('M01', 'M07')}
+        d = draft(self.catalog)
+        d['preview'] = dict(source_sha256=refs['M01']['source_sha256'], external_mm=[2200, 420, 1300],
+                            motion_values=dict(hood=300), covers_visible=True)
+        self.assertTrue(validate_draft(d, self.catalog)['valid_draft'])
+        d['variant_id'] = 'M07'
+        with self.assertRaises(ValueError):
+            validate_draft(d, self.catalog)
+        d['preview']['source_sha256'] = refs['M07']['source_sha256']
+        self.assertTrue(validate_draft(d, self.catalog)['valid_draft'])
+        d['preview']['motion_values']['unknown_part'] = 10
+        with self.assertRaises(ValueError):
+            validate_draft(d, self.catalog)
 
     def test_dimensions_are_requirements_and_do_not_promote_cad_readiness(self):
         d = draft(self.catalog)

@@ -28,10 +28,19 @@ def convert(export, receipt, inventory, mapping, output):
         raise ValueError('Mixed source revisions')
     if annotation['inventory_sha256'] != sha(inventory):
         raise ValueError('Inventory mapping mismatch')
-    if len(annotation['shelves']) != 4:
-        raise ValueError('This preview requires four explicitly mapped shelf modules')
+    legacy = 'motions' not in annotation
+    if legacy and len(annotation['shelves']) != 4:
+        raise ValueError('Legacy workstation preview requires four shelf modules')
+    motions = annotation.get('motions') or [dict(s, axis=annotation['shelf_axis'], min=0, max=500, unit='mm') for s in annotation['shelves']]
+    if not motions or len({m['id'] for m in motions}) != len(motions):
+        raise ValueError('Distinct explicit motion definitions required')
+    for motion in motions:
+        if (motion.get('unit') != 'mm' or len(motion['axis']) != 3
+                or abs(sum(float(x)**2 for x in motion['axis'])-1) > 1e-6
+                or motion['min'] != 0 or not 0 < motion['max'] <= 1000):
+            raise ValueError('Invalid preview translation definition')
     nodes = {r['path']: r for r in inv['rows']}
-    for shelf in annotation['shelves']:
+    for shelf in motions:
         for path in shelf['paths']:
             if path not in nodes:
                 raise ValueError('Missing mapped shelf path')
@@ -45,9 +54,9 @@ def convert(export, receipt, inventory, mapping, output):
             path = parent + '/' + str(node['id'])
             chain = ancestors + [(path, node.get('n', ''))]
             if node.get('t') == 'p':
-                # Native Web Viewer removes '-' and '_' from some display labels.
+                # Native Web Viewer removes these punctuation characters from labels.
                 # Exact hierarchical IDs, source hash and transforms remain primary.
-                if path not in nodes or re.sub('[-_]', '', nodes[path]['name']) != re.sub('[-_]', '', node['n']):
+                if path not in nodes or re.sub(r'[-_?+\[\]]', '', nodes[path]['name']) != re.sub(r'[-_?+\[\]]', '', node['n']):
                     raise ValueError('Export/inventory identity mismatch: ' + path)
                 if int(node['i']) in by_mesh:
                     raise ValueError('Duplicate exported mesh reference')
@@ -96,7 +105,9 @@ def convert(export, receipt, inventory, mapping, output):
                     axes = [max(range(3), key=lambda k: extents[k])]
                 shelf_id = next((s['id'] for s in annotation['shelves']
                                  if any(path == prefix or path.startswith(prefix + '/') for prefix in s['paths'])), None)
+                motion_ids = [m['id'] for m in motions if any(path == prefix or path.startswith(prefix + '/') for prefix in m['paths'])]
                 cover = any(path == prefix or path.startswith(prefix + '/') for prefix in annotation['cover_paths'])
+                reference_only = any(path == prefix or path.startswith(prefix + '/') for prefix in annotation.get('reference_paths', []))
                 if sum(g['t'] for g in raw['c']) != len(vertices) // 3:
                     raise ValueError('Invalid material ranges')
                 materials = []
@@ -108,11 +119,13 @@ def convert(export, receipt, inventory, mapping, output):
                 rows.append(dict(node_id=node['id'], path=path, name=nodes[path]['name'], matrix=matrix,
                                  offset=offset, floats=len(vertices), materials=materials, bounds=bounds,
                                  policy=policy, resize_axes=axes, rigid_group=rigid_group,
-                                 shelf_id=shelf_id, cover=cover,
+                                 shelf_id=shelf_id, motion_ids=motion_ids, cover=cover, reference_only=reference_only,
                                  external_panel=path in annotation['external_panel_paths']))
     if seen != set(by_mesh):
         raise ValueError('Missing exported mesh; preview cannot silently omit geometry')
     external = [r['bounds'] for r in rows if r['external_panel']]
+    if not external:
+        raise ValueError('Explicit plywood envelope required')
     baseline = [min(b[k] for b in external) for k in range(3)] + [max(b[k+3] for b in external) for k in range(3)]
     groups = {}
     for row in rows:
@@ -127,11 +140,19 @@ def convert(export, receipt, inventory, mapping, output):
         if not members:
             raise ValueError('Shelf has no exported geometry')
         shelves.append(dict(id=shelf['id'], label=shelf['label'], part_count=len(members)))
-    model = dict(schema_version=1, kind='workstation_native_preview', units='m', elements=rows,
+    motion_contract = []
+    for motion in motions:
+        count = sum(motion['id'] in r['motion_ids'] for r in rows)
+        if not count:
+            raise ValueError('Motion has no exported parts')
+        motion_contract.append({**{k: motion[k] for k in ('id', 'label', 'axis', 'min', 'max', 'unit')}, 'part_count': count})
+    model = dict(schema_version=1, kind='workstation_native_preview' if legacy else 'reference_native_preview', units='m', elements=rows,
                  source_sha256=proof['source_sha256'], inventory_sha256=sha(inventory),
                  export_sha256=sha(export), geometry_sha256=sha(output / 'geometry.bin'),
                  baseline_bounds=baseline, group_bounds=group_bounds, shelves=shelves,
-                 shelf_axis=annotation['shelf_axis'], mapping_status='preview_mapping',
+                 shelf_axis=annotation.get('shelf_axis', [0,-1,0]), motions=motion_contract,
+                 model_key=annotation.get('model_key', 'M04'), default_covers_visible=annotation.get('default_covers_visible', False),
+                 mapping_status='preview_mapping',
                  physical_stroke_approved=False, production_approved=False,
                  description='Real native meshes; dimensions deform a concept preview, not CAD features.')
     (output / 'model.json').write_text(json.dumps(model, ensure_ascii=False), encoding='utf-8')

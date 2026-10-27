@@ -8,9 +8,10 @@ using System.Web.Script.Serialization;
 using interop.ICApiIronCAD;
 namespace RockPro { public static class LatchInProcess {
 static readonly JavaScriptSerializer J=new JavaScriptSerializer{MaxJsonLength=128000000};
-static string Hash(string path){using(var s=File.OpenRead(path))using(var h=System.Security.Cryptography.SHA256.Create())return BitConverter.ToString(h.ComputeHash(s)).Replace("-","").ToLowerInvariant();}
+static void DirtyGraphics(IZElement e){e.SetDirtyFlag(eZDirtyFlag.Z_DIRTY_GRAPHICS);if(e.Type!=eZElementType.Z_ELEMENT_ASSEMBLY&&e.Type!=eZElementType.Z_ELEMENT_UNKNOWN)return;int count=e.GetChildrenCount();if(count==0)return;var children=e.GetChildrenZArray();for(int i=0;i<count;i++){object child;children.Get(i,out child);DirtyGraphics((IZElement)child);}}
+static string Hash(string path){using(var s=new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.ReadWrite|FileShare.Delete))using(var h=System.Security.Cryptography.SHA256.Create())return BitConverter.ToString(h.ComputeHash(s)).Replace("-","").ToLowerInvariant();}
 static object State(IZBaseApp app){return new{active=app.ActiveDoc==null?null:app.ActiveDoc.FileGUID,documents=((Array)app.GetAllOpenDocs()??new object[0]).Cast<object>().Select(x=>{var d=x as IZDoc;if(d==null)d=(IZDoc)Marshal.GetObjectForIUnknown(new IntPtr(Convert.ToInt64(x)));return new{path=d.Name,guid=d.FileGUID,modified=d.Modified};}).OrderBy(x=>x.path,StringComparer.Ordinal).ToArray()};}
-public static int Run(string folder){var result=new Dictionary<string,object>();IZBaseApp app=null;IZDoc owned=null,previous=null;bool passed=false;string before=null,source=null,expected=null;
+public static int Run(string folder){var result=new Dictionary<string,object>();IZBaseApp app=null;IZDoc owned=null,previous=null;bool passed=false,displayOnly=false;string before=null,source=null,expected=null;
  try{
   var r=(Dictionary<string,object>)J.DeserializeObject(File.ReadAllText(Path.Combine(folder,"request.json")));
   int pid=System.Diagnostics.Process.GetCurrentProcess().Id;result["pid"]=pid;
@@ -21,20 +22,23 @@ public static int Run(string folder){var result=new Dictionary<string,object>();
   source=Path.GetFullPath((string)r["source"]);expected=(string)r["source_sha256"];
   if(Hash(source)!=expected)throw new Exception("Source SHA mismatch");
   string copy=Path.Combine(folder,"reference-copy.ics");File.Copy(source,copy,false);
-  bool already;owned=app.OpenFile2(copy,true,false,out already);
+  bool refresh=r.ContainsKey("refresh_graphics")&&(bool)r["refresh_graphics"];
+  bool already;owned=app.OpenFile2(copy,true,refresh,out already);
   if(already){owned=null;throw new Exception("Copy ownership refused");}
   if(owned==null||!String.Equals(Path.GetFullPath(owned.Name),copy,StringComparison.OrdinalIgnoreCase))throw new Exception("Wrong opened document");
   if(owned.Modified)throw new Exception("Read-only copy unexpectedly modified before export");
+  if(refresh){displayOnly=true;app.ActiveDoc=owned;var scene=(IZSceneDoc)owned;if(r.ContainsKey("show_all")&&(bool)r["show_all"]){((IZSceneDocUtility)owned).ShowAll();result["all_shown_on_copy"]=true;}DirtyGraphics(scene.GetTopElement());scene.UpdateGraphics(0);scene.Redraw();result["graphics_refreshed"]=true;}
   string output=Path.Combine(folder,"native-export.zip");((IZSceneDoc)owned).ExportICWebViewerFile(output);
   if(!File.Exists(output)||new FileInfo(output).Length==0)throw new Exception("Missing exported geometry");
-  if(owned.Modified)throw new Exception("Export dirtied copy; retained without saving");
-  owned.Close();owned=null;
+  if(owned.Modified&&!displayOnly)throw new Exception("Export dirtied copy; retained without saving");
+  if(displayOnly){owned.Close2(true);result["display_changes_discarded"]=true;}else owned.Close();owned=null;
   result["export_sha256"]=Hash(output);result["source_sha256"]=expected;
   result["copy_unchanged"]=Hash(copy)==expected;result["api_version"]=app.ApiVersion;
   passed=(bool)result["copy_unchanged"];
  }catch(Exception e){result["error"]=e.ToString();}
  finally{
   if(owned!=null&&!owned.Modified)try{owned.Close();owned=null;}catch(Exception e){result["cleanup_error"]=e.ToString();passed=false;}
+  if(owned!=null&&displayOnly&&Hash(owned.Name)==expected)try{owned.Close2(true);owned=null;result["display_changes_discarded"]=true;}catch(Exception e){result["cleanup_error"]=e.ToString();passed=false;}
   if(app!=null&&before!=null)try{
    if(previous!=null&&app.ActiveDoc!=previous)app.ActiveDoc=previous;
    result["context_preserved"]=J.Serialize(State(app))==before;

@@ -117,10 +117,14 @@ def validate_draft(value, catalog):
             raise ValueError('Podaj dodatni wymagany wysuw albo pozostaw nieustalony')
     if 'preview' in value:
         preview = value['preview']
-        reference = catalog.get('workstation_preview')
-        if value['family_id'] != 'workstation' or value['variant_id'] != 'M04' or reference is None:
+        reference = catalog.get('previews', {}).get(value['variant_id'])
+        if reference is None and value['variant_id'] == 'M04':
+            reference = catalog.get('workstation_preview')
+        if reference is None:
             raise ValueError('Podgląd 3D nie jest dostępny dla tego wariantu')
-        if not isinstance(preview, dict) or set(preview) != {'source_sha256', 'external_mm', 'shelf_travel_mm', 'covers_visible'}:
+        legacy = isinstance(preview, dict) and 'shelf_travel_mm' in preview
+        motion_key = 'shelf_travel_mm' if legacy else 'motion_values'
+        if not isinstance(preview, dict) or set(preview) != {'source_sha256', 'external_mm', motion_key, 'covers_visible'}:
             raise ValueError('Nieprawidłowy stan podglądu 3D')
         if preview['source_sha256'] != reference['source_sha256'] or type(preview['covers_visible']) is not bool:
             raise ValueError('Podgląd wskazuje inną rewizję źródła lub nieprawidłowy stan osłon')
@@ -128,10 +132,18 @@ def validate_draft(value, catalog):
         if (not isinstance(dims, list) or len(dims) != 3 or not all(positive(n) for n in dims)
                 or any(not base*.8 <= n <= base*1.4 for n, base in zip(dims, reference['baseline_external_mm']))):
             raise ValueError('Gabaryt podglądu musi mieścić się w 80–140% wymiarów wzorca')
-        travels = preview['shelf_travel_mm']
-        if (not isinstance(travels, list) or len(travels) != 4
-                or any(type(n) not in (int, float) or not math.isfinite(n) or not 0 <= n <= 500 for n in travels)):
-            raise ValueError('Podaj cztery prezentacyjne wysuwy od 0 do 500 mm')
+        if legacy:
+            travels = preview['shelf_travel_mm']
+            if (value['variant_id'] != 'M04' or not isinstance(travels, list) or len(travels) != 4
+                    or any(type(n) not in (int, float) or not math.isfinite(n) or not 0 <= n <= 500 for n in travels)):
+                raise ValueError('Podaj cztery prezentacyjne wysuwy od 0 do 500 mm')
+        else:
+            values, limits = preview['motion_values'], reference.get('motions', {})
+            if not isinstance(values, dict) or set(values) != set(limits):
+                raise ValueError('Zestaw ruchów nie odpowiada wybranemu modelowi')
+            for key, number in values.items():
+                if type(number) not in (int, float) or not math.isfinite(number) or not limits[key]['min'] <= number <= limits[key]['max']:
+                    raise ValueError('Ruch poza zakresem podglądu: ' + key)
     return dict(valid_draft=True, cad_ready=False, production_approved=False,
                 message='Szkic poprawny. Zapisano wymagania koncepcji; podgląd siatek nie zastępuje obliczeń CAD.',
                 missing=['Mapowanie światła wnętrza i osłon', 'Reguły okuć i obróbek',
