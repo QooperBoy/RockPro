@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RockPro Studio · Wzorce konstrukcji</title><link rel="stylesheet" href="style.css"><script type="module" src="app.js"></script></head>
+<body><header><a class="brand" href="./">ROCK<span>PRO</span><small>STUDIO / PROTOTYP 01</small></a><div id="summary">Wczytywanie wzorców…</div><a href="https://linear.app/rock-pro/issue/ROC-45" target="_blank" rel="noreferrer">Mapowanie w Linear ↗</a></header>
+<main><aside class="library"><p class="eyebrow">01 / WYBIERZ KONSTRUKCJĘ</p><h1>Od gotowych<br>skrzyń do Twojej.</h1><p class="muted">Rzeczywiste modele są punktem wyjścia. Każda rodzina zachowuje swój podział i wnętrze.</p><nav id="families" aria-label="Rodziny skrzyń"></nav></aside>
+<section class="reference"><div class="reference-heading"><div><p class="eyebrow">WZORZEC ŹRÓDŁOWY</p><h2 id="name">—</h2></div><span class="tag">IronCAD 2027</span></div>
+<div class="variant-row"><label>Wariant <select id="variant"></select></label><div class="toggle"><button id="closed" class="active">Cała konstrukcja</button><button id="inside">Drugi widok</button></div></div>
+<div class="image-wrap"><img id="reference-image" alt="Widok rzeczywistego modelu źródłowego"><div class="image-label">Obraz wzorca · wymiary szkicu nie zmieniają tego widoku</div></div>
+<p id="description"></p><div id="controls" class="chips"></div>
+<details><summary>Struktura odziedziczona z modelu <span id="part-count"></span></summary><ul id="groups"></ul></details>
+<div id="questions" class="notice"></div><p class="muted tiny">Rodziny są kandydatami klasyfikacji. Te same identyfikatory CAD nie oznaczają tej samej rewizji; zachowujemy SHA źródła i inwentarza.</p></section>
+<aside class="draft"><p class="eyebrow">02 / TWÓJ SZKIC</p><h2>Wymagane wnętrze</h2><p class="muted">Wolna przestrzeń, którą konstrukcja ma zachować. Wszystkie wartości w mm.</p>
+<form id="draft-form"><div class="dimensions"><label>Długość X<input id="x" type="number" min="1" max="10000" step="any" placeholder="np. 600" required></label><label>Głębokość Y<input id="y" type="number" min="1" max="10000" step="any" placeholder="np. 500" required></label><label>Wysokość Z<input id="z" type="number" min="1" max="10000" step="any" placeholder="np. 350" required></label></div>
+<label>Wysokość głównej osłony / pokrywy<input id="cover" type="number" min="1" max="10000" step="any" placeholder="Do ustalenia"></label>
+<label>Sposób otwierania — wymaganie<select id="opening"><option value="source_unconfirmed">Jak we wzorcu — do potwierdzenia</option><option value="hinged">Na zawiasach</option><option value="removable">Osłona zdejmowana</option><option value="sliding">Element wysuwany</option></select></label>
+<label>Podstawa — wymaganie<select id="transport"><option value="source_unconfirmed">Jak we wzorcu — do potwierdzenia</option><option value="feet">Nóżki</option><option value="casters">Koła</option><option value="stacking">Koła i piętrowanie</option><option value="trolley">Dwa koła i teleskop</option></select></label>
+<fieldset id="shelf-fields" hidden><legend>Wysuwane półki · funkcja potwierdzona</legend><label>Liczba półek<input id="shelf-count" type="number" min="1" max="30" step="1" placeholder="Do ustalenia"></label><label>Wymagany wysuw [mm]<input id="shelf-travel" type="number" min="1" max="10000" step="any" placeholder="Do ustalenia"></label><p class="muted tiny">Skok jest wymaganiem szkicu. Prowadnice, ich osie i dopuszczalne obciążenie wymagają mapowania.</p></fieldset>
+<label id="notes-label">Wymagania dla tej rodziny<textarea id="notes" rows="4" maxlength="4000" placeholder="Opisz wkłady, podparcia i potrzebny dostęp…"></textarea></label>
+<button type="submit" class="primary">Sprawdź szkic</button><div class="actions"><button id="export" type="button">Eksportuj JSON</button><button id="import" type="button">Wczytaj JSON</button><input id="file" type="file" accept=".json,application/json" hidden></div></form>
+<div id="result" role="status" aria-live="polite">Wybierz wzorzec i wpisz wymagania. Szkice każdej rodziny są oddzielne w bieżącej sesji.</div>
+<div class="roadmap"><b>Dalszy przepływ</b><p>Szkic → kotwy i obróbki → plan → IronCAD → pomiary.</p><span class="tag">Generator CAD: jeszcze niepodłączony</span></div></aside></main>
+</body></html>
