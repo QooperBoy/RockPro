@@ -77,6 +77,7 @@ function fill(){
  editors();partsPicker?.setSelection(draft.hardware??[]);saveLabel();
 }
 function motionInputs(){
+ if(!$('motions'))return;
  $('motions').replaceChildren();for(const s of view.model.sections.slice(1)){
   const l=document.createElement('label');l.className='motion';const text=document.createElement('span');text.textContent=s.label;const out=document.createElement('output');out.textContent=Math.round(view.values[s.id])+'%';
   const range=document.createElement('input');range.type='range';range.min=0;range.max=100;range.value=view.values[s.id];range.dataset.section=s.id;range.setAttribute('aria-label','Otwarcie: '+s.label);
@@ -96,10 +97,8 @@ async function updatePreview(version=++serial){
   $('placement-summary').textContent=model.placement.instance_count+' wystąpień w koncepcji · '+(draft.placements?.length??0)+' grup'+(model.placement.unresolved_groups.length?' · grupy bez docelowej ścianki: '+model.placement.unresolved_groups.length:'')+'.';
   partsPicker.renderSummary($('hardware-summary'),model.hardware_summary);
   $('joint-fit-status').textContent=model.hardware_summary.definition_count?'do ustalenia po rozmieszczeniu i potwierdzeniu danych montażowych':'do ustalenia po wyborze okucia';
-  $('preview-title').textContent=draft.name;$('preview-title').title=draft.name;$('section-sizes').replaceChildren();$('topology').replaceChildren();
+  $('preview-title').textContent=draft.name;$('preview-title').title=draft.name;$('section-sizes').replaceChildren();
   for(const s of model.sections){const e=document.createElement('div');e.className='section-size';e.textContent=s.label;const detail=document.createElement('span');detail.textContent=s.size_mm.map(x=>Number(x.toFixed(2))).join(' × ')+' mm · '+(s.id==='body'?'korpus':options.faces[s.face]);e.append(detail);$('section-sizes').append(e);}
-  for(const j of model.joints){const s=model.sections.find(s=>s.id===j.sections[1]),e=document.createElement('div');e.className='joint';e.textContent='Korpus ↔ '+s.label+' · '+options.faces[j.face]+' · szczelina i docięcie sklejki: wymagają danych montażowych'+(s.requires.length?' · po: '+s.requires.map(id=>model.sections.find(x=>x.id===id).label).join(', '):'');$('topology').append(e);}
-  const bounds=[0,1,2].map(k=>Math.max(...model.sections.map(s=>s.position_mm[k]+s.size_mm[k]))-Math.min(...model.sections.map(s=>s.position_mm[k])));$('envelope').textContent='Gabaryt zamkniętego schematu: '+bounds.map(x=>Number(x.toFixed(2))).join(' × ')+' mm. Nominalny gabaryt bez okuć, kół i profili; dopasowanie złączy nie powiększa tych wymiarów.';
   status(model.sections.length+' sekcji · '+model.joints.length+' złączy · wnętrze '+draft.internal_mm.join(' × ')+' mm. Schemat poprawny.');
  }catch(e){if(version===serial){placementView?.setEnabled(false);status('Nieaktualny podgląd — popraw dane: '+e.message,true);}}
 }

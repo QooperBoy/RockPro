@@ -1,5 +1,14 @@
 # Studio — panele, rozmiar podglądu i tryb nocny
 
+Aktualny wzorzec zmiany rozmiaru: wyłącznie trzy jednakowe uchwyty na granicach
+(menu/edytor/3D), z jedną obsługą pointer capture i strzałek. Usunięto osobne
+suwaki menu i wysokości 3D. Podgląd nie zawiera kart „Sekcje i otwieranie”
+ani „Status techniczny podglądu”. Ikony otwarcia/zamknięcia pozostają.
+Ograniczenia techniczne są nadal w dokumentacji i szczegółowych walidacjach.
+PASS: identyczne style uchwytów w obu motywach, trzy przeciągnięcia, brak
+duplikatów, otwarcie/zamknięcie i niezmienność draftu; dowody lokalne
+`artifacts/consistent-splitters-20261027/`. Starsze opisy suwaków poniżej są historyczne.
+
 Aktualizacja: menu ma trzy tryby (pełne → ikony → całkowicie ukryte),
 własny suwak szerokości 160–320 px i pamięć wybranego trybu. Przycisk Menu
 w nagłówku przywraca dostęp również po pełnym ukryciu. Ukrycie 3D usuwa cały
