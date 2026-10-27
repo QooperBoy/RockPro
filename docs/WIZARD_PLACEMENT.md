@@ -2,6 +2,8 @@
 
 27.10.2026. Działający planer koncepcyjny i interaktywny podgląd WebGL,
 bez uruchamiania IronCAD. Operuje wyłącznie częściami wybranymi w kroku 4.
+Późniejszy przyrost: [płynny ruch, środkowy przycisk, więcej uchwytów
+i rzędy zawiasów](STUDIO_INTERACTION.md).
 
 ## Użycie
 
@@ -23,8 +25,8 @@ bez uruchamiania IronCAD. Operuje wyłącznie częściami wybranymi w kroku 4.
    rewizjami SQLite/CAS i odzyskiwaniem przeglądarki.
 
 Panel rozróżnia liczbę **na jedną ściankę**, sumę grupy i liczbę definicji SKU.
-Nie są to ilości zakupowe. Grupa uchwytów zapisuje `handles_per_wall=1|2` jawnie.
-Pozostałe okucia mogą mieć 1–8 sztuk na ściankę, w pojedynczym, równym lub
+Nie są to ilości zakupowe. Grupa uchwytów zapisuje `handles_per_wall` jawnie,
+obecnie w zakresie 1–16. Pozostałe okucia mogą mieć 1–16 sztuk na ściankę, w pojedynczym, równym lub
 symetrycznym rzędzie. Cała koncepcja: maksymalnie 32 grupy i 256 wystąpień.
 
 ## Kotwy i geometria
@@ -68,7 +70,8 @@ Usunięcie SKU w kroku 4 wymaga potwierdzenia usunięcia jego istniejących grup
 - Dla pozostałych SKU brak danych obrysu jest jawny. Umowny znacznik 64 × 44 mm
   nie jest pomiarem rzeczywistego okucia ani pozytywną walidacją kolizji.
 - Zawias/zatrzask na ściance pozostaje nieprzypisany do złącza: ostrzeżenie
-  `unbound_joint`. Parowanie po obu stronach złącza, luzy profili, wycięcia,
+  `unbound_joint` w trybie ręcznym. Rząd `joint_line` wiąże się z linią styku,
+  ale rzeczywisty montaż i wycięcia nadal wymagają potwierdzenia. Luzy profili,
   przestrzeń ruchu i kontrola narożników należą do następnego etapu.
 - Lokalny pakiet ma siatki H7159 i 17251S. W pozostałych pozycjach podgląd
   pokazuje jawny znacznik z obrazem. To referencje, bez zatwierdzonego montażu.

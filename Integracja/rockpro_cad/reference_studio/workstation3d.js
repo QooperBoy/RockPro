@@ -1,5 +1,6 @@
 import * as THREE from './vendor/three.module.min.js';
 import {OrbitControls} from './vendor/OrbitControls.js';
+import {configureOrbit} from './scene-controls.js';
 import {placement} from './preview_math.mjs';
 
 export class WorkstationView {
@@ -20,7 +21,7 @@ export class WorkstationView {
   this.camera=new THREE.PerspectiveCamera(38,1,.01,100);this.camera.up.set(0,0,1);
   this.renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
   this.renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));this.renderer.outputColorSpace=THREE.SRGBColorSpace;
-  this.host.append(this.renderer.domElement);this.controls=new OrbitControls(this.camera,this.renderer.domElement);this.controls.enableDamping=true;
+  this.host.append(this.renderer.domElement);this.controls=new OrbitControls(this.camera,this.renderer.domElement);configureOrbit(this.controls);
   this.scene.add(new THREE.HemisphereLight(0xffffff,0x7b8c80,2.8));
   const light=new THREE.DirectionalLight(0xffffff,3);light.position.set(-2,-3,4);this.scene.add(light);
   this.scene.add(new THREE.AmbientLight(0xffffff,.3));

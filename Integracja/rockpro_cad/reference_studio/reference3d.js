@@ -1,5 +1,6 @@
 import * as THREE from './vendor/three.module.min.js';
 import {OrbitControls} from './vendor/OrbitControls.js';
+import {configureOrbit} from './scene-controls.js';
 import {placement} from './preview_math.mjs';
 
 // One WebGL context for the gallery. Replace and dispose geometry on selection.
@@ -44,7 +45,7 @@ export class ReferenceView {
   this.scene=new THREE.Scene();this.scene.background=new THREE.Color(0xe9eeea);
   this.camera=new THREE.PerspectiveCamera(38,1,.01,100);this.camera.up.set(0,0,1);
   this.renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});this.renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));this.renderer.outputColorSpace=THREE.SRGBColorSpace;
-  this.host.append(this.renderer.domElement);this.controls=new OrbitControls(this.camera,this.renderer.domElement);this.controls.enableDamping=true;
+  this.host.append(this.renderer.domElement);this.controls=new OrbitControls(this.camera,this.renderer.domElement);configureOrbit(this.controls);
   this.scene.add(new THREE.HemisphereLight(0xffffff,0x7b8c80,2.8));const light=new THREE.DirectionalLight(0xffffff,3);light.position.set(-2,-3,4);this.scene.add(light);this.scene.add(new THREE.AmbientLight(0xffffff,.3));
   this.grid=new THREE.GridHelper(4,40,0x9aac9e,0xd0dad1);this.grid.rotation.x=Math.PI/2;this.scene.add(this.grid);
   this.resizeObserver=new ResizeObserver(()=>this.resize());this.resizeObserver.observe(this.host);

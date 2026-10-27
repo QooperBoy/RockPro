@@ -43,6 +43,45 @@ class StudioPlacementTests(unittest.TestCase):
         p=c.preview(d)['placement'];a,b=p['items'];self.assertAlmostEqual(a['position_mm'][1],b['position_mm'][1])
         g['opposite_wall']=False;self.assertEqual(c.preview(d)['placement']['instance_count'],1)
 
+    def test_more_handles_keep_explicit_count_and_uniform_positions(self):
+        d=placed();d['placements'][0].update(count_per_wall=4,handles_per_wall=4)
+        p=c.preview(d)['placement'];self.assertEqual(p['instance_count'],8)
+        coordinates=sorted(i['position_mm'][1] for i in p['items'] if i['face']=='left')
+        differences=[b-a for a,b in zip(coordinates,coordinates[1:])]
+        self.assertAlmostEqual(min(differences),max(differences))
+        for n in (0,17,True):
+            d['placements'][0].update(count_per_wall=n,handles_per_wall=n)
+            with self.subTest(n=n),self.assertRaises(ValueError):c.preview(d)
+
+    def test_joint_hinges_follow_topology_spacing_resize_and_lid_halves(self):
+        d=concept();d['hardware']=[dict(part_id='27095',revision=1)]
+        g=dict(id='hinges',part_id='27095',revision=1,pattern='joint_line',joint_id='joint-lid-a',hinge_count=3,edge_inset_mm=80)
+        d['placements']=[g]
+        for size in ([600,500,350],[900,700,500]):
+            d['internal_mm']=size;m=c.preview(d);p=m['placement'];items=p['items'];self.assertEqual(len(items),3)
+            xs=[i['position_mm'][0] for i in items];self.assertAlmostEqual(xs[1]-xs[0],xs[2]-xs[1])
+            self.assertAlmostEqual(xs[0],80);self.assertAlmostEqual(xs[-1],size[0]+19.6-80)
+            self.assertTrue(all(i['face']=='rear' and i['position_mm'][2]==size[2]+19.6 for i in items))
+            self.assertEqual({h['section_id'] for h in items[0]['visual_halves']},{'body','lid-a'})
+            self.assertFalse(any(w['code']=='unbound_joint' for w in p['warnings']))
+        d['covers'][0]['hinge_edge']='low';self.assertTrue(all(i['face']=='front' for i in c.preview(d)['placement']['items']))
+        g['hinge_count']=1;self.assertAlmostEqual(c.preview(d)['placement']['items'][0]['position_mm'][0],(900+19.6)/2)
+        d['covers'][0]['kind']='removable';self.assertEqual(c.preview(d)['placement']['unresolved_groups'],['hinges'])
+
+    def test_cabinet_hinge_line_is_vertical_and_invalid_rows_are_refused(self):
+        d=concept();d['type']='cabinet';d['covers'][0].update(face='front',depth_mm=80)
+        d['hardware']=[dict(part_id='27095',revision=1)]
+        g=dict(id='hinges',part_id='27095',revision=1,pattern='joint_line',joint_id='joint-lid-a',hinge_count=4,edge_inset_mm=60)
+        d['placements']=[g];p=c.preview(d)['placement'];self.assertEqual(len(p['items']),4)
+        self.assertTrue(all(i['face']=='right' and i['rotation_deg']==90 for i in p['items']))
+        self.assertEqual(len({i['position_mm'][0] for i in p['items']}),1)
+        d['covers'][0]['hinge_edge']='low';self.assertTrue(all(i['rotation_deg']==270 for i in c.preview(d)['placement']['items']))
+        for patch in [dict(hinge_count=True),dict(hinge_count=17),dict(edge_inset_mm=float('nan')),dict(extra=True)]:
+            before=dict(g);g.update(patch)
+            with self.assertRaises(ValueError):c.preview(d)
+            g.clear();g.update(before)
+        g['edge_inset_mm']=1000;self.assertEqual(c.preview(d)['placement']['items'],[])
+
     def test_invalid_refs_counts_numbers_duplicates_and_extra_fields_are_refused(self):
         for change in [dict(count_per_wall=3),dict(handles_per_wall=True),dict(u=math.nan),dict(v=2),
                        dict(u=True),dict(rotation_deg=45),dict(revision=2),dict(part_id='27095'),

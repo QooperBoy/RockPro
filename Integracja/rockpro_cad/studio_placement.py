@@ -1,6 +1,7 @@
 """Section-bound concept placements. No machining, native CAD or production approval."""
 import math
 from . import studio_parts
+from . import studio_joints
 
 FACE_LABELS = dict(front='Przód', rear='Tył', left='Lewa', right='Prawa', top='Góra', bottom='Dół')
 OPPOSITE = dict(front='rear', rear='front', left='right', right='left', top='bottom', bottom='top')
@@ -19,7 +20,18 @@ def validate(draft):
     for g in groups:
         if not isinstance(g,dict) or not isinstance(g.get('part_id'),str) or g['part_id'] not in chosen:
             raise ValueError('Rozmieszczana część musi być wybrana w kroku 4')
-        handle = chosen[g['part_id']]['family_id']=='handles'
+        family=chosen[g['part_id']]['family_id'];handle=family=='handles'
+        if g.get('pattern')=='joint_line':
+            if family!='hinges' or set(g)!={'id','part_id','revision','pattern','joint_id','hinge_count','edge_inset_mm'}:
+                raise ValueError('Rząd na złączu wymaga definicji zawiasu, linii, liczby i odsunięcia')
+            for key in ('id','joint_id'):
+                if not isinstance(g[key],str) or not 1<=len(g[key])<=86:raise ValueError('Nieprawidłowy identyfikator rzędu zawiasów')
+            if g['id'] in seen:raise ValueError('Powtórzony identyfikator grupy okuć')
+            seen.add(g['id'])
+            if type(g['revision']) is not int or g['revision']!=chosen[g['part_id']]['revision']:raise ValueError('Nieobsługiwana rewizja zawiasu')
+            if type(g['hinge_count']) is not int or not 1<=g['hinge_count']<=16:raise ValueError('Liczba zawiasów na złączu: 1–16')
+            if type(g['edge_inset_mm']) not in (int,float) or not math.isfinite(g['edge_inset_mm']) or not 0<=g['edge_inset_mm']<=5000:raise ValueError('Odsunięcie zawiasów: 0–5000 mm')
+            total+=g['hinge_count'];continue
         if set(g) != fields | ({'handles_per_wall'} if handle else set()):
             raise ValueError('Nieprawidłowy opis grupy rozmieszczenia')
         for key in ('id','section_id'):
@@ -38,12 +50,12 @@ def validate(draft):
         if type(g['rotation_deg']) is not int or g['rotation_deg'] not in (0,90,180,270):
             raise ValueError('Obrót okucia: 0, 90, 180 lub 270 stopni')
         n=g['count_per_wall']
-        if type(n) is not int or not 1<=n<=8 or (g['pattern']=='single' and n!=1):
-            raise ValueError('Liczba wystąpień na ściankę: 1–8; pojedyncze okucie wymaga 1')
+        if type(n) is not int or not 1<=n<=16 or (g['pattern']=='single' and n!=1):
+            raise ValueError('Liczba wystąpień na ściankę: 1–16; pojedyncze okucie wymaga 1')
         if type(g['opposite_wall']) is not bool:
             raise ValueError('Przeciwległa ścianka wymaga jawnego wyboru')
-        if handle and (type(g['handles_per_wall']) is not int or g['handles_per_wall'] not in (1,2) or n!=g['handles_per_wall']):
-            raise ValueError('Uchwyty: jawnie 1 lub 2 na każdą ściankę')
+        if handle and (type(g['handles_per_wall']) is not int or not 1<=g['handles_per_wall']<=16 or n!=g['handles_per_wall']):
+            raise ValueError('Uchwyty: jawnie 1–16 na każdą ściankę')
         total += n*(2 if g['opposite_wall'] else 1)
     if total>256:
         raise ValueError('Maksymalnie 256 wystąpień okuć w koncepcji')
@@ -76,8 +88,23 @@ def faces(sections, panels):
 def preview(draft, sections, panels):
     mount_faces=faces(sections,panels);by_face={(f['section_id'],f['face']):f for f in mount_faces}
     definitions={r['id']:r for r in studio_parts.resolve(draft['hardware'])}
+    joint_lines=studio_joints.lines(draft,sections,mount_faces);by_joint={j['id']:j for j in joint_lines}
     items=[];warnings=[];unresolved=[];counts={}
     for g in draft.get('placements',[]):
+        if g['pattern']=='joint_line':
+            line=by_joint.get(g['joint_id']);footprint=FOOTPRINTS.get(g['part_id'])
+            if not line or (g['hinge_count']>1 and 2*g['edge_inset_mm']>line['length_mm']):
+                unresolved.append(g['id']);warnings.append(dict(group_id=g['id'],code='missing_joint',message='Brak otwieranej pokrywy lub za mało miejsca na zadany rząd zawiasów. Wybierz linię i odsunięcie.'));continue
+            frame=by_face[('body',line['face'])]
+            resolved=studio_joints.resolve(g,line,frame,footprint);items.extend(resolved);counts[g['part_id']]=counts.get(g['part_id'],0)+len(resolved)
+            warnings.append(dict(group_id=g['id'],code='joint_mount_pending',message=g['part_id']+': rząd związany z linią styku; dokładne bazy zawiasu, profile, ruch i wycięcia wymagają potwierdzenia.'))
+            if footprint is None:warnings.append(dict(group_id=g['id'],code='unknown_envelope',message=g['part_id']+': brak potwierdzonego obrysu zawiasu.'))
+            else:
+                if min(line['negative_space_mm'],line['positive_space_mm'])<footprint[1]/2+5:
+                    warnings.append(dict(group_id=g['id'],code='hinge_mount_space',message='Za mało miejsca po jednej stronie styku na wstępny obrys '+g['part_id']+'. Sprawdź wysokość/głębokość pokrywy; wymiary nie zostały powiększone.'))
+                if any(min(i['distance_along_joint_mm'],line['length_mm']-i['distance_along_joint_mm'])<footprint[0]/2+5 for i in resolved):
+                    warnings.append(dict(group_id=g['id'],code='edge_clearance',message='Zawiasy są za blisko końca linii styku dla znanego obrysu i rezerwy 5 mm.'))
+            continue
         walls=[g['face']]+([OPPOSITE[g['face']]] if g['opposite_wall'] else [])
         if any((g['section_id'],face) not in by_face for face in walls):
             unresolved.append(g['id']);warnings.append(dict(group_id=g['id'],code='missing_wall',message='Brak wybranej sekcji lub jednej ze ścian pary. Wskaż nową ściankę; grupa pozostaje zapisana.'));continue
@@ -114,7 +141,8 @@ def preview(draft, sections, panels):
             frame=by_face[(a['section_id'],a['face'])]
             if all(abs(a[k]-b[k])*frame['size_mm'][j] < (a['footprint_mm'][j]+b['footprint_mm'][j])/2+5 for j,k in enumerate(('u','v'))):
                 warnings.append(dict(group_id=a['group_id'],other_group_id=b['group_id'],code='overlap',message=a['part_id']+' i '+b['part_id']+' · '+frame['label']+': obrysy lub rezerwy 5 mm nachodzą na siebie.'))
-    return dict(schema='rockpro.concept-placement/1',faces=mount_faces,items=items,warnings=warnings,
+    return dict(schema='rockpro.concept-placement/1',faces=mount_faces,joint_lines=joint_lines,
+        part_envelopes={k:list(v) for k,v in FOOTPRINTS.items()},items=items,warnings=warnings,
         unresolved_groups=unresolved,instance_count=len(items),counts=counts,status='draft' if items else 'not_started',
         preliminary_clearance_mm=5,collision_scope='known_2d_envelopes_same_wall',
         cutouts_generated=False,production_approved=False)

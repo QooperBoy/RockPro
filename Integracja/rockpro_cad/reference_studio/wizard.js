@@ -17,7 +17,7 @@ function selectOptions(select,entries,value){select.replaceChildren(...entries.m
 function navigate(value){if(value>step&&step===1&&$('type').value!==draft.type)$('apply-type').click();step=Math.min(5,Math.max(1,value));editors();for(let i=1;i<=5;i++)$('step-'+i).hidden=i!==step;for(const b of $('steps').children)b.classList.toggle('active',Number(b.dataset.step)===step);$('previous').disabled=step===1;$('next').disabled=step===5;placementView?.setEnabled(step===5&&JSON.stringify(view.model.draft)===JSON.stringify(draft));}
 
 function input(label,value,type='text') {const l=document.createElement('label');l.append(document.createTextNode(label));const e=document.createElement('input');e.type=type;e.value=value;l.append(e);return [l,e];}
-function select(label,entries,value){const l=document.createElement('label');l.append(document.createTextNode(label));const e=document.createElement('select');selectOptions(e,entries,value);l.append(e);return [l,e];}
+function select(label,entries,value){const l=document.createElement('label');l.append(document.createTextNode(label));const e=document.createElement('select');e.setAttribute('aria-label',label);selectOptions(e,entries,value);l.append(e);return [l,e];}
 function editors(){
  $('type-description').textContent=options.types[draft.type].description;
  $('cooperation-field').hidden=draft.covers.length===1;
@@ -61,7 +61,7 @@ function motionInputs(){
 async function updatePreview(version=++serial){
  try{const model=await api('wizard/preview',draft);if(version!==serial)return;
   if(!view)view=new ConceptView($('viewport'));
-  if(!placementView)placementView=new PlacementView(view,hit=>placementEditor.drop(hit),id=>placementEditor.selectGroup(id),message=>status(message));
+  if(!placementView)placementView=new PlacementView(view,hit=>placementEditor.drop(hit),id=>placementEditor.selectGroup(id),message=>status(message),hit=>placementEditor.candidate(hit));
   const sameLayout=view.model&&JSON.stringify(view.model.panels)===JSON.stringify(model.panels)&&JSON.stringify(view.model.sections)===JSON.stringify(model.sections);
   if(sameLayout)view.model=model;else view.setModel(model);window.rockproWizardView=view;motionInputs();
   placementEditor.setModel(model);placementView.setEnabled(step===5);

@@ -71,7 +71,7 @@ nie zadziała na Twoim komputerze. Zatrzymanie serwera: Ctrl+C w jego terminalu.
 | Krok 2 | Skrzynia: wieko na zawiasach albo zdejmowane. Szafa: jedna przednia powłoka otwierana lub zdejmowana. Typ 3-elementowy: zdejmowany przód i góra; współpraca pokryw i zależności otwierania |
 | Krok 3 | Wymiary wnętrza korpusu, grubość sklejki, wysokość/głębokość pokryw, aktualizowany schemat 3D. Przód wariantu 3-elementowego automatycznie licuje z górą |
 | Krok 4 | Baza 14 pozycji z dotychczasowych źródeł, wyszukiwanie, kategorie, obrazy i wybór wersjonowanych definicji zapisywany w drafcie |
-| Krok 5 | Drag and drop na zewnętrzne ścianki, grupy okuć, liczba na ściankę i symetria uchwytów, kotwy zależne od sekcji/wymiarów, wstępne ostrzeżenia i zapis rozmieszczenia |
+| Krok 5 | Płynny drag and drop, obrót środkowym przyciskiem, 1–16 uchwytów/ściankę, symetria, równe rzędy zawiasów na styku sekcji, wstępne ostrzeżenia i zapis |
 | Draft | Zapis/odczyt w SQLite, historia rewizji, konflikt starszego zapisu, odzyskiwanie przeglądarki oraz JSON. Format aktualny: `rockpro.configurator/3`; stare formaty są zachowane i konwertowane jawnie jako nowe |
 | Dotychczasowy dodatek | C# / WinForms, Python MCP, karty projektów, układ, snapshoty i ograniczone operacje na znanym szkielecie; pełne prototypy CAD to osobny tor od Studio |
 
@@ -88,6 +88,7 @@ obróbki, kompletny plan CAD, generowanie ICS z kreatora i synchronizacja firmow
 
 Dostępna biblioteka i ograniczenia wyboru: [krok 4](docs/WIZARD_PARTS_SELECTION.md).
 Rozmieszczanie, liczby i symetria: [krok 5](docs/WIZARD_PLACEMENT.md).
+Sterowanie, biblioteki i rzędy zawiasów: [interakcje Studio](docs/STUDIO_INTERACTION.md).
 
 Dokładniej: [aktualne wymiary i złącza](docs/WIZARD_JOINT_DIMENSIONS.md),
 [trzy typy](docs/WIZARD_THREE_TYPES.md), [galeria 3D](docs/ALL_REFERENCE_PREVIEWS.md).

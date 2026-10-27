@@ -1,5 +1,6 @@
 import * as THREE from './vendor/three.module.min.js';
 import {OrbitControls} from './vendor/OrbitControls.js';
+import {configureOrbit,stopOrbitMotion} from './scene-controls.js';
 
 export class ConceptView {
  constructor(host){
@@ -7,16 +8,16 @@ export class ConceptView {
   this.camera=new THREE.PerspectiveCamera(38,1,.005,200);this.camera.up.set(0,0,1);
   this.renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});this.renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
   this.renderer.toneMapping=THREE.ACESFilmicToneMapping;host.append(this.renderer.domElement);
-  this.controls=new OrbitControls(this.camera,this.renderer.domElement);this.controls.enableDamping=true;
+  this.controls=new OrbitControls(this.camera,this.renderer.domElement);configureOrbit(this.controls);
   this.scene.add(new THREE.HemisphereLight(0xffffff,0x657460,2));const light=new THREE.DirectionalLight(0xffffff,2.5);light.position.set(2,-3,5);this.scene.add(light);
   this.grid=new THREE.GridHelper(20,100,0x95a88d,0xcad5c2);this.grid.rotation.x=Math.PI/2;this.scene.add(this.grid);
   this.root=new THREE.Group();this.scene.add(this.root);this.groups=new Map();this.values={};
   new ResizeObserver(()=>this.resize()).observe(host);this.resize();
-  this.renderer.setAnimationLoop(()=>{this.controls.update();this.renderer.render(this.scene,this.camera);});
+  this.renderer.setAnimationLoop(()=>{this.beforeRender?.();this.controls.update();this.renderer.render(this.scene,this.camera);});
  }
  resize(){const w=this.host.clientWidth,h=this.host.clientHeight;if(!w||!h)return;this.renderer.setSize(w,h,false);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();}
  setModel(model){
-  const previous=this.values;this.root.traverse(o=>{o.geometry?.dispose();if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material?.dispose();});this.root.clear();this.groups.clear();this.model=model;
+  const previous=this.values;this.root.traverse(o=>{if(o.userData.sharedResources)return;o.geometry?.dispose();if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material?.dispose();});this.root.clear();this.groups.clear();this.model=model;
   const body=model.sections[0].size_mm.map(v=>v/1000);this.values={};
   for(const s of model.sections){
    const group=new THREE.Group();let pivot=[0,0,0],axis=2,direction=1;
@@ -59,5 +60,5 @@ export class ConceptView {
   this.apply();
  }
  all(value){for(const key of Object.keys(this.values))this.values[key]=value;this.apply();this.fit();}
- fit(){if(!this.model)return;this.resize();const box=new THREE.Box3().setFromObject(this.root),sphere=box.getBoundingSphere(new THREE.Sphere());const v=THREE.MathUtils.degToRad(this.camera.fov),h=2*Math.atan(Math.tan(v/2)*this.camera.aspect),distance=sphere.radius/Math.sin(Math.min(v,h)/2)*1.06;this.controls.target.copy(sphere.center);this.camera.position.copy(sphere.center).add(new THREE.Vector3(1.4,-2.2,1.5).normalize().multiplyScalar(distance));this.controls.update();}
+ fit(){if(!this.model)return;this.resize();stopOrbitMotion(this.controls);const box=new THREE.Box3().setFromObject(this.root),sphere=box.getBoundingSphere(new THREE.Sphere());const v=THREE.MathUtils.degToRad(this.camera.fov),h=2*Math.atan(Math.tan(v/2)*this.camera.aspect),distance=sphere.radius/Math.sin(Math.min(v,h)/2)*1.06;this.controls.target.copy(sphere.center);this.camera.position.copy(sphere.center).add(new THREE.Vector3(1.4,-2.2,1.5).normalize().multiplyScalar(distance));this.controls.update();}
 }

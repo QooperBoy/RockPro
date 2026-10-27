@@ -67,6 +67,8 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
         ('parts-picker.js', 'text/javascript; charset=utf-8'),
         ('placement-editor.js', 'text/javascript; charset=utf-8'),
         ('placement3d.js', 'text/javascript; charset=utf-8'),
+        ('placement_math.mjs', 'text/javascript; charset=utf-8'),
+        ('scene-controls.js', 'text/javascript; charset=utf-8'),
         ('preview_math.mjs', 'text/javascript; charset=utf-8'), ('favicon.svg', 'image/svg+xml'))}
     vendor = STATIC.parent / 'viewer3d' / 'vendor'
     for name in ('three.module.min.js', 'three.core.min.js', 'OrbitControls.js'):
