@@ -1,5 +1,10 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
+Studio → CAD 2027: [docs/STUDIO_CAD_INTEGRATION.md](docs/STUDIO_CAD_INTEGRATION.md),
+ROC-46. Pierwszy przyrost to przypięty plan i trwała kolejka, jeszcze bez pełnego
+adaptera natywnego. Nie promuj planu do wykonywalnego przez zmianę flagi ani nie
+podłączaj starego generatora z innym zestawem okuć jako fallbacku.
+
 Nocny przegląd 26.10.2026: [docs/NIGHT_WORK_20261026.md](docs/NIGHT_WORK_20261026.md).
 Plan ruchu standardu wymaga oryginalnych bajtów inwentarza; nie przyjmuj edytowalnego
 JSON z samym SHA jako dowodu pochodzenia. Karty nowych rodzin służą mapowaniu,

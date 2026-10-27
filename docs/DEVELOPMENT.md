@@ -1,5 +1,12 @@
 # RockPro CAD — kontrakt developerski
 
+## Studio → IronCAD 2027
+
+[ROC-46 i stan integracji](STUDIO_CAD_INTEGRATION.md): plan związany z zapisaną
+rewizją draftu, jawne braki oraz trwały dziennik zleceń w istniejącej bazie.
+Endpointy nie przyjmują kodu ani ścieżek wykonawcy. Pełny adapter montażu jest
+kolejnym przyrostem; testowy executor kolejki nie jest testem natywnym.
+
 ## Przyrost niezależny od CAD — noc 26.10.2026
 
 [Raport pracy](NIGHT_WORK_20261026.md) wskazuje poprawki integralności montażu,

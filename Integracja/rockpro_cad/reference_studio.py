@@ -16,6 +16,8 @@ from . import configurator
 from . import studio_parts
 from . import part_images
 from . import source_parts
+from . import studio_cad
+from .studio_cad_jobs import CadJobs, CadJobError
 
 STATIC = Path(__file__).with_name('reference_studio')
 IMPORT_MAP = '{"imports":{"three":"./vendor/three.module.min.js"}}'
@@ -58,13 +60,15 @@ def load_previews(index_path, catalog):
     return previews
 
 
-def make_handler(catalog, images, token, preview=None, previews=None, hardware_images=None):
+def make_handler(catalog, images, token, preview=None, previews=None, hardware_images=None, native_jobs=None):
     hardware_images = hardware_images or {}
+    native_jobs = native_jobs or CadJobs()
     routes = {name: (STATIC / name, mime) for name, mime in (
         ('index.html', 'text/html; charset=utf-8'), ('app.js', 'text/javascript; charset=utf-8'),
         ('style.css', 'text/css; charset=utf-8'), ('workstation3d.js', 'text/javascript; charset=utf-8'),
         ('reference3d.js', 'text/javascript; charset=utf-8'),
         ('wizard.html', 'text/html; charset=utf-8'), ('wizard.js', 'text/javascript; charset=utf-8'),
+        ('studio-cad.js', 'text/javascript; charset=utf-8'),
         ('wizard3d.js', 'text/javascript; charset=utf-8'), ('wizard.css', 'text/css; charset=utf-8'),
         ('parts-picker.js', 'text/javascript; charset=utf-8'),
         ('placement-editor.js', 'text/javascript; charset=utf-8'),
@@ -122,6 +126,11 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
                     self.respond(200, json.dumps(configurator.read_draft(name.rsplit('/', 1)[1]), ensure_ascii=False).encode())
                 except ValueError as exc:
                     self.respond(404, json.dumps({'error': str(exc)}).encode())
+            elif name and name.startswith('wizard/native-jobs/'):
+                try:
+                    self.respond(200, json.dumps(native_jobs.get(name.rsplit('/', 1)[1]), ensure_ascii=False).encode())
+                except ValueError as exc:
+                    self.respond(404, json.dumps({'error': str(exc)}, ensure_ascii=False).encode())
             elif name in routes or name == '':
                 path, mime = routes[name or 'index.html']
                 self.respond(200, path.read_bytes(), mime)
@@ -130,7 +139,7 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
         def do_POST(self):
             origin = self.headers.get('Origin')
             expected_origin = 'http://127.0.0.1:' + str(self.server.server_port)
-            if self.endpoint() not in ('validate', 'wizard/preview', 'wizard/save', 'wizard/convert') or self.headers.get('X-RockPro-Session') != token or origin != expected_origin:
+            if self.endpoint() not in ('validate', 'wizard/preview', 'wizard/save', 'wizard/convert', 'wizard/native-plan', 'wizard/native-build') or self.headers.get('X-RockPro-Session') != token or origin != expected_origin:
                 self.respond(403, b'{}')
                 return
             try:
@@ -138,7 +147,15 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
                 if not 0 < length <= 32768:
                     raise ValueError('Nieprawidłowy rozmiar szkicu')
                 draft = json.loads(self.rfile.read(length).decode('utf-8'))
-                if self.endpoint() == 'wizard/preview':
+                if self.endpoint() == 'wizard/native-plan':
+                    if not isinstance(draft, dict) or set(draft) != {'draft_id', 'expected_revision'}:
+                        raise ValueError('Plan CAD wymaga ID i rewizji zapisanego draftu')
+                    receipt = studio_cad.prepare(draft['draft_id'], draft['expected_revision'])
+                elif self.endpoint() == 'wizard/native-build':
+                    if not isinstance(draft, dict) or set(draft) != {'plan_id', 'plan_sha256', 'operation_id'}:
+                        raise ValueError('Wykonanie CAD wymaga ID planu, skrótu i ID operacji')
+                    receipt = native_jobs.submit(studio_cad.read_plan(draft['plan_id'], draft['plan_sha256']), draft['operation_id'])
+                elif self.endpoint() == 'wizard/preview':
                     receipt = configurator.preview(draft)
                 elif self.endpoint() == 'wizard/convert':
                     receipt = configurator.convert_legacy(draft)
@@ -149,8 +166,10 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
                 else:
                     receipt = validate_draft(draft, catalog)
                 self.respond(200, json.dumps(receipt, ensure_ascii=False).encode('utf-8'))
-            except configurator.DraftConflict as exc:
+            except (configurator.DraftConflict, studio_cad.PlanConflict) as exc:
                 self.respond(409, json.dumps({'error': str(exc)}, ensure_ascii=False).encode())
+            except CadJobError as exc:
+                self.respond(409, json.dumps(dict(error=str(exc), details=exc.details), ensure_ascii=False).encode())
             except (ValueError, KeyError, TypeError) as exc:
                 self.respond(400, json.dumps({'error': str(exc)}, ensure_ascii=False).encode('utf-8'))
         def log_message(self, *args):
@@ -168,7 +187,11 @@ def main():
     parser.add_argument('--source-parts', type=Path, help='Optional source-bound candidate catalogue')
     parser.add_argument('--port', type=int, default=0)
     parser.add_argument('--session-token', help='Reuse a local session URL when restarting the prototype')
+    parser.add_argument('--database', type=Path, help='Explicit existing shared Studio project database')
     args = parser.parse_args()
+    if args.database:
+        from .mcp import project_store
+        project_store.DB_PATH = args.database.resolve(strict=True)
     if args.source_parts:os.environ['ROCKPRO_SOURCE_PARTS']=str(args.source_parts.resolve(strict=True))
     catalog, images = build_catalog(args.bundle)
     preview = load_preview(args.workstation, catalog) if args.workstation else None

@@ -1,4 +1,5 @@
 import {icon} from './viewport-ui.js';
+import './studio-cad.js';
 import {ConceptView} from './wizard3d.js';
 import {PartsPicker} from './parts-picker.js';
 import {PlacementEditor} from './placement-editor.js';
@@ -32,7 +33,7 @@ async function api(endpoint,data){const response=await fetch(endpoint,data===und
 function status(message,error=false){$('status').textContent=message;$('status').classList.toggle('error',error);}
 function stored(){try{localStorage.setItem(localKey,JSON.stringify({draft,storage,dirty}));}catch{status('Brak miejsca na awaryjny zapis w przeglądarce. Użyj zapisu draftu lub eksportu JSON.',true);}}
 function saveLabel(){ $('save-state').textContent=(storage.id?`Draft · rewizja ${storage.revision}`:'Nowy draft')+(dirty?' · niezapisane zmiany':' · zapisany w bazie');if(!storage.id&&!dirty)$('save-state').textContent='Jeszcze niezapisany w bazie.';}
-function changed(){dirty=true;placementView?.setEnabled(false);saveLabel();stored();clearTimeout(timer);const version=++serial;timer=setTimeout(()=>updatePreview(version),220);}
+function changed(){dirty=true;document.dispatchEvent(new Event('rockpro:cad-invalidated'));placementView?.setEnabled(false);saveLabel();stored();clearTimeout(timer);const version=++serial;timer=setTimeout(()=>updatePreview(version),220);}
 function selectOptions(select,entries,value){select.replaceChildren(...entries.map(([id,label])=>new Option(label,id)));select.value=value;}
 function processUI(){
  const names=['','Konstrukcja','Wieka i współpraca','Wymiary sekcji','Części i okucia','Uchwyty i ścianki','Zatrzaski i zawiasy'];
@@ -114,7 +115,7 @@ async function save(asNew=false){
 function showLegacy(value){pendingLegacy=structuredClone(value);$('legacy-notice').hidden=false;status('Archiwalny draft zachowany. Możesz pobrać jego oryginalny JSON lub jawnie utworzyć nowy draft w obecnych typach.',true);}
 async function load(saved){
  try{await api('wizard/preview',saved.draft);}catch(e){if(['rockpro.configurator/1','rockpro.configurator/2'].includes(saved.draft?.schema)){showLegacy(saved.draft);return false;}throw e;}
- draft=saved.draft;storage={id:saved.id??null,revision:saved.revision??0};dirty=!storage.id;pendingLegacy=null;$('legacy-notice').hidden=true;clearTimeout(timer);serial++;fill();stored();await updatePreview();return true;
+ draft=saved.draft;storage={id:saved.id??null,revision:saved.revision??0};dirty=!storage.id;document.dispatchEvent(new Event('rockpro:cad-invalidated'));pendingLegacy=null;$('legacy-notice').hidden=true;clearTimeout(timer);serial++;fill();stored();await updatePreview();return true;
 }
 function download(value,name){const url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 
@@ -152,6 +153,6 @@ async function init(){
  $('fit').onclick=()=>view?.chrome.frame();for(const [id,v]of[['open-all',100],['close-all',0]])$(id).onclick=()=>{view?.all(v);if(view)motionInputs();};
  $('export').onclick=async()=>{try{if(selectionPending())throw Error('Najpierw zastosuj wybrany typ.');await api('wizard/preview',draft);download(draft,'RockPro_koncepcja.json');}catch(e){status(e.message,true);}};
  $('import').onclick=()=>$('file').click();$('file').onchange=async()=>{try{const f=$('file').files[0];if(!f)return;if(f.size>32768)throw Error('Maksymalny rozmiar draftu to 32 KB');const value=JSON.parse(await f.text());if(!mayReplace())return;if(await load({draft:value}))status('Wczytano JSON jako nowy draft. Zapisz go, aby zachować w bazie.');}catch(e){status(e.message,true);}finally{$('file').value='';}};
- window.rockproWizard={getDraft:()=>structuredClone(draft),getStorage:()=>({...storage}),preview:()=>updatePreview(),load,save,navigate};
+ window.rockproWizard={getDraft:()=>structuredClone(draft),getStorage:()=>({...storage}),getCadState:()=>({dirty,selectionPending:selectionPending()}),preview:()=>updatePreview(),load,save,navigate};
 }
 init().catch(e=>status('Nie można uruchomić kreatora: '+e.message,true));
