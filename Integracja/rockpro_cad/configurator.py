@@ -11,7 +11,7 @@ import uuid
 from .mcp import project_store
 
 TYPES = {
-    'case': {'label': 'Skrzynia', 'description': 'Jedno górne wieko na zawiasach po jednej stronie.', 'covers': [['top', 'hinged']]},
+    'case': {'label': 'Skrzynia', 'description': 'Jedno górne wieko: otwierane na zawiasach po jednej stronie lub zdejmowane.', 'covers': [['top', 'hinged']]},
     'cabinet': {'label': 'Szafa', 'description': 'Jedna przednia powłoka: otwierana na zawiasach lub zdejmowana.', 'covers': [['front', 'hinged']]},
     'three_piece': {'label': 'Skrzynia 3-elementowa', 'description': 'Korpus, zdejmowany przód i zdejmowana góra. Przód licuje z górną pokrywą.', 'covers': [['top', 'removable'], ['front', 'removable']]},
 }
@@ -61,8 +61,6 @@ def validate(value):
             raise ValueError('Nieprawidłowa lista poprzedników pokrywy')
     if [c['face'] for c in covers] != [face for face, _ in TYPES[d['type']]['covers']]:
         raise ValueError('Ściany pokryw nie odpowiadają wybranemu typowi')
-    if d['type'] == 'case' and covers[0]['kind'] != 'hinged':
-        raise ValueError('Skrzynia wymaga jednego górnego wieka na zawiasach')
     if d['type'] == 'three_piece' and any(c['kind'] != 'removable' for c in covers):
         raise ValueError('Skrzynia 3-elementowa ma zdejmowany przód i górę')
     for i, c in enumerate(covers):
@@ -129,7 +127,7 @@ def convert_legacy(value):
         raise ValueError('Konwersja dotyczy wyłącznie archiwalnego draftu w wersji 1')
     d = copy.deepcopy(value)
     faces = [c.get('face') for c in d.get('covers', [])]
-    if faces == ['top'] and d['covers'][0].get('kind') == 'hinged':
+    if faces == ['top']:
         kind = 'case'
     elif faces == ['front']:
         kind = 'cabinet'

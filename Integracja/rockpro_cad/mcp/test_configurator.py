@@ -59,9 +59,10 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_exactly_three_fixed_types_without_subtype_or_double_front(self):
         self.assertEqual(set(c.TYPES),{'case','cabinet','three_piece'})
-        for kind in ('hinged','removable'):
-            d=concept();d['type']='cabinet';d['covers'][0].update(face='front',kind=kind)
-            self.assertEqual(len(c.preview(d)['sections']),2)
+        for type_,face in [('case','top'),('cabinet','front')]:
+            for kind in ('hinged','removable'):
+                d=concept();d['type']=type_;d['covers'][0].update(face=face,kind=kind)
+                self.assertEqual(len(c.preview(d)['sections']),2)
         d=three_piece();d['covers'][0]['kind']='hinged'
         with self.assertRaises(ValueError):c.preview(d)
         d=concept();d['subtype']='double_front'
@@ -109,8 +110,18 @@ class ConfiguratorTests(unittest.TestCase):
             with self.subTest(field=field),self.assertRaises(ValueError):c.preview(d)
         d=concept();d['internal_mm'][0]=0
         with self.assertRaises(ValueError):c.preview(d)
-        d=concept();d['covers'][0]['kind']='removable'
+        d=concept();d['covers'][0]['kind']='sliding'
         with self.assertRaises(ValueError):c.preview(d)
+
+    def test_case_removable_save_preserves_geometry_and_hinge_side(self):
+        d=concept();d['covers'][0]['hinge_edge']='low';before=c.preview(d)
+        d['covers'][0]['kind']='removable';saved=c.save_draft(d)
+        restored=c.read_draft(saved['id'])['draft'];after=c.preview(restored)
+        self.assertEqual(restored,d)
+        self.assertEqual(after['panels'],before['panels'])
+        self.assertEqual(after['sections'][1]['kind'],'removable')
+        restored['covers'][0]['kind']='hinged'
+        self.assertEqual(c.preview(restored)['sections'][1]['hinge_edge'],'low')
 
     def test_save_reload_history_and_stale_write_are_atomic(self):
         d=concept();saved=c.save_draft(d);self.assertEqual(saved['revision'],1)

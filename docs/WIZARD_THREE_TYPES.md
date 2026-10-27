@@ -7,7 +7,7 @@ Zastępuje wcześniejszy katalog typów/podtypów w kroku 1.
 
 | Typ | Sekcje i otwieranie |
 |---|---|
-| Skrzynia | Korpus i jedno górne wieko na zawiasach po jednej stronie; wybór strony przód/tył |
+| Skrzynia | Korpus i jedno górne wieko: otwierane na zawiasach po jednej stronie lub zdejmowane; wybór w kroku 2 |
 | Szafa | Korpus i jedna powłoka przednia, otwierana na zawiasach z lewej/prawej albo zdejmowana |
 | Skrzynia 3-elementowa | Korpus, zdejmowana góra i zdejmowany przód |
 
@@ -15,7 +15,7 @@ Nie ma podtypów, dwojga drzwi ani swobodnego dodawania kolejnych pokryw.
 Liczba i ściany sekcji wynikają z typu; backend sprawdza tę samą regułę co UI.
 Biblioteka siedmiu istniejących modeli pozostaje zachowana jako zbiór wzorców.
 
-W kroku 2 można nazwać sekcje, ustawić stronę zawiasów dla elementu otwieranego
+W kroku 2 można nazwać sekcje, wybrać zdejmowane wieko dla Skrzyni, ustawić stronę zawiasów dla elementu otwieranego
 oraz współpracę dwóch zdejmowanych pokryw. W kroku 3 pozostają wymiary wnętrza
 korpusu, sklejka, szczelina i osobne wysokość góry/głębokość przodu. Wysokość
 przedniej powłoki jest wynikiem powiązania, nie niezależnym wymiarem do ręcznego
@@ -65,3 +65,9 @@ Backend odmawia zapisu v2 nad archiwalnym rekordem nawet z poprawną rewizją.
   oraz wejście do głównego Studio — trzy typy, trzy sekcje wariantu
   zdejmowanego i brak selektora podtypu (`production-studio.png`).
 - CAD/native i generowanie ICS: NOT RUN, poza zakresem tej poprawki Studio.
+
+Aktualizacja: tryb „Wieko zdejmowane” w typie Skrzynia zapisuje się w drafcie
+i pokazuje odsunięcie wieka w górę bez obrotu. Powrót do zawiasów zachowuje
+wybraną stronę osi. Testy zapisu, odtworzenia i WebGL: PASS; dowody prywatne
+w `artifacts/wizard-removable-lid-20261027/`. Pełna regresja:
+`artifacts/verification/20261027T143857690685Z/`.

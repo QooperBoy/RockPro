@@ -23,8 +23,9 @@ function editors(){
   const card=document.createElement('div');card.className='cover-card';const h=document.createElement('h3');h.textContent=`Sekcja ${i+1}`;card.append(h);
   const [nl,ni]=input('Nazwa sekcji',c.label);ni.maxLength=100;ni.oninput=()=>{c.label=ni.value;changed();};card.append(nl);
   const face=document.createElement('p');face.className='hint';face.textContent='Płaszczyzna łączenia: '+options.faces[c.face];card.append(face);
-  if(draft.type==='cabinet'){
-   const [kl,ki]=select('Sposób otwierania',[['hinged','Otwierana na zawiasach'],['removable','Powłoka zdejmowana']],c.kind);ki.onchange=()=>{c.kind=ki.value;editors();changed();};card.append(kl);
+  if(draft.type==='cabinet'||draft.type==='case'){
+   const modes=draft.type==='case'?[['hinged','Wieko otwierane na zawiasach'],['removable','Wieko zdejmowane']]:[['hinged','Otwierana na zawiasach'],['removable','Powłoka zdejmowana']];
+   const [kl,ki]=select('Sposób otwierania',modes,c.kind);ki.onchange=()=>{c.kind=ki.value;editors();changed();};card.append(kl);
   }else{const kind=document.createElement('p');kind.className='hint';kind.textContent=c.kind==='hinged'?'Wieko na zawiasach po jednej stronie':'Pokrywa zdejmowana';card.append(kind);}
   if(c.kind==='hinged'){
    const [el,ei]=select(c.face==='top'?'Strona zawiasów':'Strona zawiasów powłoki przedniej',c.face==='top'?[['low','Przód'],['high','Tył']]:[['low','Lewa'],['high','Prawa']],c.hinge_edge);ei.onchange=()=>{c.hinge_edge=ei.value;changed();};card.append(el);
