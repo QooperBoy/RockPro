@@ -33,4 +33,15 @@ Dane klientów, baza SQLite, logi, środowisko Python, wygenerowane DLL i robocz
 
 Konfigurator rozmieszczenia: [LAYOUT.md](LAYOUT.md) — podgląd 3D, zapis w SQLite oraz gabaryty kopii ICS.
 
+Studio wzorców: [podglądy rodzin skrzyń](docs/ALL_REFERENCE_PREVIEWS.md) — lokalny
+interfejs przeglądarkowy z rzeczywistymi siatkami, zmianą gabarytu i ruchem
+zespołów. Uruchomienie z `Integracja`:
+
+```powershell
+.\.venv\Scripts\python.exe -m rockpro_cad.reference_studio --bundle "<pakiet wzorców>" --previews "<index.json>"
+```
+
+Prywatny pakiet modeli i indeks eksportów trzeba przekazać osobno; nie należą
+do repozytorium. Podgląd zapisuje szkic JSON i nie generuje jeszcze modelu ICS.
+
 Instrukcje dla agentów i powtarzalne sprawdzanie: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md). Audyt i kolejność dalszych poprawek: [docs/REPOSITORY_AUDIT.md](docs/REPOSITORY_AUDIT.md).

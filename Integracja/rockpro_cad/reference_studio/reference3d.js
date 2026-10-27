@@ -70,7 +70,14 @@ export class ReferenceView {
  setDimensions(values){const base=this.baselineDimensions();if(values.length!==3||values.some((v,k)=>!Number.isFinite(v)||v<base[k]*.8||v>base[k]*1.4))throw Error('Gabaryt podglądu: zakres 80–140% wzorca');this.dimensions=values;this.apply();}
  setMotion(id,value){const m=this.model.motions.find(m=>m.id===id);if(!m||!Number.isFinite(value)||value<m.min||value>m.max)throw Error('Ruch poza zakresem podglądu');this.motionValues[id]=value;this.apply();}
  reset(){this.dimensions=this.baselineDimensions();this.motionValues=Object.fromEntries(this.model.motions.map(m=>[m.id,0]));this.coverVisible=this.model.default_covers_visible??false;this.referencesVisible=false;this.apply();}
- fit(){if(!this.loaded)return;const b=this.model.baseline_bounds,size=Math.max(...this.dimensions)/1000;const center=new THREE.Vector3(...[0,1,2].map(k=>b[k]+this.dimensions[k]/2000));this.controls.target.copy(center);this.camera.position.copy(center).add(new THREE.Vector3(1.4,-2.2,1.3).multiplyScalar(size));this.controls.update();}
+ fit(){
+  if(!this.loaded)return;this.resize();const box=new THREE.Box3();
+  for(const mesh of this.meshes){if(!mesh.visible)continue;mesh.geometry.computeBoundingBox();box.union(mesh.geometry.boundingBox.clone().applyMatrix4(mesh.matrix));}
+  if(box.isEmpty())return;const sphere=box.getBoundingSphere(new THREE.Sphere());
+  const vertical=THREE.MathUtils.degToRad(this.camera.fov),horizontal=2*Math.atan(Math.tan(vertical/2)*this.camera.aspect);
+  const distance=sphere.radius/Math.sin(Math.min(vertical,horizontal)/2)*1.08;
+  this.controls.target.copy(sphere.center);this.camera.position.copy(sphere.center).add(new THREE.Vector3(1.4,-2.2,1.3).normalize().multiplyScalar(distance));this.controls.update();
+ }
  state(){return {source_sha256:this.model.source_sha256,external_mm:[...this.dimensions],motion_values:{...this.motionValues},covers_visible:this.coverVisible};}
  restore(state){if(!state||state.source_sha256!==this.model.source_sha256)return;this.dimensions=[...state.external_mm];this.coverVisible=state.covers_visible;this.motionValues=state.motion_values?{...state.motion_values}:Object.fromEntries(this.model.motions.map((m,i)=>[m.id,state.shelf_travel_mm?.[i]??0]));this.apply();}
 }

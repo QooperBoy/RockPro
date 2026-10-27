@@ -52,6 +52,8 @@ async function show3d(){
   if(!workstation)workstation=new ReferenceView($('viewport'),$('mesh-status'),(state,id)=>previewDrafts.set(id,state));
   const loaded=await workstation.load(metadata.url,key);if(!loaded||variant.id!==key)return;
   if(saved)workstation.restore(saved);buildPreviewControls();refreshPreviewControls();previewBusy(false);workstation.resize();
+  const empty=workstation.model.source_empty_parts??[];$('source-warning').hidden=empty.length===0;
+  $('source-warning').textContent=empty.length?`${empty.length} elementy w źródle nie mają bryły (${[...new Set(empty.map(p=>p.name))].join(', ')}). Pozostają w rejestrze, bez zastępczej geometrii.`:'';
  }catch(e){if(variant.id===key)$('mesh-status').textContent='Nie udało się wczytać 3D: '+e.message;}
 }
 function selectVariant(id){

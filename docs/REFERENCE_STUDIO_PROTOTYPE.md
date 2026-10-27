@@ -1,9 +1,9 @@
 # Studio wzorców — pierwszy prototyp konfiguratora
 
-Aktualizacja: workstation ma teraz [interaktywny podgląd 3D](WORKSTATION_3D_PREVIEW.md)
-z rzeczywistych siatek, zmianą gabarytu i czterema wysuwanymi modułami.
-Poniższe ograniczenia dotyczą pierwszego przyrostu galerii; pozostałe rodziny
-nadal pokazują obrazy wzorców.
+Aktualizacja: wszystkie siedem wzorców ma [interaktywny podgląd 3D](ALL_REFERENCE_PREVIEWS.md)
+z rzeczywistych siatek, zmianą gabarytu i niezależnymi ruchami zespołów.
+Workstation zachowuje cztery wysuwane moduły. Poniższy opis i wyniki testów
+dokumentują historyczny pierwszy przyrost galerii; aktualne dowody są w podlinkowanym raporcie.
 
 27.10.2026. Podstawa: siedem odczytanych modeli, pogrupowanych w sześć kandydatów
 rodzin. M01/M07 to dwa oddzielne warianty ekranów, bez zatwierdzenia zamienności.

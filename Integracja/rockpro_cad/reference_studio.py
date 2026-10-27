@@ -27,8 +27,13 @@ def load_preview(folder, catalog, model_key='M04'):
         raise ValueError('Preview key does not match selected variant')
     if model['source_sha256'] != reference['source_sha256'] or model['inventory_sha256'] != reference['inventory_sha256']:
         raise ValueError('Preview is bound to another reference revision')
-    if len(model.get('elements', [])) != reference['part_count']:
+    elements, empty_parts = model.get('elements', []), model.get('source_empty_parts', [])
+    if len(elements)+len(empty_parts) != reference['part_count']:
         raise ValueError('Preview does not account for every inventoried part')
+    paths = [r['path'] for r in elements] + [r['path'] for r in empty_parts]
+    if (len(set(paths)) != len(paths) or set(paths) != set(reference['part_paths'])
+            or {r['path'] for r in empty_parts} != set(reference['source_empty_paths'])):
+        raise ValueError('Preview part identity or source-empty accounting mismatch')
     if hashlib.sha256((folder / 'geometry.bin').read_bytes()).hexdigest() != model['geometry_sha256']:
         raise ValueError('Preview geometry checksum mismatch')
     return folder, model

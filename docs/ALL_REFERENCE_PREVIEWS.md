@@ -1,4 +1,4 @@
-# Wspólny viewer rodzin — checkpoint wdrożenia
+# Wspólny podgląd 3D siedmiu wzorców
 
 27.10.2026. Rozwinięcie [workstation](WORKSTATION_3D_PREVIEW.md) na siedem wzorców.
 To podgląd koncepcji; nie generator parametrycznych ICS ani odbiór technologii.
@@ -17,7 +17,7 @@ blokują import. Starszy zapis czterech wysuwów workstation pozostaje obsługiw
 Gabaryt dotyczy siatek sklejki w zapisanym stanie wzorca, nie potwierdzonego
 światła wnętrza ani transportowego gabarytu zamkniętego.
 
-Zamierzone moduły podglądu, przypisane jawnymi ścieżkami do inwentarzy:
+Wdrożone moduły podglądu, przypisane jawnymi ścieżkami do inwentarzy:
 
 | Wzorzec | Moduły |
 |---|---|
@@ -54,8 +54,35 @@ Kontrola anulowania działa przed następną częścią i nie przerywa trwające
 wywołania SDK. Nie wolno zwalniać blokady ani zabijać klienta jako pozornego
 anulowania, gdy kod nadal wykonuje się w hoście.
 
-W tym checkpointcie pełna regeneracja danych pozostałych modeli oraz próba
-WebGL wszystkich siedmiu pozostają W TOKU. Nie przedstawiać jej jako zakończonej.
+Źródła M03 i M06 mają po cztery węzły `17251S` bez bryły: natywny odczyt
+potwierdza zero ścian i zerowy obrys, zgodny z wcześniejszym inwentarzem.
+Takie węzły pozostają w rejestrze `source_empty_parts`; interfejs pokazuje
+komunikat, zamiast tworzyć zastępczy zamek. Ładowanie sprawdza dokładne ścieżki
+wszystkich części, także pustych. Każdy inny brak siatki blokuje podgląd.
+
+Limity konwertera rozdzielają tekst eksportu od bufora GPU: do 768 MiB JSON
+łącznie, 128 MiB na plik oraz 256 MiB wynikowej geometrii Float32. M01 ma około
+554 MB tekstu i 1,53 mln trójkątów; dawny wspólny limit 512 MiB odrzucał ten
+poprawny eksport. Nowe ograniczenie nadal blokuje zbyt duży bufor podglądu.
+
+Odczyt i konwersja wszystkich siedmiu wzorców są zakończone. M02 i M04 korzystają
+z kompletnych eksportów Web Viewer; pozostałe pięć z odczytu siatek jądra.
+Wszystkie 2829 węzłów części są rozliczone: 2821 siatek i osiem potwierdzonych
+pustych węzłów źródła. Ponowne obliczenie SHA wszystkich siedmiu oryginałów
+po zakończeniu potwierdziło ich niezmienność.
+
+| Wzorzec | Siatki | Puste węzły źródła |
+|---|---:|---:|
+| M01 — 85_SMHX | 433 | 0 |
+| M02 — Wing Compact | 162 | 0 |
+| M03 — ChainMaster | 387 | 4 |
+| M04 — Workstation | 453 | 0 |
+| M05 — pięć wkładów | 434 | 0 |
+| M06 — Martin | 569 | 4 |
+| M07 — Hisense | 383 | 0 |
+
+Podgląd zachowuje zapisane pozycje dodatkowych zespołów źródła. Nie odgaduje
+roli anonimowych części ani nie przenosi automatycznie urządzenia do wnętrza.
 
 ## Uruchomienie gotowych pakietów
 
@@ -70,12 +97,23 @@ wewnątrz wybranej biblioteki. Serwer sprawdza SHA źródeł, inwentarzy i bufor
 Nie publikuje plików ICS ani dowolnych katalogów. Starszy parametr `--workstation`
 nadal działa. Prywatne indeksy i geometria pozostają poza Gitem.
 
-## Dowody checkpointu
+## Wyniki sprawdzeń — 27.10.2026
 
-- PASS: 9 testów Python/HTTP, w tym różne hashe M01/M07 i listy ruchów.
+- PASS: 10 testów Python/HTTP, w tym różne hashe M01/M07, listy ruchów
+  i odmowa ukrycia brakującej geometrii jako pustego elementu źródła.
 - PASS: reguły geometrii JS oraz składnia modułów.
-- PASS: przełączenie Wing → workstation → Wing, zachowanie ruchu czapki,
-  cztery suwaki workstation i jeden kontekst WebGL. Pozostałe modele: w toku.
+- PASS: wszystkie siedem modeli w rzeczywistym WebGL; gabaryt +10%, brak
+  skalowania sztywnych okuć, każdy ruch osobno oraz dokładny powrót macierzy.
+- PASS: eksport i ponowny import JSON każdego wariantu; M01/M07 zachowują
+  oddzielne wartości suwaków; szybkie przełączanie pozostawia najnowszy model
+  i jeden canvas. Brak błędów JavaScript, układ 430 px bez poziomego przepełnienia.
+- PASS: pełny `scripts/Verify.ps1`: repository, backend, parts, core-design,
+  core-contracts, qa, harness. Pierwsza próba core-contracts podczas eksportu
+  została zablokowana przez działający mutex CAD; pełna próba po zwolnieniu
+  wykonawcy przeszła bez zmiany ochrony współbieżności.
 - Native resize/save/reopen: NOT RUN; bieżące zmiany dotyczą podglądu.
 
-Raporty i dane robocze: `artifacts/family-3d-20261027/`.
+Raporty i dane robocze: `artifacts/family-3d-20261027/`: `browser-report.json`,
+`final-dataset-report.json`, `index.json` i obrazy `Mxx-browser.png` oraz
+`Mxx-open-browser.png`. Pełna regresja: `artifacts/verification/20261027T121939050113Z/`.
+Są to lokalne prywatne dowody; nie dodajemy ich do repozytorium.

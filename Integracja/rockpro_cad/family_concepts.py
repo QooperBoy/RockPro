@@ -64,6 +64,8 @@ def build_catalog(bundle):
                     images[name] = image
                     image_routes[view] = 'images/' + name
             variants.append(dict(id=key, label=Path(row['name']).stem, part_count=count,
+                                 part_paths=[n['source_path'] for n in nodes if n['type']=='Z_ELEMENT_PART'],
+                                 source_empty_paths=[n['source_path'] for n in nodes if n['type']=='Z_ELEMENT_PART' and n.get('body_bounds_local_m')==[0]*6],
                                  source_sha256=row['sha256'], inventory_sha256=sha(raw),
                                  groups=groups, images=image_routes,
                                  geometry_dimensions='unmapped', cad_generation=False))

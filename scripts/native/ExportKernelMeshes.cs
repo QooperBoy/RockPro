@@ -19,8 +19,16 @@ try{
  foreach(var item in (object[])r["parts"]){
   if(File.Exists(Path.Combine(folder,"cancel")))throw new OperationCanceledException("Cancelled before next part");var spec=(Dictionary<string,object>)item;int id=Convert.ToInt32(spec["node_id"]),meshId=Convert.ToInt32(spec["mesh_id"]);var part=(IZPart)utility.GetElementById(id);var element=(IZElement)part;
   if(element.Name!=(string)spec["name"])throw new Exception("Part identity mismatch");
-  object faceIdsRaw;var meshes=(Array)part.GetSpecifiedPolyMeshes(0.0001f,15f,10f,true,out faceIdsRaw);var faceIds=Num(faceIdsRaw);
-  var vertices=new List<double>();var normals=new List<double>();var colors=new List<object>();var body=part.GetBody(true);var bounds=Num(body.GetBoundingBox());int partColor=part.SurfaceFinish.Color;uint partTriangles=0;
+  var body=part.GetBody(true);var bounds=Num(body.GetBoundingBox());
+  if(body.GetFacesCount()==0&&bounds.All(x=>x==0)){
+   files.Add(new{file=(string)null,node_id=id,mesh_id=meshId,source_empty=true,faces=0,bounds=bounds});sequence++;
+   File.WriteAllText(Path.Combine(folder,"progress.json"),J.Serialize(new{completed=sequence,total=((object[])r["parts"]).Length}));continue;
+  }
+  object faceIdsRaw;object rawMeshes=part.GetSpecifiedPolyMeshes(0.0001f,15f,10f,true,out faceIdsRaw);var meshes=rawMeshes as Array;
+  if(meshes==null){try{object facetMeshes;((IZFacetPart)part).GetPolyMeshes(out facetMeshes);meshes=facetMeshes as Array;}catch(COMException){}}
+  if(meshes==null)throw new Exception("No readable mesh array for part "+id);
+  var faceIds=faceIdsRaw is Array?Num(faceIdsRaw):Enumerable.Repeat(-1.0,meshes.Length).ToArray();
+  var vertices=new List<double>();var normals=new List<double>();var colors=new List<object>();int partColor=part.SurfaceFinish.Color;uint partTriangles=0;
   for(int face=0;face<meshes.Length;face++){
    var mesh=(IZPolyMesh)meshes.GetValue(face);uint vertexCount,triCount;object coords,norms,vertexColors,uv,uvw,triangles;
    mesh.GetAllTriangulatedFacetInfo(out triCount);partTriangles+=triCount;if(partTriangles>2000000)throw new Exception("Preview triangle budget exceeded: "+id);mesh.GetAllVertexData(out vertexCount,out coords,out norms,out vertexColors,out uv,out uvw);mesh.GetAllTriangulatedFacetData(out triCount,out triangles);

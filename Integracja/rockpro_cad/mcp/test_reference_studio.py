@@ -93,7 +93,7 @@ class ReferenceStudioTests(unittest.TestCase):
         folder.mkdir()
         ref = next(v for f in self.catalog['families'] for v in f['variants'] if v['id'] == 'M04')
         model = dict(kind='workstation_native_preview', units='m', source_sha256=ref['source_sha256'],
-                     inventory_sha256=ref['inventory_sha256'], geometry_sha256=sha(b'original'), elements=[{}])
+                     inventory_sha256=ref['inventory_sha256'], geometry_sha256=sha(b'original'), elements=[dict(path='root/2')])
         (folder / 'model.json').write_text(json.dumps(model), encoding='utf-8')
         (folder / 'geometry.bin').write_bytes(b'original')
         self.assertEqual(load_preview(folder, self.catalog)[1], model)
@@ -118,6 +118,20 @@ class ReferenceStudioTests(unittest.TestCase):
         d['preview']['motion_values']['unknown_part'] = 10
         with self.assertRaises(ValueError):
             validate_draft(d, self.catalog)
+
+    def test_source_empty_nodes_are_explicit_and_cannot_hide_missing_geometry(self):
+        folder = self.root / 'empty-mesh'
+        folder.mkdir()
+        ref = next(v for f in self.catalog['families'] for v in f['variants'] if v['id']=='M04')
+        model = dict(kind='reference_native_preview',model_key='M04',units='m',
+                     source_sha256=ref['source_sha256'],inventory_sha256=ref['inventory_sha256'],
+                     geometry_sha256=sha(b''),elements=[],source_empty_parts=[dict(path='root/2')])
+        (folder/'model.json').write_text(json.dumps(model),encoding='utf-8')
+        (folder/'geometry.bin').write_bytes(b'')
+        with self.assertRaisesRegex(ValueError,'accounting mismatch'):
+            load_preview(folder,self.catalog)
+        ref['source_empty_paths']=['root/2']
+        self.assertEqual(load_preview(folder,self.catalog)[1],model)
 
     def test_dimensions_are_requirements_and_do_not_promote_cad_readiness(self):
         d = draft(self.catalog)

@@ -12,6 +12,12 @@ import re
 from pathlib import Path
 import zipfile
 
+# Native JSON includes decimal vertices and normals; its size is much larger
+# than the packed Float32 buffer. Keep separate limits for parsing and WebGL.
+MAX_EXPORT_BYTES = 768 * 1024 * 1024
+MAX_MEMBER_BYTES = 128 * 1024 * 1024
+MAX_GEOMETRY_BYTES = 256 * 1024 * 1024
+
 
 def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -46,8 +52,10 @@ def convert(export, receipt, inventory, mapping, output):
                 raise ValueError('Missing mapped shelf path')
     rows = []
     by_mesh = {}
+    empty_parts = []
     with zipfile.ZipFile(export) as archive:
-        if sum(x.file_size for x in archive.infolist()) > 512 * 1024 * 1024:
+        if (sum(x.file_size for x in archive.infolist()) > MAX_EXPORT_BYTES
+                or any(x.file_size > MAX_MEMBER_BYTES for x in archive.infolist())):
             raise ValueError('Export exceeds preview budget')
         tree = json.loads(archive.read('tree.json'))
         def walk(node, parent, ancestors):
@@ -67,6 +75,16 @@ def convert(export, receipt, inventory, mapping, output):
             walk(top, 'root', [])
         if len(by_mesh) != sum(r['type'] == 'Z_ELEMENT_PART' for r in inv['rows']):
             raise ValueError('Export tree does not account for all inventoried parts')
+        empty_ids = set()
+        for item in proof.get('source_empty_parts', []):
+            mesh_id = item['mesh_id']
+            if mesh_id not in by_mesh or mesh_id in empty_ids:
+                raise ValueError('Invalid empty-part accounting')
+            node, path, _ = by_mesh[mesh_id]
+            if node['id'] != item['node_id'] or nodes[path].get('bounds_local_m') != [0]*6 or item.get('faces') != 0:
+                raise ValueError('Empty part not confirmed by source inventory and native read')
+            empty_ids.add(mesh_id)
+            empty_parts.append(dict(node_id=node['id'], path=path, name=nodes[path]['name']))
         output.mkdir(parents=True, exist_ok=False)
         seen = set()
         with (output / 'geometry.bin').open('xb') as stream:
@@ -115,13 +133,15 @@ def convert(export, receipt, inventory, mapping, output):
                     bgr = int(g['c'], 16)
                     materials.append(dict(count=g['t'], color=((bgr & 255) << 16) | (bgr & 0xff00) | ((bgr >> 16) & 255)))
                 offset = stream.tell()
+                if offset + len(vertices)*8 > MAX_GEOMETRY_BYTES:
+                    raise ValueError('Packed geometry exceeds WebGL preview budget')
                 array('f', vertices + normals).tofile(stream)
                 rows.append(dict(node_id=node['id'], path=path, name=nodes[path]['name'], matrix=matrix,
                                  offset=offset, floats=len(vertices), materials=materials, bounds=bounds,
                                  policy=policy, resize_axes=axes, rigid_group=rigid_group,
                                  shelf_id=shelf_id, motion_ids=motion_ids, cover=cover, reference_only=reference_only,
                                  external_panel=path in annotation['external_panel_paths']))
-    if seen != set(by_mesh):
+    if seen != set(by_mesh)-empty_ids:
         raise ValueError('Missing exported mesh; preview cannot silently omit geometry')
     external = [r['bounds'] for r in rows if r['external_panel']]
     if not external:
@@ -149,14 +169,14 @@ def convert(export, receipt, inventory, mapping, output):
     model = dict(schema_version=1, kind='workstation_native_preview' if legacy else 'reference_native_preview', units='m', elements=rows,
                  source_sha256=proof['source_sha256'], inventory_sha256=sha(inventory),
                  export_sha256=sha(export), geometry_sha256=sha(output / 'geometry.bin'),
-                 baseline_bounds=baseline, group_bounds=group_bounds, shelves=shelves,
+                 baseline_bounds=baseline, group_bounds=group_bounds, shelves=shelves, source_empty_parts=empty_parts,
                  shelf_axis=annotation.get('shelf_axis', [0,-1,0]), motions=motion_contract,
                  model_key=annotation.get('model_key', 'M04'), default_covers_visible=annotation.get('default_covers_visible', False),
                  mapping_status='preview_mapping',
                  physical_stroke_approved=False, production_approved=False,
                  description='Real native meshes; dimensions deform a concept preview, not CAD features.')
     (output / 'model.json').write_text(json.dumps(model, ensure_ascii=False), encoding='utf-8')
-    return dict(mesh_count=len(rows), shelves=shelves,
+    return dict(mesh_count=len(rows), source_empty_count=len(empty_parts), shelves=shelves,
                 external_mm=[round(1000*(baseline[k+3]-baseline[k]), 3) for k in range(3)])
 
 
