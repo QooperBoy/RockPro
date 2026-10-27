@@ -1,0 +1,12 @@
+// Shared product navigation. Wizard steps are a separate, contextual level.
+const page=document.body.dataset.studioPage;
+const sidebar=document.createElement('aside');sidebar.className='app-sidebar';sidebar.setAttribute('aria-label','RockPro Studio');
+const brand=document.createElement('a');brand.className='app-brand';brand.href='wizard.html';brand.innerHTML='<strong>ROCK<span>PRO</span></strong><small>STUDIO</small>';sidebar.append(brand);
+const nav=document.createElement('nav');nav.className='app-navigation';nav.setAttribute('aria-label','Nawigacja aplikacji');
+for(const [id,url,label,path]of [['wizard','wizard.html','Konfigurator','m3 7 9-4 9 4v10l-9 4-9-4zM3 7l9 4 9-4M12 11v10'],['library','./','Biblioteka wzorców','M3 4h7v7H3zM14 4h7v7h-7zM3 15h7v6H3zM14 15h7v6h-7z']]){const a=document.createElement('a');a.href=url;a.dataset.appPage=id;if(id===page)a.setAttribute('aria-current','page');const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','1.6');svg.setAttribute('aria-hidden','true');const p=document.createElementNS(svg.namespaceURI,'path');p.setAttribute('d',path);svg.append(p);a.append(svg,document.createTextNode(label));nav.append(a);}sidebar.append(nav);
+const steps=document.getElementById('steps');if(steps){const title=document.createElement('p');title.className='app-section-title';title.textContent='ETAPY PROJEKTU';sidebar.append(title,steps);}
+if(page==='library'){const back=document.createElement('a');back.href='wizard.html';back.className='back-project';back.textContent='← Wróć do projektu';sidebar.append(back);}
+const footer=document.createElement('small');footer.className='app-sidebar-footer';footer.textContent='Przestrzeń robocza · lokalnie';sidebar.append(footer);document.body.prepend(sidebar);
+for(const link of sidebar.querySelectorAll('a'))link.addEventListener('click',()=>document.dispatchEvent(new CustomEvent('rockpro:before-navigation')));
+
+if(page==='wizard'){const mobile=document.createElement('select');mobile.className='mobile-step';mobile.setAttribute('aria-label','Przejdź do etapu projektu');for(const b of document.querySelectorAll('#steps button'))mobile.append(new Option(b.dataset.step+'. '+b.querySelector('span:last-child').textContent,b.dataset.step));mobile.onchange=()=>document.dispatchEvent(new CustomEvent('rockpro:navigate-step',{detail:Number(mobile.value)}));document.querySelector('.process-progress').append(mobile);}

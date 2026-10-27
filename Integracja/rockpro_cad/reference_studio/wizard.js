@@ -7,6 +7,24 @@ import {PlacementView} from './placement3d.js';
 const $=id=>document.getElementById(id),token=location.pathname.split('/').filter(Boolean)[0];
 let options,draft,storage={id:null,revision:0},step=1,view,timer,serial=0,dirty=false,pendingLegacy=null,partsPicker=null,placementEditor=null,placementView=null,closureEditor=null,partsCatalog;
 const localKey='rockpro.configurator.recovery.v3';
+const uiKey='rockpro.studio.context.'+token;
+function rememberContext(){
+ if(!draft||!view?.model)return;stored();
+ try{sessionStorage.setItem(uiKey,JSON.stringify({name:draft.name,project:storage.id,step,position:view.camera.position.toArray(),target:view.controls.target.toArray(),motion:view.values,placement:placementEditor.selected,closure:closureEditor.selected,part:placementEditor.part,closurePart:closureEditor.part,filters:{search:partsPicker.search.value,category:partsPicker.category.value,source:partsPicker.source.value,only:partsPicker.only.checked}}));}catch{}
+}
+function restoreContext(){
+ try{const c=JSON.parse(sessionStorage.getItem(uiKey));if(!c||c.name!==draft.name||c.project!==storage.id)return;
+  navigate(Number.isInteger(c.step)?c.step:1);
+  if(c.part&&draft.hardware.some(r=>r.part_id===c.part)){placementEditor.part=c.part;placementEditor.render();}
+  if(c.closurePart&&draft.hardware.some(r=>r.part_id===c.closurePart)){closureEditor.part=c.closurePart;closureEditor.render();}
+  if(c.placement)placementEditor.selectGroup(c.placement);if(c.closure)closureEditor.selectGroup(c.closure);
+  const vector=a=>Array.isArray(a)&&a.length===3&&a.every(x=>typeof x==='number'&&Number.isFinite(x)&&Math.abs(x)<1e6);
+  if(vector(c.position)&&vector(c.target)&&Math.hypot(...c.position.map((x,k)=>x-c.target[k]))>.001){view.camera.position.fromArray(c.position);view.controls.target.fromArray(c.target);view.controls.update();}
+  for(let pass=0;pass<draft.covers.length;pass++)for(const [id,value]of Object.entries(c.motion??{})){if(view.values[id]!==undefined&&typeof value==='number'&&value>=0&&value<=100)try{view.setMotion(id,value);}catch{}}motionInputs();
+  if(c.filters){partsPicker.search.value=String(c.filters.search??'');partsPicker.category.value=c.filters.category??'';partsPicker.source.value=c.filters.source??'';partsPicker.only.checked=c.filters.only===true;partsPicker.render();}
+ }catch{}
+}
+
 const labels={top:'Wieko górne',front:'Klapa przednia',rear:'Klapa tylna',left:'Pokrywa lewa',right:'Pokrywa prawa'};
 function cover(face='top',kind='hinged'){return {id:crypto.randomUUID(),label:labels[face],face,depth_mm:face==='top'?45:40,kind,hinge_edge:'high',requires:[],height_override:false};}
 function fresh(){return {schema:'rockpro.configurator/3',name:'Nowa skrzynia',type:'case',internal_mm:[600,500,350],thickness_mm:9.8,cooperation:'independent',covers:[cover()],hardware:[],placements:[]};}
@@ -18,7 +36,7 @@ function changed(){dirty=true;placementView?.setEnabled(false);saveLabel();store
 function selectOptions(select,entries,value){select.replaceChildren(...entries.map(([id,label])=>new Option(label,id)));select.value=value;}
 function processUI(){
  const names=['','Konstrukcja','Wieka i współpraca','Wymiary sekcji','Części i okucia','Uchwyty i ścianki','Zatrzaski i zawiasy'];
- $('process-caption').textContent='Etap '+step+' z 6 · '+names[step];$('process-progress').value=step;
+ $('process-caption').textContent='Etap '+step+' z 6 · '+names[step];$('process-progress').value=step;const mobileStep=document.querySelector('.mobile-step');if(mobileStep)mobileStep.value=String(step);
  for(const b of $('steps').children){b.setAttribute('aria-current',Number(b.dataset.step)===step?'step':'false');b.classList.toggle('earlier',Number(b.dataset.step)<step);}
  if(view?.model)view.chrome.setContext(step,view.model);
 }
@@ -106,7 +124,8 @@ async function init(){
  placementEditor=new PlacementEditor($('placement-editor'),partsCatalog,()=>draft,changed,id=>placementView?.select(id),id=>placementView?.setPart(id),message=>status(message));
  closureEditor=new ClosureEditor($('closure-editor'),partsCatalog,()=>draft,changed,id=>placementView?.select(id));
  draft=fresh();try{const recovery=JSON.parse(localStorage.getItem(localKey));if(recovery?.draft){await api('wizard/preview',recovery.draft);draft=recovery.draft;storage=recovery.storage;dirty=recovery.dirty;}}catch{}
- fill();await updatePreview();await refreshList();
+ fill();await updatePreview();await refreshList();restoreContext();
+ window.addEventListener('pagehide',rememberContext);document.addEventListener('rockpro:before-navigation',rememberContext);document.addEventListener('rockpro:navigate-step',e=>navigate(e.detail));
  try{if(!localStorage.getItem(localKey)){const old=JSON.parse(localStorage.getItem('rockpro.configurator.recovery.v2')||localStorage.getItem('rockpro.configurator.recovery.v1'));if(old?.draft)showLegacy(old.draft);}}catch{}
  $('type').onchange=()=>status('Wybrany typ zostanie zastosowany przyciskiem „Zastosuj typ” lub „Dalej”.');
  $('apply-type').onclick=()=>{draft.type=$('type').value;draft.covers=options.types[draft.type].covers.map(([face,kind])=>cover(face,kind));draft.cooperation='independent';fill();changed();};

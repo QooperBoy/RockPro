@@ -1,4 +1,5 @@
 import * as THREE from './vendor/three.module.min.js';
+import {ViewportGizmo} from './vendor/three-viewport-gizmo.js';
 import {stopOrbitMotion} from './scene-controls.js';
 
 const paths={
@@ -38,14 +39,22 @@ export class ViewportUI{
   this.helpPanel=node('div','viewport-help');this.helpPanel.hidden=true;this.helpPanel.id='viewport-help';this.help.setAttribute('aria-controls',this.helpPanel.id);
   const title=node('strong',null,'Sterowanie w przestrzeni 3D');this.helpPanel.append(title);
   for(const [keys,meaning]of [['Środkowy przycisk','Obracanie modelu'],['Prawy przycisk','Przesuwanie widoku'],['Rolka','Przybliżanie / oddalanie'],['Lewy przycisk','Wybór i rozmieszczanie części'],['F / 0','Dopasuj / widok przestrzenny'],['1 / 2 / 3','Przód / prawa / góra'],['Esc','Anuluj wstawianie i zamknij pomoc']]){const row=node('div');row.append(node('kbd',null,keys),node('span',null,meaning));this.helpPanel.append(row);}this.host.append(this.helpPanel);
-  this.compass=node('div','view-compass');this.compass.setAttribute('role','group');this.compass.setAttribute('aria-label','Kompas — wybór widoku');this.axisButtons=[];
-  this.axisLines=node('div','compass-lines');this.compass.append(this.axisLines);
-  for(const [key,d]of Object.entries(directions)){const b=node('button','compass-axis axis-'+d.color,d.short);b.type='button';b.dataset.view=key;b.setAttribute('aria-label','Widok: '+d.name);b.title=d.name;b.onclick=()=>this.snap(key);const line=node('i','axis-line axis-'+d.color);this.axisLines.append(line);this.compass.append(b);this.axisButtons.push({key,d,b,line});}
-  this.compassLabel=node('select','compass-label');this.compassLabel.setAttribute('aria-label','Ustaw widok kamery');this.compassLabel.append(new Option('Widok 3D','iso'),...Object.entries(directions).map(([key,d])=>new Option(d.name,key)));this.compassLabel.onchange=()=>this.snap(this.compassLabel.value);this.compass.append(this.compassLabel);this.host.append(this.compass);
+  THREE.Object3D.DEFAULT_UP.set(0,0,1);
+  this.gizmo=new ViewportGizmo(view.camera,view.renderer,{type:'cube',radius:.03,container:this.host,size:128,placement:'top-right',offset:{top:15,right:15},animated:!this.reduced,speed:1.5,id:'view-cube',className:'standard-view-cube',
+   x:{label:'PRAWA',scale:1,border:{size:1,color:0xcad4ce},color:0xf1f4f2,hover:{color:0xf4cfaa,scale:1}},nx:{label:'LEWA',scale:1,color:0xf1f4f2,hover:{color:0xf4cfaa,scale:1}},
+   y:{label:'TYŁ',scale:1,color:0xf1f4f2,hover:{color:0xf4cfaa,scale:1}},ny:{label:'PRZÓD',scale:1,color:0xf1f4f2,hover:{color:0xf4cfaa,scale:1}},
+   z:{label:'GÓRA',scale:1,color:0xf1f4f2,hover:{color:0xf4cfaa,scale:1}},nz:{label:'DÓŁ',scale:1,color:0xf1f4f2,hover:{color:0xf4cfaa,scale:1}},
+   background:{enabled:false},font:{family:'Segoe UI,Arial',weight:600},corners:{enabled:true,opacity:0,color:0xc8d3cc,hover:{color:0xdb681f,opacity:1}},edges:{enabled:true,opacity:0,hover:{color:0xdb681f,opacity:1}}});
+  this.gizmo.attachControls(view.controls);
+  this.gizmo.addEventListener('start',()=>{if(this.tween){view.controls.enableDamping=this.tween.damping;this.tween=null;}document.dispatchEvent(new CustomEvent('rockpro:stop-placement'));view.controls.enabled=false;});
+  document.getElementById('view-cube').setAttribute('aria-label','Kostka widoków — kliknij ścianę, krawędź lub narożnik');
+  this.cubeMenu=node('div','cube-menu');this.compassLabel=node('select','cube-view-select');this.compassLabel.setAttribute('aria-label','Ustaw widok kamery');this.compassLabel.append(new Option('Widok 3D','iso'),...Object.entries(directions).map(([key,d])=>new Option(d.name,key)));this.compassLabel.onchange=()=>this.snap(this.compassLabel.value);this.cubeMenu.append(this.compassLabel);this.host.append(this.cubeMenu);
+  this.cubeHome=node('button','cube-home');this.cubeHome.type='button';this.cubeHome.setAttribute('aria-label','Widok przestrzenny');this.cubeHome.title='Widok przestrzenny';this.cubeHome.append(icon('home'));this.cubeHome.onclick=()=>this.snap('iso');this.host.append(this.cubeHome);
+  window.addEventListener('scroll',()=>this.gizmo.domUpdate(),{passive:true});
   this.hud=node('div','viewport-hud');this.hud.append(icon('box'),node('span',null,'Podgląd koncepcji'));this.hudText=this.hud.lastChild;this.host.append(this.hud);
   this.selection=node('div','viewport-selection');this.selection.hidden=true;this.selection.setAttribute('role','status');this.selectionText=node('span');this.selection.append(icon('select'),this.selectionText);const finish=node('button',null,'Zakończ · Esc');finish.onclick=()=>document.dispatchEvent(new CustomEvent('rockpro:stop-placement'));this.selection.append(finish);this.host.append(this.selection);
   document.addEventListener('keydown',e=>{if(e.target.closest('input,select,textarea,[contenteditable="true"]')||e.ctrlKey||e.metaKey||e.altKey)return;if(e.key==='Escape'){for(const b of this.toolbar.children)b.dataset.tipHidden='true';this.helpPanel.hidden=true;this.help.setAttribute('aria-expanded','false');if(document.body.classList.contains('viewport-expanded'))this.expand.click();}else if(e.key.toLowerCase()==='f'){e.preventDefault();document.getElementById('fit').click();}else if(['0','1','2','3'].includes(e.key)){e.preventDefault();this.snap({'0':'iso','1':'front','2':'right','3':'top'}[e.key]);}else if(e.key==='?'){e.preventDefault();this.help.click();}});
-  this.host.addEventListener('pointerdown',e=>{if(e.target.closest('.viewport-tools,.view-compass'))document.dispatchEvent(new CustomEvent('rockpro:stop-placement'));});
+  this.host.addEventListener('pointerdown',e=>{if(e.target.closest('.viewport-tools,.standard-view-cube,.cube-menu,.cube-home'))document.dispatchEvent(new CustomEvent('rockpro:stop-placement'));});
  }
  frame(direction=null,animated=true){
   const v=this.view;if(!v.model)return;document.dispatchEvent(new CustomEvent('rockpro:stop-placement'));stopOrbitMotion(v.controls);
@@ -63,10 +72,11 @@ export class ViewportUI{
   if(this.tween){const t=this.tween,p=Math.min(1,(performance.now()-t.start)/260),ease=p*p*(3-2*p);v.camera.position.lerpVectors(t.from,t.to,ease);v.controls.target.lerpVectors(t.targetFrom,t.targetTo,ease);v.controls.update();if(p===1){v.controls.enableDamping=t.damping;v.controls.enabled=t.enabled;this.tween=null;}}
   if(!this.lastQ.equals(v.camera.quaternion)){
    this.lastQ.copy(v.camera.quaternion);const inv=v.camera.quaternion.clone().invert();let nearest=null,best=.985;
-   for(const {key,d,b,line}of this.axisButtons){const p=new THREE.Vector3(...d.axis).applyQuaternion(inv),x=p.x*42,y=-p.y*42;b.style.left=(64+x)+'px';b.style.top=(62+y)+'px';b.style.zIndex=String(Math.round((p.z+1)*10)+2);b.style.opacity=p.z<-.1?'.48':'1';b.classList.toggle('facing',p.z>.985);b.setAttribute('aria-pressed',String(p.z>.985));line.style.width=Math.hypot(x,y)+'px';line.style.transform=`rotate(${Math.atan2(y,x)}rad)`;if(p.z>best){best=p.z;nearest=key;}}
+   for(const [key,d]of Object.entries(directions)){const p=new THREE.Vector3(...d.axis).applyQuaternion(inv);if(p.z>best){best=p.z;nearest=key;}}
    this.compassLabel.value=nearest??'iso';
   }
  }
+ render(){this.gizmo.render();}
  setContext(step,model){const names=['','Konstrukcja','Wieka i współpraca','Wymiary','Biblioteka części','Uchwyty i ścianki','Zatrzaski i zawiasy'];this.hudText.textContent=names[step]+' · '+model.draft.internal_mm.join(' × ')+' mm wewnątrz';vLabels(this.view,this.labels);}
  setSelection(text){this.selection.hidden=!text;this.selectionText.textContent=text??'';}
 }

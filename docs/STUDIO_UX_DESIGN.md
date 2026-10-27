@@ -1,5 +1,8 @@
 # Studio — spójny interfejs i proces pracy
 
+Aktualny przyrost: [przegląd agenta UI/UX, stały sidebar i standardowa kostka](STUDIO_NAVIGATION_REVIEW.md).
+Opis punktowego kompasu poniżej przedstawia poprzedni checkpoint.
+
 27.10.2026. Cel: konstruktor operuje skrzynią, kierunkiem i częścią; nie musi
 znać identyfikatorów eksportu ani sposobu działania renderera.
 

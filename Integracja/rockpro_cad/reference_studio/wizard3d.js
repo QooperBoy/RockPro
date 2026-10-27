@@ -15,9 +15,9 @@ export class ConceptView {
   this.root=new THREE.Group();this.scene.add(this.root);this.groups=new Map();this.values={};this.faceTextures=new Map();
   this.chrome=new ViewportUI(this);
   new ResizeObserver(()=>this.resize()).observe(host);this.resize();
-  this.renderer.setAnimationLoop(()=>{this.beforeRender?.();this.controls.update();this.chrome.update();this.renderer.render(this.scene,this.camera);});
+  this.renderer.setAnimationLoop(()=>{this.beforeRender?.();this.controls.update();this.chrome.update();this.renderer.render(this.scene,this.camera);this.chrome.render();});
  }
- resize(){const w=this.host.clientWidth,h=this.host.clientHeight;if(!w||!h)return;const oldAspect=this.camera.aspect;this.renderer.setSize(w,h,false);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();if(this.model&&Math.abs(oldAspect-this.camera.aspect)>.02)this.chrome.frame(null,false);}
+ resize(){const w=this.host.clientWidth,h=this.host.clientHeight;if(!w||!h)return;const oldAspect=this.camera.aspect;this.renderer.setSize(w,h,false);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();this.chrome?.gizmo.domUpdate();if(this.model&&Math.abs(oldAspect-this.camera.aspect)>.02)this.chrome.frame(null,false);}
  setModel(model){
   const previous=this.values,hadModel=!!this.model;this.root.traverse(o=>{if(o.userData.sharedResources)return;o.geometry?.dispose();if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material?.dispose();});this.root.clear();this.groups.clear();this.model=model;
   const body=model.sections[0].size_mm.map(v=>v/1000);this.values={};
