@@ -58,3 +58,5 @@ Nowe projekty: stosuj [docs/CASE_DEFAULTS.md](docs/CASE_DEFAULTS.md): zielonkawa
 - Studio: menu ma tryby pełne/ikony/całkowicie ukryte i regulację szerokości. Ukryty podgląd 3D nie rezerwuje miejsca ani nagłówka; środkowy edytor wykorzystuje zwolnioną szerokość i responsywne kolumny. Nie przywracaj zbędnej informacji o jednym górnym wieku w kroku wyboru typu.
 
 - Studio — korekta UX: wszystkie rozmiary paneli reguluj jednakowymi uchwytami na granicach, bez osobnych range sliderów menu/wysokości. Nie przywracaj kart „Sekcje i otwieranie” ani „Status techniczny podglądu” pod modelem.
+
+- Aktualna korekta: bez przycisków Menu/Ustawienia/Podgląd 3D w nagłówku. Rozmiar, zwijanie i przywracanie realizują uchwyty granic; muszą zostać osiągalne po ukryciu panelu. W nagłówku pozostają motyw i zapis.

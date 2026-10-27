@@ -1,5 +1,15 @@
 # Studio — panele, rozmiar podglądu i tryb nocny
 
+Aktualizacja sterowania: przyciski Menu/Ustawienia/Podgląd 3D usunięte.
+Przeciągnięcie krawędzi wykonuje resize oraz snap do ikon/ukrycia. Uchwyty
+są niezależne od ukrywanego panelu i pozostają przy krawędziach do jego
+przywrócenia. Granica formularza pozwala schować formularz w lewo lub 3D
+w prawo; po ukryciu 3D uchwyt na prawym brzegu przywraca go ruchem w lewo.
+Menu przeciągnięte do małej szerokości przechodzi w ikony, dalej do ukrycia;
+uchwyt przy lewym brzegu rozwija je ponownie. Strzałki i Home nadal działają.
+PASS: trzy ukrycia/przywrócenia przeciąganiem i niezmieniony draft.
+Dowody: `artifacts/edge-only-panels-20261027/`. Starsze opisy przycisków są historyczne.
+
 Aktualny wzorzec zmiany rozmiaru: wyłącznie trzy jednakowe uchwyty na granicach
 (menu/edytor/3D), z jedną obsługą pointer capture i strzałek. Usunięto osobne
 suwaki menu i wysokości 3D. Podgląd nie zawiera kart „Sekcje i otwieranie”
