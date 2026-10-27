@@ -19,6 +19,12 @@ potwierdził rzeczywiste obrysy sklejki po zmianie wymiarów i powrocie.
 Nie wywołuj Part.Update/Assembly.Update wewnątrz niezmienionych okuć T2 w celu
 samego odświeżenia grafiki. Sprawdzaj `native13-rejected.json` i nowsze wyniki.
 Szerokość T2 pozostaje stała dla tego wariantu racka; nie skalować katalogowych okuć.
+- Organizacja nowych scen: [docs/CASE_STRUCTURE.md](docs/CASE_STRUCTURE.md).
+  Stosuj sześć grup ze wspólnego rejestru; po grupowaniu odtwórz powiązania
+  z planu i sprawdź zmianę wymiarów. Dla T1 zawias wymaga wycięcia w sklejce
+  ORAZ przerwy w profilu. Wykonuj validate_t1_machining przed CAD i kontrolę
+  rzeczywistych operacji po wykonaniu. Brak informacji o wycięciu blokuje
+  przyjęcie nowego SKU. Nie traktuj otworu L905/915 jako szablonu 27095.
 
 26.10.2026, późniejszy checkpoint: własna Scene14 w 2023 ma poprawiony montaż
 i polskie parametry; natywna zmiana wymiarów oraz powrót PASS. Czytaj
@@ -39,6 +45,7 @@ Nowe projekty: stosuj [docs/CASE_DEFAULTS.md](docs/CASE_DEFAULTS.md): zielonkawa
 
 - Uchwyty do podnoszenia: domyślnie po dwa na dwóch przeciwległych ścianach prostopadłych do ściany zawiasów. Konstruktor może wybrać po jednym, wyśrodkowanym na każdej (łącznie 2). Zapisuj handles_per_wall=1 lub 2, nie myl z liczbą łączną. Natywne pozycje muszą reagować na gabaryt; gotowych okuć nie skaluj. Szczegóły w docs/CASE_DEFAULTS.md.
 - Zachowaj strukturę Integracja: frontend wylicza położenie .venv względem DLL, worker względem pliku Python.
+- Studio, 27.10.2026: użytkownik rozszerzył liczbę uchwytów do 1–16 na ściankę w grupie, z jawnym handles_per_wall i równym rozstawem/symetrią. Domyślnie pozostaje 2 na przeciwległych bokach. Reguła 1/2 powyżej opisuje stary natywny generator T1, nie limit Studio. Rzędy zawiasów wiąż z joint_id topologii; nie pozycjonuj ich dowolnie na ścianie ani nie obiecuj wycięć/pełnego ruchu na podstawie zdjęciowego znacznika. Patrz docs/STUDIO_INTERACTION.md.
 - Setup.ps1 instaluje zależności, konfiguruje ścieżki i buduje. Parametr -InstallAddin dodatkowo rejestruje HKCU. Rejestracji nie wykonuj podczas pracy IronCAD z niezapisanymi dokumentami.
 - Nie kopiuj ścieżek autora z historycznych raportów. Uruchom configure.py w nowym położeniu paczki.
 - Przed istotną zmianą sprawdź bazowy stan odpowiednich testów; po niej uruchom adekwatne sprawdzenia według [.agents/skills/rockpro-verification/SKILL.md](.agents/skills/rockpro-verification/SKILL.md). Polecenie: powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Verify.ps1. Opcje -WithAddinBuild -WithUiChecks dodają kompilację i regresje formularzy. Wybór Pythona opisuje docs/DEVELOPMENT.md; nie utrzymuj stałej liczby testów jako bramki.
@@ -58,3 +65,19 @@ Nowe projekty: stosuj [docs/CASE_DEFAULTS.md](docs/CASE_DEFAULTS.md): zielonkawa
 - W raporcie rozróżnij kod zaimplementowany, test jednostkowy, test natywny oraz makietę bez backendu.
 - Nowa kompilacja nie oznacza nowej DLL w działającym hoście. Rejestruj i przeładowuj po bezpiecznym zamknięciu IronCAD; zachowuj dane użytkownika. Wyniki sprawdzeń oznaczaj PASS / FAIL / NOT RUN.
 
+
+- Studio, preferencja konstruktora 27.10.2026: pokazuj kompletne, pojedyncze części do montażu. Nie pokazuj źródłowych zespołów, rozrzuconych grup ani niekompletnych połówek jako gotowych części. Najpierw wyodrębnij i potwierdź kompletną jednostkę. Wielobryłowy model jednego kompletnego uchwytu/koła jest dozwolony; liczba brył nie oznacza liczby części. Zachowaj archiwalne dane i drafty, nie kasuj ich przy filtrowaniu prezentacji.
+
+- Nawigacja Studio: stały sidebar Konfigurator / Biblioteka wzorców, oddzielony od pionowych etapów projektu. Nie wracaj do odsyłacza sugerującego zewnętrzną bibliotekę. Zachowuj draft, krok, kamerę i zaznaczenie przy przejściu i powrocie. Nawigacja 3D: standardowa kostka widoków z polskimi pełnymi etykietami, nie autorski kompas punktowy. Szczegóły: docs/STUDIO_NAVIGATION_REVIEW.md.
+
+- Aktualna preferencja podglądu Studio: bez napisów na ściankach skrzyni. Kierunki wyłącznie na kompaktowej kostce widoków (96 px, mniejsze etykiety); nie przywracaj plakietek PRZÓD/TYŁ na geometrii.
+
+- Studio: utrzymuj zwijanie paneli, regulację/minimalizację 3D i przełącznik jasny/nocny w nagłówku na obu ekranach. Sprawdzaj ciasne układy i długie podpisy na desktopie oraz mobile; preferencje układu/motywu są oddzielone od draftów. Patrz docs/STUDIO_PANELS_AND_THEME.md.
+
+- Studio: menu ma tryby pełne/ikony/całkowicie ukryte i regulację szerokości. Ukryty podgląd 3D nie rezerwuje miejsca ani nagłówka; środkowy edytor wykorzystuje zwolnioną szerokość i responsywne kolumny. Nie przywracaj zbędnej informacji o jednym górnym wieku w kroku wyboru typu.
+
+- Studio — korekta UX: wszystkie rozmiary paneli reguluj jednakowymi uchwytami na granicach, bez osobnych range sliderów menu/wysokości. Nie przywracaj kart „Sekcje i otwieranie” ani „Status techniczny podglądu” pod modelem.
+
+- Aktualna korekta: bez przycisków Menu/Ustawienia/Podgląd 3D w nagłówku. Rozmiar, zwijanie i przywracanie realizują uchwyty granic; muszą zostać osiągalne po ukryciu panelu. W nagłówku pozostają motyw i zapis.
+
+- Przejścia stanów paneli Studio mają być płynne, krótkie i spójne po obu stronach; zwykły resize bez opóźnień. Respektuj prefers-reduced-motion i nie kolejkuj przerwanych animacji.

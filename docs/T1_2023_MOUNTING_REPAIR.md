@@ -1,5 +1,10 @@
 # T1 w IronCAD 2023 — montaż i polskie parametry
 
+Późniejsze uzupełnienie: [CASE_STRUCTURE.md](CASE_STRUCTURE.md) dodaje cztery
+brakujące wycięcia 27095 w tylnej sklejce, sześć grup sceny i obowiązkową
+kontrolę 24 obróbek. Odbudowa powiązań po grupowaniu oraz natywny resize/restore
+PASS. Poniższy raport 20 obróbek opisuje wcześniejszy checkpoint.
+
 26.10.2026. Naprawiono własną, niezapisaną Scene14 w IronCAD 2023 PU1 SP1
 (25.0.12.18734). Nie zapisano ICS ani nie zmieniano T1_mvp_v_4_3 w IronCAD 2027.
 Nie używano sterowania pulpitem.

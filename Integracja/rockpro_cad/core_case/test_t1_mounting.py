@@ -3,10 +3,17 @@ import unittest
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from rockpro_cad.core_case.t1_mounting import corner_pose, support_dimensions, hinge_profile_interval, SOCKET_SEAT, PARAMETERS_PL
+from rockpro_cad.core_case.t1_mounting import corner_pose, support_dimensions, hinge_profile_interval, SOCKET_SEAT, PARAMETERS_PL, HINGE_27095_OPENING
 
 
 class MountingTests(unittest.TestCase):
+    def test_27095_opening_matches_manufacturer_and_native_corner_centres(self):
+        t=HINGE_27095_OPENING
+        self.assertEqual((t['width_mm'],t['height_mm'],t['installation_depth_mm']),(79,82,8))
+        self.assertAlmostEqual(t['width_mm']/2-t['radius_mm'],28.1)
+        self.assertAlmostEqual(t['height_mm']/2-t['radius_mm'],29.6)
+        self.assertTrue(t['requires_plywood_cut'] and t['requires_profile_cut'])
+
     def test_all_corner_planes_face_case_interior(self):
         for size in [(600,500,350), (760,620,430)]:
             for top,right,rear in itertools.product((False,True),repeat=3):

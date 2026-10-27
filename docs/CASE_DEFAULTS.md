@@ -76,6 +76,13 @@ Plik końcowy: Prototyp_02_plytka_pokrywa/RockPro_EB-L630U_650x500x381_final.ics
 
 ## Uchwyty do podnoszenia — obowiązująca reguła
 
+Aktualizacja Studio 27.10.2026: konstruktor może jawnie wybrać **1–16 uchwytów
+na ściankę w grupie**, z równym rozstawem i opcjonalną symetrią. Domyślnie nadal
+2 na każdej z dwóch przeciwległych ścian. `handles_per_wall` oznacza liczbę
+na jedną ściankę. Poniższa opcja 1/2 i parametry CLI opisują osobny, dotychczasowy
+natywny generator T1; nie rozszerzono go automatycznie do wszystkich liczności.
+Szczegóły Studio: [sterowanie i linie zawiasów](STUDIO_INTERACTION.md).
+
 Domyślnie cztery całe H7159: po dwa na dwóch przeciwległych ścianach bocznych,
 prostopadłych do ściany z zawiasami. W naszym układzie zawiasy są z tyłu (Y=D),
 uchwyty na lewej i prawej ścianie (X=0 oraz X=L). Ich zewnętrzne strony mają
