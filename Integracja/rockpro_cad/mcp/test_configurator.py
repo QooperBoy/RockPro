@@ -15,10 +15,17 @@ from rockpro_cad.reference_studio import make_handler
 
 
 def concept():
-    return dict(schema='rockpro.configurator/1', name='Próba kreatora', type='case', subtype='top',
+    return dict(schema='rockpro.configurator/2', name='Próba kreatora', type='case',
                 internal_mm=[600,500,350], thickness_mm=9.8, joint_gap_mm=2,
                 cooperation='independent', covers=[dict(id='lid-a',label='Wieko',face='top',depth_mm=45,
                     kind='hinged',hinge_edge='high',requires=[],height_override=False)])
+
+
+def three_piece():
+    d=concept();d['type']='three_piece';d['covers'][0]['kind']='removable'
+    front=copy.deepcopy(d['covers'][0]);front.update(id='front',label='Przód',face='front',depth_mm=40)
+    d['covers'].append(front)
+    return d
 
 
 class ConfiguratorTests(unittest.TestCase):
@@ -36,20 +43,52 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(changed['sections'][0],model['sections'][0]);self.assertEqual(changed['draft']['internal_mm'],[600,500,350])
         self.assertFalse(changed['cad_ready'])
 
-    def test_opposing_and_split_covers_get_distinct_sections_and_joint_ids(self):
-        d=concept();d['subtype']='custom';d['covers'][0]['face']='front'
-        other=copy.deepcopy(d['covers'][0]);other.update(id='lid-b',face='front');d['covers'].append(other)
-        model=c.preview(d);a,b=model['sections'][1:]
-        self.assertEqual(a['size_mm'][0],(619.6-2)/2)
-        self.assertAlmostEqual(b['position_mm'][0]-a['position_mm'][0]-a['size_mm'][0],2)
-        self.assertEqual(len({j['id'] for j in model['joints']}),2)
-        other['face']='rear';model=c.preview(d)
-        self.assertLess(model['sections'][1]['position_mm'][1],0)
-        self.assertGreater(model['sections'][2]['position_mm'][1],519.6)
+    def test_three_piece_front_stays_flush_with_top_and_bottom_after_resize(self):
+        d=three_piece()
+        for height,top_depth,thickness,gap in [(350,45,9.8,2),(500,120,12,4),(200,30,6,.5)]:
+            with self.subTest(height=height):
+                d['internal_mm']=[800,600,height];d['thickness_mm']=thickness;d['joint_gap_mm']=gap;d['covers'][0]['depth_mm']=top_depth
+                model=c.preview(d);body,top,front=model['sections']
+                self.assertEqual(front['position_mm'][2],body['position_mm'][2])
+                self.assertAlmostEqual(front['position_mm'][2]+front['size_mm'][2],top['position_mm'][2]+top['size_mm'][2])
+                self.assertEqual(body['size_mm'][2],height+2*thickness)
+                # Actual panel extents, not merely metadata, must share the upper plane.
+                def upper(key):return max(p['center_mm'][2]+p['size_mm'][2]/2 for p in model['panels'] if p['section']==key)
+                self.assertAlmostEqual(upper(front['id']),upper(top['id']))
+                self.assertEqual(len(model['joints']),2)
+
+    def test_exactly_three_fixed_types_without_subtype_or_double_front(self):
+        self.assertEqual(set(c.TYPES),{'case','cabinet','three_piece'})
+        for kind in ('hinged','removable'):
+            d=concept();d['type']='cabinet';d['covers'][0].update(face='front',kind=kind)
+            self.assertEqual(len(c.preview(d)['sections']),2)
+        d=three_piece();d['covers'][0]['kind']='hinged'
+        with self.assertRaises(ValueError):c.preview(d)
+        d=concept();d['subtype']='double_front'
+        with self.assertRaises(ValueError):c.preview(d)
+        d=concept();d['type']='cabinet';d['covers'][0]['face']='front';other=copy.deepcopy(d['covers'][0]);other['id']='other';d['covers'].append(other)
+        with self.assertRaises(ValueError):c.preview(d)
+
+    def test_legacy_conversion_is_explicit_non_mutating_and_refuses_two_fronts(self):
+        old=three_piece();old.update(schema='rockpro.configurator/1',type='case',subtype='two_covers');old['covers'][0]['kind']='hinged'
+        before=copy.deepcopy(old);new=c.convert_legacy(old)
+        self.assertEqual(old,before);self.assertNotIn('subtype',new);self.assertEqual(new['type'],'three_piece')
+        self.assertTrue(all(x['kind']=='removable' for x in new['covers']))
+        with self.assertRaises(ValueError):c.save_draft(old)
+        saved=c.save_draft(new);self.assertEqual(saved['revision'],1)
+        # Seed a genuine old-format record, as produced before the type reduction.
+        with project_store.db() as conn:
+            conn.execute('UPDATE configurator_drafts SET payload=? WHERE id=?',(json.dumps(before),saved['id']))
+        with self.assertRaisesRegex(ValueError,'Archiwalny'):
+            c.save_draft(new,saved['id'],1)
+        self.assertEqual(c.read_draft(saved['id'])['draft'],before)
+        self.assertNotEqual(c.save_draft(new)['id'],saved['id'])
+        old['covers'][0]['face']='front'
+        with self.assertRaises(ValueError):c.convert_legacy(old)
 
     def test_dependencies_are_bound_and_cycles_are_refused(self):
-        d=concept();d['subtype']='custom';d['cooperation']='custom'
-        other=copy.deepcopy(d['covers'][0]);other.update(id='lid-b',face='front',requires=['lid-a']);d['covers'].append(other)
+        d=three_piece();d['cooperation']='custom'
+        other=d['covers'][1];other.update(id='lid-b',requires=['lid-a'])
         self.assertEqual(c.preview(d)['sections'][2]['requires'],['lid-a'])
         d['covers'][0]['requires']=['lid-b']
         with self.assertRaisesRegex(ValueError,'Cykl'):c.preview(d)
@@ -61,11 +100,11 @@ class ConfiguratorTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'odstępstwo'):c.preview(d)
         d['covers'][0]['height_override']=True
         self.assertEqual(c.preview(d)['draft']['internal_mm'],[600,500,350])
-        d['subtype']='hood';d['covers'][0].update(kind='removable',height_override=False)
+        d=three_piece();d['covers'][0]['depth_mm']=115
         self.assertTrue(c.preview(d)['sections'])
 
     def test_incompatible_subtype_and_invalid_dimensions_are_refused(self):
-        for field,value in [('type','other'),('subtype','double_front'),('thickness_mm',True),('joint_gap_mm',float('nan'))]:
+        for field,value in [('type','other'),('type','workstation'),('thickness_mm',True),('joint_gap_mm',float('nan'))]:
             d=concept();d[field]=value
             with self.subTest(field=field),self.assertRaises(ValueError):c.preview(d)
         d=concept();d['internal_mm'][0]=0

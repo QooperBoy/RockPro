@@ -45,7 +45,7 @@ Prywatny pakiet modeli i indeks eksportów trzeba przekazać osobno; nie należ�
 do repozytorium. Podgląd zapisuje szkic JSON i nie generuje jeszcze modelu ICS.
 
 Docelowy kreator: [proces w 11 krokach](docs/CUSTOM_CASE_WORKFLOW.md) — typ,
-podtyp/wieka, sekcje, katalog i rozmieszczenie części, review, CAD/snapshoty
+wieka, sekcje, katalog i rozmieszczenie części, review, CAD/snapshoty
 oraz wstępny BOM i integracja z firmowym Excelem. To specyfikacja do wdrożenia.
 
 Instrukcje dla agentów i powtarzalne sprawdzanie: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md). Audyt i kolejność dalszych poprawek: [docs/REPOSITORY_AUDIT.md](docs/REPOSITORY_AUDIT.md).
@@ -53,3 +53,6 @@ Instrukcje dla agentów i powtarzalne sprawdzanie: [docs/DEVELOPMENT.md](docs/DE
 Kreator kroków 1–3 już działa: [obsługa i zapis draftów](docs/WIZARD_STEPS_1_3.md).
 W Studio wybierz **Nowa konstrukcja**; nowy widok `wizard.html` pokazuje edytowalne
 sekcje 3D, ich współpracę i wymiary. Drafty są zapisywane z rewizjami w lokalnej SQLite.
+
+Aktualizacja kreatora: [trzy typy bez podtypów](docs/WIZARD_THREE_TYPES.md).
+Przód skrzyni 3-elementowej automatycznie licuje z górną pokrywą.

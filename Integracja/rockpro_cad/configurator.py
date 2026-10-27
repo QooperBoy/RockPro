@@ -11,26 +11,23 @@ import uuid
 from .mcp import project_store
 
 TYPES = {
-    'case': {'label': 'Skrzynia', 'subtypes': ['top', 'hood', 'two_covers', 'custom']},
-    'cabinet': {'label': 'Szafa', 'subtypes': ['front', 'double_front', 'custom']},
-    'workstation': {'label': 'Stanowisko / workstation', 'subtypes': ['top', 'front', 'custom']},
-    'suitcase': {'label': 'Walizka', 'subtypes': ['front', 'custom']},
+    'case': {'label': 'Skrzynia', 'description': 'Jedno górne wieko na zawiasach po jednej stronie.', 'covers': [['top', 'hinged']]},
+    'cabinet': {'label': 'Szafa', 'description': 'Jedna przednia powłoka: otwierana na zawiasach lub zdejmowana.', 'covers': [['front', 'hinged']]},
+    'three_piece': {'label': 'Skrzynia 3-elementowa', 'description': 'Korpus, zdejmowany przód i zdejmowana góra. Przód licuje z górną pokrywą.', 'covers': [['top', 'removable'], ['front', 'removable']]},
 }
-SUBTYPES = {'top': 'Górne wieko na zawiasach', 'hood': 'Zdejmowana czapka',
-            'two_covers': 'Górne wieko i osłona przednia', 'front': 'Jedna klapa przednia',
-            'double_front': 'Dwoje drzwi przednich', 'custom': 'Własny podział pokryw'}
-FACES = {'top': 'Góra', 'front': 'Przód', 'rear': 'Tył', 'left': 'Lewa', 'right': 'Prawa'}
+FACES = {'top': 'Góra', 'front': 'Przód'}
+
 
 
 def validate(value):
-    fields = {'schema', 'name', 'type', 'subtype', 'internal_mm', 'thickness_mm', 'joint_gap_mm', 'cooperation', 'covers'}
-    if not isinstance(value, dict) or set(value) != fields or value['schema'] != 'rockpro.configurator/1':
-        raise ValueError('Nieobsługiwany format kreatora (wymagana wersja 1)')
+    fields = {'schema', 'name', 'type', 'internal_mm', 'thickness_mm', 'joint_gap_mm', 'cooperation', 'covers'}
+    if not isinstance(value, dict) or set(value) != fields or value['schema'] != 'rockpro.configurator/2':
+        raise ValueError('Nieobsługiwany format kreatora (wymagana wersja 2, bez podtypu)')
     d = copy.deepcopy(value)
     if not isinstance(d['name'], str) or not 1 <= len(d['name'].strip()) <= 200:
         raise ValueError('Podaj nazwę draftu (1–200 znaków)')
-    if d['type'] not in TYPES or d['subtype'] not in TYPES[d['type']]['subtypes']:
-        raise ValueError('Podtyp nie pasuje do głównego typu konstrukcji')
+    if not isinstance(d['type'], str) or d['type'] not in TYPES:
+        raise ValueError('Wybierz jeden z trzech typów konstrukcji')
     def number(n, lo, hi):
         return type(n) in (float, int) and math.isfinite(n) and lo <= n <= hi
     if not isinstance(d['internal_mm'], list) or len(d['internal_mm']) != 3 or not all(number(n, 50, 10000) for n in d['internal_mm']):
@@ -40,8 +37,8 @@ def validate(value):
     if d['cooperation'] not in ('independent', 'together', 'sequence', 'custom'):
         raise ValueError('Nieznany sposób współpracy pokryw')
     covers = d['covers']
-    if not isinstance(covers, list) or not 1 <= len(covers) <= 4:
-        raise ValueError('Wybierz od jednej do czterech pokryw')
+    if not isinstance(covers, list) or len(covers) != len(TYPES[d['type']]['covers']):
+        raise ValueError('Liczba pokryw nie odpowiada wybranemu typowi')
     ids = []
     for c in covers:
         if not isinstance(c, dict) or set(c) != {'id', 'label', 'face', 'depth_mm', 'kind', 'hinge_edge', 'requires', 'height_override'}:
@@ -57,19 +54,17 @@ def validate(value):
             raise ValueError('Wysokość/głębokość pokrywy: od 2 grubości sklejki do 3000 mm')
         if type(c['height_override']) is not bool:
             raise ValueError('Odstępstwo konstruktora musi być jawne')
-        if (c['face'] == 'top' and c['kind'] == 'hinged' and d['type'] in ('case', 'workstation')
+        if (c['face'] == 'top' and c['kind'] == 'hinged' and d['type'] == 'case'
                 and c['depth_mm'] > d['internal_mm'][2]*.15 and not c['height_override']):
             raise ValueError('Górne wieko przekracza 15% wysokości korpusu. Zaznacz jawne odstępstwo konstruktora albo zmniejsz wysokość wieka.')
         if not isinstance(c['requires'], list) or len(c['requires']) != len(set(c['requires'])) or not all(isinstance(x, str) for x in c['requires']):
             raise ValueError('Nieprawidłowa lista poprzedników pokrywy')
-    expected_faces = {'top': ['top'], 'hood': ['top'], 'two_covers': ['top', 'front'], 'front': ['front'], 'double_front': ['front', 'front']}
-    if d['subtype'] != 'custom' and [c['face'] for c in covers] != expected_faces[d['subtype']]:
-        raise ValueError('Zmiana liczby lub ścian pokryw wymaga podtypu „Własny podział”')
-    if d['subtype'] == 'hood' and covers[0]['kind'] != 'removable':
-        raise ValueError('Zdejmowana czapka musi mieć tryb zdejmowany')
-    kinds = {'top': ['hinged'], 'front': ['hinged'], 'double_front': ['hinged', 'hinged'], 'two_covers': ['hinged', 'removable']}
-    if d['subtype'] in kinds and [c['kind'] for c in covers] != kinds[d['subtype']]:
-        raise ValueError('Sposób otwierania wymaga podtypu „Własny podział”')
+    if [c['face'] for c in covers] != [face for face, _ in TYPES[d['type']]['covers']]:
+        raise ValueError('Ściany pokryw nie odpowiadają wybranemu typowi')
+    if d['type'] == 'case' and covers[0]['kind'] != 'hinged':
+        raise ValueError('Skrzynia wymaga jednego górnego wieka na zawiasach')
+    if d['type'] == 'three_piece' and any(c['kind'] != 'removable' for c in covers):
+        raise ValueError('Skrzynia 3-elementowa ma zdejmowany przód i górę')
     for i, c in enumerate(covers):
         if any(x not in ids or x == c['id'] for x in c['requires']):
             raise ValueError('Poprzednik musi wskazywać inną istniejącą pokrywę')
@@ -110,6 +105,10 @@ def preview(value):
         axis, sign = axes[c['face']]; peers = [x for x in d['covers'] if x['face'] == c['face']]
         order = peers.index(c); split = 0 if axis != 0 else 1
         dims = list(size); dims[axis] = c['depth_mm']
+        if d['type'] == 'three_piece' and c['face'] == 'front':
+            # Both outer top planes and both bottom planes must coincide.
+            # Raising the front adds the top section and its joint, not base height.
+            dims[2] = size[2] + gap + d['covers'][0]['depth_mm']
         dims[split] = (size[split]-(len(peers)-1)*gap)/len(peers)
         if dims[split] < 2*t:
             raise ValueError('Zbyt wąskie skrzydło pokrywy dla tej grubości sklejki')
@@ -122,6 +121,27 @@ def preview(value):
     return dict(draft=d, panels=panels, sections=sections, joints=joints, cad_ready=False,
                 warnings=['Schemat sekcji bez okuć i tolerancji produkcyjnych. Ruchy pokazują intencję otwierania; oś rzeczywistego zawiasu wymaga doboru części.',
                           'Wymiary wnętrza są wymaganiem. Pokrywy są dodatkowymi sekcjami; nie zmniejszają korpusu.'])
+
+
+def convert_legacy(value):
+    """Explicit conversion to a NEW draft; never rewrites archived versions."""
+    if not isinstance(value, dict) or value.get('schema') != 'rockpro.configurator/1':
+        raise ValueError('Konwersja dotyczy wyłącznie archiwalnego draftu w wersji 1')
+    d = copy.deepcopy(value)
+    faces = [c.get('face') for c in d.get('covers', [])]
+    if faces == ['top'] and d['covers'][0].get('kind') == 'hinged':
+        kind = 'case'
+    elif faces == ['front']:
+        kind = 'cabinet'
+    elif len(faces) == 2 and set(faces) == {'top', 'front'}:
+        kind = 'three_piece'
+        d['covers'].sort(key=lambda c: c['face'] != 'top')
+        for cover in d['covers']:
+            cover['kind'] = 'removable'
+    else:
+        raise ValueError('Ten archiwalny układ nie pasuje do trzech obecnych typów. Oryginał pozostaje zachowany; utwórz nowy draft.')
+    d.pop('subtype', None);d.update(schema='rockpro.configurator/2', type=kind)
+    return preview(d)['draft']
 
 
 def _tables(conn):
@@ -161,7 +181,9 @@ def save_draft(value, key=None, expected_revision=0):
     payload = json.dumps(d, ensure_ascii=False, sort_keys=True, allow_nan=False)
     with project_store.db() as conn:
         _tables(conn); conn.execute('BEGIN IMMEDIATE')
-        old = conn.execute('SELECT revision FROM configurator_drafts WHERE id=?', (key,)).fetchone() if key else None
+        old = conn.execute('SELECT revision,payload FROM configurator_drafts WHERE id=?', (key,)).fetchone() if key else None
+        if old and json.loads(old['payload']).get('schema') != 'rockpro.configurator/2':
+            raise ValueError('Archiwalny draft pozostaje zachowany. Zapisz konwersję jako nowy draft.')
         if (key and old is None) or (old['revision'] if old else 0) != expected_revision:
             raise DraftConflict('Draft zmienił się w innym oknie. Wczytaj bieżącą wersję lub zapisz jako nowy.')
         key = key or uuid.uuid4().hex; revision = expected_revision+1; stamp = project_store.now()

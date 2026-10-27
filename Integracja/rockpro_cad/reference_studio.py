@@ -96,7 +96,7 @@ def make_handler(catalog, images, token, preview=None, previews=None):
             if name == 'catalog.json':
                 self.respond(200, json.dumps(catalog, ensure_ascii=False).encode('utf-8'))
             elif name == 'wizard/options':
-                self.respond(200, json.dumps(dict(types=configurator.TYPES, subtypes=configurator.SUBTYPES, faces=configurator.FACES), ensure_ascii=False).encode())
+                self.respond(200, json.dumps(dict(types=configurator.TYPES, faces=configurator.FACES), ensure_ascii=False).encode())
             elif name == 'wizard/drafts':
                 self.respond(200, json.dumps(configurator.list_drafts(), ensure_ascii=False).encode())
             elif name and name.startswith('wizard/drafts/'):
@@ -112,7 +112,7 @@ def make_handler(catalog, images, token, preview=None, previews=None):
         def do_POST(self):
             origin = self.headers.get('Origin')
             expected_origin = 'http://127.0.0.1:' + str(self.server.server_port)
-            if self.endpoint() not in ('validate', 'wizard/preview', 'wizard/save') or self.headers.get('X-RockPro-Session') != token or origin != expected_origin:
+            if self.endpoint() not in ('validate', 'wizard/preview', 'wizard/save', 'wizard/convert') or self.headers.get('X-RockPro-Session') != token or origin != expected_origin:
                 self.respond(403, b'{}')
                 return
             try:
@@ -122,6 +122,8 @@ def make_handler(catalog, images, token, preview=None, previews=None):
                 draft = json.loads(self.rfile.read(length).decode('utf-8'))
                 if self.endpoint() == 'wizard/preview':
                     receipt = configurator.preview(draft)
+                elif self.endpoint() == 'wizard/convert':
+                    receipt = configurator.convert_legacy(draft)
                 elif self.endpoint() == 'wizard/save':
                     if not isinstance(draft, dict) or set(draft) != {'draft', 'id', 'expected_revision'}:
                         raise ValueError('Nieprawidłowe polecenie zapisu')

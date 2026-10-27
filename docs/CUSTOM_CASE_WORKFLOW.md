@@ -10,12 +10,17 @@ Wdrożony pierwszy przyrost: [kreator kroków 1–3](WIZARD_STEPS_1_3.md) z graf
 pokryw, wymiarami sekcji, podglądem 3D i trwałym zapisem draftów. Pozostałe
 punkty tego dokumentu opisują docelowy zakres, nie gotową integrację.
 
+Aktualizacja zakresu: [trzy główne typy, bez podtypu](WIZARD_THREE_TYPES.md).
+Krok 1 wybiera Skrzynię, Szafę lub Skrzynię 3-elementową. Krok 2 określa
+otwieranie ich ustalonych sekcji; wcześniejsza swobodna liczba pokryw jest
+archiwalnym wymaganiem, nie opcją obecnego interfejsu.
+
 ## Nawigacja kreatora
 
 | Krok | Ekran i decyzje konstruktora | Wynik i zależności |
 |---|---|---|
-| 1 | Główny typ konstrukcji: skrzynia, szafa, stanowisko, walizka; możliwość nowej rodziny | ID rodziny i wersja reguł; jawna dostępność podglądu, planowania i adaptera CAD |
-| 2 | Podtyp, liczba wiek/drzwi/osłon, sposób i kolejność ich otwierania, zdejmowanie, zależności między sekcjami | Graf sekcji i złączy, linie podziału, kierunki ruchu, wstępne strefy zawiasów i zamków |
+| 1 | Główny typ konstrukcji: skrzynia, szafa lub skrzynia 3-elementowa | ID rodziny i wersja reguł; jawna dostępność podglądu, planowania i adaptera CAD |
+| 2 | Otwieranie ustalonych sekcji wybranego typu, strona zawiasów lub zdejmowanie i współpraca dwóch pokryw | Graf sekcji i złączy, linie podziału, kierunki ruchu, wstępne strefy zawiasów i zamków |
 | 3 | Wymagane wnętrze oraz wymiary i parametry każdej sekcji, grubości i materiały, półki, pianki i prześwity | Wymiarowany układ sekcji, wynikowy obrys sklejki i gabaryt; parametry mają polskie opisy |
 | 4 | Wybór części z biblioteki Tomka; dopuszczalne SKU i warianty | Przypięta rewizja katalogu, koszyk definicji części i lista braków danych montażowych |
 | 5 | Uchwyty: ściany, liczba na ścianę, orientacja, linia, symetria lub układ indywidualny; także wskazanie/zmiana stref zawiasów | Wystąpienia z kotwami na konkretnych ścianach, relacje rozmieszczenia i powiązane wycięcia |
