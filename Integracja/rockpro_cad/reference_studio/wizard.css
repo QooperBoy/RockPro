@@ -35,3 +35,5 @@ h1{font-size:23px;letter-spacing:-.6px;margin:24px 0 10px}h2{font-size:15px}labe
 
 /* Standard CAD cube: neutral faces, full labels, corners and edges. */
 .standard-view-cube{border-radius:8px!important;outline:none;touch-action:none}.cube-menu{position:absolute;right:18px;top:147px;width:125px;z-index:6}.cube-view-select{font-size:10px;padding:6px 8px;text-align:center;margin:0;background:#ffffffed;border-color:#d4dfd6}.cube-home{position:absolute;right:132px;top:15px;width:25px;height:25px;padding:4px;border:1px solid #d6e1d9;background:#fffffff0;z-index:6;border-radius:5px}.cube-home svg{width:15px!important;height:15px!important}@media(max-width:750px){.cube-menu{right:12px;top:145px}.cube-home{right:130px}}
+
+.cube-menu{top:114px;right:14px;width:103px}.cube-view-select{font-size:9px;padding:5px 6px}.cube-home{right:114px;width:23px;height:23px}@media(max-width:750px){.cube-menu{top:114px;right:14px}.cube-home{right:114px}}

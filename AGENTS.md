@@ -50,3 +50,5 @@ Nowe projekty: stosuj [docs/CASE_DEFAULTS.md](docs/CASE_DEFAULTS.md): zielonkawa
 - Studio, preferencja konstruktora 27.10.2026: pokazuj kompletne, pojedyncze części do montażu. Nie pokazuj źródłowych zespołów, rozrzuconych grup ani niekompletnych połówek jako gotowych części. Najpierw wyodrębnij i potwierdź kompletną jednostkę. Wielobryłowy model jednego kompletnego uchwytu/koła jest dozwolony; liczba brył nie oznacza liczby części. Zachowaj archiwalne dane i drafty, nie kasuj ich przy filtrowaniu prezentacji.
 
 - Nawigacja Studio: stały sidebar Konfigurator / Biblioteka wzorców, oddzielony od pionowych etapów projektu. Nie wracaj do odsyłacza sugerującego zewnętrzną bibliotekę. Zachowuj draft, krok, kamerę i zaznaczenie przy przejściu i powrocie. Nawigacja 3D: standardowa kostka widoków z polskimi pełnymi etykietami, nie autorski kompas punktowy. Szczegóły: docs/STUDIO_NAVIGATION_REVIEW.md.
+
+- Aktualna preferencja podglądu Studio: bez napisów na ściankach skrzyni. Kierunki wyłącznie na kompaktowej kostce widoków (96 px, mniejsze etykiety); nie przywracaj plakietek PRZÓD/TYŁ na geometrii.

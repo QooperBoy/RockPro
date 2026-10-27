@@ -22,14 +22,13 @@ const directions={front:{name:'Przód',short:'Pr',axis:[0,-1,0],color:'y'},rear:
 
 export class ViewportUI{
  constructor(view){
-  this.view=view;this.host=view.host;this.labels=true;this.lastQ=new THREE.Quaternion(0,0,0,0);this.reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  this.view=view;this.host=view.host;this.lastQ=new THREE.Quaternion(0,0,0,0);this.reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   this.toolbar=node('div','viewport-tools');this.toolbar.setAttribute('role','toolbar');this.toolbar.setAttribute('aria-orientation','vertical');this.toolbar.setAttribute('aria-label','Narzędzia widoku 3D');
   const tool=(id,name,label,action,toggle=false)=>{const b=document.getElementById(id)??node('button');b.id=id;b.type='button';b.replaceChildren(icon(name));b.setAttribute('aria-label',label);b.dataset.tooltip=label;b.title=label;b.tabIndex=this.toolbar.children.length? -1:0;if(toggle)b.setAttribute('aria-pressed','true');if(action)b.onclick=action;this.toolbar.append(b);return b;};
   this.home=tool('view-home','home','Widok przestrzenny · 0',()=>this.snap('iso'));
   tool('fit','fit','Dopasuj model · F');
   tool('open-all','open','Otwórz wszystkie wieka');tool('close-all','close','Zamknij wszystkie wieka');
   this.grid=tool('view-grid','grid','Pokaż lub ukryj siatkę',()=>{view.grid.visible=!view.grid.visible;this.grid.setAttribute('aria-pressed',String(view.grid.visible));},true);
-  this.tags=tool('view-labels','label','Pokaż lub ukryj nazwy ścianek',()=>{this.labels=!this.labels;view.root.traverse(o=>{if(o.userData.faceLabel)o.visible=this.labels;});this.tags.setAttribute('aria-pressed',String(this.labels));},true);
   this.expand=tool('view-expand','expand','Powiększ obszar roboczy',()=>{const expanded=document.body.classList.toggle('viewport-expanded');this.expand.setAttribute('aria-pressed',String(expanded));view.resize();});this.expand.setAttribute('aria-pressed','false');
   this.help=tool('view-help','help','Sterowanie i skróty · ?',()=>{this.helpPanel.hidden=!this.helpPanel.hidden;this.help.setAttribute('aria-expanded',String(!this.helpPanel.hidden));});this.help.setAttribute('aria-expanded','false');
   this.toolbar.addEventListener('focusin',e=>{for(const b of this.toolbar.children)b.tabIndex=b===e.target?0:-1;e.target.removeAttribute('data-tip-hidden');});
@@ -40,11 +39,11 @@ export class ViewportUI{
   const title=node('strong',null,'Sterowanie w przestrzeni 3D');this.helpPanel.append(title);
   for(const [keys,meaning]of [['Środkowy przycisk','Obracanie modelu'],['Prawy przycisk','Przesuwanie widoku'],['Rolka','Przybliżanie / oddalanie'],['Lewy przycisk','Wybór i rozmieszczanie części'],['F / 0','Dopasuj / widok przestrzenny'],['1 / 2 / 3','Przód / prawa / góra'],['Esc','Anuluj wstawianie i zamknij pomoc']]){const row=node('div');row.append(node('kbd',null,keys),node('span',null,meaning));this.helpPanel.append(row);}this.host.append(this.helpPanel);
   THREE.Object3D.DEFAULT_UP.set(0,0,1);
-  this.gizmo=new ViewportGizmo(view.camera,view.renderer,{type:'cube',radius:.03,container:this.host,size:128,placement:'top-right',offset:{top:15,right:15},animated:!this.reduced,speed:1.5,id:'view-cube',className:'standard-view-cube',
-   x:{label:'PRAWA',scale:1,border:{size:1,color:0xcad4ce},color:0xf1f4f2,hover:{color:0xf4cfaa,scale:1}},nx:{label:'LEWA',scale:1,color:0xf1f4f2,hover:{color:0xf4cfaa,scale:1}},
-   y:{label:'TYŁ',scale:1,color:0xf1f4f2,hover:{color:0xf4cfaa,scale:1}},ny:{label:'PRZÓD',scale:1,color:0xf1f4f2,hover:{color:0xf4cfaa,scale:1}},
-   z:{label:'GÓRA',scale:1,color:0xf1f4f2,hover:{color:0xf4cfaa,scale:1}},nz:{label:'DÓŁ',scale:1,color:0xf1f4f2,hover:{color:0xf4cfaa,scale:1}},
-   background:{enabled:false},font:{family:'Segoe UI,Arial',weight:600},corners:{enabled:true,opacity:0,color:0xc8d3cc,hover:{color:0xdb681f,opacity:1}},edges:{enabled:true,opacity:0,hover:{color:0xdb681f,opacity:1}}});
+  this.gizmo=new ViewportGizmo(view.camera,view.renderer,{type:'cube',radius:.03,container:this.host,size:96,placement:'top-right',offset:{top:15,right:15},animated:!this.reduced,speed:1.5,id:'view-cube',className:'standard-view-cube',
+   x:{label:'  PRAWA  ',scale:1,border:{size:1,color:0xcad4ce},color:0xf1f4f2,hover:{color:0xf4cfaa,scale:1}},nx:{label:'  LEWA  ',scale:1,color:0xf1f4f2,hover:{color:0xf4cfaa,scale:1}},
+   y:{label:'  TYŁ  ',scale:1,color:0xf1f4f2,hover:{color:0xf4cfaa,scale:1}},ny:{label:'  PRZÓD  ',scale:1,color:0xf1f4f2,hover:{color:0xf4cfaa,scale:1}},
+   z:{label:'  GÓRA  ',scale:1,color:0xf1f4f2,hover:{color:0xf4cfaa,scale:1}},nz:{label:'  DÓŁ  ',scale:1,color:0xf1f4f2,hover:{color:0xf4cfaa,scale:1}},
+   background:{enabled:false},font:{family:'Segoe UI,Arial',weight:500},corners:{enabled:true,opacity:0,color:0xc8d3cc,hover:{color:0xdb681f,opacity:1}},edges:{enabled:true,opacity:0,hover:{color:0xdb681f,opacity:1}}});
   this.gizmo.attachControls(view.controls);
   this.gizmo.addEventListener('start',()=>{if(this.tween){view.controls.enableDamping=this.tween.damping;this.tween=null;}document.dispatchEvent(new CustomEvent('rockpro:stop-placement'));view.controls.enabled=false;});
   document.getElementById('view-cube').setAttribute('aria-label','Kostka widoków — kliknij ścianę, krawędź lub narożnik');
@@ -77,7 +76,6 @@ export class ViewportUI{
   }
  }
  render(){this.gizmo.render();}
- setContext(step,model){const names=['','Konstrukcja','Wieka i współpraca','Wymiary','Biblioteka części','Uchwyty i ścianki','Zatrzaski i zawiasy'];this.hudText.textContent=names[step]+' · '+model.draft.internal_mm.join(' × ')+' mm wewnątrz';vLabels(this.view,this.labels);}
+ setContext(step,model){const names=['','Konstrukcja','Wieka i współpraca','Wymiary','Biblioteka części','Uchwyty i ścianki','Zatrzaski i zawiasy'];this.hudText.textContent=names[step]+' · '+model.draft.internal_mm.join(' × ')+' mm wewnątrz';}
  setSelection(text){this.selection.hidden=!text;this.selectionText.textContent=text??'';}
 }
-function vLabels(view,value){view.root.traverse(o=>{if(o.userData.faceLabel)o.visible=value;});}
