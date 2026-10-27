@@ -47,7 +47,8 @@ def compiler_revision():
 def dependency_revisions():
     root = Path(__file__).parent
     names = ('configurator.py', 'studio_parts.py', 'studio_placement.py',
-             'studio_structure.py', 'studio_closures.py', 'studio_joints.py', 'part_registry.py')
+             'studio_structure.py', 'studio_closures.py', 'studio_joints.py', 'part_registry.py',
+             'studio_native_t1.py', 'studio_native.py')
     return {name: hashlib.sha256((root/name).read_bytes()).hexdigest() for name in names}
 
 
@@ -138,10 +139,27 @@ def analyze(record):
                   construction_parameters=draft.get('construction'),
                   project_summary=model.get('project_summary'),
                   sections=model['sections'], panels=model['panels'],
-                  panel_dimensions_status='nominal_not_cutting', joints=model['joints'],
+                  panel_dimensions_status=model['panel_dimensions_status'], joints=model['joints'],
                   occurrences=occurrences, selected_parts=accounting, machining_intents=intents,
                   blockers=blockers, adapter_id=None, executable=False,
                   native_status='NOT RUN', production_approved=False)
+    from .studio_native import configured
+    adapter = configured()
+    if adapter is not None:
+        try:
+            native = adapter.compile(record)
+        except (ValueError, KeyError, OSError) as error:
+            # Local file paths/errors must not leak into the browser.
+            result['blockers'].append(dict(code='NATIVE_T1_CONTRACT_REQUIRED',
+                message='Wybrany układ nie spełnia przypiętego kontraktu T1: '+str(error)
+                if isinstance(error, ValueError) else 'Brak kompletnego źródła CAD dla tego układu.'))
+        else:
+            # Compilation accounts for every selected SKU, target and operation;
+            # unsupported kits fail above rather than silently substituting parts.
+            result.update(native_spec=native, blockers=[], adapter_id='t1-source-bound-v1', executable=True)
+            result['machining_intents']=native['cuts']
+            for row in result['selected_parts']:
+                row['native_binding_status']='source_pinned'
     return result
 
 

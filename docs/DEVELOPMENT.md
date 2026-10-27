@@ -4,8 +4,11 @@
 
 [ROC-46 i stan integracji](STUDIO_CAD_INTEGRATION.md): plan związany z zapisaną
 rewizją draftu, jawne braki oraz trwały dziennik zleceń w istniejącej bazie.
-Endpointy nie przyjmują kodu ani ścieżek wykonawcy. Pełny adapter montażu jest
-kolejnym przyrostem; testowy executor kolejki nie jest testem natywnym.
+Endpointy nie przyjmują kodu ani ścieżek wykonawcy. Adapter T1 ma przypięty zestaw
+źródeł, rzeczywiste okucia i obróbki; inne rodziny/SKU pozostają blokowane.
+Stan odbioru natywnego jest w dokumencie — test kolejki nie jest dowodem CAD.
+Równania cech wiąż po wszystkich importach, a po reopen sprawdzaj ich działanie
+bez naprawczego ponownego wiązania.
 
 ## Przyrost niezależny od CAD — noc 26.10.2026
 

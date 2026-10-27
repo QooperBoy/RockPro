@@ -6,7 +6,7 @@ from . import studio_joints, studio_closures
 FACE_LABELS = dict(front='Przód', rear='Tył', left='Lewa', right='Prawa', top='Góra', bottom='Dół')
 OPPOSITE = dict(front='rear', rear='front', left='right', right='left', top='bottom', bottom='top')
 # Reference mounting envelopes, NOT machining contours or approved motion clearances.
-FOOTPRINTS = {'H7159': [161.,107.], '17251S': [127.,174.5], '27095': [102.,105.]}
+FOOTPRINTS = {'H7159': [161.,107.], '17251S': [127.,174.5], '270836': [127.,174.5], '27095': [102.,105.]}
 
 
 def validate(draft):

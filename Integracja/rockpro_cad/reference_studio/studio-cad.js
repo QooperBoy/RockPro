@@ -24,8 +24,9 @@ function invalidate(){requestVersion++;plan=null;preparedDraft=preparedStorage=n
 document.addEventListener('rockpro:cad-invalidated',invalidate);
 function render(){
  list.replaceChildren();const add=text=>{const li=document.createElement('li');li.textContent=text;list.append(li);};
- add('Rewizja '+plan.draft_revision+' · '+plan.panels.length+' płyt nominalnych · '+plan.occurrences.length+' elementów montażu · '+plan.selected_parts.length+' wybranych definicji.');
- for(const row of plan.selected_parts)add(row.part_id+': '+row.instance_ids.length+' wystąpień; baza montażu: do powiązania.');
+ add('Rewizja '+plan.draft_revision+' · '+plan.panels.length+' płyt skrzyni · '+plan.occurrences.length+' elementów montażu · '+plan.selected_parts.length+' wybranych definicji.');
+ if(plan.native_spec)add('CAD: '+plan.native_spec.panels.length+' płyt i podpór, '+plan.native_spec.parts.length+' wystąpień części, '+plan.native_spec.cuts.length+' obróbek. Zestaw T1 z przypiętych modeli źródłowych.');
+ for(const row of plan.selected_parts)add(row.part_id+': '+row.instance_ids.length+' wystąpień w podglądzie; baza montażu: '+(row.native_binding_status==='source_pinned'?'powiązana ze źródłem':'do powiązania')+'.');
  for(const blocker of plan.blockers)add(blocker.message);
  message.textContent=plan.executable?'Plan gotowy do wykonania w IronCAD 2027.':'Generowanie zablokowane: '+plan.blockers.length+' braków. Plan obejmuje wszystkie wybory; szczegóły poniżej.';
  build.disabled=!plan.executable;exportButton.disabled=false;report.open=plan.blockers.length>0;
@@ -45,7 +46,7 @@ async function poll(id){
  try{const job=await api('wizard/native-jobs/'+id);showJob(job);if(['queued','running'].includes(job.status))pollTimer=setTimeout(()=>poll(id),1500);}
  catch(e){jobMessage.textContent=e.message+' Sprawdź wynik operacji przed ponowieniem.';}
 }
-function showJob(job){const labels={queued:'Oczekuje w kolejce',running:'Generowanie w IronCAD',succeeded:'Generowanie zakończone',rejected:'Plan odrzucony przed rozpoczęciem budowy',outcome_unknown:'Wynik wymaga sprawdzenia przed ponowieniem',reconciliation_required:'Operacja przerwana — wymagane uzgodnienie wyniku'};jobMessage.textContent=(labels[job.status]??job.status)+' · operacja '+job.operation_id;}
+function showJob(job){const labels={queued:'Oczekuje w kolejce',running:'Generowanie w IronCAD',succeeded:'Generowanie zakończone',rejected:'Plan odrzucony przed rozpoczęciem budowy',failed_reconciled:'Budowa nieudana — kopia odzyskiwania zachowana, sprzątnięcie potwierdzone',outcome_unknown:'Wynik wymaga sprawdzenia przed ponowieniem',reconciliation_required:'Operacja przerwana — wymagane uzgodnienie wyniku'};jobMessage.textContent=(labels[job.status]??job.status)+' · operacja '+job.operation_id;if(job.status==='succeeded'&&job.receipt?.output_path)jobMessage.textContent+=' · '+job.receipt.occurrence_count+' elementów · '+job.receipt.machining_count+' obróbek · plik: '+job.receipt.output_path;}
 build.onclick=async()=>{
  if(busy||!plan?.executable)return;
  try{

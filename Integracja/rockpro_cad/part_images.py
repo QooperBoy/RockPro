@@ -41,7 +41,10 @@ def load(folder):
             if len(data)>16*1024*1024 or hashlib.sha256(data).hexdigest()!=row['mesh']['sha256']:
                 raise ValueError('Part mesh checksum or size mismatch')
             model=json.loads(data)
-            if model.get('schema')!='rockpro.part-mesh/1' or model.get('units')!='m' or model.get('frame')!='mount.local_uvn':
+            structural=(model.get('frame')=='source.local' and model.get('display_only') is True
+                        and row['mesh'].get('scope')=='structural_reference_native_coordinates'
+                        and known[key]['family_id'] in ('profiles','corners','braces','stacking_sockets'))
+            if model.get('schema')!='rockpro.part-mesh/1' or model.get('units')!='m' or (model.get('frame')!='mount.local_uvn' and not structural):
                 raise ValueError('Unsupported display mesh')
             if known[key].get('source_binding'):
                 if model.get('source_binding')!=known[key]['source_binding'] or model.get('display_only') is not True:
@@ -53,6 +56,7 @@ def load(folder):
             result[key]['mesh_path']=mesh
             result[key]['metadata']['mesh_url']='part-models/'+mesh.name
             result[key]['metadata']['mesh_sha256']=row['mesh']['sha256']
+            result[key]['metadata']['mesh_frame']=model['frame']
     if len({r['metadata']['url'] for r in result.values()}) != len(result):
         raise ValueError('Duplicate part image filename')
     mesh_urls=[r['metadata']['mesh_url'] for r in result.values() if 'mesh_path' in r]

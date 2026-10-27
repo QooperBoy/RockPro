@@ -21,6 +21,31 @@ TYPES = {
 FACES = {'top': 'Góra', 'front': 'Przód'}
 
 
+def _t1_panel_layout(d, size):
+    """Pinned 9.8 mm T1 joints: non-overlapping panels, before machining.
+
+    Preserve the historical panel order used by face/panel_index bindings.
+    Body height includes only the floor. The lid height includes the profile
+    joint: its walls begin 8.63 mm above the body rim, without growing the box.
+    """
+    w, depth, base = size
+    t = d['thickness_mm']; lid = d['covers'][0]['depth_mm']; joint = 8.63
+    rows = []
+    for section, z, height in [('body', t, base-t),
+                               (d['covers'][0]['id'], base+joint, lid-joint-t)]:
+        specs = [([0, t, z], [t, depth-2*t, height]),
+                 ([w-t, t, z], [t, depth-2*t, height]),
+                 ([0, 0, z], [w, t, height]),
+                 ([0, depth-t, z], [w, t, height]),
+                 ([0, 0, 0 if section == 'body' else base+lid-t], [w, depth, t])]
+        for lo, dims in specs:
+            if any(x <= 0 for x in dims):
+                raise ValueError('Brak miejsca na płyty T1 przy wybranym złączu profili.')
+            rows.append(dict(section=section, size_mm=dims,
+                             center_mm=[lo[k]+dims[k]/2 for k in range(3)]))
+    return rows
+
+
 
 def validate(value):
     fields = {'schema', 'name', 'type', 'internal_mm', 'thickness_mm', 'cooperation', 'covers'}
@@ -93,6 +118,12 @@ def preview(value):
     # Sections share nominal joint planes. Hardware will determine plywood
     # setbacks/trim inside this envelope; no invented gap expands the case.
     size = [x+2*t for x in d['internal_mm']]
+    structural_t1 = (d.get('construction', {}).get('enabled') is True
+                     and d['type'] == 'case' and len(d['covers']) == 1
+                     and d['covers'][0]['face'] == 'top'
+                     and d['covers'][0]['kind'] == 'hinged' and t == 9.8)
+    if structural_t1:
+        size[2] = d['internal_mm'][2]+t  # Open body: floor, no second top panel.
     panels, sections, joints = [], [], []
     axes = {'top': (2, 1), 'front': (1, -1), 'rear': (1, 1), 'left': (0, -1), 'right': (0, 1)}
     def box(section, lo, lengths, open_face=None):
@@ -126,6 +157,10 @@ def preview(value):
         requires = c['requires'] if d['cooperation'] == 'custom' else ([d['covers'][i-1]['id']] if d['cooperation'] == 'sequence' and i else [])
         sections.append(dict(id=c['id'], label=c['label'], size_mm=dims, position_mm=lo, face=c['face'], kind=c['kind'], hinge_edge=c['hinge_edge'], requires=requires))
         joints.append(dict(id='joint-'+c['id'], sections=['body', c['id']], face=c['face'], gap_mm=None, plywood_trim_mm=None, fit_status='awaiting_mounting_layout' if d['hardware'] else 'awaiting_hardware'))
+    if structural_t1:
+        panels = _t1_panel_layout(d, size)
+        joints[0].update(gap_mm=8.63, plywood_trim_mm=8.63,
+                         fit_status='t1_reference_joint_layout')
     placement=studio_placement.preview(d,sections,panels)
     construction=studio_structure.preview(d,sections,placement)
     summary=studio_parts.summarize(d['hardware'],d['covers'])
@@ -133,11 +168,11 @@ def preview(value):
         summary['placement_status']='concept_draft'
         summary['note']='Wystąpienia i kotwy zapisano w koncepcji. Wycięcia, pasowanie złączy i BOM zakupowy wymagają dalszej walidacji.'
     return dict(draft=d, panels=panels, sections=sections, joints=joints, cad_ready=False,
-                panel_dimensions_status='nominal_not_cutting',
-                joint_fitting_status='awaiting_mounting_layout' if d['hardware'] else 'awaiting_hardware',
+                panel_dimensions_status='t1_reference_layout_not_cutting' if structural_t1 else 'nominal_not_cutting',
+                joint_fitting_status='t1_reference_joint_layout' if structural_t1 else ('awaiting_mounting_layout' if d['hardware'] else 'awaiting_hardware'),
                 hardware_summary=summary,placement=placement,construction=construction,
                 project_summary=studio_structure.summarize(d,panels,placement,construction),
-                warnings=['Schemat sekcji bez okuć i tolerancji produkcyjnych. Ruchy pokazują intencję otwierania; oś rzeczywistego zawiasu wymaga doboru części.',
+                warnings=[('Układ płyt T1 uwzględnia złącze profili 8,63 mm. Wycięcia pod okucia i odbiór produkcyjny pozostają osobnymi etapami.' if structural_t1 else 'Schemat sekcji bez okuć i tolerancji produkcyjnych. Ruchy pokazują intencję otwierania; oś rzeczywistego zawiasu wymaga doboru części.'),
                           'Wymiary wnętrza są wymaganiem. Pokrywy są dodatkowymi sekcjami; nie zmniejszają korpusu.'])
 
 

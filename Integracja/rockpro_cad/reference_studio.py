@@ -69,6 +69,7 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
         ('reference3d.js', 'text/javascript; charset=utf-8'),
         ('wizard.html', 'text/html; charset=utf-8'), ('wizard.js', 'text/javascript; charset=utf-8'),
         ('studio-cad.js', 'text/javascript; charset=utf-8'),
+        ('structure3d.js', 'text/javascript; charset=utf-8'),
         ('wizard3d.js', 'text/javascript; charset=utf-8'), ('wizard.css', 'text/css; charset=utf-8'),
         ('parts-picker.js', 'text/javascript; charset=utf-8'),
         ('placement-editor.js', 'text/javascript; charset=utf-8'),
@@ -188,7 +189,14 @@ def main():
     parser.add_argument('--port', type=int, default=0)
     parser.add_argument('--session-token', help='Reuse a local session URL when restarting the prototype')
     parser.add_argument('--database', type=Path, help='Explicit existing shared Studio project database')
+    parser.add_argument('--cad-assets', type=Path, help='Trusted local native T1 source manifest (not accepted by HTTP)')
+    parser.add_argument('--cad-output', type=Path, default=Path(__file__).resolve().parents[2]/'artifacts/studio-native', help='New native result folders')
+    parser.add_argument('--cad-pid', type=int, help='Existing IronCAD 2027 process ID')
     args = parser.parse_args()
+    native_jobs=None
+    if args.cad_assets:
+        from . import studio_native
+        native_jobs=CadJobs(studio_native.configure(args.cad_assets,args.cad_output,args.cad_pid))
     if args.database:
         from .mcp import project_store
         project_store.DB_PATH = args.database.resolve(strict=True)
@@ -218,7 +226,7 @@ def main():
         imported_images=part_images.load(source_images)
         if hardware_images.keys()&imported_images.keys():raise ValueError('Duplicate part image between packages')
         hardware_images.update(imported_images)
-    server = ThreadingHTTPServer(('127.0.0.1', args.port), make_handler(catalog, images, token, preview, previews, hardware_images))
+    server = ThreadingHTTPServer(('127.0.0.1', args.port), make_handler(catalog, images, token, preview, previews, hardware_images, native_jobs))
     server.timeout = 1
     url = f'http://127.0.0.1:{server.server_port}/{token}/'
     print(url, flush=True)

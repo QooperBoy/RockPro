@@ -1,9 +1,14 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
 Studio → CAD 2027: [docs/STUDIO_CAD_INTEGRATION.md](docs/STUDIO_CAD_INTEGRATION.md),
-ROC-46. Pierwszy przyrost to przypięty plan i trwała kolejka, jeszcze bez pełnego
-adaptera natywnego. Nie promuj planu do wykonywalnego przez zmianę flagi ani nie
-podłączaj starego generatora z innym zestawem okuć jako fallbacku.
+ROC-46. Studio ma przypięty plan, trwałą kolejkę i adapter natywny T1 dla
+H7159 + 17251S + 270836, sklejki 9,8 mm oraz wskazanego zestawu konstrukcyjnego.
+Stan dowodów natywnych czytaj w dokumencie. Nie promuj innych zestawów przez
+zmianę flagi ani nie podstawiaj starego generatora. Równania cech odtwarzaj po
+WSZYSTKICH importach: kolejne AddChildFromExternalFile potrafi usunąć wcześniej
+utworzone powiązania. Sprawdź resize i reopen bez ponownego wiązania po otwarciu.
+Regeneruj tylko własne płyty i czyste profile. Nie ponawiaj outcome_unknown
+bez uzgodnienia dowodów; lokalny CLI opisano w dokumencie.
 
 Nocny przegląd 26.10.2026: [docs/NIGHT_WORK_20261026.md](docs/NIGHT_WORK_20261026.md).
 Plan ruchu standardu wymaga oryginalnych bajtów inwentarza; nie przyjmuj edytowalnego

@@ -4,6 +4,7 @@ from .part_registry import metadata
 from . import studio_parts
 from .core_case.t1_mounting import corner_pose,SOCKET_SEAT,support_dimensions
 from .core_case.machining_rules import minimum_lid_height
+from .core_case.profile_rules import rules as profile_rules, value as profile_value
 
 REQUIRED=['EG-0113','EG-0500/1','EG-0500/2','410429','B1930','B1121']
 IDENTITY=[[1,0,0],[0,1,0],[0,0,1]]
@@ -35,58 +36,68 @@ def preview(d,sections,placement):
     def profile(key,part,section,rotation,position,length,seed):
         if length<=0:raise ValueError('Brak miejsca na profil: '+key)
         add(key,part,'profiles',section,position,rotation,length_mm=length,seed_length_mm=seed)
-    # Same 35 mm angle and 33 mm inner edge as the corrected native T1.
-    for top,z,section in [(False,0,'body'),(True,height,cover['id'])]:
-        for face,rot,pos,length in [
-            ('front',[[0,-1,0],[0,0,-1 if not top else 1],[1 if not top else -1,0,0]],[30 if not top else w-30,33,33 if not top else z-33],w-60),
-            ('rear',[[0,1,0],[0,0,-1 if not top else 1],[-1 if not top else 1,0,0]],[w-30 if not top else 30,depth-33,33 if not top else z-33],w-60),
-            ('left',[[-1,0,0],[0,0,-1 if not top else 1],[0,-1 if not top else 1,0]],[33,depth-30 if not top else 30,33 if not top else z-33],depth-60),
-            ('right',[[1,0,0],[0,0,-1 if not top else 1],[0,1 if not top else -1,0]],[w-33,30 if not top else depth-30,33 if not top else z-33],depth-60)]:
-            profile('edge/'+('top' if top else 'bottom')+'/'+face,'EG-0113',section,rot,pos,length,590)
-    for section,z,high in [('body',0,h),(cover['id'],h,lid)]:
-        for right,rear,rot in [(False,False,[[-1,0,0],[0,-1,0],[0,0,1]]),(True,False,[[0,-1,0],[1,0,0],[0,0,1]]),(False,True,[[0,1,0],[-1,0,0],[0,0,1]]),(True,True,[[1,0,0],[0,1,0],[0,0,1]])]:
-            profile('upright/'+section+'/'+str(int(right))+str(int(rear)),'EG-0113',section,rot,[w-33 if right else 33,depth-33 if rear else 33,z+30],high-60,590)
+    parameters=dict(RP_Length=w,RP_Depth=depth,RP_BaseHeight=h,RP_LidHeight=lid,
+                    RP_Thickness=t,RP_DisplayGap=0,RP_JointGap=8.63)
+    rules={r['id']:r for r in profile_rules()}
+    # Measured native local centres, not centres of the mounted world bounds.
+    # Joint corrections reproduce the pinned T1 profile_seating mount revisions.
+    cross_centres={'EG-0113':[17.5,17.5],
+                   'EG-0500_1':[13.3961848981016,6.15058825963358],
+                   'EG-0500_2':[10.5578504046396,6.15]}
+    def profile_pose(rule):
+        length=profile_value(rule['cut_length'],parameters)
+        local=cross_centres[rule['sku']]+[length/2]
+        rot=rule['rotation']
+        pos=[profile_value(rule['center'][j],parameters)-sum(local[k]*rot[k][j] for k in range(3)) for j in range(3)]
+        if rule['sku']=='EG-0500_1':
+            wall=rule['id'].rsplit('/',1)[1]
+            pos[1 if wall in ('front','rear') else 0]+=1 if wall in ('front','left') else -1
+        elif rule['sku']=='EG-0500_2':
+            pos[2]+=.05
+        return rot,pos,length
+    for rule in rules.values():
+        if rule['sku']!='EG-0113':continue
+        half,edge=rule['id'].split('/')
+        section='body' if half in ('base','bottom') else cover['id']
+        key=('edge/'+rule['id'] if half in ('bottom','top') else
+             'upright/'+section+'/'+str(int('right' in edge))+str(int('rear' in edge)))
+        rot,pos,length=profile_pose(rule)
+        profile(key,'EG-0113',section,rot,pos,length,590)
     # Paired tongue/groove profiles. Interrupt all rows at complete closure envelopes.
     for face in ['front','rear','left','right']:
-        axis=0 if face in ['front','rear'] else 1;length=[w,depth][axis]
+        axis=0 if face in ['front','rear'] else 1
         forbidden=[]
         for item in placement['items']:
             if not (item.get('seam_id') or item.get('joint_id')) or item['face']!=face:continue
             a=item['position_mm'][axis];half=item['footprint_mm'][0]/2+5
             forbidden.append((a-half,a+half))
-        segments=[(0,length)]
-        for lo,hi in sorted(forbidden):
-            segments=[piece for a,b in segments for piece in [(a,min(b,lo)),(max(a,hi),b)] if piece[1]-piece[0]>2]
-        for part,section,zz in [('EG-0500/1','body',h-19.497),('EG-0500/2',cover['id'],h+23.709)]:
+        for sku,section in [('EG-0500_1','body'),('EG-0500_2',cover['id'])]:
+            part=sku.replace('_','/');rot,origin,length=profile_pose(rules[sku+'/'+face])
+            direction=rot[2][axis]
+            low,high=sorted([origin[axis],origin[axis]+direction*length])
+            segments=[(low,high)]
+            for lo,hi in sorted(forbidden):
+                segments=[piece for a,b in segments for piece in [(a,min(b,lo)),(max(a,hi),b)] if piece[1]-piece[0]>2]
             for i,(a,b) in enumerate(segments):
-                # Rotate native profile Z into the perimeter direction.
-                if face=='front':rot=[[0,0,1],[0,-1,0],[1,0,0]];pos=[a,10.0506 if section=='body' else -1.25,zz]
-                elif face=='rear':rot=[[0,0,-1],[0,1,0],[1,0,0]];pos=[a,depth-10.0506 if section=='body' else depth+1.25,zz]
-                elif face=='left':rot=[[0,0,-1],[-1,0,0],[0,1,0]];pos=[10.0506 if section=='body' else -1.25,a,zz]
-                else:rot=[[0,0,1],[1,0,0],[0,1,0]];pos=[w-10.0506 if section=='body' else w+1.25,a,zz]
-                if section!='body':rot=[[-v for v in row] if k<2 else row for k,row in enumerate(rot)]
+                # Source local Z grows from zero. Negative world directions
+                # therefore start at the segment's high endpoint.
+                pos=list(origin);pos[axis]=a if direction>0 else b
                 profile('joint/'+part+'/'+face+'/'+str(i),part,section,rot,pos,b-a,650)
     for top in (False,True):
         for right in (False,True):
             for rear in (False,True):
                 rot,pos=corner_pose(top,right,rear,[w,depth,height]);add('corner/'+str(int(top))+str(int(right))+str(int(rear)),'410429','corners',cover['id'] if top else 'body',pos,rot)
-    # Opaque, whole corner braces; no modification of catalogue hardware.
-    for section,z,flip in [('body',h-40,False),(cover['id'],h+40,True)]:
-        for right in (False,True):
-            for rear in (False,True):
-                part='B1121' if rear else 'B1930'
-                rotations={
-                    (False,False,False):[[0,0,1],[1,0,0],[0,1,0]],
-                    (False,True,False):[[0,0,1],[0,1,0],[-1,0,0]],
-                    (False,False,True):[[1,0,0],[0,0,1],[0,-1,0]],
-                    (False,True,True):[[0,-1,0],[0,0,1],[-1,0,0]],
-                    (True,False,False):[[0,0,-1],[0,1,0],[1,0,0]],
-                    (True,True,False):[[0,0,-1],[-1,0,0],[0,1,0]],
-                    (True,False,True):[[0,-1,0],[0,0,-1],[1,0,0]],
-                    (True,True,True):[[-1,0,0],[0,0,-1],[0,-1,0]],
-                }
-                rot=rotations[(flip,right,rear)]
-                add('brace/'+section+'/'+str(int(right))+str(int(rear)),part,'braces',section,[w+4.7 if right else -4.7,depth+4.7 if rear else -4.7,z],rot)
+    # The shared rules specify world centres; source meshes keep native local
+    # coordinates. Convert the measured local centre into the placement origin.
+    # Lid braces use the same catalogue orientation as body braces, not a flip.
+    brace_centres={'B1930':[20.,18.25,18.25],'B1121':[15.5,20.,15.5]}
+    for rule in rules.values():
+        if rule['sku'] not in brace_centres:continue
+        section='body' if rule['id'].startswith('base/') else cover['id']
+        right='right' in rule['id'];rear='rear' in rule['id']
+        rot=rule['rotation'];local=brace_centres[rule['sku']]
+        position=[profile_value(rule['center'][j],parameters)-sum(local[k]*rot[k][j] for k in range(3)) for j in range(3)]
+        add('brace/'+section+'/'+str(int(right))+str(int(rear)),rule['sku'],'braces',section,position,rot)
     if d['construction']['wheels']:
         inset,pad_length=support_dimensions(depth)
         x_inset=min(150,w*.25);y_inset=100
@@ -95,11 +106,27 @@ def preview(d,sections,placement):
             add('pad/'+str(int(right)),None,'wheel_pads','body',[x-60,inset,-18],size_mm=[120,pad_length,18])
             for rear in (False,True):
                 y=depth-y_inset if rear else y_inset;pair='wheel-'+str(int(right))+str(int(rear))
-                add(pair,'source-caster-epson','wheels','body',[x,y,-18],[[1,0,0],[0,-1,0],[0,0,-1]],stacking_pair=pair)
+                rotation=[[1 if right else -1,0,0],[0,0,1],[0,-1 if right else 1,0]]
+                position=[x,y,-18]
+                add(pair,'source-caster-epson','wheels','body',position,rotation,stacking_pair=pair)
                 if d['construction']['stacking']:
-                    # This source socket's seat is not its bbox top or bottom.
+                    # Match the native wheel contact point, not the caster's
+                    # mounting origin. Both sockets use the measured seat datum.
+                    contact_local=[-36.,-132.1,0.]
+                    contact=[position[j]+sum(contact_local[k]*rotation[k][j] for k in range(3)) for j in range(3)]
+                    seat=[contact[0],contact[1],height]
                     add('socket/'+pair,'W0968Z','stacking_sockets',cover['id'],
-                        [x-SOCKET_SEAT[0],y-SOCKET_SEAT[1],height-SOCKET_SEAT[2]],stacking_pair=pair,seat_world_mm=[x,y,height])
+                        [seat[k]-SOCKET_SEAT[k] for k in range(3)],stacking_pair=pair,seat_world_mm=seat)
+    # Source 38083/W0968Z flange is 136 x 90 mm about its measured seat.
+    # Test the actual seats after the caster contact offset, not wheel origins.
+    sockets=[r for r in rows if r['family_id']=='stacking_sockets']
+    for i,a in enumerate(sockets):
+        for b in sockets[i+1:]:
+            gaps=[abs(a['seat_world_mm'][k]-b['seat_world_mm'][k])-size
+                  for k,size in enumerate((136.,90.))]
+            if all(gap < 2.-1e-7 for gap in gaps):
+                raise ValueError('Gniazda kół 136 × 90 mm wymagają co najmniej 2 mm odstępu: '
+                                 +a['id']+' / '+b['id']+'. Zmień układ lub wymiary skrzyni.')
     counts=dict(Counter(r['part_id'] or 'plywood-wheel-pad' for r in rows))
     return dict(items=rows,counts=counts,status='reference_construction_not_manufacturing',
                 notes=['Geometria katalogowa z zapisanej referencji. Wycięcia i pasowanie produkcyjne wymagają osobnego potwierdzenia.'])

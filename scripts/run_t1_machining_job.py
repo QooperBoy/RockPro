@@ -53,10 +53,10 @@ def cleanup_owned_addon(collection,owner,count_before):
     return {'removed':True,'count_after':after}
 
 def current_interop(folder):
-    """2023 samples ship a stale 2018 wrapper; import the installed TLB locally."""
-    install=installation_dir()
-    if selected_year()!=2023:
-        return install/'ICAPI/Samples/C#/References/interop.ICApiIronCAD.dll'
+    """Import this host's installed TLB; sample wrappers are stale in both releases."""
+    year=selected_year()
+    install=installation_dir(year)
+    folder=Path(folder).resolve()
     helper=ROOT/'scripts/native/GenerateLocalInterop.cs'
     exe=folder/'GenerateLocalInterop.exe'
     compiler='C:/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe'
@@ -66,7 +66,7 @@ def current_interop(folder):
     vendor=folder/'interop.ICApiIronCAD.dll'
     result=subprocess.run([str(exe),str(tlb),str(vendor)],capture_output=True,text=True,encoding='utf-8',errors='replace')
     evidence={'returncode':result.returncode,'stdout':result.stdout,'stderr':result.stderr,
-              'tlb_sha256':sha(tlb),'helper_sha256':sha(helper),'host_year':selected_year()}
+              'tlb_sha256':sha(tlb),'helper_sha256':sha(helper),'host_year':year}
     if result.returncode==0:evidence['interop_sha256']=sha(vendor)
     (folder/'interop-generation.json').write_text(json.dumps(evidence,indent=2),encoding='utf-8')
     if result.returncode:raise RuntimeError('Local interop generation failed; see interop-generation.json')
@@ -89,10 +89,17 @@ def run(folder,source,request):
     names=re.findall(r'LatchInProcess[^\x00]{0,90}\.dll',loader.read_bytes().decode('utf-16-le',errors='ignore'))
     if len(names)!=1:raise ValueError('Ambiguous fixed managed loader name')
     vendor=current_interop(folder)
-    src=Path(source).resolve();built=folder/('Machining_'+sha(src)[:20]+'.dll')
-    cmd=['C:/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe','/nologo','/target:library','/platform:x64','/out:'+str(built),'/reference:'+str(vendor),'/reference:System.Web.Extensions.dll','/reference:Microsoft.CSharp.dll',str(src)]
+    src=Path(source).resolve()
+    source_bytes=src.read_bytes();source_hash=hashlib.sha256(source_bytes).hexdigest()
+    if request.get('contract')=='roc46-native-v1':
+        if request.get('executor_sha256')!=source_hash or request.get('runner_sha256')!=sha(__file__):
+            raise ValueError('Studio executor/runner revision changed before native execution')
+    # Compile exactly the bytes whose hash was verified, not a mutable source path.
+    compiled_source=folder/'native-source.cs';compiled_source.write_bytes(source_bytes)
+    built=folder/('Machining_'+source_hash[:20]+'.dll')
+    cmd=['C:/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe','/nologo','/target:library','/platform:x64','/out:'+str(built),'/reference:'+str(vendor),'/reference:System.Web.Extensions.dll','/reference:Microsoft.CSharp.dll',str(compiled_source)]
     c=subprocess.run(cmd+['/utf8output'],capture_output=True,text=True,encoding='utf-8',errors='replace')
-    (folder/'compile.json').write_text(json.dumps({'returncode':c.returncode,'stdout':c.stdout,'stderr':c.stderr,'source_sha256':sha(src),'loader_sha256':sha(loader)}),encoding='utf-8')
+    (folder/'compile.json').write_text(json.dumps({'returncode':c.returncode,'stdout':c.stdout,'stderr':c.stderr,'source_sha256':source_hash,'loader_sha256':sha(loader)}),encoding='utf-8')
     if c.returncode:raise RuntimeError(c.stdout+c.stderr)
     shutil.copyfile(built,folder/names[0])
     if vendor.resolve()!=(folder/vendor.name).resolve():shutil.copyfile(vendor,folder/vendor.name)
@@ -100,7 +107,7 @@ def run(folder,source,request):
     (folder/'request.json').write_text(json.dumps(request,ensure_ascii=False,indent=2),encoding='utf-8')
     import comtypes.client
     IronCAD=comtypes.client.GetModule(str(installation_dir()/"bin/IronCad.tlb"))
-    app=existing_legacy_app(request['context_path']) if request.get('context_path') else comtypes.client.GetActiveObject('IronCAD.Application',dynamic=True)
+    app=existing_legacy_app(request['context_path']) if request.get('context_path') else comtypes.client.GetActiveObject('IronCAD.Application',interface=IronCAD.IIronCADApp)
     collection=app.AddOns;raw=collection._comobj
     def disp(x):return x._comobj if hasattr(x,'_comobj') else x
     owner='RockProMachining_'+uuid.uuid4().hex

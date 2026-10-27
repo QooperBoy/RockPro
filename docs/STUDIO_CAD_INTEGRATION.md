@@ -1,118 +1,154 @@
 # Studio → IronCAD 2027 — ROC-46
 
-Zadanie: [ROC-46 — Generować kompletną skrzynię z kreatora w IronCAD 2027](https://linear.app/rock-pro/issue/ROC-46/studiocad-generowac-kompletna-skrzynie-z-kreatora-w-ironcad-2027),
-podzadanie [ROC-20](https://linear.app/rock-pro/issue/ROC-20/rp-10-zbudowac-lokalny-adapter-i-kolejke-operacji-cad).
-Status: **In Progress**. Pierwszy przyrost przygotowuje kompletny handoff i
-kontrolę gotowości; pełny adapter montażu CAD pozostaje do implementacji.
+[ROC-46](https://linear.app/rock-pro/issue/ROC-46/studiocad-generowac-kompletna-skrzynie-z-kreatora-w-ironcad-2027)
+łączy zapisaną rewizję kreatora z nową sceną CAD. Adapter obejmuje T1:
+jedno górne wieko na zawiasach, sklejkę 9,8 mm, H7159, 17251S i 270836 oraz
+EG-0113, EG-0500/1 i /2, 410429, B1930/B1121, podpory, źródłowe koła Epson
+i W0968Z. Inny SKU lub rodzina wymaga osobnego powiązania. 27095 ma własną
+znaną receptę, lecz nie jest obsługiwany przez ten adapter.
 
-## Docelowy rezultat
+**Stan odbioru: PASS** — generowanie z przycisku Studio, pełny model,
+zmiana gabarytów/powrót, zapis/ponowne otwarcie i ponowna zmiana parametrów.
+To nie jest odbiór produkcyjny konstruktora.
 
-Konstruktor zapisuje rewizję w Studio, sprawdza plan i generuje nową skrzynię
-w IronCAD 2027. Do CAD trafiają wszystkie wybrane parametry sekcji, rzeczywiste
-okucia, profile, narożniki, podpory, koła/gniazda i wymagane obróbki. Nieobsługiwany
-wybór daje konkretny błąd przed wykonaniem. Generator nie zmniejsza liczności,
-nie podmienia SKU i nie pomija elementu, aby uzyskać sukces.
+## Przepływ
 
-Aktualna zgoda na generowanie nie zmienia zakazu nadpisywania oryginałów.
-Przed uruchomieniem trybu utrwalającego ICS trzeba potwierdzić aktualny zakres
-zgody na zapis nowych plików; starsze skrypty prototypowe zapisują także w cleanup.
-Nie uruchamiać ich jako niejawnego fallbacku przycisku Studio.
+1. Zapis draftu w istniejącej bazie. „Sprawdź plan CAD” przypina ID, rewizję,
+   SHA draftu, katalog, kompilator, manifest źródeł i kod wykonawcy.
+2. Plan rozlicza wszystkie wybory, pozycje i obróbki. Pełna kompilacja zestawu T1
+   odblokowuje „Wygeneruj całą skrzynię”. Edycja draftu unieważnia plan.
+3. Trwała kolejka w tej samej SQLite przyjmuje operation_id. Worker poza HTTP/DB
+   uruchamia proces SDK ze wspólną blokadą CAD.
+4. Wykonawca sprawdza API29/PID hosta i SHA wejść, tworzy nową scenę oraz sześć
+   grup. Każdy etap obejmuje swoje części i wycięcia.
+5. Kontrole obejmują podzespoły katalogowe, pozycje/obroty, obrysy płyt,
+   długości profili, negatywne cechy i ich kotwy, resize/powrót oraz zapis/reopen.
+6. Kwit wiąże wynik z SHA planu i wskazuje plik. Błąd/timeout daje outcome_unknown
+   i blokuje ponowienie do uzgodnienia. Restart nie odtwarza rozpoczętych operacji.
 
-## Wykonane w pierwszym przyroście
+Endpointy: wizard/native-plan, wizard/native-build, wizard/native-jobs/<id>.
+Przyjmują zapisane ID/SHA, nie ścieżki ani kod. Token sesji, Origin, kontrola
+rewizji/CAS i pełne ponowne przeliczenie planu pozostają obowiązkowe. Prywatne
+ścieżki źródeł nie trafiają do planu przeglądarki.
 
-- Kod bieżącego Studio połączono do izolowanej gałęzi `codex/t2-parametryzacja`.
-  Snapshot kodu sprzed prac: `codex/snapshot-before-studio-cad-20261027`.
-- `studio_cad.py`: plan `rockpro.studio-cad-plan/1` z ID/rewizją/SHA draftu,
-  rewizją kompilatora i katalogu, hostem 2027/API29 oraz kontraktem rejestru.
-  Plan rozlicza nominalne płyty, sekcje, złącza, wystąpienia, wszystkie wybrane
-  definicje i intencje obróbek. Zachowuje właściciela każdej intencji.
-- Wybrane, lecz nierozmieszczone części nie znikają z raportu. Brak wiedzy
-  o wycięciu jest odróżniony od znanej recepty i braku jej natywnego powiązania.
-  Recepta 27095 jest rozpoznana jako dostępna; nie jest zastępowana zamkiem.
-- Ujęto także aktualne przełączniki konstrukcji, podpory, koła i gniazda.
-  Kontrakt `studio_structure.py` przeniesiono jako kontrolowany snapshot
-  z bieżącej pracy drugiego checkoutu, zachowując jego pliki. Naprawiono
-  pomijanie przerw profili przy starszych rzędach zawiasów z `joint_id`.
-- Plany zapisują się w tej samej bazie co drafty, w nowej tabeli. Kontrola
-  rewizji działa podczas zapisu i przed wykonaniem. Samodzielne podmienienie
-  planu i ponowne obliczenie SHA nie nadaje mu prawa wykonania.
-- `studio_cad_jobs.py`: trwały dziennik operacji, idempotencja operation_id,
-  jedno nierozstrzygnięte zlecenie i worker poza wątkiem HTTP/transakcją DB.
-  Po awarii nie następuje automatyczne ponowienie operacji o nieznanych skutkach.
-  Kwit musi potwierdzić dokładny SHA planu. Testowy executor nie jest CAD.
-- Endpointy `wizard/native-plan`, `wizard/native-build`,
-  `wizard/native-jobs/<id>` zachowują token sesji, Origin i ścisłe pola poleceń.
-  Klient nie przekazuje ścieżki skryptu, DLL, pliku docelowego ani kodu do wykonania.
-- Panel kreatora: „Sprawdź plan CAD”, rozliczenie części/lista braków,
-  pobranie planu, przycisk generowania i odczyt statusu zlecenia.
-  Edycja/wczytanie draftu unieważnia plan. Generowanie pozostaje niedostępne,
-  dopóki cały plan nie jest wykonywalny.
+## Wymiary i wspólny podgląd
 
-**Ważna granica:** obecny kompilator nie ma zarejestrowanego pełnego adaptera
-natywnego. Każdy rzeczywisty plan pozostaje `executable=false` z listą braków.
-Nie wygenerowano nowego kompletnego ICS w tej rundzie. Kontrola bramek i kolejki
-jest działającym kodem, nie dowodem ukończenia generatora.
+Studio podaje użyteczne wnętrze korpusu X/Y/Z. Dla tego zestawu W=X+2t,
+D=Y+2t, B=Z+t (dno); wysokość obudowy bez transportu to B+L.
+Dziesięć płyt nie nakłada się objętościami. Szczelina 8,63 mm pochodzi
+z przypiętej receptury profili, a nie z rozsunięcia prezentacyjnego.
+Podfrezowania są osobnymi operacjami; cztery ściany wieka tracą dodatkowo
+0,1 mm przy osadzeniu. Półfabrykat i końcowe obrysy są sprawdzane osobno.
 
-## Dlaczego nie podłączamy wprost starego prototypu
+Polskie parametry sceny: RP_SzerokoscWnetrza, RP_GlebokoscWnetrza,
+RP_WysokoscWnetrza, RP_WysokoscPokrywy, RP_GruboscSklejki. Komentarze
+wyjaśniają osie i pomiar. Grubość 9,8 mm jest stałą tego pasowania;
+zmiana zestawu/grubości wymaga nowego planu Studio. Pokrywa i jej jawny
+override wynikają z aktualnego draftu.
 
-1. Studio podaje wnętrze korpusu; T1 używa obrysu sklejki. Nominalne panele Studio
-   nachodzą na siebie na krawędziach, a szczelina/formatki nie są jeszcze wynikiem
-   receptury konstrukcyjnej. Wykonawca musi obliczyć je przed CAD.
-2. Studio zapisuje ramę ściany UVN. Pozycja wycentrowanej siatki nie jest natywną
-   kotwą. Dla każdego źródła potrzebne jest jawne przekształcenie source→mount.
-3. Stary pełny T1 ma H7159 + 17251S + 270836. Naprawiona Scene14 ma H7159 +
-   L905/915 + 27095. Studio może wybierać 17251S + 27095: źródła i kontury są
-   dostępne, ale ten zestaw nie ma wspólnego wykonawcy ani mapy nowych ID.
-4. Wizualne połówki zatrzasku/zawiasu są prezentacją. CAD wymaga rzeczywistych
-   pełnych połówek i ich niesymetrycznych datumów, bez kadrowania siatki.
-5. Stary T1 ma stałe liczności i zakresy. Studio obsługuje 1–16 uchwytów na
-   ściankę; nie wolno po cichu sprowadzić wyboru do dwóch.
-6. Historyczne `lid_height_override_authorized=true` nie jest zgodą na nowy
-   projekt. Stosować aktualny `height_override` z zapisanego draftu.
+Ramy profili/wzmocnień/transportu podglądu odpowiadają natywnym bazom.
+Siatka koła ma przypięte do SHA przeliczenie UVN→source.local. Podgląd skaluje
+tylko długość profilu, według zmierzonego obrysu siatki. Gniazdo jest nad punktem
+kontaktu koła, a jego płaszczyzna osadzenia leży na górnej powierzchni wieka.
 
-## Kolejne przyrosty ROC-46
+Liczności podglądu i sceny mogą się różnić: segmenty profilu odpowiadają ciągłemu
+profilowi z wycięciem, a para zamka/zawiasu ma dwie natywne połówki. Plan zawiera
+structure_mapping. Żadna wybrana pozycja nie może pozostać niezmontowana.
+Zestawienie nie obejmuje nieznanych nitów/wkrętów i nie jest zakupowym BOM.
 
-| Etap | Zakres | Dowód odbioru |
-|---|---|---|
-| 1 — bieżący | Plan, rozliczenie i kolejka | Odmowa niekompletnego/zmienionego planu, zachowany draft, brak wykonania CAD |
-| 2 | Kontrakt wymiarów T1 i manifest rzeczywistych zasobów | Ramy wszystkich części; poprawne wymiary cięcia i styki bez wzrostu gabarytu |
-| 3 | Montaż okuć i wycięcia | Każde wybrane wystąpienie ma nowy native_id, komplet operacji i wspólną kotwę |
-| 4 | Profile, narożniki, podpory i transport | Poprawna orientacja, przerwy przy zawiasach, osadzenie gniazd, zgodny rozstaw kół |
-| 5 | Uruchomienie z kreatora i odbiór natywny | Model zgodny z planem, resize→powrót, osobno zapis/reopen gdy dozwolone |
-| 6 | Szafa i konstrukcja trzyczęściowa, dalsze moduły | Osobne adaptery i zakresy; brak podmiany rodziny na T1 |
+## Ochrona danych i wykonanie
 
-Recepty i moduły do użycia: `core_case/t1_mounting.py`, `machining_rules.py`,
-`scene_structure.py`, `prototype_t1_machining.py`, `prepare_scene14_repair.py`,
-`prepare_t1_structure.py` oraz natywne operacje kopiowania/odejmowania.
-Ujemne cechy należą do płyt/profili, nie do wnętrza katalogowego okucia.
-Wspólny rejestr zachowuje koła, podpory i gniazda w etapie 6.
+Snapshot: codex/snapshot-before-roc46-native-20261027. Nowe wyniki i próby zapisu
+ROC-46 trafiają wyłącznie do nowych katalogów. Oryginały i wcześniej otwarte,
+niezapisane dokumenty pozostają zachowane. Po błędzie własny model trafia do
+nowego recovery przed zamknięciem. Wejścia otwierane są z unikalnych kopii tylko
+do odczytu. Automatyczne zmiany ich cache SDK nie są zapisywane przez przebudowę
+historii katalogowej; oryginalne bajty kopii pozostają na dysku. Regenerowane są
+tylko nowe płyty i jawnie edytowane, czyste profile, bez wnętrza katalogowych okuć.
+
+StudioCad2027.cs jest kompilowany z przypiętych bajtów. Runner weryfikuje SHA
+siebie, wykonawcy i bridge. Interop powstaje z aktualnego TLB instalacji,
+a nie starego przykładu SDK. Brak fallbacku do 2023 i uruchamiania drugiego hosta.
 
 ## Uruchomienie i dowody
 
-Studio można jawnie skierować na istniejącą bazę przez `--database <projects.sqlite3>`.
-Nie kopiować danych klienta do Gita ani nie zastępować wdrożenia demonstracją.
-Nowa tabela jest migracją addytywną. Wyniki testów i przeglądu UI są w
-`artifacts/studio-cad-20261027/`; pełny harness w `artifacts/verification/`.
-Testy kolejki używają syntetycznego executora; natywne wykonanie tego przyrostu
-pozostaje **NOT RUN**. Zadanie ROC-46 pozostaje otwarte.
+Uruchom normalnie IronCAD 2027. scripts/Start-StudioCad.ps1 przyjmuje -Bundle,
+-Database, -CadAssets, opcjonalnie -Python, -Previews, -PartImages i -SourceParts.
+Ścieżki wskazują istniejące prywatne zasoby. Manifest podaje lokalny operator,
+nie HTTP. Serwer wybiera jedną działającą instancję 2027. Baza jest współdzielona
+z dotychczasowym Studio, a nowe tabele są addytywne. Nie zastępować danych demem.
 
-Końcowa regresja: **PASS**, 12 kroków,
-`artifacts/verification/20261027T214105313652Z/results.json` — 775 wykonań testów
-unittest w tym konkretnym przebiegu, bez kompilacji i operacji CAD.
-Nowe testy planera/HTTP: 9; kolejki: 11; konstrukcji: 5.
+Kod: studio_cad.py, studio_native_t1.py, studio_native.py, studio_cad_jobs.py,
+reference_studio.py i scripts/native/StudioCad2027.cs. Historyczny pierwszy
+przyrost: artifacts/studio-cad-20261027/. Bieżące próby: artifacts/roc46-*;
+wyniki z przycisku: artifacts/studio-native/. CAD, manifesty, bazy i logi są
+prywatne, poza Gitem.
 
-Sprawdzono rzeczywisty istniejący draft rewizji 5: 10 płyt nominalnych,
-66 elementów montażu, 11 wybranych definicji. Plan objął również profile,
-narożniki, podpory, koła i gniazda. Zwrócił 21 jawnych braków i nie uruchomił CAD.
-Edycja nazwy bez zapisu unieważniła plan oraz jego pobieranie. Konsola nie
-zgłosiła błędów JavaScript. Później drugi klient zapisał rewizję 6 — nie jest
-to uszkodzenie ani zmiana wykonana przez ten przyrost. Wszystkie 16 historycznych
-wersji obecnych przed sprawdzeniem pozostało identycznych. Wykonano backup SQLite.
+## Naprawy ujawnione w próbach natywnych
 
-Dowód UI/SQLite: `artifacts/studio-cad-20261027/ui-result.json`, plan przykładowy
-`example-plan.json`, potwierdzenie zadania `ROC-46-created.png`. Po teście
-interfejs przestał odpowiadać na sterowanie karty; próba odczytu okna aplikacji
-wymagała zgody i wygasła. Nie wykonano dalszych działań w oknie. Nie jest to
-pełny odbiór wizualny. Własny serwer testowy zatrzymano; działającego wcześniej
-Studio użytkownika i hosta CAD nie przeładowywano. Kod jest w tej gałęzi,
-nie został wdrożony do drugiego checkoutu.
+- CopyFeatureTo odejmowało w starym położeniu i zwracało E_FAIL. Teraz dokładny
+  profil jest kopiowany i ustawiany przed włączeniem odejmowania.
+- Automatyczne równania przesuwały ekstruzję płyty. Jej położenie jest jawnie zerowe.
+- Nowa ekstruzja miała fabryczny sizebox, co powiększało wycięcia. Najpierw
+  materializacja/reset, potem powiązanie wymiarów.
+- Sam Part.Update/Regenerate nie przeliczał gabarytów sceny. Aktualizacja sceny
+  poprzedza regenerację własnych części.
+- Kolejne importy kasowały wcześniej utworzone równania cech. Powiązania są
+  odtwarzane dopiero po ostatnim imporcie, w finalnej hierarchii. Po ponownym
+  otwarciu nie są naprawiane: próba sprawdza ich trwałość.
+- SHA otwartego wyniku wymaga współdzielenia odczytu/zapisu z hostem. Zapis
+  wyników nadal odbywa się wyłącznie pod nowe nazwy.
+
+Szafa, konstrukcja trzyczęściowa i inne SKU pozostają zablokowane. Ruch TriBallem
+nie przelicza układu: zmiany wynikają z tabeli parametrów sceny lub nowego
+zapisanego planu Studio. Akceptacja produkcyjna należy do konstruktora.
+
+## Jawne odzyskiwanie kolejki
+
+Po znanej nieudanej i posprzątanej budowie można lokalnie wywołać
+scripts/reconcile_studio_cad_job.py --database <baza> --operation <ID> --evidence <katalog>.
+CLI bierze blokadę CAD, weryfikuje przypięty request/kod/plan, oryginalne źródła,
+raport niepowodzenia, kopię recovery i sprzątnięcie dodatku. Zapisuje osobny
+status failed_reconciled z passed=false oraz addytywny audyt poprzedniego stanu.
+Nie obsługuje queued/running ani przypadków bez kompletnych dowodów; nie ma
+publicznego endpointu ani automatycznego retry. Udane uzgodnienie umożliwia nowe
+zlecenie po poprawce, a nie zmienia nieudanej próby na sukces.
+
+Kompilator stosuje dopuszczalne jednostronne próby przy granicy 15% pokrywy,
+bez modyfikowania override. Przed planem kontroluje obrysy górnych gniazd
+136 × 90 mm, już po przeliczeniu rzeczywistych punktów osadzenia, z luzem 2 mm.
+Nie powiększa sam skrzyni i nie przesuwa kół, aby ominąć konflikt.
+
+## Odbiór z przycisku — 28 października 2026
+
+- Draft 70a10d97998143749cdfe9ae793e3bdc, rewizja 6.
+- Operacja fe2d6b09344c46c5878d32db9cf2066f, status succeeded.
+- Plan SHA a4c66665a8ef26214ada5bca3849d9bf91cc5f0bb0f1e506d1bad5941e4b1f8a.
+- Wnętrze 600 × 500 × 800 mm, pokrywa 115 mm, sklejka 9,8 mm.
+- 72 wystąpienia (12 płyt/podpór + 60 części katalogowych), 48 obróbek;
+  zachowane 244 wewnętrzne części źródłowych podzespołów i płyt.
+- Baseline, resize, powrót, reopen, resize po reopen, powrót i pomiar końcowego
+  zapisanego pliku: PASS. Po reopen nie odtwarzano naprawczo powiązań.
+- SHA wyniku 5f14516a294f6d587ed5ce4dab3e087477ec545bddf9e2dfb5bbb57219bdf525.
+- Oryginalne źródła oraz 10 wcześniej otwartych dokumentów zachowane.
+  W bazie pozostało identycznych wszystkich 10 draftów i 18 historycznych rewizji.
+- Raport: artifacts/studio-native/verification-summary.json. Pełne dane:
+  studio-26a21292a8114979baeb481c57fff92f-e2f72898/result.json w tym katalogu.
+  Native-source.cs, request, compile, progress i addon_cleanup wiążą wynik
+  z faktyczną wersją kodu. Pozostałe próby roc46-* są diagnostyką historyczną.
+- Studio-ROC46-success.png pokazuje status sukcesu kreatora;
+  RockPro_Studio_T1.png w katalogu zlecenia jest eksportem obrazu z IronCADa.
+
+Pierwsza próba e8307c83926149deab8f5304e3dd47fa pozostaje nieudana:
+failed_reconciled, passed=false, z odrębnym audytem i zachowaną kopią recovery.
+Odbiór dotyczy wyłącznie wskazanego adaptera T1, nie produkcji, innych rodzin
+ani nieobsługiwanych SKU. Nie wykonywano push.
+
+Końcowa regresja kodu: PASS, 12 kroków w
+artifacts/verification/20261027T232115451805Z/results.json. Osobno PASS:
+cztery testy generowania interop (scripts/test_t1_local_interop.py), kontrola
+składni JS i launchera PowerShell oraz końcowy audyt SQLite/kwitu CAD.
+Wcześniejsze nieudane raporty pozostają historyczne: zajęta blokada podczas
+równoległej próby CAD oraz test samych paneli używający transportu w zbyt wąskiej
+skrzyni. Test paneli izoluje teraz geometrię płyt, a gniazda mają oddzielne próby
+odrzucenia kolizji i dokładnej granicy 2 mm. Nie pominięto wymaganych kontroli.
