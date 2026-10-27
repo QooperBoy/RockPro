@@ -1,5 +1,44 @@
 # Studio — części z pozostałych otwartych projektów
 
+## Aktualizacja: rzeczywiste modele w kroku 5
+
+Siatki wszystkich 39 nowych wariantów są teraz podłączone do rozmieszczania
+na ściankach i podglądu pod kursorem. Zachowują metry, geometrię, kolory źródła
+i skalę 1:1; przesunięcie/obrót całej części nie zmienia jej wymiarów.
+Współdzielone bufory GPU ograniczają koszt powtarzania uchwytów. Wybieranie
+korzysta z obrysu rzeczywistej siatki, a nie dawnego prostokąta 64 × 44 mm.
+
+Generator: `scripts/prepare_source_part_meshes.py <lokalny-pakiet>`. Czyta
+wyłącznie zachowane eksporty i indeks renderów; nie łączy się z IronCAD.
+Sprawdza SHA geometrii, źródłowe wiązanie oraz jawny wybór `node_ids`.
+Siatki trafiają do `images/<ID>.mesh.json`, indeks obrazów dostaje SHA i URL.
+Loader HTTP sprawdza plik i wiązanie źródła; błędna siatka nie udaje
+poprawnego modelu, interfejs zgłasza błąd i pokazuje znacznik zastępczy.
+
+Zakres geometrii odpowiada jawnie wybranym bryłom z renderu. Jeśli render
+pokazywał jeden element z rozrzuconego zespołu, model również pokazuje ten
+element. Panel podaje liczbę wyświetlanych i źródłowych brył. Profil zachowuje
+całą długość wybranej źródłowej bryły, nawet gdy miniatura była kadrowana.
+Nie wprowadzono automatycznego rozciągania profili ani kompletnych SKU.
+
+Ramy podglądu są wstępne: jawny kierunek dla rozpoznanych części lub oś
+najmniejszego rozmiaru dla pozostałych; baza na dominującej płaskiej powierzchni
+(koła: górna płaszczyzna źródłowego zespołu). To wybór prezentacji, **nie
+potwierdzona rama montażu**. Obrót w płaszczyźnie i strona ścianki działają
+jak wcześniej. Definicje części, rewizje draftów i statusy zgód pozostają
+niezmienione. Nie ma nowych wycięć w sklejce; wnęka okucia może być zasłonięta
+nieobrobioną płytą. Kontrola kolizji nadal dotyczy wstępnych obrysów 2D.
+
+PASS: syntetyczne testy wymiarów, transformacji, koloru, tożsamości i odmowy
+błędnych buforów. PASS: przeglądarka — 39 rzeczywistych siatek, rzeczywisty
+podgląd pod kursorem, wybieranie/Esc, zmiana wymiarów ze współdzieloną geometrią,
+skala 1:1 i zapis/odczyt SQLite. Pełny harness PASS:
+`artifacts/verification/20261027T183429439500Z/`. Dowody przeglądarki:
+`artifacts/source-parts-3d-20261027/`. Natywne montowanie w CAD: NOT RUN
+(nie jest częścią tej zmiany Studio).
+
+## Poprzedni checkpoint: import i znaczniki
+
 27.10.2026. Rozszerzenie biblioteki i kroku 5 na podstawie faktycznego
 odczytu dziewięciu dokumentów IronCAD 2027 oraz przypiętych eksportów siedmiu
 modeli. Lokalnie: **14 dotychczasowych pozycji + 39 wariantów źródłowych = 53**.

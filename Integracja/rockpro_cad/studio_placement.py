@@ -113,7 +113,7 @@ def preview(draft, sections, panels):
         if definitions[g['part_id']]['family_id'] in ('hinges','latches'):
             warnings.append(dict(group_id=g['id'],code='unbound_joint',message=g['part_id']+': pozycja na ściance jest koncepcją. Przypisanie do złącza, parowanie połówek i wycięcia wymagają następnego etapu.'))
         if footprint is None:
-            warnings.append(dict(group_id=g['id'],code='unknown_envelope',message='Niepotwierdzony obrys montażowy '+label+' — znacznik ma umowny rozmiar, kontrola kolizji niepełna.'))
+            warnings.append(dict(group_id=g['id'],code='unknown_envelope',message='Niepotwierdzony obrys montażowy '+label+' — kontrola kolizji korzysta z umownego obrysu 2D, niezależnie od szczegółowej geometrii podglądu.'))
         n=g['count_per_wall']
         offsets=[0] if n==1 else [(i/(n-1)-.5)*g['spread'] for i in range(n)]
         center=.5 if g['pattern']=='symmetric' else g['u']

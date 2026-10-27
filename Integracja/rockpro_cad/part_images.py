@@ -16,7 +16,7 @@ def load(folder):
     index = json.loads((folder / 'index.json').read_text(encoding='utf-8'))
     if index.get('schema') != 'rockpro.part-images/1':
         raise ValueError('Unsupported part image index')
-    known = {r['id'] for r in studio_parts.catalog()['items']}
+    known = {r['id']:r for r in studio_parts.catalog()['items']}
     result = {}
     for key, row in index['images'].items():
         if key not in known or row['kind'] not in ('cad_render', 'manufacturer_photo'):
@@ -40,11 +40,24 @@ def load(folder):
             data=mesh.read_bytes()
             if len(data)>16*1024*1024 or hashlib.sha256(data).hexdigest()!=row['mesh']['sha256']:
                 raise ValueError('Part mesh checksum or size mismatch')
+            model=json.loads(data)
+            if model.get('schema')!='rockpro.part-mesh/1' or model.get('units')!='m' or model.get('frame')!='mount.local_uvn':
+                raise ValueError('Unsupported display mesh')
+            if known[key].get('source_binding'):
+                if model.get('source_binding')!=known[key]['source_binding'] or model.get('display_only') is not True:
+                    raise ValueError('Display mesh source binding mismatch')
+                result[key]['metadata']['mesh_scope']=row['mesh'].get('scope')
+                result[key]['metadata']['display_body_count']=row['mesh']['display_body_count']
+                result[key]['metadata']['source_body_count']=row['mesh']['source_body_count']
+                result[key]['metadata']['frame_status']=model['frame_status']
             result[key]['mesh_path']=mesh
             result[key]['metadata']['mesh_url']='part-models/'+mesh.name
             result[key]['metadata']['mesh_sha256']=row['mesh']['sha256']
     if len({r['metadata']['url'] for r in result.values()}) != len(result):
         raise ValueError('Duplicate part image filename')
+    mesh_urls=[r['metadata']['mesh_url'] for r in result.values() if 'mesh_path' in r]
+    if len(set(mesh_urls))!=len(mesh_urls):
+        raise ValueError('Duplicate part mesh filename')
     return result
 
 

@@ -1,5 +1,10 @@
 # Studio — krok 5: rozmieszczenie okuć
 
+Aktualizacja 27.10: wszystkie 39 części źródłowych mają rzeczywistą geometrię
+3D w rozmieszczaniu i podczas przeciągania. Szczegóły ram prezentacji i podczęści:
+[STUDIO_SOURCE_PARTS.md](STUDIO_SOURCE_PARTS.md). Historyczne opisy znaczników
+poniżej odnoszą się do wcześniejszego checkpointu lub braku siatki.
+
 27.10.2026. Działający planer koncepcyjny i interaktywny podgląd WebGL,
 bez uruchamiania IronCAD. Operuje wyłącznie częściami wybranymi w kroku 4.
 Późniejszy przyrost: [płynny ruch, środkowy przycisk, więcej uchwytów

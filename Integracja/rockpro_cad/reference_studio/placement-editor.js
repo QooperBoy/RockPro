@@ -30,7 +30,10 @@ export class PlacementEditor {
   this.host.append(palette);const stop=el('button','Zakończ wstawianie / obracaj widok');stop.id='placement-stop';stop.onclick=()=>this.onArm(null);this.host.append(stop);
   let g=d.placements?.find(g=>g.id===this.selected);const row=this.selectedRow();if(!row)return;const value=g??this.defaults??this.template(row),handle=row.family_id==='handles';
   const form=el('div',null,'placement-form');form.append(el('h2',g?'Edycja grupy · '+(row.catalog_code_raw??row.sku??row.name):'Nowa grupa · '+(row.catalog_code_raw??row.sku??row.name)));
-  if(row.source_project)form.append(el('p','Wariant z projektu '+row.source_project+'. Rozmieszczenie jest znacznikiem koncepcji; rama montażu i wycięcie wymagają potwierdzenia.'+(row.component_only?' Wybrano zespół / komponent, nie potwierdzony komplet SKU.':''),'notice'));
+  if(row.source_project)form.append(el('p','Wariant z projektu '+row.source_project+(row.image?.mesh_url?'. Rzeczywista geometria 3D w skali 1:1; orientacja podglądu nie jest potwierdzoną ramą montażu.':'. Brak siatki — znacznik zastępczy.')+' Wycięcie i montaż wymagają potwierdzenia.'+(row.component_only?' Wybrano zespół / komponent, nie potwierdzony komplet SKU.':''),'notice'));
+  if(row.image?.mesh_url&&row.source_project){
+   const im=row.image;form.append(el('p',`Geometria: ${im.display_body_count} brył z ${im.source_body_count} w źródłowym poddrzewie. `+(im.display_body_count<im.source_body_count?'Pokazano podczęść zgodną z renderem, nie cały zespół. ':'')+'Wymiary pochodzą ze źródła; okucia nie są skalowane.','hint'));
+  }
   if(row.family_id==='hinges'&&!row.component_only){
    if(value.pattern!=='joint_line'&&this.model.placement.joint_lines.length){const bind=el('button','Rozmieść równo na linii zawiasów');bind.onclick=()=>{const replacement={...this.template(row),...(g?{id:g.id}:{})};if(g){d.placements=d.placements.map(p=>p.id===g.id?replacement:p);this.onChange();}else{this.defaults=replacement;this.render();}};form.append(bind);}
    if(value.pattern==='joint_line'){this.renderJoint(form,value,g);this.host.append(form);this.renderGroups(d);return;}
