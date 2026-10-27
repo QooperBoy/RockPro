@@ -1,5 +1,8 @@
 # RockPro CAD / Studio
 
+[Interfejs i proces Studio](docs/STUDIO_UX_DESIGN.md): kompas, narzędzia 3D,
+spójne kroki i kierunek dalszego rozwoju, wraz z przeglądem bibliotek UI/UX.
+
 Studio ma teraz [krok 6 — zatrzaski i zawiasy na złączach](docs/WIZARD_CLOSURES.md):
 liczba, równy rozstaw i omijanie uchwytów, z zachowaniem draftu oraz podglądem 3D.
 
