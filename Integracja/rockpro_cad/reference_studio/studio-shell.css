@@ -31,3 +31,17 @@ body.app-menu-collapsed{--app-sidebar-width:64px!important}body.app-menu-hidden{
 /* Edge handles remain reachable when their panels are hidden. */
 .menu-resizer,.editor-resizer{position:fixed!important;bottom:0;right:auto!important;width:12px;z-index:60;display:block!important}.menu-resizer::after,.editor-resizer::after{margin-left:4px}.menu-resizer{left:max(0px,calc(var(--app-sidebar-width) - 6px))}.viewport-expanded~.menu-resizer,.viewport-expanded~.editor-resizer{display:none}.workspace-controls,.preview-restore{display:none!important}@media(max-width:750px){.menu-resizer,.editor-resizer{display:block!important}}body[data-theme=dark] .menu-resizer::after,body[data-theme=dark] .editor-resizer::after{background:#819c89!important}
 body[data-theme=dark] .panel-splitter:hover::after,body[data-theme=dark] .panel-splitter:focus-visible::after{background:#df782e!important}
+/* Short geometry transitions only at snap-state changes; ordinary resizing tracks the pointer. */
+@media(min-width:751px){
+ body.panel-motion{--app-sidebar-width:var(--motion-menu)!important}
+ .panel-motion .app-sidebar{display:flex!important;width:var(--motion-menu)!important;overflow:hidden;padding-left:min(14px,calc(var(--motion-menu) / 5));padding-right:min(14px,calc(var(--motion-menu) / 5))}
+ body[data-studio-page=wizard].panel-motion>main{grid-template-columns:var(--motion-editor) minmax(0,1fr)!important}
+ body[data-studio-page=wizard].panel-motion .editor{display:block!important;min-width:0;overflow:hidden;padding-left:clamp(0px,calc(var(--motion-editor) * .08),22px)!important;padding-right:clamp(0px,calc(var(--motion-editor) * .08),22px)!important}
+ body[data-studio-page=wizard].panel-motion .preview{display:block!important;min-width:0;overflow:hidden;padding-left:clamp(0px,calc(var(--motion-preview) * .08),22px)!important;padding-right:clamp(0px,calc(var(--motion-preview) * .08),22px)!important}
+ .panel-motion.preview-minimized .preview>:not(.preview-heading){display:block!important}.panel-motion.preview-minimized .preview-heading{flex-direction:row}
+ .panel-motion .app-navigation span,.panel-motion #steps span:not(.step-number){display:inline-block!important;opacity:var(--motion-label-opacity);white-space:nowrap;overflow:hidden}
+ .panel-motion .app-sidebar #steps button,.panel-motion .app-navigation a{justify-content:flex-start!important;white-space:nowrap;flex-shrink:0}
+ .panel-motion .app-brand strong,.panel-motion .app-brand small,.panel-motion .app-section-title,.panel-motion .app-sidebar-footer{display:block!important;opacity:var(--motion-label-opacity);white-space:nowrap}
+ .panel-motion .app-brand::before{display:none!important}.panel-motion .app-sidebar #steps{display:flex!important}
+}
+@media(prefers-reduced-motion:reduce){body.panel-motion{animation:none!important}}

@@ -1,5 +1,15 @@
 # Studio — panele, rozmiar podglądu i tryb nocny
 
+Przejścia stanów na desktopie są animowane przez 190 ms (ease-out): menu
+pełne/ikony/ukryte, zwijanie ustawień i 3D. Interpolowana jest rzeczywista
+szerokość kolumn, a tekst menu łagodnie zanika. Zwykły resize w obrębie
+tego samego stanu nadal bezpośrednio śledzi kursor. Szybka zmiana kierunku
+rozpoczyna przejście od bieżącego rozmiaru, bez kolejki animacji. Preferencja
+`prefers-reduced-motion` wyłącza animację; wąski mobilny układ pozostaje bez
+animacji kolumn. PASS: próbki kolejnych klatek potwierdzają rozmiary pośrednie
+menu, edytora i 3D; przywracanie i niezmienność draftu sprawdzone osobno.
+Dowody: `artifacts/panel-motion-20261027/`.
+
 Aktualizacja sterowania: przyciski Menu/Ustawienia/Podgląd 3D usunięte.
 Przeciągnięcie krawędzi wykonuje resize oraz snap do ikon/ukrycia. Uchwyty
 są niezależne od ukrywanego panelu i pozostają przy krawędziach do jego
