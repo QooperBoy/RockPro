@@ -8,7 +8,7 @@ import unittest
 from http.server import ThreadingHTTPServer
 
 from rockpro_cad.family_concepts import build_catalog, sha, validate_draft
-from rockpro_cad.reference_studio import make_handler
+from rockpro_cad.reference_studio import make_handler, load_preview
 
 
 def fixture(root):
@@ -74,6 +74,32 @@ class ReferenceStudioTests(unittest.TestCase):
             d[field] = value
             with self.subTest(field=field), self.assertRaises(ValueError):
                 validate_draft(d, self.catalog)
+
+    def test_preview_requires_bound_source_and_preserves_the_four_slide_values(self):
+        self.catalog['workstation_preview'] = dict(source_sha256='a'*64, baseline_external_mm=[800, 740, 880])
+        d = draft(self.catalog)
+        d.update(family_id='workstation', variant_id='M04', preview=dict(source_sha256='a'*64,
+                 external_mm=[900, 800, 950], shelf_travel_mm=[0, 100, 200, 300], covers_visible=False))
+        self.assertTrue(validate_draft(d, self.catalog)['valid_draft'])
+        for field, value in [('external_mm', [100, 800, 950]), ('shelf_travel_mm', [0, 0, 0, 501]),
+                             ('source_sha256', 'b'*64), ('covers_visible', 1)]:
+            bad = copy.deepcopy(d)
+            bad['preview'][field] = value
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                validate_draft(bad, self.catalog)
+
+    def test_preview_loader_rejects_changed_geometry(self):
+        folder = self.root / 'mesh'
+        folder.mkdir()
+        ref = next(v for f in self.catalog['families'] for v in f['variants'] if v['id'] == 'M04')
+        model = dict(kind='workstation_native_preview', units='m', source_sha256=ref['source_sha256'],
+                     inventory_sha256=ref['inventory_sha256'], geometry_sha256=sha(b'original'))
+        (folder / 'model.json').write_text(json.dumps(model), encoding='utf-8')
+        (folder / 'geometry.bin').write_bytes(b'original')
+        self.assertEqual(load_preview(folder, self.catalog)[1], model)
+        (folder / 'geometry.bin').write_bytes(b'changed')
+        with self.assertRaisesRegex(ValueError, 'checksum'):
+            load_preview(folder, self.catalog)
 
     def test_dimensions_are_requirements_and_do_not_promote_cad_readiness(self):
         d = draft(self.catalog)

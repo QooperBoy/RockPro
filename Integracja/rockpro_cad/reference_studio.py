@@ -1,21 +1,47 @@
 """Local prototype for selecting source families and exporting concept drafts."""
 import argparse
+import base64
+import hashlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 from pathlib import Path
 import secrets
+import re
 from urllib.parse import urlsplit
 import webbrowser
 
 from .family_concepts import build_catalog, validate_draft
 
 STATIC = Path(__file__).with_name('reference_studio')
+IMPORT_MAP = '{"imports":{"three":"./vendor/three.module.min.js"}}'
+IMPORT_HASH = base64.b64encode(hashlib.sha256(IMPORT_MAP.encode()).digest()).decode()
 
 
-def make_handler(catalog, images, token):
+def load_preview(folder, catalog):
+    folder = Path(folder).resolve(strict=True)
+    model = json.loads((folder / 'model.json').read_text(encoding='utf-8'))
+    reference = next(v for f in catalog['families'] for v in f['variants'] if v['id'] == 'M04')
+    if model.get('kind') != 'workstation_native_preview' or model.get('units') != 'm':
+        raise ValueError('Unsupported preview format')
+    if model['source_sha256'] != reference['source_sha256'] or model['inventory_sha256'] != reference['inventory_sha256']:
+        raise ValueError('Preview is bound to another reference revision')
+    if hashlib.sha256((folder / 'geometry.bin').read_bytes()).hexdigest() != model['geometry_sha256']:
+        raise ValueError('Preview geometry checksum mismatch')
+    return folder, model
+
+
+def make_handler(catalog, images, token, preview=None):
     routes = {name: (STATIC / name, mime) for name, mime in (
         ('index.html', 'text/html; charset=utf-8'), ('app.js', 'text/javascript; charset=utf-8'),
-        ('style.css', 'text/css; charset=utf-8'))}
+        ('style.css', 'text/css; charset=utf-8'), ('workstation3d.js', 'text/javascript; charset=utf-8'),
+        ('preview_math.mjs', 'text/javascript; charset=utf-8'), ('favicon.svg', 'image/svg+xml'))}
+    vendor = STATIC.parent / 'viewer3d' / 'vendor'
+    for name in ('three.module.min.js', 'three.core.min.js', 'OrbitControls.js'):
+        routes['vendor/' + name] = (vendor / name, 'text/javascript; charset=utf-8')
+    if preview:
+        folder, model = preview
+        for name, mime in (('model.json', 'application/json'), ('geometry.bin', 'application/octet-stream')):
+            routes['workstation/' + name] = (folder / name, mime)
     routes.update({'images/' + name: (path, 'image/png') for name, path in images.items()})
     class Handler(BaseHTTPRequestHandler):
         def respond(self, status, body, mime='application/json; charset=utf-8'):
@@ -25,7 +51,7 @@ def make_handler(catalog, images, token):
             self.send_header('Cache-Control', 'no-store')
             self.send_header('X-Content-Type-Options', 'nosniff')
             self.send_header('Referrer-Policy', 'no-referrer')
-            self.send_header('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self'; frame-ancestors 'none'")
+            self.send_header('Content-Security-Policy', "default-src 'self'; script-src 'self' 'sha256-" + IMPORT_HASH + "'; style-src 'self'; frame-ancestors 'none'")
             self.end_headers()
             self.wfile.write(body)
         def endpoint(self):
@@ -65,10 +91,20 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--bundle', required=True, type=Path)
     parser.add_argument('--no-browser', action='store_true')
+    parser.add_argument('--workstation', type=Path, help='Receipt-bound converted native mesh folder')
+    parser.add_argument('--port', type=int, default=0)
+    parser.add_argument('--session-token', help='Reuse a local session URL when restarting the prototype')
     args = parser.parse_args()
     catalog, images = build_catalog(args.bundle)
-    token = secrets.token_urlsafe(24)
-    server = ThreadingHTTPServer(('127.0.0.1', 0), make_handler(catalog, images, token))
+    preview = load_preview(args.workstation, catalog) if args.workstation else None
+    if preview:
+        model = preview[1]
+        catalog['workstation_preview'] = dict(source_sha256=model['source_sha256'],
+            baseline_external_mm=[1000*(model['baseline_bounds'][k+3]-model['baseline_bounds'][k]) for k in range(3)])
+    token = args.session_token or secrets.token_urlsafe(24)
+    if not re.fullmatch(r'[A-Za-z0-9_-]{24,80}', token):
+        parser.error('Invalid local session token')
+    server = ThreadingHTTPServer(('127.0.0.1', args.port), make_handler(catalog, images, token, preview))
     server.timeout = 1
     url = f'http://127.0.0.1:{server.server_port}/{token}/'
     print(url, flush=True)

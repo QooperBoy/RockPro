@@ -85,7 +85,7 @@ def validate_draft(value, catalog):
     """A concept can be captured before its family has an executable CAD adapter."""
     required = {'schema', 'catalog_binding', 'family_id', 'variant_id', 'internal_mm',
                 'cover_height_mm', 'opening', 'transport', 'notes', 'sliding_shelves'}
-    if not isinstance(value, dict) or set(value) != required:
+    if not isinstance(value, dict) or not required.issubset(value) or set(value) - required - {'preview'}:
         raise ValueError('Nieprawidłowy zestaw pól szkicu')
     if value['schema'] != 'rockpro.concept-draft/1' or value['catalog_binding'] != catalog['binding']:
         raise ValueError('Szkic pochodzi z innej wersji katalogu')
@@ -115,7 +115,24 @@ def validate_draft(value, catalog):
             raise ValueError('Podaj liczbę półek od 1 do 30 albo pozostaw nieustaloną')
         if shelves['requested_travel_mm'] is not None and not positive(shelves['requested_travel_mm']):
             raise ValueError('Podaj dodatni wymagany wysuw albo pozostaw nieustalony')
+    if 'preview' in value:
+        preview = value['preview']
+        reference = catalog.get('workstation_preview')
+        if value['family_id'] != 'workstation' or value['variant_id'] != 'M04' or reference is None:
+            raise ValueError('Podgląd 3D nie jest dostępny dla tego wariantu')
+        if not isinstance(preview, dict) or set(preview) != {'source_sha256', 'external_mm', 'shelf_travel_mm', 'covers_visible'}:
+            raise ValueError('Nieprawidłowy stan podglądu 3D')
+        if preview['source_sha256'] != reference['source_sha256'] or type(preview['covers_visible']) is not bool:
+            raise ValueError('Podgląd wskazuje inną rewizję źródła lub nieprawidłowy stan osłon')
+        dims = preview['external_mm']
+        if (not isinstance(dims, list) or len(dims) != 3 or not all(positive(n) for n in dims)
+                or any(not base*.8 <= n <= base*1.4 for n, base in zip(dims, reference['baseline_external_mm']))):
+            raise ValueError('Gabaryt podglądu musi mieścić się w 80–140% wymiarów wzorca')
+        travels = preview['shelf_travel_mm']
+        if (not isinstance(travels, list) or len(travels) != 4
+                or any(type(n) not in (int, float) or not math.isfinite(n) or not 0 <= n <= 500 for n in travels)):
+            raise ValueError('Podaj cztery prezentacyjne wysuwy od 0 do 500 mm')
     return dict(valid_draft=True, cad_ready=False, production_approved=False,
-                message='Szkic poprawny. Wymiary i wybory zapisują wymagania; nie zmieniają obrazu wzorca.',
+                message='Szkic poprawny. Zapisano wymagania koncepcji; podgląd siatek nie zastępuje obliczeń CAD.',
                 missing=['Mapowanie światła wnętrza i osłon', 'Reguły okuć i obróbek',
                          'Wykonywalny adapter rodziny oraz próba natywna'])
