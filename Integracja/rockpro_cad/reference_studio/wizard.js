@@ -45,7 +45,7 @@ function navigate(value){placementView?.setPart(null);if(value>step&&step===1&&$
 function input(label,value,type='text') {const l=document.createElement('label');l.append(document.createTextNode(label));const e=document.createElement('input');e.type=type;e.value=value;l.append(e);return [l,e];}
 function select(label,entries,value){const l=document.createElement('label');l.append(document.createTextNode(label));const e=document.createElement('select');e.setAttribute('aria-label',label);selectOptions(e,entries,value);l.append(e);return [l,e];}
 function editors(){
- $('type-description').textContent=options.types[draft.type].description;
+
  $('cooperation-field').hidden=draft.covers.length===1;
  $('cover-editors').replaceChildren();$('section-editors').replaceChildren();
  for(const [i,c] of draft.covers.entries()){
@@ -73,7 +73,7 @@ function fill(){
  draft.hardware??=[];draft.placements??=[];
  $('name').value=draft.name;$('type').value=draft.type;$('cooperation').value=draft.cooperation;
  ['x','y','z'].forEach((key,i)=>$('dim-'+key).value=draft.internal_mm[i]);$('thickness').value=draft.thickness_mm;
- $('type-description').textContent=options.types[draft.type].description;
+
  editors();partsPicker?.setSelection(draft.hardware??[]);saveLabel();
 }
 function motionInputs(){

@@ -1,5 +1,15 @@
 # Studio — panele, rozmiar podglądu i tryb nocny
 
+Aktualizacja: menu ma trzy tryby (pełne → ikony → całkowicie ukryte),
+własny suwak szerokości 160–320 px i pamięć wybranego trybu. Przycisk Menu
+w nagłówku przywraca dostęp również po pełnym ukryciu. Ukrycie 3D usuwa cały
+prawy panel, a formularz zajmuje dostępną szerokość. Container queries dobierają
+kolumny filtrów, kart i edytorów do rzeczywistego miejsca, niezależnie od
+szerokości całego monitora. Usunięto zbędny opis pojedynczego wieka z kroku 1.
+PASS: przeglądarka — wszystkie tryby menu, suwak, pełne ukrycie 3D, rozszerzenie
+formularza, trwałość preferencji, zachowanie draftu i mobile. Dowody:
+`artifacts/studio-fluid-layout-20261027/`.
+
 27.10.2026. Kontrolki w nagłówku są niezależne od danych projektu:
 
 - Menu zwija się do wąskiego paska ikon/numerów etapów; przycisk Menu je rozwija.
