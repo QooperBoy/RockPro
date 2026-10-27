@@ -3,6 +3,12 @@
 27.10.2026. Status: propozycja architektury po przeglądzie repozytorium.
 Dokument nie oznacza wdrożenia edytora ani podłączenia pełnych T1/T2 do MCP.
 
+Aktualne wymagania użytkownika i kolejność prac:
+[indywidualny proces w 11 krokach](CUSTOM_CASE_WORKFLOW.md). Obejmuje główny typ,
+podtyp i współpracę wielu wiek, katalog, rozmieszczenie okuć, transport, logo,
+review, kontrolowany zapis CAD/foldery oraz roboczy BOM i integrację z firmowym
+Excelem. Ten proces zastępuje wcześniejszą kolejność zaczynającą od wymiarów.
+
 Uzupełnienie: podstawą kart są również wszystkie siedem przeanalizowanych
 nowych wzorców, zgrupowanych w sześć kandydatów rodzin. M01/M07 pozostają osobnymi
 wariantami ekranów. Pierwszy działający wybór wzorców i szkic wymagań opisuje
@@ -22,26 +28,18 @@ online nie dowodzi dostępności każdej metody w naszym lokalnym r180.
 
 ## Proces użytkownika
 
-1. Wnętrze: wymagana wolna przestrzeń X/Y/Z w mm, opcjonalne bryły urządzeń,
-   ich orientacja, liczba, pianki i komory. Przestrzeń wymagana jest ograniczeniem;
-   dodatkowe warstwy nie mogą jej po cichu zmniejszyć. Oddzielnie pokazujemy
-   minimalne wnętrze, wynikowe wnętrze, obrys sklejki i gabaryt transportowy.
-2. Konstrukcja i otwieranie: wybór rodziny, podział na korpus i pokrywy,
-   wysokość/głębokość każdej pokrywy, kierunek i sposób otwierania. Urządzenia
-   można przesuwać i obracać, z kontrolą wyjmowania w późniejszym etapie.
-3. Zamknięcia: wskazanie krawędzi zawiasów i ścian zamków, liczność i orientacja.
-   Para połówek ma wspólną kotwę na płaszczyźnie zamknięcia. Nie jest to dowolny
-   przedmiot umieszczony w przestrzeni.
-4. Uchwyty i dodatki: przeciąganie z katalogu na ścianę, wybór jednej sztuki lub
-   pary, symetrii, wycentrowania i odsunięcia od krawędzi. Domyślnie po dwa
-   uchwyty na przeciwnych ścianach prostopadłych do ściany zawiasów; jawna opcja
-   po jednym centralnym. Nietypowy układ wymaga zapisanego wyjątku konstruktora.
-5. Podstawa: nóżki, cztery koła, wariant piętrowany lub walizkowy z dwoma kołami
-   i teleskopem. Koła i górne gniazda są parą interfejsu piętrowania, nie osobnymi
-   zestawami ustawianymi ręcznie. Wariant walizkowy początkowo może mieć tylko
-   podgląd, dopóki nie zatwierdzimy mocowań i geometrii katalogowej.
-6. Sprawdzenie: widok zamknięty/otwarty, warstwy i lista braków. Zatwierdzenie
-   konkretnej rewizji koncepcji, plan dokładny, następnie zlecenie do IronCAD.
+1. Główny typ konstrukcji.
+2. Podtyp, sekcje, liczba wiek i sposób ich współpracy; wstępne strefy zamknięć.
+3. Wymagane wnętrze, wymiary i parametry każdej sekcji, materiały i urządzenia.
+4. Dobór SKU z wersjonowanej biblioteki części.
+5. Uchwyty i ściany montażu: liczba, orientacja, linia, symetria, drag and drop;
+   wskazanie stref zawiasów z uwzględnieniem późniejszego doboru.
+6. Finalizacja zawiasów i zatrzasków na złączach wynikających z kroków 1–2.
+7. Podstawa, koła i sparowane gniazda, podpory, nóżki i transport walizkowy.
+8. Dodatki i oznakowanie, np. logo klienta o zadanym fizycznym rozmiarze.
+9. Review konkretnej rewizji draftu oraz jawna lista braków i konfliktów.
+10. Plan, IronCAD, nowa kopia, pomiary, zapis/otwarcie, snapshot i foldery.
+11. Roboczy BOM, liczba skrzyń, zestawienie na zlecenie i przekazanie do Excela.
 
 Kroki są nawigacją po edycji. Nie narzucają kolejności obróbek wykonawcy.
 Zmiana wcześniejszego kroku unieważnia zależne wyniki walidacji i plan CAD.
@@ -150,9 +148,10 @@ Zachowujemy istniejącą blokadę, kontrolę źródeł i odzyskiwanie niepewnego
 Rozłączenie przeglądarki nie anuluje rozpoczętego joba i nie uprawnia do ponowienia.
 
 SDK 2023 i 2027 mają osobne adaptery i jawne możliwości. Zasób zapisany w 2027
-nie staje się zgodny z 2023 przez zmianę nazwy/formatu żądania. Dotychczasowy
-zakaz zapisywania prototypów pozostaje w mocy; implementacja edytora nie uruchamia
-automatycznie zapisów ani nie zamyka dokumentów użytkownika.
+nie staje się zgodny z 2023 przez zmianę nazwy/formatu żądania. Nowy proces
+obejmuje kontrolowany zapis nowych kopii w kroku 10; sam podgląd lub specyfikacja
+nie uruchamia zapisu ani nie zamyka dokumentów użytkownika. Historyczne prototypy
+wykonane bez zapisu pozostają zachowane.
 
 HTTP obsługuje polecenia, WebSocket dostarcza odtwarzalne zdarzenia postępu
 z numerem sekwencji. Trwały stan pochodzi z SQLite/dziennika, nie pamięci socketu.
@@ -182,6 +181,10 @@ adapter HTTP, zapis szkiców, adaptery pełnych T1/T2 do wspólnej usługi, wali
 montażu i eksportów oraz mapowanie koncepcja ↔ plan ↔ elementy CAD ↔ siatki.
 
 ## Kolejność realizacji i odbiór
+
+Aktualny podział na przyrosty A–G i kryteria odbioru, w tym BOM roboczy i Excel,
+jest w [CUSTOM_CASE_WORKFLOW.md](CUSTOM_CASE_WORKFLOW.md). Poniższe punkty
+zachowują techniczne zależności adapterów opisane we wcześniejszym planie.
 
 1. Kontrakt koncepcji i rejestr możliwości rodzin. Odbiór: wnętrze zachowane przy
    zmianie grubości, nieobsługiwany wariant jawnie zablokowany, serializacja rewizji.

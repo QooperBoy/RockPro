@@ -44,4 +44,8 @@ zespołów. Uruchomienie z `Integracja`:
 Prywatny pakiet modeli i indeks eksportów trzeba przekazać osobno; nie należą
 do repozytorium. Podgląd zapisuje szkic JSON i nie generuje jeszcze modelu ICS.
 
+Docelowy kreator: [proces w 11 krokach](docs/CUSTOM_CASE_WORKFLOW.md) — typ,
+podtyp/wieka, sekcje, katalog i rozmieszczenie części, review, CAD/snapshoty
+oraz wstępny BOM i integracja z firmowym Excelem. To specyfikacja do wdrożenia.
+
 Instrukcje dla agentów i powtarzalne sprawdzanie: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md). Audyt i kolejność dalszych poprawek: [docs/REPOSITORY_AUDIT.md](docs/REPOSITORY_AUDIT.md).
