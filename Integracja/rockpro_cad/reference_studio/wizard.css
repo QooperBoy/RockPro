@@ -7,3 +7,5 @@
 #steps span{overflow-wrap:anywhere}
 
 #steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}#closure-warnings{max-height:320px;overflow:auto}
+
+#new-clean{width:100%;margin:0 0 12px;border-color:#df681f;color:#b65016;background:#fff6eb;font-weight:600}

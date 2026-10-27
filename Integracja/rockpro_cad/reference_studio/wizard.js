@@ -112,7 +112,15 @@ async function init(){
  for(const b of $('steps').children)b.onclick=()=>navigate(Number(b.dataset.step));$('previous').onclick=()=>navigate(step-1);$('next').onclick=()=>navigate(step+1);
  const mayReplace=()=>!dirty||confirm('Masz niezapisane zmiany. Zastąpić bieżący draft?');
  $('save').onclick=()=>save();$('save-copy').onclick=()=>save(true);$('load').onclick=async()=>{if(!$('saved').value||!mayReplace())return;try{const item=await api('wizard/drafts/'+$('saved').value);await load(item);}catch(e){status(e.message,true);}};
- $('new').onclick=()=>{if(mayReplace())load({draft:fresh()});};
+ const startClean=async()=>{
+  if(!mayReplace())return;
+  placementView?.cancelDrag();placementView?.setPart(null);
+  placementEditor.selected=placementEditor.part=placementEditor.defaults=null;
+  closureEditor.selected=closureEditor.part=closureEditor.defaults=null;
+  partsPicker.search.value=partsPicker.category.value=partsPicker.source.value='';partsPicker.only.checked=false;
+  await load({draft:fresh()});navigate(1);status('Nowa czysta skrzynia — części i rozmieszczenie wyczyszczone. Zapisane projekty pozostają w bazie.');
+ };
+ $('new').onclick=$('new-clean').onclick=startClean;
  $('fit').onclick=()=>view?.fit();for(const [id,v]of[['open-all',100],['close-all',0]])$(id).onclick=()=>{view?.all(v);if(view)motionInputs();};
  $('export').onclick=async()=>{try{if(selectionPending())throw Error('Najpierw zastosuj wybrany typ.');await api('wizard/preview',draft);download(draft,'RockPro_koncepcja.json');}catch(e){status(e.message,true);}};
  $('import').onclick=()=>$('file').click();$('file').onchange=async()=>{try{const f=$('file').files[0];if(!f)return;if(f.size>32768)throw Error('Maksymalny rozmiar draftu to 32 KB');const value=JSON.parse(await f.text());if(!mayReplace())return;if(await load({draft:value}))status('Wczytano JSON jako nowy draft. Zapisz go, aby zachować w bazie.');}catch(e){status(e.message,true);}finally{$('file').value='';}};
