@@ -11,7 +11,7 @@ export class ConceptView {
   this.controls=new OrbitControls(this.camera,this.renderer.domElement);configureOrbit(this.controls);
   this.scene.add(new THREE.HemisphereLight(0xffffff,0x657460,2));const light=new THREE.DirectionalLight(0xffffff,2.5);light.position.set(2,-3,5);this.scene.add(light);
   this.grid=new THREE.GridHelper(20,100,0x95a88d,0xcad5c2);this.grid.rotation.x=Math.PI/2;this.scene.add(this.grid);
-  this.root=new THREE.Group();this.scene.add(this.root);this.groups=new Map();this.values={};
+  this.root=new THREE.Group();this.scene.add(this.root);this.groups=new Map();this.values={};this.faceTextures=new Map();
   new ResizeObserver(()=>this.resize()).observe(host);this.resize();
   this.renderer.setAnimationLoop(()=>{this.beforeRender?.();this.controls.update();this.renderer.render(this.scene,this.camera);});
  }
@@ -38,9 +38,34 @@ export class ConceptView {
    mesh.position.fromArray(p.center_mm.map((v,k)=>v/1000-pivot[k]));group.add(mesh);
    const edges=new THREE.LineSegments(new THREE.EdgesGeometry(geometry),new THREE.LineBasicMaterial({color:0x294e47,transparent:true,opacity:.55}));edges.position.copy(mesh.position);group.add(edges);
   }
-  // Topology edits reset opening state: old motion cannot bypass new dependencies.
+  this.addFaceLabels(model);
+ // Topology edits reset opening state: old motion cannot bypass new dependencies.
   this.values=Object.fromEntries(model.sections.slice(1).map(s=>[s.id,0]));this.apply();this.fit();
   this.grid.position.set(body[0]/2,body[1]/2,-.002);this.grid.scale.setScalar(Math.max(...body)/4);
+ }
+ faceTexture(face){
+  if(!this.faceTextures.has(face)){
+   const names={front:'PRZÓD',rear:'TYŁ',left:'LEWA',right:'PRAWA',top:'GÓRA',bottom:'DÓŁ'};
+   const canvas=document.createElement('canvas');canvas.width=512;canvas.height=128;
+   const ctx=canvas.getContext('2d');ctx.fillStyle='rgba(23,55,49,.88)';ctx.fillRect(4,4,504,120);
+   ctx.strokeStyle='#a9d5c9';ctx.lineWidth=3;ctx.strokeRect(5,5,502,118);
+   ctx.fillStyle='#ffffff';ctx.font='700 65px "Segoe UI", Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(names[face],256,65);
+   const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;this.faceTextures.set(face,texture);
+  }return this.faceTextures.get(face);
+ }
+ addFaceLabels(model){
+  for(const face of model.placement.faces){
+   const section=model.sections.find(s=>s.id===face.section_id);
+   // Six exterior directions; thin lid rims must not duplicate the body label.
+   if(section.id!=='body'&&section.face!==face.face)continue;
+   const group=this.groups.get(section.id),width=Math.min(face.size_mm[0]*.3,face.size_mm[1]*.8,160)/1000;
+   const label=new THREE.Mesh(new THREE.PlaneGeometry(width,width/4),new THREE.MeshBasicMaterial({map:this.faceTexture(face.face),transparent:true,depthWrite:false,toneMapped:false}));
+   label.userData.faceLabel=face.face;label.raycast=()=>{};
+   const v=['top','bottom'].includes(face.face) ? .5 : .25;
+   label.position.fromArray(face.origin_mm.map((x,k)=>(x+.5*face.size_mm[0]*face.u_axis[k]+v*face.size_mm[1]*face.v_axis[k]+2*face.normal[k])/1000-group.userData.pivot[k]));
+   label.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(new THREE.Vector3(...face.u_axis),new THREE.Vector3(...face.v_axis),new THREE.Vector3(...face.normal)));
+   group.add(label);
+  }
  }
  apply(){
   const normals={top:[0,0,1],front:[0,-1,0],rear:[0,1,0],left:[-1,0,0],right:[1,0,0]};
