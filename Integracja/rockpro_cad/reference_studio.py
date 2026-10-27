@@ -65,6 +65,8 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
         ('wizard.html', 'text/html; charset=utf-8'), ('wizard.js', 'text/javascript; charset=utf-8'),
         ('wizard3d.js', 'text/javascript; charset=utf-8'), ('wizard.css', 'text/css; charset=utf-8'),
         ('parts-picker.js', 'text/javascript; charset=utf-8'),
+        ('placement-editor.js', 'text/javascript; charset=utf-8'),
+        ('placement3d.js', 'text/javascript; charset=utf-8'),
         ('preview_math.mjs', 'text/javascript; charset=utf-8'), ('favicon.svg', 'image/svg+xml'))}
     vendor = STATIC.parent / 'viewer3d' / 'vendor'
     for name in ('three.module.min.js', 'three.core.min.js', 'OrbitControls.js'):
@@ -78,6 +80,7 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
             routes['models/' + key + '/' + name] = (folder / name, mime)
     routes.update({'images/' + name: (path, 'image/png') for name, path in images.items()})
     routes.update({row['metadata']['url']: (row['path'], row['mime']) for row in hardware_images.values()})
+    routes.update({row['metadata']['mesh_url']: (row['mesh_path'], 'application/json') for row in hardware_images.values() if 'mesh_path' in row})
     class Handler(BaseHTTPRequestHandler):
         def respond(self, status, body, mime='application/json; charset=utf-8'):
             self.send_response(status)

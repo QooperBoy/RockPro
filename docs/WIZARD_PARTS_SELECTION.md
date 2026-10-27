@@ -1,8 +1,8 @@
 # Studio — krok 4: baza części i wybór okuć
 
 27.10.2026. Krok 4 działa w `wizard.html` po typie, otwieraniu i wymiarach.
-To wybór definicji do koncepcji. Rozmieszczanie na ścianach, liczby wystąpień,
-kotwy oraz generowanie obróbek należą do następnego przyrostu.
+To wybór definicji do koncepcji. [Krok 5](WIZARD_PLACEMENT.md) dodaje teraz
+rozmieszczenie, liczby i kotwy na ściankach. Obróbki pozostają dalszym etapem.
 
 ## Istniejące dane
 
@@ -58,7 +58,7 @@ gabarytu i nie wpisujemy fikcyjnego zera.
 `studio_parts.py` jest adapterem istniejącej biblioteki. Kategorie używają
 `part_registry`, więc zachowują wspólne rodziny i etapy CAD/obserwatora.
 GET `wizard/parts` zwraca katalog `rockpro.studio-parts/1`, rewizję/hash,
-definicje oraz jawny brak podłączonego magazynu i rozmieszczania.
+definicje, dostępność koncepcyjnego rozmieszczania i jawny brak podłączonego magazynu.
 
 Draft `rockpro.configurator/3` dostał opcjonalne, jawnie rozpoznane pole:
 
@@ -77,8 +77,9 @@ odzyskiwanie przeglądarki oraz eksport/import JSON. Bieżące definicje mają
 rewizję 1; przyszły import powinien zachowywać stare rewizje i podnosić numer
 zmienionej definicji. To wersjonowane referencje, nie dowolny plik ICS z klienta.
 
-`hardware_summary` w odpowiedzi planera pokazuje wybrane definicje i ostrzeżenia,
-ale `placement_status=not_started`, `purchase_bom_ready=false`, `cad_ready=false`.
+`hardware_summary` w odpowiedzi planera pokazuje wybrane definicje i ostrzeżenia.
+Przed krokiem 5 ma `placement_status=not_started`; po rozmieszczeniu
+`concept_draft`. Nadal `purchase_bom_ready=false`, `cad_ready=false`.
 Suma wybranych rodzajów nie jest liczbą zamontowanych części ani zakupowym BOM.
 
 ## Weryfikacja

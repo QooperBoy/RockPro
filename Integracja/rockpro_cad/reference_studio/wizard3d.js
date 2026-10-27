@@ -16,7 +16,7 @@ export class ConceptView {
  }
  resize(){const w=this.host.clientWidth,h=this.host.clientHeight;if(!w||!h)return;this.renderer.setSize(w,h,false);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();}
  setModel(model){
-  const previous=this.values;this.root.traverse(o=>{o.geometry?.dispose();if(o.material)o.material.dispose();});this.root.clear();this.groups.clear();this.model=model;
+  const previous=this.values;this.root.traverse(o=>{o.geometry?.dispose();if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material?.dispose();});this.root.clear();this.groups.clear();this.model=model;
   const body=model.sections[0].size_mm.map(v=>v/1000);this.values={};
   for(const s of model.sections){
    const group=new THREE.Group();let pivot=[0,0,0],axis=2,direction=1;
@@ -29,10 +29,11 @@ export class ConceptView {
    }
    group.position.fromArray(pivot);group.userData={section:s,pivot,axis,direction};this.root.add(group);this.groups.set(s.id,group);
   }
-  for(const p of model.panels){
+  for(const [panelIndex,p] of model.panels.entries()){
    const group=this.groups.get(p.section),pivot=group.userData.pivot;
    const geometry=new THREE.BoxGeometry(...p.size_mm.map(v=>v/1000));
    const mesh=new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({color:p.section==='body'?0x408080:0x5a9891,roughness:.85,metalness:0}));
+   mesh.userData.panelIndex=panelIndex;
    mesh.position.fromArray(p.center_mm.map((v,k)=>v/1000-pivot[k]));group.add(mesh);
    const edges=new THREE.LineSegments(new THREE.EdgesGeometry(geometry),new THREE.LineBasicMaterial({color:0x294e47,transparent:true,opacity:.55}));edges.position.copy(mesh.position);group.add(edges);
   }

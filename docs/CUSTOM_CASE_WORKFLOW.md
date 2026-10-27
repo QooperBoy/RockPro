@@ -16,7 +16,9 @@ otwieranie ich ustalonych sekcji; wcześniejsza swobodna liczba pokryw jest
 archiwalnym wymaganiem, nie opcją obecnego interfejsu.
 
 Wdrożono również [krok 4 — bazę i wybór części](WIZARD_PARTS_SELECTION.md).
-Wybór zapisuje rodzaje okuć; ich liczby i rozmieszczenie pozostają kolejnym etapem.
+Wybór zapisuje rodzaje okuć. [Krok 5](WIZARD_PLACEMENT.md) dodaje koncepcyjne
+kotwy na ściankach, drag and drop, liczby, symetrię i zapis rozmieszczenia.
+Wycięcia i zatwierdzone połączenia okuć z liniami podziału pozostają dalszym etapem.
 
 ## Nawigacja kreatora
 

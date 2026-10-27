@@ -1,4 +1,4 @@
-"""Steps 1–3: validated concept topology, plywood preview and revisioned drafts.
+"""Steps 1–5: concept topology, selected parts and section-bound placement drafts.
 
 No CAD jobs, purchasing quantities or inferred mounting geometry.
 """
@@ -10,6 +10,7 @@ import uuid
 
 from .mcp import project_store
 from . import studio_parts
+from . import studio_placement
 
 TYPES = {
     'case': {'label': 'Skrzynia', 'description': 'Jedno górne wieko: otwierane na zawiasach po jednej stronie lub zdejmowane.', 'covers': [['top', 'hinged']]},
@@ -23,7 +24,7 @@ FACES = {'top': 'Góra', 'front': 'Przód'}
 def validate(value):
     fields = {'schema', 'name', 'type', 'internal_mm', 'thickness_mm', 'cooperation', 'covers'}
     if (not isinstance(value, dict) or not fields.issubset(value)
-            or set(value)-fields-{'hardware'} or value['schema'] != 'rockpro.configurator/3'):
+            or set(value)-fields-{'hardware','placements'} or value['schema'] != 'rockpro.configurator/3'):
         raise ValueError('Nieobsługiwany format kreatora (wymagana wersja 3, szczelina jest wynikiem doboru okucia)')
     d = copy.deepcopy(value)
     d.setdefault('hardware', [])
@@ -80,6 +81,7 @@ def validate(value):
             visit(parent, chain | {key})
     for key in ids:
         visit(key, set())
+    studio_placement.validate(d)
     return d
 
 
@@ -122,10 +124,15 @@ def preview(value):
         requires = c['requires'] if d['cooperation'] == 'custom' else ([d['covers'][i-1]['id']] if d['cooperation'] == 'sequence' and i else [])
         sections.append(dict(id=c['id'], label=c['label'], size_mm=dims, position_mm=lo, face=c['face'], kind=c['kind'], hinge_edge=c['hinge_edge'], requires=requires))
         joints.append(dict(id='joint-'+c['id'], sections=['body', c['id']], face=c['face'], gap_mm=None, plywood_trim_mm=None, fit_status='awaiting_mounting_layout' if d['hardware'] else 'awaiting_hardware'))
+    placement=studio_placement.preview(d,sections,panels)
+    summary=studio_parts.summarize(d['hardware'],d['covers'])
+    if placement['items']:
+        summary['placement_status']='concept_draft'
+        summary['note']='Wystąpienia i kotwy zapisano w koncepcji. Wycięcia, pasowanie złączy i BOM zakupowy wymagają dalszej walidacji.'
     return dict(draft=d, panels=panels, sections=sections, joints=joints, cad_ready=False,
                 panel_dimensions_status='nominal_not_cutting',
                 joint_fitting_status='awaiting_mounting_layout' if d['hardware'] else 'awaiting_hardware',
-                hardware_summary=studio_parts.summarize(d['hardware'],d['covers']),
+                hardware_summary=summary,placement=placement,
                 warnings=['Schemat sekcji bez okuć i tolerancji produkcyjnych. Ruchy pokazują intencję otwierania; oś rzeczywistego zawiasu wymaga doboru części.',
                           'Wymiary wnętrza są wymaganiem. Pokrywy są dodatkowymi sekcjami; nie zmniejszają korpusu.'])
 

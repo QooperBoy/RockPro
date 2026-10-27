@@ -33,6 +33,16 @@ def load(folder):
         result[key] = dict(path=path, mime=mime, metadata=dict(
             url='part-images/'+path.name, kind=row['kind'], label=row['label'],
             source=row['source'], sha256=row['sha256']))
+        if row.get('mesh'):
+            mesh=(folder/row['mesh']['file']).resolve(strict=True)
+            if not mesh.is_relative_to(folder) or mesh.suffix!='.json':
+                raise ValueError('Part mesh must be local JSON')
+            data=mesh.read_bytes()
+            if len(data)>16*1024*1024 or hashlib.sha256(data).hexdigest()!=row['mesh']['sha256']:
+                raise ValueError('Part mesh checksum or size mismatch')
+            result[key]['mesh_path']=mesh
+            result[key]['metadata']['mesh_url']='part-models/'+mesh.name
+            result[key]['metadata']['mesh_sha256']=row['mesh']['sha256']
     if len({r['metadata']['url'] for r in result.values()}) != len(result):
         raise ValueError('Duplicate part image filename')
     return result

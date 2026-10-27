@@ -180,6 +180,12 @@ class ReferenceStudioTests(unittest.TestCase):
         index = dict(schema='rockpro.part-images/1', images={'H7159': record})
         (self.root/'index.json').write_text(json.dumps(index), encoding='utf-8')
         images = part_images.load(self.root)
+        mesh=b'{"schema":"rockpro.part-mesh/1","units":"m","frame":"mount.local_uvn","elements":[]}'
+        (self.root/'part.mesh.json').write_bytes(mesh)
+        record['mesh']=dict(file='part.mesh.json',sha256=sha(mesh))
+        (self.root/'index.json').write_text(json.dumps(index), encoding='utf-8')
+        images=part_images.load(self.root)
+        self.assertEqual(images['H7159']['metadata']['mesh_url'],'part-models/part.mesh.json')
         original = studio_parts.catalog()
         decorated = part_images.decorate(studio_parts.catalog(), images)
         row = next(r for r in decorated['items'] if r['id']=='H7159')
@@ -196,9 +202,16 @@ class ReferenceStudioTests(unittest.TestCase):
             self.assertEqual(response.status, 200)
             self.assertEqual(response.getheader('Content-Type'), 'image/png')
             self.assertEqual(response.read(), image)
+            conn.request('GET','/session/part-models/part.mesh.json')
+            response=conn.getresponse();self.assertEqual(response.status,200)
+            self.assertEqual(response.read(),mesh)
             conn.close()
         finally:
             server.shutdown(); server.server_close(); thread.join(timeout=2)
+        (self.root/'part.mesh.json').write_bytes(mesh+b'tampered')
+        with self.assertRaisesRegex(ValueError,'mesh checksum'):
+            part_images.load(self.root)
+        (self.root/'part.mesh.json').write_bytes(mesh)
         (self.root/'part.png').write_bytes(image+b'tampered')
         with self.assertRaisesRegex(ValueError, 'checksum'):
             part_images.load(self.root)

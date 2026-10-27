@@ -79,7 +79,7 @@ def catalog():
     rows = copy.deepcopy(_definitions())
     return dict(schema='rockpro.studio-parts/1', revision=_hash(rows), categories=dict(CATEGORIES),
                 items=rows, scope='existing_reference_and_prototype_candidates',
-                placement_available=False, inventory_connected=False)
+                placement_available=True, placement_scope='section_relative_concept', inventory_connected=False)
 
 
 def resolve(selection):
