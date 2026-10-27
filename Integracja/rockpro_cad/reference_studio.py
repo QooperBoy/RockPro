@@ -12,6 +12,7 @@ import webbrowser
 
 from .family_concepts import build_catalog, validate_draft
 from . import configurator
+from . import studio_parts
 
 STATIC = Path(__file__).with_name('reference_studio')
 IMPORT_MAP = '{"imports":{"three":"./vendor/three.module.min.js"}}'
@@ -61,6 +62,7 @@ def make_handler(catalog, images, token, preview=None, previews=None):
         ('reference3d.js', 'text/javascript; charset=utf-8'),
         ('wizard.html', 'text/html; charset=utf-8'), ('wizard.js', 'text/javascript; charset=utf-8'),
         ('wizard3d.js', 'text/javascript; charset=utf-8'), ('wizard.css', 'text/css; charset=utf-8'),
+        ('parts-picker.js', 'text/javascript; charset=utf-8'),
         ('preview_math.mjs', 'text/javascript; charset=utf-8'), ('favicon.svg', 'image/svg+xml'))}
     vendor = STATIC.parent / 'viewer3d' / 'vendor'
     for name in ('three.module.min.js', 'three.core.min.js', 'OrbitControls.js'):
@@ -97,6 +99,8 @@ def make_handler(catalog, images, token, preview=None, previews=None):
                 self.respond(200, json.dumps(catalog, ensure_ascii=False).encode('utf-8'))
             elif name == 'wizard/options':
                 self.respond(200, json.dumps(dict(types=configurator.TYPES, faces=configurator.FACES), ensure_ascii=False).encode())
+            elif name == 'wizard/parts':
+                self.respond(200, json.dumps(studio_parts.catalog(), ensure_ascii=False).encode())
             elif name == 'wizard/drafts':
                 self.respond(200, json.dumps(configurator.list_drafts(), ensure_ascii=False).encode())
             elif name and name.startswith('wizard/drafts/'):

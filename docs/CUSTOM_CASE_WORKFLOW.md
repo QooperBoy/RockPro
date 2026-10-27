@@ -15,6 +15,9 @@ Krok 1 wybiera Skrzynię, Szafę lub Skrzynię 3-elementową. Krok 2 określa
 otwieranie ich ustalonych sekcji; wcześniejsza swobodna liczba pokryw jest
 archiwalnym wymaganiem, nie opcją obecnego interfejsu.
 
+Wdrożono również [krok 4 — bazę i wybór części](WIZARD_PARTS_SELECTION.md).
+Wybór zapisuje rodzaje okuć; ich liczby i rozmieszczenie pozostają kolejnym etapem.
+
 ## Nawigacja kreatora
 
 | Krok | Ekran i decyzje konstruktora | Wynik i zależności |

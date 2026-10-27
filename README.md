@@ -70,6 +70,7 @@ nie zadziała na Twoim komputerze. Zatrzymanie serwera: Ctrl+C w jego terminalu.
 | Krok 1 | Dokładnie trzy typy: Skrzynia, Szafa, Skrzynia 3-elementowa; brak podtypów i wariantu dwojga drzwi |
 | Krok 2 | Skrzynia: wieko na zawiasach albo zdejmowane. Szafa: jedna przednia powłoka otwierana lub zdejmowana. Typ 3-elementowy: zdejmowany przód i góra; współpraca pokryw i zależności otwierania |
 | Krok 3 | Wymiary wnętrza korpusu, grubość sklejki, wysokość/głębokość pokryw, aktualizowany schemat 3D. Przód wariantu 3-elementowego automatycznie licuje z górą |
+| Krok 4 | Baza 14 pozycji z dotychczasowych źródeł, wyszukiwanie i kategorie, wybór wersjonowanych definicji oraz zapis wyboru w drafcie; rozmieszczanie jest następnym etapem |
 | Draft | Zapis/odczyt w SQLite, historia rewizji, konflikt starszego zapisu, odzyskiwanie przeglądarki oraz JSON. Format aktualny: `rockpro.configurator/3`; stare formaty są zachowane i konwertowane jawnie jako nowe |
 | Dotychczasowy dodatek | C# / WinForms, Python MCP, karty projektów, układ, snapshoty i ograniczone operacje na znanym szkielecie; pełne prototypy CAD to osobny tor od Studio |
 
@@ -80,9 +81,11 @@ pokazany oddzielnie. Zielona sklejka: `#408080`.
 Szczelina złącza i docięcie sklejki mają wynikać z wybranego okucia/profilu.
 Nie są ręcznym dodatkiem do gabarytu. Na razie biblioteka montażowa nie jest
 podłączona: wyniki mają status „do ustalenia po wyborze okucia”, nie fikcyjne
-zero. Płyty podglądu nie są formatkami produkcyjnymi. Wybór części, kompletny
+zero. Płyty podglądu nie są formatkami produkcyjnymi. Rozmieszczanie wybranych części, kompletny
 plan CAD, generowanie ICS z kreatora i synchronizacja firmowego Excela
 **nie są jeszcze wdrożone**.
+
+Dostępna biblioteka i ograniczenia wyboru: [krok 4](docs/WIZARD_PARTS_SELECTION.md).
 
 Dokładniej: [aktualne wymiary i złącza](docs/WIZARD_JOINT_DIMENSIONS.md),
 [trzy typy](docs/WIZARD_THREE_TYPES.md), [galeria 3D](docs/ALL_REFERENCE_PREVIEWS.md).
@@ -93,7 +96,7 @@ zakres v1 — aktualne ograniczenia mają pierwszeństwo.
 
 1. Przyjąć pełny katalog części od Tomka: SKU, jednostki zakupowe, modele CAD,
    zgodność wersji, ramy montażu, wymagane wycięcia i dane połączeń.
-2. Wybór i rozmieszczanie okuć na ścianach/złączach, docelowo drag and drop,
+2. Rozmieszczanie wybranych okuć na ścianach/złączach, docelowo drag and drop,
    z licznością, symetrią i kontrolą konfliktów. Okucie i jego obróbki muszą
    korzystać z tej samej kotwy; gotowych okuć nie skalujemy.
 3. Wyliczać szczeliny, osadzenie profili i docięcie sklejki z konkretnego
@@ -131,6 +134,7 @@ Szczegóły: [HANDOVER](HANDOVER.md), [AUTOSTART](AUTOSTART.md).
 
 ## Kod i weryfikacja
 
+- `Integracja/rockpro_cad/studio_parts.py` i `reference_studio/parts-picker.js`: katalog oraz wybór okuć w kroku 4.
 - `Integracja/rockpro_cad/configurator.py`: reguły kroków 1–3, nominalna geometria,
   walidacja i rewizje draftów; `reference_studio.py`: lokalne trasy HTTP.
 - `Integracja/rockpro_cad/reference_studio/wizard*`: kreator i jego schemat 3D.

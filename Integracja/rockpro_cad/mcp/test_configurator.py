@@ -10,6 +10,7 @@ import unittest
 from unittest.mock import patch
 
 from rockpro_cad import configurator as c
+from rockpro_cad import studio_parts as parts
 from rockpro_cad.mcp import project_store
 from rockpro_cad.reference_studio import make_handler
 
@@ -17,7 +18,7 @@ from rockpro_cad.reference_studio import make_handler
 def concept():
     return dict(schema='rockpro.configurator/3', name='Próba kreatora', type='case',
                 internal_mm=[600,500,350], thickness_mm=9.8,
-                cooperation='independent', covers=[dict(id='lid-a',label='Wieko',face='top',depth_mm=45,
+                cooperation='independent', hardware=[], covers=[dict(id='lid-a',label='Wieko',face='top',depth_mm=45,
                     kind='hinged',hinge_edge='high',requires=[],height_override=False)])
 
 
@@ -33,6 +34,43 @@ class ConfiguratorTests(unittest.TestCase):
         self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
         self.db=Path(self.temp.name)/'projects.sqlite3'
         self.patcher=patch.object(project_store,'DB_PATH',self.db);self.patcher.start();self.addCleanup(self.patcher.stop)
+
+    def test_catalogue_keeps_aliases_as_one_definition_and_preserves_unknown_sku(self):
+        catalog=parts.catalog();rows={r['id']:r for r in catalog['items']}
+        self.assertIn('H7159',rows);self.assertIn('27095',rows)
+        self.assertIn('17251S_1',rows['17251S']['aliases']);self.assertNotIn('17251S_1',rows)
+        self.assertIsNone(rows['source-caster-epson']['sku'])
+        self.assertFalse(rows['2643']['selectable'])
+        self.assertTrue(all(not r['automatic_placement_approved'] and not r['production_approved'] for r in rows.values()))
+        catalog['items'][0]['name']='mutated';catalog['categories']['handles']='mutated'
+        self.assertNotEqual(parts.catalog()['items'][0]['name'],'mutated')
+        self.assertEqual(parts.catalog()['categories']['handles'],'Uchwyty')
+
+    def test_part_selection_refuses_unknown_revision_duplicates_and_empty_source(self):
+        ref=dict(part_id='H7159',revision=1)
+        for refs in [[dict(part_id='unknown',revision=1)], [dict(part_id='H7159',revision=2)],
+                     [dict(part_id='H7159',revision=True)], [ref,ref],
+                     [dict(part_id='2643',revision=1)], [dict(ref,quantity=4)]]:
+            d=concept();d['hardware']=refs
+            with self.subTest(refs=refs),self.assertRaises(ValueError):c.preview(d)
+
+    def test_parts_roundtrip_and_summary_never_place_or_resize_hardware(self):
+        d=concept();before=c.preview(d)
+        d['hardware']=[dict(part_id='H7159',revision=1),dict(part_id='EG-0500/1',revision=1)]
+        after=c.preview(d);summary=after['hardware_summary']
+        self.assertEqual(after['panels'],before['panels']);self.assertEqual(after['sections'],before['sections'])
+        self.assertEqual(summary['definition_count'],2);self.assertFalse(summary['purchase_bom_ready'])
+        self.assertEqual(summary['placement_status'],'not_started');self.assertTrue(summary['warnings'])
+        self.assertEqual(after['joint_fitting_status'],'awaiting_mounting_layout')
+        self.assertTrue(all(j['gap_mm'] is None and j['plywood_trim_mm'] is None for j in after['joints']))
+        saved=c.save_draft(d);self.assertEqual(c.read_draft(saved['id'])['draft'],d)
+        d['hardware'].append(dict(part_id='EG-0500/2',revision=1))
+        self.assertFalse(c.preview(d)['hardware_summary']['warnings'])
+
+    def test_existing_v3_without_hardware_keeps_empty_selection(self):
+        d=concept();d.pop('hardware');before=copy.deepcopy(d)
+        self.assertEqual(c.preview(d)['draft']['hardware'],[])
+        self.assertEqual(d,before)
 
     def test_section_envelope_and_required_interior_survive_lid_changes(self):
         d=concept();before=copy.deepcopy(d);model=c.preview(d)
@@ -163,6 +201,9 @@ class ConfiguratorTests(unittest.TestCase):
         thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
         conn=http.client.HTTPConnection('127.0.0.1',server.server_port)
         try:
+            conn.request('GET','/test/wizard/parts');response=conn.getresponse()
+            self.assertEqual(response.status,200)
+            catalogue=json.loads(response.read());self.assertIn('H7159',{r['id'] for r in catalogue['items']})
             command=dict(draft=concept(),id=None,expected_revision=0)
             conn.request('POST','/test/wizard/save',json.dumps(command),{'Origin':'https://foreign.example','X-RockPro-Session':'test'})
             response=conn.getresponse();self.assertEqual(response.status,403);response.read();self.assertFalse(self.db.exists())

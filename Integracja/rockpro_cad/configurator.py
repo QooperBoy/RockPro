@@ -9,6 +9,7 @@ import math
 import uuid
 
 from .mcp import project_store
+from . import studio_parts
 
 TYPES = {
     'case': {'label': 'Skrzynia', 'description': 'Jedno górne wieko: otwierane na zawiasach po jednej stronie lub zdejmowane.', 'covers': [['top', 'hinged']]},
@@ -21,9 +22,12 @@ FACES = {'top': 'Góra', 'front': 'Przód'}
 
 def validate(value):
     fields = {'schema', 'name', 'type', 'internal_mm', 'thickness_mm', 'cooperation', 'covers'}
-    if not isinstance(value, dict) or set(value) != fields or value['schema'] != 'rockpro.configurator/3':
+    if (not isinstance(value, dict) or not fields.issubset(value)
+            or set(value)-fields-{'hardware'} or value['schema'] != 'rockpro.configurator/3'):
         raise ValueError('Nieobsługiwany format kreatora (wymagana wersja 3, szczelina jest wynikiem doboru okucia)')
     d = copy.deepcopy(value)
+    d.setdefault('hardware', [])
+    studio_parts.resolve(d['hardware'])
     if not isinstance(d['name'], str) or not 1 <= len(d['name'].strip()) <= 200:
         raise ValueError('Podaj nazwę draftu (1–200 znaków)')
     if not isinstance(d['type'], str) or d['type'] not in TYPES:
@@ -117,10 +121,11 @@ def preview(value):
         box(c['id'], lo, dims, (axis, -sign))
         requires = c['requires'] if d['cooperation'] == 'custom' else ([d['covers'][i-1]['id']] if d['cooperation'] == 'sequence' and i else [])
         sections.append(dict(id=c['id'], label=c['label'], size_mm=dims, position_mm=lo, face=c['face'], kind=c['kind'], hinge_edge=c['hinge_edge'], requires=requires))
-        joints.append(dict(id='joint-'+c['id'], sections=['body', c['id']], face=c['face'], gap_mm=None, plywood_trim_mm=None, fit_status='awaiting_hardware'))
+        joints.append(dict(id='joint-'+c['id'], sections=['body', c['id']], face=c['face'], gap_mm=None, plywood_trim_mm=None, fit_status='awaiting_mounting_layout' if d['hardware'] else 'awaiting_hardware'))
     return dict(draft=d, panels=panels, sections=sections, joints=joints, cad_ready=False,
                 panel_dimensions_status='nominal_not_cutting',
-                joint_fitting_status='awaiting_hardware',
+                joint_fitting_status='awaiting_mounting_layout' if d['hardware'] else 'awaiting_hardware',
+                hardware_summary=studio_parts.summarize(d['hardware'],d['covers']),
                 warnings=['Schemat sekcji bez okuć i tolerancji produkcyjnych. Ruchy pokazują intencję otwierania; oś rzeczywistego zawiasu wymaga doboru części.',
                           'Wymiary wnętrza są wymaganiem. Pokrywy są dodatkowymi sekcjami; nie zmniejszają korpusu.'])
 
