@@ -39,6 +39,8 @@ obróbka T1 nie zatwierdza montażu tego SKU w dowolnej nowej konstrukcji.
 - Kategorie oraz filtr „Pokaż tylko wybrane”.
 - Karta części: opis, status wycięcia i danych montażowych, źródło oraz uwagi.
 - Zaznaczanie rodzajów części i usuwanie z podsumowania przy modelu.
+- Miniatury oraz powiększenie po kliknięciu (zamknięcie przyciskiem lub Escape).
+  Małe obrazy są także w podsumowaniu wybranych części.
 - Ostrzeżenie o brakującej połówce pary profili EG-0500 oraz o wybranym
   zawiasie przy zdejmowanych pokrywach. Program nie dodaje pary automatycznie.
 
@@ -93,3 +95,38 @@ testowa baza jest odrębna od danych użytkownika.
 
 Pełna regresja PASS: `artifacts/verification/20261027T150909063856Z/`.
 Rozmieszczenie, natywny montaż, wycena/magazyn i produkcja: NOT RUN, poza zakresem.
+
+## Obrazy części — 27.10.2026
+
+Lokalny zestaw zawiera 10 renderów z wcześniej wyeksportowanych siatek T1
+oraz trzy zdjęcia producentów: H2026 (Penn Elcom), 270836 i 27095 (Adam Hall).
+Podpis rozróżnia render CAD i zdjęcie. 2643 ma komunikat o braku geometrii.
+Nie przypisujemy mu zdjęcia innego zawiasu. Profile pokazują opisany fragment
+120 mm, bez skalowania przekroju; narożnik jedną fizyczną sztukę, a zamek
+dwie odpowiadające sobie połówki. Kadr nie jest rysunkiem wymiarowym.
+
+Prywatny lokalny pakiet: `artifacts/studio-part-images/index.json` oraz rastry.
+Studio wykrywa go domyślnie; `--part-images <folder>` jawnie wybiera inny pakiet.
+Po sklonowaniu repo bez pakietu widoczny jest opis braku obrazu, a wybór części
+nadal działa. Nie commitujemy eksportów klienta ani prywatnej bazy modeli.
+Pakiet trzeba przekazać osobno jako dozwolone zasoby podglądu.
+
+`part_images.py` sprawdza znane ID, typ obrazu, sygnaturę PNG/JPEG, limit 2 MB,
+SHA256 i pozostawanie pliku w wybranym katalogu. Serwer udostępnia wyłącznie
+te zweryfikowane pliki pod adresem bieżącej sesji. Przeglądarka nie łączy się
+ze stronami producentów przy ładowaniu miniatur. Źródło zdjęcia jest linkiem
+w szczegółach; dokładny adres pobrania jest w lokalnym indeksie.
+
+Obrazy są metadanymi prezentacji odpowiedzi HTTP, poza hashem definicji części
+i draftem. Dodanie obrazu nie podnosi rewizji SKU, nie zmienia układu ani zgód.
+Generator `scripts/render_part_thumbnails.cjs` używa lokalnego Three.js
+i deweloperskiego Playwright. Przyjmuje prywatny plik mapowania z jawnymi
+ID korzeni/węzłów, kierunkiem kadru i opcjonalnym wycięciem widoku profilu.
+Sprawdza hash wejściowego bufora. Nie otwiera IronCAD i nie zmienia ICS.
+
+PASS: test HTTP/raster/odmowy podmienionego pliku i wyjścia poza katalog,
+27 testów Studio/konfiguratora oraz pełny harness
+`artifacts/verification/20261027T153020181569Z/`.
+PASS: 13 obrazów dekoduje się w przeglądarce, modal/Escape, brak zmiany wyboru
+po powiększeniu, miniatury w podsumowaniu oraz ekran 430 px.
+Dowody: `artifacts/part-images-20261027/` (PNG i `browser-report.json`).

@@ -5,6 +5,12 @@ const cutLabels={required:'Wycięcie w sklejce: wymagane',none:'Wycięcie w skle
 export class PartsPicker {
  constructor(host,catalog,onChange){
   this.host=host;this.catalog=catalog;this.onChange=onChange;this.selected=[];
+  this.dialog=element('dialog',null,'part-image-dialog');
+  const close=element('button','Zamknij ×','part-image-close');close.type='button';close.onclick=()=>this.dialog.close();
+  this.dialogTitle=element('h2');this.dialogTitle.id='part-image-title';this.dialog.setAttribute('aria-labelledby',this.dialogTitle.id);
+  this.dialogImage=element('img');this.dialogCaption=element('p',null,'hint');this.dialog.append(close,this.dialogTitle,this.dialogImage,this.dialogCaption);
+  this.dialog.addEventListener('click',e=>{if(e.target===this.dialog){const r=this.dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)this.dialog.close();}});
+  document.body.append(this.dialog);
   host.append(element('p',`Baza robocza: ${catalog.items.length} pozycji z dotychczasowych źródeł i prototypów. Pełny katalog firmy zostanie dołączony później.`,'hint'));
   const searchLabel=element('label','Szukaj części');this.search=element('input');this.search.type='search';this.search.id='parts-search';this.search.placeholder='SKU, nazwa, producent lub alias CAD';searchLabel.append(this.search);
   const categoryLabel=element('label','Kategoria');this.category=element('select');this.category.id='parts-category';
@@ -21,6 +27,15 @@ export class PartsPicker {
   if(checked)this.selected.push({part_id:row.id,revision:row.revision});
   this.onChange(structuredClone(this.selected));this.render();
  }
+ image(row,small=false){
+  if(!row.image){const empty=element('div',row.id==='2643'?'Brak geometrii w źródle':'Obraz do uzupełnienia','part-image-missing');return empty;}
+  const button=element('button',null,'part-image-button'+(small?' compact':''));button.type='button';button.setAttribute('aria-label','Powiększ obraz '+row.id);
+  const img=element('img');img.src=row.image.url;img.alt=row.name+' — '+row.image.label;img.loading='lazy';img.width=720;img.height=480;
+  img.onerror=()=>{button.replaceWith(element('div','Nie udało się wczytać obrazu','part-image-missing'));};
+  button.append(img);if(!small)button.append(element('span',row.image.label+' · Powiększ ↗','part-image-caption'));
+  button.onclick=()=>{this.dialogTitle.textContent=(row.sku??'SKU nieustalone')+' · '+row.name;this.dialogImage.src=row.image.url;this.dialogImage.alt=img.alt;this.dialogCaption.textContent=row.image.label+'. '+row.image.source.description;this.dialog.showModal();};
+  return button;
+ }
  render(){
   const selected=new Set(this.selected.map(r=>r.part_id)),query=this.search.value.trim().toLocaleLowerCase('pl');
   const rows=this.catalog.items.filter(r=>(!this.category.value||r.family_id===this.category.value)
@@ -31,6 +46,7 @@ export class PartsPicker {
   if(!rows.length){this.list.append(element('p','Brak części pasujących do filtra.','hint'));return;}
   for(const row of rows){
    const card=element('article',null,'part-card'+(selected.has(row.id)?' selected':''));card.dataset.part=row.id;
+   card.append(this.image(row));
    const label=element('label',null,'part-choice'),check=element('input');check.type='checkbox';check.checked=selected.has(row.id);check.disabled=!row.selectable;check.dataset.part=row.id;check.setAttribute('aria-label','Wybierz '+(row.sku??row.name));
    check.onchange=()=>this.toggle(row,check.checked);
    const title=element('div');title.append(element('b',row.sku??'SKU niepotwierdzone'),element('span',row.name));label.append(check,title);card.append(label);
@@ -43,6 +59,7 @@ export class PartsPicker {
    details.append(element('p',`Rewizja definicji: ${row.revision}. Źródło: ${row.source_document}; rozpoznanie: ${row.source_checked_on}.`,'hint'));
    details.append(element('p','Wybór koncepcyjny. Brak zgody na automatyczny montaż lub produkcję. Jednostka zakupowa i stan magazynowy nie są potwierdzone.','hint'));
    if(row.source_url){const a=element('a','Źródło katalogowe ↗');a.href=row.source_url;a.target='_blank';a.rel='noreferrer noopener';details.append(a);}
+   if(row.image?.source.page_url){const a=element('a','Źródło zdjęcia ↗');a.href=row.image.source.page_url;a.target='_blank';a.rel='noreferrer noopener';details.append(a);}
    card.append(details);this.list.append(card);
   }
  }
@@ -50,7 +67,7 @@ export class PartsPicker {
   host.replaceChildren(element('h2','Wybrane części'),element('p',`Pozycje katalogowe: ${summary.definition_count}. To rodzaje części, nie liczba zamontowanych sztuk.`,'hint'));
   if(!summary.items.length){host.append(element('p','W kroku 4 wybierz części z biblioteki.','hint'));return;}
   const list=element('div',null,'selected-parts');
-  for(const row of summary.items){const chip=element('div',null,'selected-part');chip.append(element('span',(row.sku??'SKU nieustalone')+' · '+row.name));const remove=element('button','Usuń');remove.type='button';remove.setAttribute('aria-label','Usuń '+row.id);remove.onclick=()=>this.toggle(row,false);chip.append(remove);list.append(chip);}
+  for(const row of summary.items){const chip=element('div',null,'selected-part'),definition=this.catalog.items.find(r=>r.id===row.id);if(definition?.image)chip.append(this.image(definition,true));chip.append(element('span',(row.sku??'SKU nieustalone')+' · '+row.name));const remove=element('button','Usuń');remove.type='button';remove.setAttribute('aria-label','Usuń '+row.id);remove.onclick=()=>this.toggle(row,false);chip.append(remove);list.append(chip);}
   host.append(list,element('p',summary.note,'hint'));
   for(const warning of summary.warnings)host.append(element('p',warning,'notice'));
  }

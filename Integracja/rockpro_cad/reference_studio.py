@@ -13,6 +13,7 @@ import webbrowser
 from .family_concepts import build_catalog, validate_draft
 from . import configurator
 from . import studio_parts
+from . import part_images
 
 STATIC = Path(__file__).with_name('reference_studio')
 IMPORT_MAP = '{"imports":{"three":"./vendor/three.module.min.js"}}'
@@ -55,7 +56,8 @@ def load_previews(index_path, catalog):
     return previews
 
 
-def make_handler(catalog, images, token, preview=None, previews=None):
+def make_handler(catalog, images, token, preview=None, previews=None, hardware_images=None):
+    hardware_images = hardware_images or {}
     routes = {name: (STATIC / name, mime) for name, mime in (
         ('index.html', 'text/html; charset=utf-8'), ('app.js', 'text/javascript; charset=utf-8'),
         ('style.css', 'text/css; charset=utf-8'), ('workstation3d.js', 'text/javascript; charset=utf-8'),
@@ -75,6 +77,7 @@ def make_handler(catalog, images, token, preview=None, previews=None):
         for name, mime in (('model.json', 'application/json'), ('geometry.bin', 'application/octet-stream')):
             routes['models/' + key + '/' + name] = (folder / name, mime)
     routes.update({'images/' + name: (path, 'image/png') for name, path in images.items()})
+    routes.update({row['metadata']['url']: (row['path'], row['mime']) for row in hardware_images.values()})
     class Handler(BaseHTTPRequestHandler):
         def respond(self, status, body, mime='application/json; charset=utf-8'):
             self.send_response(status)
@@ -100,7 +103,7 @@ def make_handler(catalog, images, token, preview=None, previews=None):
             elif name == 'wizard/options':
                 self.respond(200, json.dumps(dict(types=configurator.TYPES, faces=configurator.FACES), ensure_ascii=False).encode())
             elif name == 'wizard/parts':
-                self.respond(200, json.dumps(studio_parts.catalog(), ensure_ascii=False).encode())
+                self.respond(200, json.dumps(part_images.decorate(studio_parts.catalog(), hardware_images), ensure_ascii=False).encode())
             elif name == 'wizard/drafts':
                 self.respond(200, json.dumps(configurator.list_drafts(), ensure_ascii=False).encode())
             elif name and name.startswith('wizard/drafts/'):
@@ -150,6 +153,7 @@ def main():
     parser.add_argument('--no-browser', action='store_true')
     parser.add_argument('--workstation', type=Path, help='Receipt-bound converted native mesh folder')
     parser.add_argument('--previews', type=Path, help='Private index of receipt-bound preview datasets')
+    parser.add_argument('--part-images', type=Path, help='Local verified part thumbnail folder')
     parser.add_argument('--port', type=int, default=0)
     parser.add_argument('--session-token', help='Reuse a local session URL when restarting the prototype')
     args = parser.parse_args()
@@ -171,7 +175,9 @@ def main():
     token = args.session_token or secrets.token_urlsafe(24)
     if not re.fullmatch(r'[A-Za-z0-9_-]{24,80}', token):
         parser.error('Invalid local session token')
-    server = ThreadingHTTPServer(('127.0.0.1', args.port), make_handler(catalog, images, token, preview, previews))
+    image_folder = args.part_images or (part_images.DEFAULT_FOLDER if part_images.DEFAULT_FOLDER.exists() else None)
+    hardware_images = part_images.load(image_folder)
+    server = ThreadingHTTPServer(('127.0.0.1', args.port), make_handler(catalog, images, token, preview, previews, hardware_images))
     server.timeout = 1
     url = f'http://127.0.0.1:{server.server_port}/{token}/'
     print(url, flush=True)

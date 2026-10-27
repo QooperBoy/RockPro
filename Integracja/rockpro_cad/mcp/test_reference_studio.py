@@ -9,6 +9,7 @@ from http.server import ThreadingHTTPServer
 
 from rockpro_cad.family_concepts import build_catalog, sha, validate_draft
 from rockpro_cad.reference_studio import make_handler, load_preview
+from rockpro_cad import part_images, studio_parts
 
 
 def fixture(root):
@@ -170,6 +171,44 @@ class ReferenceStudioTests(unittest.TestCase):
             server.shutdown()
             server.server_close()
             thread.join(timeout=2)
+
+    def test_verified_thumbnail_is_served_and_does_not_change_part_definition(self):
+        image = b'\x89PNG\r\n\x1a\nsynthetic-test-raster'
+        (self.root/'part.png').write_bytes(image)
+        record = dict(file='part.png', sha256=sha(image), kind='cad_render', label='Render testowy',
+                      source=dict(description='Synthetic fixture'))
+        index = dict(schema='rockpro.part-images/1', images={'H7159': record})
+        (self.root/'index.json').write_text(json.dumps(index), encoding='utf-8')
+        images = part_images.load(self.root)
+        original = studio_parts.catalog()
+        decorated = part_images.decorate(studio_parts.catalog(), images)
+        row = next(r for r in decorated['items'] if r['id']=='H7159')
+        self.assertEqual(row['image']['url'], 'part-images/part.png')
+        self.assertNotIn('path', row['image'])
+        self.assertEqual(decorated['revision'], original['revision'])
+        self.assertNotIn('image', original['items'][0])
+        server = ThreadingHTTPServer(('127.0.0.1', 0), make_handler({}, {}, 'session', hardware_images=images))
+        thread = threading.Thread(target=server.serve_forever, daemon=True); thread.start()
+        try:
+            conn = http.client.HTTPConnection('127.0.0.1', server.server_port)
+            conn.request('GET', '/session/part-images/part.png')
+            response = conn.getresponse()
+            self.assertEqual(response.status, 200)
+            self.assertEqual(response.getheader('Content-Type'), 'image/png')
+            self.assertEqual(response.read(), image)
+            conn.close()
+        finally:
+            server.shutdown(); server.server_close(); thread.join(timeout=2)
+        (self.root/'part.png').write_bytes(image+b'tampered')
+        with self.assertRaisesRegex(ValueError, 'checksum'):
+            part_images.load(self.root)
+        outside = self.root.parent/(self.root.name+'-outside.png')
+        record['file']='../'+outside.name
+        outside.write_bytes(image)
+        self.addCleanup(outside.unlink)
+        (self.root/'index.json').write_text(json.dumps(index), encoding='utf-8')
+        with self.assertRaisesRegex(ValueError, 'local raster'):
+            part_images.load(self.root)
 
 
 if __name__ == '__main__':
