@@ -1,3 +1,4 @@
+import {StructureView} from './structure3d.js';
 import {icon} from './viewport-ui.js';
 import {ConceptView} from './wizard3d.js';
 import {PartsPicker} from './parts-picker.js';
@@ -6,8 +7,10 @@ import {ClosureEditor} from './closure-editor.js';
 import {PlacementView} from './placement3d.js';
 const $=id=>document.getElementById(id),token=location.pathname.split('/').filter(Boolean)[0];
 let options,draft,storage={id:null,revision:0},step=1,view,timer,serial=0,dirty=false,pendingLegacy=null,partsPicker=null,placementEditor=null,placementView=null,closureEditor=null,partsCatalog;
-const localKey='rockpro.configurator.recovery.v3';
-const uiKey='rockpro.studio.context.'+token;
+const queryDraft=new URLSearchParams(location.search).get('draft');
+const requestedDraft=/^[0-9a-f]{32}$/.test(queryDraft??'')?queryDraft:null;
+const localKey='rockpro.configurator.recovery.v3'+(requestedDraft?'.'+requestedDraft:'');
+const uiKey='rockpro.studio.context.'+token+(requestedDraft?'.'+requestedDraft:'');
 function rememberContext(){
  if(!draft||!view?.model)return;stored();
  try{sessionStorage.setItem(uiKey,JSON.stringify({name:draft.name,project:storage.id,step,position:view.camera.position.toArray(),target:view.controls.target.toArray(),motion:view.values,placement:placementEditor.selected,closure:closureEditor.selected,part:placementEditor.part,closurePart:closureEditor.part,filters:{search:partsPicker.search.value,category:partsPicker.category.value,source:partsPicker.source.value,only:partsPicker.only.checked}}));}catch{}
@@ -25,6 +28,7 @@ function restoreContext(){
  }catch{}
 }
 
+let structureView=null;
 const labels={top:'Wieko górne',front:'Klapa przednia',rear:'Klapa tylna',left:'Pokrywa lewa',right:'Pokrywa prawa'};
 function cover(face='top',kind='hinged'){return {id:crypto.randomUUID(),label:labels[face],face,depth_mm:face==='top'?45:40,kind,hinge_edge:'high',requires:[],height_override:false};}
 function fresh(){return {schema:'rockpro.configurator/3',name:'Nowa skrzynia',type:'case',internal_mm:[600,500,350],thickness_mm:9.8,cooperation:'independent',covers:[cover()],hardware:[],placements:[]};}
@@ -35,12 +39,12 @@ function saveLabel(){ $('save-state').textContent=(storage.id?`Draft · rewizja 
 function changed(){dirty=true;placementView?.setEnabled(false);saveLabel();stored();clearTimeout(timer);const version=++serial;timer=setTimeout(()=>updatePreview(version),220);}
 function selectOptions(select,entries,value){select.replaceChildren(...entries.map(([id,label])=>new Option(label,id)));select.value=value;}
 function processUI(){
- const names=['','Konstrukcja','Wieka i współpraca','Wymiary sekcji','Części i okucia','Uchwyty i ścianki','Zatrzaski i zawiasy'];
- $('process-caption').textContent='Etap '+step+' z 6 · '+names[step];$('process-progress').value=step;const mobileStep=document.querySelector('.mobile-step');if(mobileStep)mobileStep.value=String(step);
+ const names=['','Konstrukcja','Wieka i współpraca','Wymiary sekcji','Części i okucia','Uchwyty i ścianki','Zatrzaski i zawiasy','Konstrukcja i podstawa'];
+ $('process-caption').textContent='Etap '+step+' z 7 · '+names[step];$('process-progress').value=step;const mobileStep=document.querySelector('.mobile-step');if(mobileStep)mobileStep.value=String(step);
  for(const b of $('steps').children){b.setAttribute('aria-current',Number(b.dataset.step)===step?'step':'false');b.classList.toggle('earlier',Number(b.dataset.step)<step);}
  if(view?.model)view.chrome.setContext(step,view.model);
 }
-function navigate(value){placementView?.setPart(null);if(value>step&&step===1&&$('type').value!==draft.type)$('apply-type').click();step=Math.min(6,Math.max(1,value));editors();for(let i=1;i<=6;i++)$('step-'+i).hidden=i!==step;for(const b of $('steps').children)b.classList.toggle('active',Number(b.dataset.step)===step);$('previous').disabled=step===1;$('next').disabled=step===6;processUI();placementView?.setEnabled(step>=5&&JSON.stringify(view.model.draft)===JSON.stringify(draft));}
+function navigate(value){placementView?.setPart(null);if(value>step&&step===1&&$('type').value!==draft.type)$('apply-type').click();step=Math.min(7,Math.max(1,value));editors();for(let i=1;i<=7;i++)$('step-'+i).hidden=i!==step;for(const b of $('steps').children)b.classList.toggle('active',Number(b.dataset.step)===step);$('previous').disabled=step===1;$('next').disabled=step===7;processUI();placementView?.setEnabled(step>=5&&JSON.stringify(view.model.draft)===JSON.stringify(draft));}
 
 function input(label,value,type='text') {const l=document.createElement('label');l.append(document.createTextNode(label));const e=document.createElement('input');e.type=type;e.value=value;l.append(e);return [l,e];}
 function select(label,entries,value){const l=document.createElement('label');l.append(document.createTextNode(label));const e=document.createElement('select');e.setAttribute('aria-label',label);selectOptions(e,entries,value);l.append(e);return [l,e];}
@@ -71,6 +75,7 @@ function editors(){
 }
 function fill(){
  draft.hardware??=[];draft.placements??=[];
+ $('construction-wheels').checked=draft.construction?.wheels??true;$('construction-stacking').checked=draft.construction?.stacking??true;
  $('name').value=draft.name;$('type').value=draft.type;$('cooperation').value=draft.cooperation;
  ['x','y','z'].forEach((key,i)=>$('dim-'+key).value=draft.internal_mm[i]);$('thickness').value=draft.thickness_mm;
 
@@ -93,9 +98,11 @@ async function updatePreview(version=++serial){
   if(sameLayout)view.model=model;else view.setModel(model);window.rockproWizardView=view;motionInputs();
   placementEditor.setModel(model);closureEditor.setModel(model);placementView.setEnabled(step>=5);
   await placementView.update(model,partsCatalog,step===6?closureEditor.selected:placementEditor.selected);if(version!==serial)return;
+  if(!structureView)structureView=new StructureView(view);await structureView.update(model,partsCatalog);if(version!==serial)return;window.rockproStructureView=structureView;
   window.rockproPlacementView=placementView;processUI();
   $('placement-summary').textContent=model.placement.instance_count+' wystąpień w koncepcji · '+(draft.placements?.length??0)+' grup'+(model.placement.unresolved_groups.length?' · grupy bez docelowej ścianki: '+model.placement.unresolved_groups.length:'')+'.';
   partsPicker.renderSummary($('hardware-summary'),model.hardware_summary);
+  renderConstruction(model);
   $('joint-fit-status').textContent=model.hardware_summary.definition_count?'do ustalenia po rozmieszczeniu i potwierdzeniu danych montażowych':'do ustalenia po wyborze okucia';
   $('preview-title').textContent=draft.name;$('preview-title').title=draft.name;$('section-sizes').replaceChildren();
   for(const s of model.sections){const e=document.createElement('div');e.className='section-size';e.textContent=s.label;const detail=document.createElement('span');detail.textContent=s.size_mm.map(x=>Number(x.toFixed(2))).join(' × ')+' mm · '+(s.id==='body'?'korpus':options.faces[s.face]);e.append(detail);$('section-sizes').append(e);}
@@ -118,16 +125,34 @@ async function load(saved){
 }
 function download(value,name){const url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 
+function renderConstruction(model){
+ const summary=model.project_summary,table=document.createElement('table');table.className='parts-table';
+ for(const row of summary.rows){const tr=document.createElement('tr');for(const text of [row.name,row.part_id.startsWith('plywood')?'Sklejka '+row.material_thickness_mm+' mm':row.part_id,row.quantity+' '+row.unit]){const td=document.createElement('td');td.textContent=text;tr.append(td);}table.append(tr);}
+ $('construction-bom').replaceChildren(table);
+ $('construction-bom').prepend(Object.assign(document.createElement('p'),{textContent:summary.total_count+' części w projekcie · '+summary.definition_count+' pozycji.'}));
+ if(draft.construction?.enabled)$('placement-summary').textContent=summary.total_count+' części w projekcie · konstrukcja i rozmieszczenie okuć.';
+}
 async function init(){
+ $('construction-apply').onclick=()=>{
+  if(draft.type!=='case'){status('Ten zestaw obsługuje obecnie skrzynię z jednym górnym wiekiem.',true);return;}
+  const wheels=$('construction-wheels').checked,stacking=$('construction-stacking').checked;
+  if(stacking&&!wheels){status('Gniazda wymagają kół. Włącz koła albo wyłącz gniazda.',true);return;}
+  const ids=['EG-0113','EG-0500/1','EG-0500/2','410429','B1930','B1121',...(wheels?['source-caster-epson']:[]),...(stacking?['W0968Z']:[])];
+  for(const id of ids)if(!draft.hardware.some(r=>r.part_id===id))draft.hardware.push({part_id:id,revision:1});
+  draft.construction={enabled:true,wheels,stacking};partsPicker.setSelection(draft.hardware);changed();
+ };
+ $('construction-remove').onclick=()=>{delete draft.construction;changed();};
+
  options=await api('wizard/options');partsCatalog=await api('wizard/parts');partsPicker=new PartsPicker($('parts-library'),partsCatalog,refs=>{const ids=new Set(refs.map(r=>r.part_id)),affected=(draft.placements??[]).filter(g=>!ids.has(g.part_id)||(g.mate_part_id&&!ids.has(g.mate_part_id)));if(affected.length&&!confirm('Usunięcie części z wyboru usunie także jej grupy rozmieszczenia ('+affected.length+'). Kontynuować?')){partsPicker.setSelection(draft.hardware);return;}draft.placements=(draft.placements??[]).filter(g=>ids.has(g.part_id)&&(!g.mate_part_id||ids.has(g.mate_part_id)));draft.hardware=refs;changed();});selectOptions($('type'),Object.entries(options.types).map(([id,t])=>[id,t.label]),'case');
  placementEditor=new PlacementEditor($('placement-editor'),partsCatalog,()=>draft,changed,id=>placementView?.select(id),id=>placementView?.setPart(id),message=>status(message));
  closureEditor=new ClosureEditor($('closure-editor'),partsCatalog,()=>draft,changed,id=>placementView?.select(id));
  draft=fresh();try{const recovery=JSON.parse(localStorage.getItem(localKey));if(recovery?.draft){await api('wizard/preview',recovery.draft);draft=recovery.draft;storage=recovery.storage;dirty=recovery.dirty;}}catch{}
- fill();await updatePreview();await refreshList();restoreContext();
+ if(requestedDraft&&storage.id!==requestedDraft){const saved=await api('wizard/drafts/'+requestedDraft);draft=saved.draft;storage={id:saved.id,revision:saved.revision};dirty=false;step=7;}
+ fill();await updatePreview();await refreshList();restoreContext();if(requestedDraft)navigate(step);
  window.addEventListener('pagehide',rememberContext);document.addEventListener('rockpro:before-navigation',rememberContext);document.addEventListener('rockpro:navigate-step',e=>navigate(e.detail));
  try{if(!localStorage.getItem(localKey)){const old=JSON.parse(localStorage.getItem('rockpro.configurator.recovery.v2')||localStorage.getItem('rockpro.configurator.recovery.v1'));if(old?.draft)showLegacy(old.draft);}}catch{}
  $('type').onchange=()=>status('Wybrany typ zostanie zastosowany przyciskiem „Zastosuj typ” lub „Dalej”.');
- $('apply-type').onclick=()=>{draft.type=$('type').value;draft.covers=options.types[draft.type].covers.map(([face,kind])=>cover(face,kind));draft.cooperation='independent';fill();changed();};
+ $('apply-type').onclick=()=>{draft.type=$('type').value;delete draft.construction;draft.covers=options.types[draft.type].covers.map(([face,kind])=>cover(face,kind));draft.cooperation='independent';fill();changed();};
  $('legacy-convert').onclick=async()=>{try{const converted=await api('wizard/convert',pendingLegacy);await load({draft:converted});status('Utworzono nowy, niezapisany draft bez ręcznej szczeliny. Złącza wymagają doboru okucia. Oryginał pozostał zachowany.');}catch(e){status(e.message,true);}};
  $('legacy-export').onclick=()=>download(pendingLegacy,'RockPro_draft_archiwalny.json');
  $('cooperation').onchange=()=>{draft.cooperation=$('cooperation').value;for(const c of draft.covers)c.requires=[];editors();changed();};

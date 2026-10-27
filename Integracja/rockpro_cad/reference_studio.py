@@ -73,6 +73,7 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
         ('studio-shell.js', 'text/javascript; charset=utf-8'),
         ('studio-shell.css', 'text/css; charset=utf-8'),
         ('placement3d.js', 'text/javascript; charset=utf-8'),
+        ('structure3d.js', 'text/javascript; charset=utf-8'),
         ('placement_math.mjs', 'text/javascript; charset=utf-8'),
         ('scene-controls.js', 'text/javascript; charset=utf-8'),
         ('preview_math.mjs', 'text/javascript; charset=utf-8'), ('favicon.svg', 'image/svg+xml'))}

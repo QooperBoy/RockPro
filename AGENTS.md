@@ -1,5 +1,10 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
+- Pełna konstrukcja w Studio: [docs/STUDIO_CONSTRUCTION.md](docs/STUDIO_CONSTRUCTION.md).
+  Zachowaj opcjonalną receptę `construction`, wspólne `project_summary`, sztywne
+  modele okuć i pary koło–gniazdo. Nie pokazuj samego wyboru katalogowego jako
+  rozmieszczonej części. Kompletny podgląd Studio nie zatwierdza obróbek ani CAD.
+
 - Organizacja nowych scen: [docs/CASE_STRUCTURE.md](docs/CASE_STRUCTURE.md).
   Stosuj sześć grup ze wspólnego rejestru; po grupowaniu odtwórz powiązania
   z planu i sprawdź zmianę wymiarów. Dla T1 zawias wymaga wycięcia w sklejce

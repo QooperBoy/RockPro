@@ -76,6 +76,6 @@ export class ViewportUI{
   }
  }
  render(){this.gizmo.render();}
- setContext(step,model){const names=['','Konstrukcja','Wieka i współpraca','Wymiary','Biblioteka części','Uchwyty i ścianki','Zatrzaski i zawiasy'];this.hudText.textContent=names[step]+' · '+model.draft.internal_mm.join(' × ')+' mm wewnątrz';}
+ setContext(step,model){const names=['','Konstrukcja','Wieka i współpraca','Wymiary','Biblioteka części','Uchwyty i ścianki','Zatrzaski i zawiasy','Konstrukcja i podstawa'];this.hudText.textContent=names[step]+' · '+model.draft.internal_mm.join(' × ')+' mm wewnątrz';}
  setSelection(text){this.selection.hidden=!text;this.selectionText.textContent=text??'';}
 }
