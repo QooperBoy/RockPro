@@ -2,9 +2,13 @@
 
 27.10.2026. Wymagania użytkownika: jedenaście etapów, od typu konstrukcji do
 wstępnego zapotrzebowania w firmowym Excelu. Ten dokument jest specyfikacją do
-wdrożenia; nie oznacza działającego kreatora, synchronizacji ERP ani generowania
+wdrożenia; nie oznacza wdrożenia całego kreatora, synchronizacji ERP ani generowania
 dowolnej rodziny w IronCAD. Aktualny działający zakres:
 [siedem podglądów źródłowych](ALL_REFERENCE_PREVIEWS.md).
+
+Wdrożony pierwszy przyrost: [kreator kroków 1–3](WIZARD_STEPS_1_3.md) z grafem
+pokryw, wymiarami sekcji, podglądem 3D i trwałym zapisem draftów. Pozostałe
+punkty tego dokumentu opisują docelowy zakres, nie gotową integrację.
 
 ## Nawigacja kreatora
 

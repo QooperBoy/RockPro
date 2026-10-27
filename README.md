@@ -49,3 +49,7 @@ podtyp/wieka, sekcje, katalog i rozmieszczenie części, review, CAD/snapshoty
 oraz wstępny BOM i integracja z firmowym Excelem. To specyfikacja do wdrożenia.
 
 Instrukcje dla agentów i powtarzalne sprawdzanie: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md). Audyt i kolejność dalszych poprawek: [docs/REPOSITORY_AUDIT.md](docs/REPOSITORY_AUDIT.md).
+
+Kreator kroków 1–3 już działa: [obsługa i zapis draftów](docs/WIZARD_STEPS_1_3.md).
+W Studio wybierz **Nowa konstrukcja**; nowy widok `wizard.html` pokazuje edytowalne
+sekcje 3D, ich współpracę i wymiary. Drafty są zapisywane z rewizjami w lokalnej SQLite.

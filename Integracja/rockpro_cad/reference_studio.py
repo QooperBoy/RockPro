@@ -11,6 +11,7 @@ from urllib.parse import urlsplit
 import webbrowser
 
 from .family_concepts import build_catalog, validate_draft
+from . import configurator
 
 STATIC = Path(__file__).with_name('reference_studio')
 IMPORT_MAP = '{"imports":{"three":"./vendor/three.module.min.js"}}'
@@ -58,6 +59,8 @@ def make_handler(catalog, images, token, preview=None, previews=None):
         ('index.html', 'text/html; charset=utf-8'), ('app.js', 'text/javascript; charset=utf-8'),
         ('style.css', 'text/css; charset=utf-8'), ('workstation3d.js', 'text/javascript; charset=utf-8'),
         ('reference3d.js', 'text/javascript; charset=utf-8'),
+        ('wizard.html', 'text/html; charset=utf-8'), ('wizard.js', 'text/javascript; charset=utf-8'),
+        ('wizard3d.js', 'text/javascript; charset=utf-8'), ('wizard.css', 'text/css; charset=utf-8'),
         ('preview_math.mjs', 'text/javascript; charset=utf-8'), ('favicon.svg', 'image/svg+xml'))}
     vendor = STATIC.parent / 'viewer3d' / 'vendor'
     for name in ('three.module.min.js', 'three.core.min.js', 'OrbitControls.js'):
@@ -80,7 +83,10 @@ def make_handler(catalog, images, token, preview=None, previews=None):
             self.send_header('Referrer-Policy', 'no-referrer')
             self.send_header('Content-Security-Policy', "default-src 'self'; script-src 'self' 'sha256-" + IMPORT_HASH + "'; style-src 'self'; frame-ancestors 'none'")
             self.end_headers()
-            self.wfile.write(body)
+            try:
+                self.wfile.write(body)
+            except ConnectionError:
+                pass  # Browser navigation can cancel a large preview download.
         def endpoint(self):
             prefix = '/' + token + '/'
             path = urlsplit(self.path).path
@@ -89,6 +95,15 @@ def make_handler(catalog, images, token, preview=None, previews=None):
             name = self.endpoint()
             if name == 'catalog.json':
                 self.respond(200, json.dumps(catalog, ensure_ascii=False).encode('utf-8'))
+            elif name == 'wizard/options':
+                self.respond(200, json.dumps(dict(types=configurator.TYPES, subtypes=configurator.SUBTYPES, faces=configurator.FACES), ensure_ascii=False).encode())
+            elif name == 'wizard/drafts':
+                self.respond(200, json.dumps(configurator.list_drafts(), ensure_ascii=False).encode())
+            elif name and name.startswith('wizard/drafts/'):
+                try:
+                    self.respond(200, json.dumps(configurator.read_draft(name.rsplit('/', 1)[1]), ensure_ascii=False).encode())
+                except ValueError as exc:
+                    self.respond(404, json.dumps({'error': str(exc)}).encode())
             elif name in routes or name == '':
                 path, mime = routes[name or 'index.html']
                 self.respond(200, path.read_bytes(), mime)
@@ -97,7 +112,7 @@ def make_handler(catalog, images, token, preview=None, previews=None):
         def do_POST(self):
             origin = self.headers.get('Origin')
             expected_origin = 'http://127.0.0.1:' + str(self.server.server_port)
-            if self.endpoint() != 'validate' or self.headers.get('X-RockPro-Session') != token or origin != expected_origin:
+            if self.endpoint() not in ('validate', 'wizard/preview', 'wizard/save') or self.headers.get('X-RockPro-Session') != token or origin != expected_origin:
                 self.respond(403, b'{}')
                 return
             try:
@@ -105,8 +120,17 @@ def make_handler(catalog, images, token, preview=None, previews=None):
                 if not 0 < length <= 32768:
                     raise ValueError('Nieprawidłowy rozmiar szkicu')
                 draft = json.loads(self.rfile.read(length).decode('utf-8'))
-                receipt = validate_draft(draft, catalog)
+                if self.endpoint() == 'wizard/preview':
+                    receipt = configurator.preview(draft)
+                elif self.endpoint() == 'wizard/save':
+                    if not isinstance(draft, dict) or set(draft) != {'draft', 'id', 'expected_revision'}:
+                        raise ValueError('Nieprawidłowe polecenie zapisu')
+                    receipt = configurator.save_draft(draft['draft'], draft['id'], draft['expected_revision'])
+                else:
+                    receipt = validate_draft(draft, catalog)
                 self.respond(200, json.dumps(receipt, ensure_ascii=False).encode('utf-8'))
+            except configurator.DraftConflict as exc:
+                self.respond(409, json.dumps({'error': str(exc)}, ensure_ascii=False).encode())
             except (ValueError, KeyError, TypeError) as exc:
                 self.respond(400, json.dumps({'error': str(exc)}, ensure_ascii=False).encode('utf-8'))
         def log_message(self, *args):
