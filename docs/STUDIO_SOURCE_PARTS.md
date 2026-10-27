@@ -1,5 +1,10 @@
 # Studio — części z pozostałych otwartych projektów
 
+Aktualna preferencja konstruktora: widoczność ograniczona do kompletnych części.
+Źródłowe komponenty/połówki, nieokreślone zespoły i niekompletne reprezentacje
+są ukryte w bibliotece, paletach i 3D. Dane historyczne są zachowane.
+Wielobryłowy kompletny uchwyt lub koło pozostaje jedną widoczną częścią.
+
 ## Aktualizacja: rzeczywiste modele w kroku 5
 
 Siatki wszystkich 39 nowych wariantów są teraz podłączone do rozmieszczania

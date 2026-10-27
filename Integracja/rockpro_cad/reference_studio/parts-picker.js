@@ -11,7 +11,7 @@ export class PartsPicker {
   this.dialogImage=element('img');this.dialogCaption=element('p',null,'hint');this.dialog.append(close,this.dialogTitle,this.dialogImage,this.dialogCaption);
   this.dialog.addEventListener('click',e=>{if(e.target===this.dialog){const r=this.dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)this.dialog.close();}});
   document.body.append(this.dialog);
-  host.append(element('p',`Baza robocza: ${catalog.items.length} pozycji z dotychczasowych źródeł i prototypów. Pełny katalog firmy zostanie dołączony później.`,'hint'));
+  host.append(element('p',`Baza robocza: ${catalog.items.length} pozycji z dotychczasowych źródeł i prototypów. Pokazujemy kompletne części; źródłowe zespoły i niekompletne fragmenty są ukryte. Pełny katalog firmy zostanie dołączony później.`,'hint'));
   const searchLabel=element('label','Szukaj części');this.search=element('input');this.search.type='search';this.search.id='parts-search';this.search.placeholder='SKU, nazwa, producent lub alias CAD';searchLabel.append(this.search);
   const categoryLabel=element('label','Kategoria');this.category=element('select');this.category.id='parts-category';
   this.category.append(new Option('Wszystkie kategorie',''));for(const [id,label]of Object.entries(catalog.categories))this.category.append(new Option(label,id));categoryLabel.append(this.category);
@@ -39,7 +39,7 @@ export class PartsPicker {
  }
  render(){
   const selected=new Set(this.selected.map(r=>r.part_id)),query=this.search.value.trim().toLocaleLowerCase('pl');
-  const rows=this.catalog.items.filter(r=>(!this.category.value||r.family_id===this.category.value)
+  const rows=this.catalog.items.filter(r=>r.show_as_complete_part!==false&&( !this.category.value||r.family_id===this.category.value)
    &&(!this.source.value||(this.source.value==='base'?!r.source_project:this.source.value==='source'?!!r.source_project:(r.observed_projects??[r.source_project]).includes(this.source.value)))
    &&(!this.only.checked||selected.has(r.id))
    &&[r.id,r.sku,r.catalog_code_raw,r.source_project,r.name,r.manufacturer,this.catalog.categories[r.family_id],...r.aliases].filter(Boolean).join(' ').toLocaleLowerCase('pl').includes(query));
@@ -72,7 +72,7 @@ export class PartsPicker {
   host.replaceChildren(element('h2','Wybrane części'),element('p',`Pozycje katalogowe: ${summary.definition_count}. To rodzaje części, nie liczba zamontowanych sztuk.`,'hint'));
   if(!summary.items.length){host.append(element('p','W kroku 4 wybierz części z biblioteki.','hint'));return;}
   const list=element('div',null,'selected-parts');
-  for(const row of summary.items){const chip=element('div',null,'selected-part'),definition=this.catalog.items.find(r=>r.id===row.id);if(definition?.image)chip.append(this.image(definition,true));chip.append(element('span',(row.sku??row.catalog_code_raw??'SKU nieustalone')+' · '+row.name));const remove=element('button','Usuń');remove.type='button';remove.setAttribute('aria-label','Usuń '+row.id);remove.onclick=()=>this.toggle(row,false);chip.append(remove);list.append(chip);}
+  for(const row of summary.items){const chip=element('div',null,'selected-part'),definition=this.catalog.items.find(r=>r.id===row.id);if(definition?.image&&definition.show_as_complete_part!==false)chip.append(this.image(definition,true));chip.append(element('span',(row.sku??row.catalog_code_raw??'SKU nieustalone')+' · '+row.name));const remove=element('button','Usuń');remove.type='button';remove.setAttribute('aria-label','Usuń '+row.id);remove.onclick=()=>this.toggle(row,false);chip.append(remove);list.append(chip);}
   host.append(list,element('p',summary.note,'hint'));
   for(const warning of summary.warnings)host.append(element('p',warning,'notice'));
  }

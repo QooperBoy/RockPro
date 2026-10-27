@@ -71,4 +71,10 @@ def decorate(catalog, images):
             entry=coverage.get(row['id'],{})
             match=next((o for o in entry.get('occurrences',[]) if o['project']==row['source_project'] and o['root_path']==row['source_binding']['root_path']),{})
             row['source_body_count']=match.get('part_count')
+        # Constructor-facing picker shows whole mounting units, not source trees or halves.
+        image=row.get('image') or {}
+        partial=(image.get('display_body_count') is not None and image.get('source_body_count') is not None
+                 and image['display_body_count']<image['source_body_count'])
+        row['show_as_complete_part']=bool(row.get('selectable') and not row.get('component_only')
+            and row.get('family_id')!='unclassified' and not partial)
     return catalog

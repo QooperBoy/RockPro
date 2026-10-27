@@ -4,7 +4,7 @@ function pick(label,options,value,id){const l=make('label',label),s=make('select
 export class ClosureEditor{
  constructor(host,catalog,getDraft,onChange,onSelect){Object.assign(this,{host,catalog,getDraft,onChange,onSelect});this.selected=null;this.part=null;this.defaults=null;}
  row(id){return this.catalog.items.find(r=>r.id===id);}
- eligible(){const ids=new Set(this.getDraft().hardware.map(r=>r.part_id));return this.catalog.items.filter(r=>ids.has(r.id)&&['hinges','latches'].includes(r.family_id));}
+ eligible(){const ids=new Set(this.getDraft().hardware.map(r=>r.part_id));return this.catalog.items.filter(r=>r.show_as_complete_part!==false&&ids.has(r.id)&&['hinges','latches'].includes(r.family_id));}
  template(row){const lines=this.model.placement.closure_lines.filter(l=>l.roles.includes(row.family_id));return {id:crypto.randomUUID(),part_id:row.id,revision:row.revision,pattern:'closure_line',seam_id:lines[0]?.id??'',count:2,edge_inset_mm:90,clearance_mm:5,avoid_handles:true,...(row.component_only?{mate_part_id:'',mate_revision:1}:{})};}
  setModel(model){this.model=model;if(!this.eligible().some(r=>r.id===this.part)){this.part=this.eligible()[0]?.id??null;this.defaults=null;}if(!this.getDraft().placements.some(g=>g.id===this.selected))this.selected=null;this.render();}
  selectGroup(id){const g=this.getDraft().placements.find(g=>g.id===id&&g.pattern==='closure_line');if(!g)return;this.selected=id;this.part=g.part_id;this.onSelect(id);this.render();}

@@ -46,3 +46,5 @@ Nowe projekty: stosuj [docs/CASE_DEFAULTS.md](docs/CASE_DEFAULTS.md): zielonkawa
 - W raporcie rozróżnij kod zaimplementowany, test jednostkowy, test natywny oraz makietę bez backendu.
 - Nowa kompilacja nie oznacza nowej DLL w działającym hoście. Rejestruj i przeładowuj po bezpiecznym zamknięciu IronCAD; zachowuj dane użytkownika. Wyniki sprawdzeń oznaczaj PASS / FAIL / NOT RUN.
 
+
+- Studio, preferencja konstruktora 27.10.2026: pokazuj kompletne, pojedyncze części do montażu. Nie pokazuj źródłowych zespołów, rozrzuconych grup ani niekompletnych połówek jako gotowych części. Najpierw wyodrębnij i potwierdź kompletną jednostkę. Wielobryłowy model jednego kompletnego uchwytu/koła jest dozwolony; liczba brył nie oznacza liczby części. Zachowaj archiwalne dane i drafty, nie kasuj ich przy filtrowaniu prezentacji.

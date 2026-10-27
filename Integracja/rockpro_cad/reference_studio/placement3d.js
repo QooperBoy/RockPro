@@ -98,7 +98,7 @@ export class PlacementView {
   for(const line of [...model.placement.joint_lines,...(model.placement.closure_lines??[])]){const parent=this.view.groups.get('body'),points=[line.start_mm,line.end_mm].map(p=>new THREE.Vector3(...p.map((x,k)=>x/1000-parent.userData.pivot[k]+line.normal[k]*.0015)));const helper=new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),new THREE.LineBasicMaterial({color:line.roles?.includes('latches')?0xe28a40:0x3b9dc9}));helper.visible=this.enabled;parent.add(helper);this.jointHelpers.push(helper);}
   for(const item of model.placement.items){
    for(const half of item.visual_halves??[{section_id:item.section_id,position_mm:item.position_mm}]){
-   const visualPart=half.part_id??item.part_id,row=rows.get(visualPart),group=new THREE.Group();if(!this.view.groups.has(half.section_id))continue;
+   const visualPart=half.part_id??item.part_id,row=rows.get(visualPart),group=new THREE.Group();if(!this.view.groups.has(half.section_id)||row?.show_as_complete_part===false)continue;
    group.userData.occurrence=item;group.userData.visualKey=item.id+'@'+half.section_id;this.pose(group,item,half.section_id,half.position_mm);
    const native=sources.get(visualPart);
    if(native&&(!item.visual_halves||item.seam_id)){
