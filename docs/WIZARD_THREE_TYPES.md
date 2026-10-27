@@ -1,5 +1,8 @@
 # Studio — trzy typy i licowanie przodu
 
+Aktualizacja: [szczelina i docięcie jako wynik doboru okucia](WIZARD_JOINT_DIMENSIONS.md).
+Ręczna szczelina została usunięta; obecny format draftu to v3.
+
 27.10.2026. Zmiana wymagań po obejrzeniu kreatora: brak wyboru podtypu.
 Zastępuje wcześniejszy katalog typów/podtypów w kroku 1.
 
@@ -17,7 +20,7 @@ Biblioteka siedmiu istniejących modeli pozostaje zachowana jako zbiór wzorców
 
 W kroku 2 można nazwać sekcje, wybrać zdejmowane wieko dla Skrzyni, ustawić stronę zawiasów dla elementu otwieranego
 oraz współpracę dwóch zdejmowanych pokryw. W kroku 3 pozostają wymiary wnętrza
-korpusu, sklejka, szczelina i osobne wysokość góry/głębokość przodu. Wysokość
+korpusu, sklejka i osobne wysokość góry/głębokość przodu (dopasowanie złączy jest wynikiem późniejszego doboru okuć). Wysokość
 przedniej powłoki jest wynikiem powiązania, nie niezależnym wymiarem do ręcznego
 wyrównywania. Reguła płytkiego wieka i jawnego odstępstwa dotyczy typu Skrzynia;
 nie ogranicza wysokości zdejmowanej góry w konstrukcji 3-elementowej.
@@ -29,7 +32,7 @@ wyżej. Dla konstrukcji 3-elementowej:
 
 ```text
 H_korpusu_zewn = H_wnętrza + 2 × grubość_sklejki
-H_przodu = H_korpusu_zewn + szczelina + H_górnej_pokrywy
+H_przodu = H_korpusu_zewn + H_górnej_pokrywy
 Z_dół_przodu = Z_dół_korpusu
 Z_góra_przodu = Z_góra_górnej_pokrywy
 ```

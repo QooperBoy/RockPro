@@ -1,5 +1,7 @@
 # Studio — działający kreator kroków 1–3
 
+Aktualna interpretacja wymiarów i złączy: [WIZARD_JOINT_DIMENSIONS.md](WIZARD_JOINT_DIMENSIONS.md).
+
 Aktualny zakres: [trzy typy bez podtypów i licowanie przodu](WIZARD_THREE_TYPES.md).
 Poniższy opis dokumentuje wcześniejszy przyrost w formacie v1; jego dodatkowe
 podtypy i wariant dwojga drzwi zostały wycofane z obecnego kreatora.

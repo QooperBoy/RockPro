@@ -56,3 +56,6 @@ sekcje 3D, ich współpracę i wymiary. Drafty są zapisywane z rewizjami w loka
 
 Aktualizacja kreatora: [trzy typy bez podtypów](docs/WIZARD_THREE_TYPES.md).
 Przód skrzyni 3-elementowej automatycznie licuje z górną pokrywą.
+
+W kreatorze XYZ to wnętrze korpusu; [szczelina i docięcie sklejki](docs/WIZARD_JOINT_DIMENSIONS.md)
+są wynikami doboru okuć, a nie ręcznym dodatkiem do gabarytu.

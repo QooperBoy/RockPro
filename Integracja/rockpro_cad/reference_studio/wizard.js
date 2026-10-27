@@ -1,10 +1,10 @@
 import {ConceptView} from './wizard3d.js';
 const $=id=>document.getElementById(id),token=location.pathname.split('/').filter(Boolean)[0];
 let options,draft,storage={id:null,revision:0},step=1,view,timer,serial=0,dirty=false,pendingLegacy=null;
-const localKey='rockpro.configurator.recovery.v2';
+const localKey='rockpro.configurator.recovery.v3';
 const labels={top:'Wieko górne',front:'Klapa przednia',rear:'Klapa tylna',left:'Pokrywa lewa',right:'Pokrywa prawa'};
 function cover(face='top',kind='hinged'){return {id:crypto.randomUUID(),label:labels[face],face,depth_mm:face==='top'?45:40,kind,hinge_edge:'high',requires:[],height_override:false};}
-function fresh(){return {schema:'rockpro.configurator/2',name:'Nowa skrzynia',type:'case',internal_mm:[600,500,350],thickness_mm:9.8,joint_gap_mm:2,cooperation:'independent',covers:[cover()]};}
+function fresh(){return {schema:'rockpro.configurator/3',name:'Nowa skrzynia',type:'case',internal_mm:[600,500,350],thickness_mm:9.8,cooperation:'independent',covers:[cover()]};}
 async function api(endpoint,data){const response=await fetch(endpoint,data===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json','X-RockPro-Session':token},body:JSON.stringify(data)});const value=await response.json();if(!response.ok)throw Error(value.error||'Błąd połączenia ze Studio');return value;}
 function status(message,error=false){$('status').textContent=message;$('status').classList.toggle('error',error);}
 function stored(){try{localStorage.setItem(localKey,JSON.stringify({draft,storage,dirty}));}catch{status('Brak miejsca na awaryjny zapis w przeglądarce. Użyj zapisu draftu lub eksportu JSON.',true);}}
@@ -42,7 +42,7 @@ function editors(){
 }
 function fill(){
  $('name').value=draft.name;$('type').value=draft.type;$('cooperation').value=draft.cooperation;
- ['x','y','z'].forEach((key,i)=>$('dim-'+key).value=draft.internal_mm[i]);$('thickness').value=draft.thickness_mm;$('gap').value=draft.joint_gap_mm;
+ ['x','y','z'].forEach((key,i)=>$('dim-'+key).value=draft.internal_mm[i]);$('thickness').value=draft.thickness_mm;
  $('type-description').textContent=options.types[draft.type].description;
  editors();saveLabel();
 }
@@ -59,8 +59,8 @@ async function updatePreview(version=++serial){
   if(!view)view=new ConceptView($('viewport'));view.setModel(model);window.rockproWizardView=view;motionInputs();
   $('preview-title').textContent=draft.name;$('section-sizes').replaceChildren();$('topology').replaceChildren();
   for(const s of model.sections){const e=document.createElement('div');e.className='section-size';e.textContent=s.label;const detail=document.createElement('span');detail.textContent=s.size_mm.map(x=>Number(x.toFixed(2))).join(' × ')+' mm · '+(s.id==='body'?'korpus':options.faces[s.face]);e.append(detail);$('section-sizes').append(e);}
-  for(const j of model.joints){const s=model.sections.find(s=>s.id===j.sections[1]),e=document.createElement('div');e.className='joint';e.textContent='Korpus ↔ '+s.label+' · '+options.faces[j.face]+(s.requires.length?' · po: '+s.requires.map(id=>model.sections.find(x=>x.id===id).label).join(', '):'');$('topology').append(e);}
-  const bounds=[0,1,2].map(k=>Math.max(...model.sections.map(s=>s.position_mm[k]+s.size_mm[k]))-Math.min(...model.sections.map(s=>s.position_mm[k])));$('envelope').textContent='Gabaryt zamkniętego schematu: '+bounds.map(x=>Number(x.toFixed(2))).join(' × ')+' mm. Bez okuć, kół i profili.';
+  for(const j of model.joints){const s=model.sections.find(s=>s.id===j.sections[1]),e=document.createElement('div');e.className='joint';e.textContent='Korpus ↔ '+s.label+' · '+options.faces[j.face]+' · szczelina i docięcie sklejki: po doborze okucia'+(s.requires.length?' · po: '+s.requires.map(id=>model.sections.find(x=>x.id===id).label).join(', '):'');$('topology').append(e);}
+  const bounds=[0,1,2].map(k=>Math.max(...model.sections.map(s=>s.position_mm[k]+s.size_mm[k]))-Math.min(...model.sections.map(s=>s.position_mm[k])));$('envelope').textContent='Gabaryt zamkniętego schematu: '+bounds.map(x=>Number(x.toFixed(2))).join(' × ')+' mm. Nominalny gabaryt bez okuć, kół i profili; dopasowanie złączy nie powiększa tych wymiarów.';
   status(model.sections.length+' sekcji · '+model.joints.length+' złączy · wnętrze '+draft.internal_mm.join(' × ')+' mm. Schemat poprawny.');
  }catch(e){if(version===serial)status('Nieaktualny podgląd — popraw dane: '+e.message,true);}
 }
@@ -75,7 +75,7 @@ async function save(asNew=false){
 }
 function showLegacy(value){pendingLegacy=structuredClone(value);$('legacy-notice').hidden=false;status('Archiwalny draft zachowany. Możesz pobrać jego oryginalny JSON lub jawnie utworzyć nowy draft w obecnych typach.',true);}
 async function load(saved){
- try{await api('wizard/preview',saved.draft);}catch(e){if(saved.draft?.schema==='rockpro.configurator/1'){showLegacy(saved.draft);return false;}throw e;}
+ try{await api('wizard/preview',saved.draft);}catch(e){if(['rockpro.configurator/1','rockpro.configurator/2'].includes(saved.draft?.schema)){showLegacy(saved.draft);return false;}throw e;}
  draft=saved.draft;storage={id:saved.id??null,revision:saved.revision??0};dirty=!storage.id;pendingLegacy=null;$('legacy-notice').hidden=true;clearTimeout(timer);serial++;fill();stored();await updatePreview();return true;
 }
 function download(value,name){const url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
@@ -84,15 +84,15 @@ async function init(){
  options=await api('wizard/options');selectOptions($('type'),Object.entries(options.types).map(([id,t])=>[id,t.label]),'case');
  draft=fresh();try{const recovery=JSON.parse(localStorage.getItem(localKey));if(recovery?.draft){await api('wizard/preview',recovery.draft);draft=recovery.draft;storage=recovery.storage;dirty=recovery.dirty;}}catch{}
  fill();await updatePreview();await refreshList();
- try{if(!localStorage.getItem(localKey)){const old=JSON.parse(localStorage.getItem('rockpro.configurator.recovery.v1'));if(old?.draft)showLegacy(old.draft);}}catch{}
+ try{if(!localStorage.getItem(localKey)){const old=JSON.parse(localStorage.getItem('rockpro.configurator.recovery.v2')||localStorage.getItem('rockpro.configurator.recovery.v1'));if(old?.draft)showLegacy(old.draft);}}catch{}
  $('type').onchange=()=>status('Wybrany typ zostanie zastosowany przyciskiem „Zastosuj typ” lub „Dalej”.');
  $('apply-type').onclick=()=>{draft.type=$('type').value;draft.covers=options.types[draft.type].covers.map(([face,kind])=>cover(face,kind));draft.cooperation='independent';fill();changed();};
- $('legacy-convert').onclick=async()=>{try{const converted=await api('wizard/convert',pendingLegacy);await load({draft:converted});status('Utworzono nowy, niezapisany draft. Dla skrzyni 3-elementowej obie pokrywy są zdejmowane, a przód licuje z górą. Oryginał pozostał zachowany.');}catch(e){status(e.message,true);}};
+ $('legacy-convert').onclick=async()=>{try{const converted=await api('wizard/convert',pendingLegacy);await load({draft:converted});status('Utworzono nowy, niezapisany draft bez ręcznej szczeliny. Złącza wymagają doboru okucia. Oryginał pozostał zachowany.');}catch(e){status(e.message,true);}};
  $('legacy-export').onclick=()=>download(pendingLegacy,'RockPro_draft_archiwalny.json');
  $('cooperation').onchange=()=>{draft.cooperation=$('cooperation').value;for(const c of draft.covers)c.requires=[];editors();changed();};
  $('name').oninput=()=>{draft.name=$('name').value;changed();};
  for(const [i,k] of ['x','y','z'].entries())$('dim-'+k).oninput=()=>{draft.internal_mm[i]=$('dim-'+k).value===''?null:Number($('dim-'+k).value);changed();};
- for(const [id,key]of[['thickness','thickness_mm'],['gap','joint_gap_mm']])$(id).oninput=()=>{draft[key]=$(id).value===''?null:Number($(id).value);changed();};
+ for(const [id,key]of[['thickness','thickness_mm']])$(id).oninput=()=>{draft[key]=$(id).value===''?null:Number($(id).value);changed();};
  for(const b of $('steps').children)b.onclick=()=>navigate(Number(b.dataset.step));$('previous').onclick=()=>navigate(step-1);$('next').onclick=()=>navigate(step+1);
  const mayReplace=()=>!dirty||confirm('Masz niezapisane zmiany. Zastąpić bieżący draft?');
  $('save').onclick=()=>save();$('save-copy').onclick=()=>save(true);$('load').onclick=async()=>{if(!$('saved').value||!mayReplace())return;try{const item=await api('wizard/drafts/'+$('saved').value);await load(item);}catch(e){status(e.message,true);}};

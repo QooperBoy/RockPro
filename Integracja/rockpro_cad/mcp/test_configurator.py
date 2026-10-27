@@ -15,8 +15,8 @@ from rockpro_cad.reference_studio import make_handler
 
 
 def concept():
-    return dict(schema='rockpro.configurator/2', name='Próba kreatora', type='case',
-                internal_mm=[600,500,350], thickness_mm=9.8, joint_gap_mm=2,
+    return dict(schema='rockpro.configurator/3', name='Próba kreatora', type='case',
+                internal_mm=[600,500,350], thickness_mm=9.8,
                 cooperation='independent', covers=[dict(id='lid-a',label='Wieko',face='top',depth_mm=45,
                     kind='hinged',hinge_edge='high',requires=[],height_override=False)])
 
@@ -45,9 +45,9 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_three_piece_front_stays_flush_with_top_and_bottom_after_resize(self):
         d=three_piece()
-        for height,top_depth,thickness,gap in [(350,45,9.8,2),(500,120,12,4),(200,30,6,.5)]:
+        for height,top_depth,thickness in [(350,45,9.8),(500,120,12),(200,30,6)]:
             with self.subTest(height=height):
-                d['internal_mm']=[800,600,height];d['thickness_mm']=thickness;d['joint_gap_mm']=gap;d['covers'][0]['depth_mm']=top_depth
+                d['internal_mm']=[800,600,height];d['thickness_mm']=thickness;d['covers'][0]['depth_mm']=top_depth
                 model=c.preview(d);body,top,front=model['sections']
                 self.assertEqual(front['position_mm'][2],body['position_mm'][2])
                 self.assertAlmostEqual(front['position_mm'][2]+front['size_mm'][2],top['position_mm'][2]+top['size_mm'][2])
@@ -56,6 +56,22 @@ class ConfiguratorTests(unittest.TestCase):
                 def upper(key):return max(p['center_mm'][2]+p['size_mm'][2]/2 for p in model['panels'] if p['section']==key)
                 self.assertAlmostEqual(upper(front['id']),upper(top['id']))
                 self.assertEqual(len(model['joints']),2)
+
+    def test_gap_is_unknown_hardware_result_and_never_expands_the_envelope(self):
+        d=three_piece();model=c.preview(d)
+        self.assertEqual(model['joint_fitting_status'],'awaiting_hardware')
+        self.assertEqual(model['panel_dimensions_status'],'nominal_not_cutting')
+        for joint in model['joints']:
+            self.assertIsNone(joint['gap_mm']);self.assertIsNone(joint['plywood_trim_mm'])
+        for previous_gap in (.5,2,8.63):
+            old=copy.deepcopy(d);old.update(schema='rockpro.configurator/2',joint_gap_mm=previous_gap)
+            original=copy.deepcopy(old);converted=c.convert_legacy(old)
+            self.assertEqual(old,original)
+            self.assertNotIn('joint_gap_mm',converted)
+            self.assertEqual(c.preview(converted)['panels'],model['panels'])
+            self.assertEqual(c.preview(converted)['sections'],model['sections'])
+        d['joint_gap_mm']=2
+        with self.assertRaises(ValueError):c.preview(d)
 
     def test_exactly_three_fixed_types_without_subtype_or_double_front(self):
         self.assertEqual(set(c.TYPES),{'case','cabinet','three_piece'})
@@ -105,7 +121,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertTrue(c.preview(d)['sections'])
 
     def test_incompatible_subtype_and_invalid_dimensions_are_refused(self):
-        for field,value in [('type','other'),('type','workstation'),('thickness_mm',True),('joint_gap_mm',float('nan'))]:
+        for field,value in [('type','other'),('type','workstation'),('thickness_mm',True),('cooperation','invalid')]:
             d=concept();d[field]=value
             with self.subTest(field=field),self.assertRaises(ValueError):c.preview(d)
         d=concept();d['internal_mm'][0]=0

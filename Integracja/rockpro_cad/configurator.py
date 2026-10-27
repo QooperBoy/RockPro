@@ -20,9 +20,9 @@ FACES = {'top': 'Góra', 'front': 'Przód'}
 
 
 def validate(value):
-    fields = {'schema', 'name', 'type', 'internal_mm', 'thickness_mm', 'joint_gap_mm', 'cooperation', 'covers'}
-    if not isinstance(value, dict) or set(value) != fields or value['schema'] != 'rockpro.configurator/2':
-        raise ValueError('Nieobsługiwany format kreatora (wymagana wersja 2, bez podtypu)')
+    fields = {'schema', 'name', 'type', 'internal_mm', 'thickness_mm', 'cooperation', 'covers'}
+    if not isinstance(value, dict) or set(value) != fields or value['schema'] != 'rockpro.configurator/3':
+        raise ValueError('Nieobsługiwany format kreatora (wymagana wersja 3, szczelina jest wynikiem doboru okucia)')
     d = copy.deepcopy(value)
     if not isinstance(d['name'], str) or not 1 <= len(d['name'].strip()) <= 200:
         raise ValueError('Podaj nazwę draftu (1–200 znaków)')
@@ -32,8 +32,8 @@ def validate(value):
         return type(n) in (float, int) and math.isfinite(n) and lo <= n <= hi
     if not isinstance(d['internal_mm'], list) or len(d['internal_mm']) != 3 or not all(number(n, 50, 10000) for n in d['internal_mm']):
         raise ValueError('Wnętrze: trzy wymiary od 50 do 10000 mm')
-    if not number(d['thickness_mm'], 3, 30) or not number(d['joint_gap_mm'], .5, 10):
-        raise ValueError('Sklejka: 3–30 mm; szczelina prezentacyjna: 0,5–10 mm')
+    if not number(d['thickness_mm'], 3, 30):
+        raise ValueError('Grubość sklejki: 3–30 mm')
     if d['cooperation'] not in ('independent', 'together', 'sequence', 'custom'):
         raise ValueError('Nieznany sposób współpracy pokryw')
     covers = d['covers']
@@ -81,7 +81,9 @@ def validate(value):
 
 def preview(value):
     d = validate(value)
-    t, gap = d['thickness_mm'], d['joint_gap_mm']
+    t = d['thickness_mm']
+    # Sections share nominal joint planes. Hardware will determine plywood
+    # setbacks/trim inside this envelope; no invented gap expands the case.
     size = [x+2*t for x in d['internal_mm']]
     panels, sections, joints = [], [], []
     axes = {'top': (2, 1), 'front': (1, -1), 'rear': (1, 1), 'left': (0, -1), 'right': (0, 1)}
@@ -105,27 +107,32 @@ def preview(value):
         dims = list(size); dims[axis] = c['depth_mm']
         if d['type'] == 'three_piece' and c['face'] == 'front':
             # Both outer top planes and both bottom planes must coincide.
-            # Raising the front adds the top section and its joint, not base height.
-            dims[2] = size[2] + gap + d['covers'][0]['depth_mm']
-        dims[split] = (size[split]-(len(peers)-1)*gap)/len(peers)
+            # Raising the front adds the top section, never a free gap or base height.
+            dims[2] = size[2] + d['covers'][0]['depth_mm']
+        dims[split] = size[split]/len(peers)
         if dims[split] < 2*t:
             raise ValueError('Zbyt wąskie skrzydło pokrywy dla tej grubości sklejki')
-        lo = [0, 0, 0]; lo[split] = order*(dims[split]+gap)
-        lo[axis] = size[axis]+gap if sign > 0 else -dims[axis]-gap
+        lo = [0, 0, 0]; lo[split] = order*dims[split]
+        lo[axis] = size[axis] if sign > 0 else -dims[axis]
         box(c['id'], lo, dims, (axis, -sign))
         requires = c['requires'] if d['cooperation'] == 'custom' else ([d['covers'][i-1]['id']] if d['cooperation'] == 'sequence' and i else [])
         sections.append(dict(id=c['id'], label=c['label'], size_mm=dims, position_mm=lo, face=c['face'], kind=c['kind'], hinge_edge=c['hinge_edge'], requires=requires))
-        joints.append(dict(id='joint-'+c['id'], sections=['body', c['id']], face=c['face'], gap_mm=gap))
+        joints.append(dict(id='joint-'+c['id'], sections=['body', c['id']], face=c['face'], gap_mm=None, plywood_trim_mm=None, fit_status='awaiting_hardware'))
     return dict(draft=d, panels=panels, sections=sections, joints=joints, cad_ready=False,
+                panel_dimensions_status='nominal_not_cutting',
+                joint_fitting_status='awaiting_hardware',
                 warnings=['Schemat sekcji bez okuć i tolerancji produkcyjnych. Ruchy pokazują intencję otwierania; oś rzeczywistego zawiasu wymaga doboru części.',
                           'Wymiary wnętrza są wymaganiem. Pokrywy są dodatkowymi sekcjami; nie zmniejszają korpusu.'])
 
 
 def convert_legacy(value):
     """Explicit conversion to a NEW draft; never rewrites archived versions."""
-    if not isinstance(value, dict) or value.get('schema') != 'rockpro.configurator/1':
-        raise ValueError('Konwersja dotyczy wyłącznie archiwalnego draftu w wersji 1')
+    if not isinstance(value, dict) or value.get('schema') not in ('rockpro.configurator/1','rockpro.configurator/2'):
+        raise ValueError('Konwersja dotyczy wyłącznie archiwalnego draftu w wersji 1 lub 2')
     d = copy.deepcopy(value)
+    if d['schema'] == 'rockpro.configurator/2':
+        d.pop('joint_gap_mm', None);d.update(schema='rockpro.configurator/3')
+        return preview(d)['draft']
     faces = [c.get('face') for c in d.get('covers', [])]
     if faces == ['top']:
         kind = 'case'
@@ -138,7 +145,7 @@ def convert_legacy(value):
             cover['kind'] = 'removable'
     else:
         raise ValueError('Ten archiwalny układ nie pasuje do trzech obecnych typów. Oryginał pozostaje zachowany; utwórz nowy draft.')
-    d.pop('subtype', None);d.update(schema='rockpro.configurator/2', type=kind)
+    d.pop('subtype', None);d.pop('joint_gap_mm', None);d.update(schema='rockpro.configurator/3', type=kind)
     return preview(d)['draft']
 
 
@@ -180,7 +187,7 @@ def save_draft(value, key=None, expected_revision=0):
     with project_store.db() as conn:
         _tables(conn); conn.execute('BEGIN IMMEDIATE')
         old = conn.execute('SELECT revision,payload FROM configurator_drafts WHERE id=?', (key,)).fetchone() if key else None
-        if old and json.loads(old['payload']).get('schema') != 'rockpro.configurator/2':
+        if old and json.loads(old['payload']).get('schema') != 'rockpro.configurator/3':
             raise ValueError('Archiwalny draft pozostaje zachowany. Zapisz konwersję jako nowy draft.')
         if (key and old is None) or (old['revision'] if old else 0) != expected_revision:
             raise DraftConflict('Draft zmienił się w innym oknie. Wczytaj bieżącą wersję lub zapisz jako nowy.')
