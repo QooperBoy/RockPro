@@ -1,5 +1,8 @@
 # RockPro CAD / Studio
 
+Studio ma teraz [krok 6 — zatrzaski i zawiasy na złączach](docs/WIZARD_CLOSURES.md):
+liczba, równy rozstaw i omijanie uchwytów, z zachowaniem draftu oraz podglądem 3D.
+
 Budujemy konfigurator skrzyń: od wyboru konstrukcji i wymaganego wnętrza,
 przez części i ich montaż, do kontrolowanego projektu IronCAD, snapshotu
 oraz zestawienia materiałów i firmowego Excela. Obliczenia mają wykonywać

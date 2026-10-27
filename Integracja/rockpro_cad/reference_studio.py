@@ -68,6 +68,7 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
         ('wizard3d.js', 'text/javascript; charset=utf-8'), ('wizard.css', 'text/css; charset=utf-8'),
         ('parts-picker.js', 'text/javascript; charset=utf-8'),
         ('placement-editor.js', 'text/javascript; charset=utf-8'),
+        ('closure-editor.js', 'text/javascript; charset=utf-8'),
         ('placement3d.js', 'text/javascript; charset=utf-8'),
         ('placement_math.mjs', 'text/javascript; charset=utf-8'),
         ('scene-controls.js', 'text/javascript; charset=utf-8'),

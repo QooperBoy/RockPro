@@ -1,5 +1,8 @@
 # Studio — krok 5: rozmieszczenie okuć
 
+Nowe rzędy zamknięć dodawaj w [kroku 6](WIZARD_CLOSURES.md). Starsze rzędy
+`joint_line` pozostają obsługiwane; poniższe opisy to wcześniejszy checkpoint.
+
 Aktualizacja 27.10: wszystkie 39 części źródłowych mają rzeczywistą geometrię
 3D w rozmieszczaniu i podczas przeciągania. Szczegóły ram prezentacji i podczęści:
 [STUDIO_SOURCE_PARTS.md](STUDIO_SOURCE_PARTS.md). Historyczne opisy znaczników

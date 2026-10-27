@@ -14,6 +14,7 @@ export class PlacementView {
   // Capture phase stops OrbitControls only when an attachment is actually dragged.
   canvas.addEventListener('pointerdown',e=>{
    if(!this.enabled||e.button!==0)return;const item=this.markerAt(e.clientX,e.clientY);
+   if(item?.seam_id){e.stopImmediatePropagation();e.preventDefault();this.onSelect(item.group_id);return;}
    if(item){e.stopImmediatePropagation();e.preventDefault();stopOrbitMotion(view.controls);canvas.setPointerCapture(e.pointerId);view.controls.enabled=false;this.drag={id:item.group_id,item,start:[e.clientX,e.clientY],pointer:e.pointerId,originals:this.markers.filter(m=>m.userData.occurrence.group_id===item.group_id).map(m=>({marker:m,parent:m.parent,position:m.position.clone(),quaternion:m.quaternion.clone()}))};this.onSelect(item.group_id);}
    else if(this.activePart){e.stopImmediatePropagation();this.pendingClick=[e.clientX,e.clientY];}
   },true);
@@ -77,13 +78,14 @@ export class PlacementView {
    const colours=new Float32Array(e.positions.length);let offset=0;
    for(const g of e.materials){const colour=new THREE.Color(g.color===16777215?0xbec9cf:g.color);for(let i=0;i<g.count;i++){colours[offset++]=colour.r;colours[offset++]=colour.g;colours[offset++]=colour.b;}}
    geometry.setAttribute('color',new THREE.BufferAttribute(colours,3));
-   return {geometry,mats:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.5,metalness:.45,side:THREE.DoubleSide})};
+   geometry.computeBoundingBox();return {geometry,region:geometry.boundingBox.getCenter(new THREE.Vector3()).y<0?'body':'cover',mats:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.5,metalness:.45,side:THREE.DoubleSide})};
   }));return this.geometryCache.get(id);
  }
- addNative(group,id,native,ghost=false){
+ addNative(group,id,native,ghost=false,half=null){
   for(const resource of this.nativeGeometry(id,native)){
+   if(half?.mesh_region&&resource.region!==half.mesh_region)continue;
    if(ghost&&!resource.ghostMaterial)resource.ghostMaterial=new THREE.MeshStandardMaterial({vertexColors:true,color:0xf6ba87,transparent:true,opacity:.55,depthWrite:false,roughness:.5,metalness:.3,side:THREE.DoubleSide});
-   const mesh=new THREE.Mesh(resource.geometry,ghost?resource.ghostMaterial:resource.mats);mesh.userData.sharedResources=true;group.add(mesh);
+   const mesh=new THREE.Mesh(resource.geometry,ghost?resource.ghostMaterial:resource.mats);mesh.userData.sharedResources=true;mesh.position.y=(half?.mesh_local_offset_y_mm??0)/1000;group.add(mesh);
   }
  }
  clear(){this.cancelDrag();for(const helper of this.jointHelpers){helper.parent?.remove(helper);helper.geometry.dispose();helper.material.dispose();}this.jointHelpers=[];for(const marker of this.markers){marker.parent?.remove(marker);marker.traverse(o=>{if(o.userData.sharedResources)return;o.geometry?.dispose();if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material?.dispose();});}this.markers=[];}
@@ -91,16 +93,16 @@ export class PlacementView {
   const serial=++this.serial;this.clear();this.catalog=catalog;
   this.view.root.traverse(o=>{if(o.userData.panelIndex!==undefined)o.userData.mountFace=model.placement.faces.find(f=>f.panel_index===o.userData.panelIndex);});
   const rows=new Map(catalog.items.map(r=>[r.id,r]));
-  const sources=new Map();await Promise.all([...new Set(model.placement.items.map(i=>i.part_id))].map(async id=>{try{sources.set(id,await this.mesh(rows.get(id)));}catch(e){sources.set(id,null);this.onMessage(e.message+' — pokazano znacznik zastępczy.');}}));
+  const sources=new Map();await Promise.all([...new Set(model.placement.items.flatMap(i=>[i.part_id,...(i.visual_halves??[]).map(h=>h.part_id).filter(Boolean)]))].map(async id=>{try{sources.set(id,await this.mesh(rows.get(id)));}catch(e){sources.set(id,null);this.onMessage(e.message+' — pokazano znacznik zastępczy.');}}));
   if(serial!==this.serial)return;
-  for(const line of model.placement.joint_lines){const parent=this.view.groups.get('body'),points=[line.start_mm,line.end_mm].map(p=>new THREE.Vector3(...p.map((x,k)=>x/1000-parent.userData.pivot[k]+line.normal[k]*.0015)));const helper=new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),new THREE.LineBasicMaterial({color:0x3b9dc9}));helper.visible=this.enabled;parent.add(helper);this.jointHelpers.push(helper);}
+  for(const line of [...model.placement.joint_lines,...(model.placement.closure_lines??[])]){const parent=this.view.groups.get('body'),points=[line.start_mm,line.end_mm].map(p=>new THREE.Vector3(...p.map((x,k)=>x/1000-parent.userData.pivot[k]+line.normal[k]*.0015)));const helper=new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),new THREE.LineBasicMaterial({color:line.roles?.includes('latches')?0xe28a40:0x3b9dc9}));helper.visible=this.enabled;parent.add(helper);this.jointHelpers.push(helper);}
   for(const item of model.placement.items){
    for(const half of item.visual_halves??[{section_id:item.section_id,position_mm:item.position_mm}]){
-   const row=rows.get(item.part_id),group=new THREE.Group();if(!this.view.groups.has(half.section_id))continue;
+   const visualPart=half.part_id??item.part_id,row=rows.get(visualPart),group=new THREE.Group();if(!this.view.groups.has(half.section_id))continue;
    group.userData.occurrence=item;group.userData.visualKey=item.id+'@'+half.section_id;this.pose(group,item,half.section_id,half.position_mm);
-   const native=sources.get(item.part_id);
-   if(native&&!item.visual_halves){
-    this.addNative(group,item.part_id,native);group.userData.geometryMode='source_mesh';
+   const native=sources.get(visualPart);
+   if(native&&(!item.visual_halves||item.seam_id)){
+    this.addNative(group,visualPart,native,false,half);group.userData.geometryMode='source_mesh';
    }else{
     // A plainly labelled concept marker, never a substitute CAD solid or cutout.
     const size=[...item.footprint_mm];if(item.rotation_deg%180)size.reverse();if(item.visual_halves)size[1]/=2;
@@ -110,6 +112,7 @@ export class PlacementView {
    const flagged=model.placement.warnings.some(w=>w.group_id===item.group_id||w.other_group_id===item.group_id),size=[...item.footprint_mm];group.userData.flagged=flagged;if(item.rotation_deg%180)size.reverse();if(item.visual_halves)size[1]/=2;
    // Pick the real local geometry envelope, including recessed parts. No fixed-size invisible handle.
    const box=new THREE.Box3();for(const child of group.children){if(!child.geometry)continue;child.geometry.computeBoundingBox();box.union(child.geometry.boundingBox.clone().translate(child.position));}
+   if(box.isEmpty()){box.min.set(-.02,-.01,0);box.max.set(.02,.01,.004);}
    const bounds=box.getSize(new THREE.Vector3()).max(new THREE.Vector3(.004,.004,.004)),center=box.getCenter(new THREE.Vector3());
    const proxyGeometry=new THREE.BoxGeometry(bounds.x+.004,bounds.y+.004,bounds.z+.004);
    const outline=new THREE.LineSegments(new THREE.EdgesGeometry(proxyGeometry),new THREE.LineBasicMaterial({color:item.group_id===selected?0xf06b1f:flagged?0xc48a24:0x447359}));outline.position.copy(center);outline.visible=item.group_id===selected;group.add(outline);

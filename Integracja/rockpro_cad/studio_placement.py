@@ -1,7 +1,7 @@
 """Section-bound concept placements. No machining, native CAD or production approval."""
 import math
 from . import studio_parts
-from . import studio_joints
+from . import studio_joints, studio_closures
 
 FACE_LABELS = dict(front='Przód', rear='Tył', left='Lewa', right='Prawa', top='Góra', bottom='Dół')
 OPPOSITE = dict(front='rear', rear='front', left='right', right='left', top='bottom', bottom='top')
@@ -21,6 +21,8 @@ def validate(draft):
         if not isinstance(g,dict) or not isinstance(g.get('part_id'),str) or g['part_id'] not in chosen:
             raise ValueError('Rozmieszczana część musi być wybrana w kroku 4')
         family=chosen[g['part_id']]['family_id'];handle=family=='handles'
+        if g.get('pattern')=='closure_line':
+            total+=studio_closures.validate(g,chosen,seen);continue
         if g.get('pattern')=='joint_line':
             if family!='hinges' or chosen[g['part_id']].get('component_only') or set(g)!={'id','part_id','revision','pattern','joint_id','hinge_count','edge_inset_mm'}:
                 raise ValueError('Rząd na złączu wymaga definicji zawiasu, linii, liczby i odsunięcia')
@@ -89,9 +91,21 @@ def preview(draft, sections, panels):
     mount_faces=faces(sections,panels);by_face={(f['section_id'],f['face']):f for f in mount_faces}
     definitions={r['id']:r for r in studio_parts.resolve(draft['hardware'])}
     joint_lines=studio_joints.lines(draft,sections,mount_faces);by_joint={j['id']:j for j in joint_lines}
+    closure_lines=studio_closures.lines(draft,sections,mount_faces);by_seam={j['id']:j for j in closure_lines}
+    envelopes={**FOOTPRINTS,**studio_closures.envelopes()}
     items=[];warnings=[];unresolved=[];counts={}
-    for g in draft.get('placements',[]):
+    for g in sorted(draft.get('placements',[]),key=lambda g:g['pattern']=='closure_line'):
         label=definitions[g['part_id']].get('catalog_code_raw') or definitions[g['part_id']]['sku'] or definitions[g['part_id']]['name']
+        if g['pattern']=='closure_line':
+            line=by_seam.get(g['seam_id'])
+            if not line or definitions[g['part_id']]['family_id'] not in line['roles']:
+                unresolved.append(g['id']);warnings.append(dict(group_id=g['id'],code='missing_seam',message='Wybrana linia nie pasuje do rodzaju okucia lub sposobu otwierania. Wskaż nowe złącze.'));continue
+            resolved,notes=studio_closures.resolve(g,line,by_face[('body',line['face'])],envelopes,definitions,items)
+            warnings.extend(notes);items.extend(resolved)
+            if not resolved:unresolved.append(g['id'])
+            counts[g['part_id']]=counts.get(g['part_id'],0)+len(resolved)
+            if g.get('mate_part_id'):counts[g['mate_part_id']]=counts.get(g['mate_part_id'],0)+len(resolved)
+            continue
         if g['pattern']=='joint_line':
             line=by_joint.get(g['joint_id']);footprint=FOOTPRINTS.get(g['part_id'])
             if not line or (g['hinge_count']>1 and 2*g['edge_inset_mm']>line['length_mm']):
@@ -120,7 +134,7 @@ def preview(draft, sections, panels):
         for face in walls:
             frame=by_face[(g['section_id'],face)];width,height=frame['size_mm']
             for i,offset in enumerate(offsets):
-                u=center+offset;v=g['v'];size=list(footprint or [64.,44.])
+                u=center+offset;v=g['v'];size=list(envelopes.get(g['part_id'],[64.,44.]))
                 # Opposing side-wall frames have opposite horizontal directions.
                 # Reflect the frame coordinate so corresponding parts stay aligned in world space.
                 if face!=g['face']:
@@ -142,8 +156,8 @@ def preview(draft, sections, panels):
             frame=by_face[(a['section_id'],a['face'])]
             if all(abs(a[k]-b[k])*frame['size_mm'][j] < (a['footprint_mm'][j]+b['footprint_mm'][j])/2+5 for j,k in enumerate(('u','v'))):
                 warnings.append(dict(group_id=a['group_id'],other_group_id=b['group_id'],code='overlap',message=a['part_id']+' i '+b['part_id']+' · '+frame['label']+': obrysy lub rezerwy 5 mm nachodzą na siebie.'))
-    return dict(schema='rockpro.concept-placement/1',faces=mount_faces,joint_lines=joint_lines,
-        part_envelopes={k:list(v) for k,v in FOOTPRINTS.items()},items=items,warnings=warnings,
+    return dict(schema='rockpro.concept-placement/1',faces=mount_faces,joint_lines=joint_lines,closure_lines=closure_lines,
+        part_envelopes={k:list(v) for k,v in envelopes.items()},items=items,warnings=warnings,
         unresolved_groups=unresolved,instance_count=len(items),counts=counts,status='draft' if items else 'not_started',
         preliminary_clearance_mm=5,collision_scope='known_2d_envelopes_same_wall',
         cutouts_generated=False,production_approved=False)
