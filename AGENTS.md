@@ -52,3 +52,5 @@ Nowe projekty: stosuj [docs/CASE_DEFAULTS.md](docs/CASE_DEFAULTS.md): zielonkawa
 - Nawigacja Studio: stały sidebar Konfigurator / Biblioteka wzorców, oddzielony od pionowych etapów projektu. Nie wracaj do odsyłacza sugerującego zewnętrzną bibliotekę. Zachowuj draft, krok, kamerę i zaznaczenie przy przejściu i powrocie. Nawigacja 3D: standardowa kostka widoków z polskimi pełnymi etykietami, nie autorski kompas punktowy. Szczegóły: docs/STUDIO_NAVIGATION_REVIEW.md.
 
 - Aktualna preferencja podglądu Studio: bez napisów na ściankach skrzyni. Kierunki wyłącznie na kompaktowej kostce widoków (96 px, mniejsze etykiety); nie przywracaj plakietek PRZÓD/TYŁ na geometrii.
+
+- Studio: utrzymuj zwijanie paneli, regulację/minimalizację 3D i przełącznik jasny/nocny w nagłówku na obu ekranach. Sprawdzaj ciasne układy i długie podpisy na desktopie oraz mobile; preferencje układu/motywu są oddzielone od draftów. Patrz docs/STUDIO_PANELS_AND_THEME.md.

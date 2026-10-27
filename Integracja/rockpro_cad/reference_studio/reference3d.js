@@ -5,7 +5,8 @@ import {placement} from './preview_math.mjs';
 
 // One WebGL context for the gallery. Replace and dispose geometry on selection.
 export class ReferenceView {
- constructor(host,status,onChange){this.host=host;this.status=status;this.onChange=onChange;this.meshes=[];this.materials=[];this.loaded=false;this.serial=0;}
+ constructor(host,status,onChange){this.host=host;this.status=status;this.onChange=onChange;this.meshes=[];this.materials=[];this.loaded=false;this.serial=0;document.addEventListener('rockpro:theme',()=>this.applyTheme());}
+ applyTheme(){if(!this.scene)return;const dark=document.body.dataset.theme==='dark';this.scene.background.setHex(dark?0x1c282f:0xe9eeea);if(this.grid){this.grid.material.transparent=true;this.grid.material.opacity=dark ? .18 : 1;}}
  async load(url,key){
   if(this.loaded&&this.url===url)return this;
   const serial=++this.serial;this.abort?.abort();this.abort=new AbortController();const signal=this.abort.signal;
@@ -47,7 +48,7 @@ export class ReferenceView {
   this.renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});this.renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));this.renderer.outputColorSpace=THREE.SRGBColorSpace;
   this.host.append(this.renderer.domElement);this.controls=new OrbitControls(this.camera,this.renderer.domElement);configureOrbit(this.controls);
   this.scene.add(new THREE.HemisphereLight(0xffffff,0x7b8c80,2.8));const light=new THREE.DirectionalLight(0xffffff,3);light.position.set(-2,-3,4);this.scene.add(light);this.scene.add(new THREE.AmbientLight(0xffffff,.3));
-  this.grid=new THREE.GridHelper(4,40,0x9aac9e,0xd0dad1);this.grid.rotation.x=Math.PI/2;this.scene.add(this.grid);
+  this.grid=new THREE.GridHelper(4,40,0x9aac9e,0xd0dad1);this.grid.rotation.x=Math.PI/2;this.scene.add(this.grid);this.applyTheme();
   this.resizeObserver=new ResizeObserver(()=>this.resize());this.resizeObserver.observe(this.host);
   this.renderer.setAnimationLoop(()=>{if(!this.loaded||this.host.hidden||this.host.closest('[hidden]'))return;this.controls.update();this.renderer.render(this.scene,this.camera);});
  }

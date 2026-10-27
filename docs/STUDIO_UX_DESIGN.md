@@ -1,5 +1,7 @@
 # Studio — spójny interfejs i proces pracy
 
+Bieżące ustawienia przestrzeni: [zwijane panele, resize i tryb nocny](STUDIO_PANELS_AND_THEME.md).
+
 Aktualny przyrost: [przegląd agenta UI/UX, stały sidebar i standardowa kostka](STUDIO_NAVIGATION_REVIEW.md).
 Opis punktowego kompasu poniżej przedstawia poprzedni checkpoint.
 

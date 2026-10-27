@@ -13,10 +13,11 @@ export class ConceptView {
   this.scene.add(new THREE.HemisphereLight(0xffffff,0x657460,2));const light=new THREE.DirectionalLight(0xffffff,2.5);light.position.set(2,-3,5);this.scene.add(light);
   this.grid=new THREE.GridHelper(20,100,0x95a88d,0xcad5c2);this.grid.rotation.x=Math.PI/2;this.scene.add(this.grid);
   this.root=new THREE.Group();this.scene.add(this.root);this.groups=new Map();this.values={};
-  this.chrome=new ViewportUI(this);
+  this.chrome=new ViewportUI(this);this.applyTheme();document.addEventListener('rockpro:theme',()=>this.applyTheme());
   new ResizeObserver(()=>this.resize()).observe(host);this.resize();
-  this.renderer.setAnimationLoop(()=>{this.beforeRender?.();this.controls.update();this.chrome.update();this.renderer.render(this.scene,this.camera);this.chrome.render();});
+  this.renderer.setAnimationLoop(()=>{if(!this.host.clientWidth||!this.host.clientHeight)return;this.beforeRender?.();this.controls.update();this.chrome.update();this.renderer.render(this.scene,this.camera);this.chrome.render();});
  }
+ applyTheme(){const dark=document.body.dataset.theme==='dark';this.scene.background.setHex(dark?0x1c282f:0xe9eee5);this.grid.material.transparent=true;this.grid.material.opacity=dark ? .18 : 1;}
  resize(){const w=this.host.clientWidth,h=this.host.clientHeight;if(!w||!h)return;const oldAspect=this.camera.aspect;this.renderer.setSize(w,h,false);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();this.chrome?.gizmo.domUpdate();if(this.model&&Math.abs(oldAspect-this.camera.aspect)>.02)this.chrome.frame(null,false);}
  setModel(model){
   const previous=this.values,hadModel=!!this.model;this.root.traverse(o=>{if(o.userData.sharedResources)return;o.geometry?.dispose();if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material?.dispose();});this.root.clear();this.groups.clear();this.model=model;
