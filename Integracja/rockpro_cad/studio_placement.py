@@ -22,7 +22,7 @@ def validate(draft):
             raise ValueError('Rozmieszczana część musi być wybrana w kroku 4')
         family=chosen[g['part_id']]['family_id'];handle=family=='handles'
         if g.get('pattern')=='joint_line':
-            if family!='hinges' or set(g)!={'id','part_id','revision','pattern','joint_id','hinge_count','edge_inset_mm'}:
+            if family!='hinges' or chosen[g['part_id']].get('component_only') or set(g)!={'id','part_id','revision','pattern','joint_id','hinge_count','edge_inset_mm'}:
                 raise ValueError('Rząd na złączu wymaga definicji zawiasu, linii, liczby i odsunięcia')
             for key in ('id','joint_id'):
                 if not isinstance(g[key],str) or not 1<=len(g[key])<=86:raise ValueError('Nieprawidłowy identyfikator rzędu zawiasów')
@@ -91,6 +91,7 @@ def preview(draft, sections, panels):
     joint_lines=studio_joints.lines(draft,sections,mount_faces);by_joint={j['id']:j for j in joint_lines}
     items=[];warnings=[];unresolved=[];counts={}
     for g in draft.get('placements',[]):
+        label=definitions[g['part_id']].get('catalog_code_raw') or definitions[g['part_id']]['sku'] or definitions[g['part_id']]['name']
         if g['pattern']=='joint_line':
             line=by_joint.get(g['joint_id']);footprint=FOOTPRINTS.get(g['part_id'])
             if not line or (g['hinge_count']>1 and 2*g['edge_inset_mm']>line['length_mm']):
@@ -112,7 +113,7 @@ def preview(draft, sections, panels):
         if definitions[g['part_id']]['family_id'] in ('hinges','latches'):
             warnings.append(dict(group_id=g['id'],code='unbound_joint',message=g['part_id']+': pozycja na ściance jest koncepcją. Przypisanie do złącza, parowanie połówek i wycięcia wymagają następnego etapu.'))
         if footprint is None:
-            warnings.append(dict(group_id=g['id'],code='unknown_envelope',message='Niepotwierdzony obrys montażowy '+g['part_id']+' — znacznik ma umowny rozmiar, kontrola kolizji niepełna.'))
+            warnings.append(dict(group_id=g['id'],code='unknown_envelope',message='Niepotwierdzony obrys montażowy '+label+' — znacznik ma umowny rozmiar, kontrola kolizji niepełna.'))
         n=g['count_per_wall']
         offsets=[0] if n==1 else [(i/(n-1)-.5)*g['spread'] for i in range(n)]
         center=.5 if g['pattern']=='symmetric' else g['u']
@@ -134,7 +135,7 @@ def preview(draft, sections, panels):
                 items.append(item);counts[g['part_id']]=counts.get(g['part_id'],0)+1
                 margin=5. # Preliminary placement clearance only, never a manufacturing tolerance.
                 if u*width-size[0]/2<margin or (1-u)*width-size[0]/2<margin or v*height-size[1]/2<margin or (1-v)*height-size[1]/2<margin:
-                    warnings.append(dict(group_id=g['id'],occurrence_id=item['id'],code='edge_clearance',message=g['part_id']+' · '+frame['label']+': obrys lub rezerwa 5 mm wychodzi poza ściankę.'))
+                    warnings.append(dict(group_id=g['id'],occurrence_id=item['id'],code='edge_clearance',message=label+' · '+frame['label']+': obrys lub rezerwa 5 mm wychodzi poza ściankę.'))
     for i,a in enumerate(items):
         for b in items[i+1:]:
             if a['face_key']!=b['face_key'] or not(a['footprint_known'] and b['footprint_known']):continue

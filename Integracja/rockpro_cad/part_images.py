@@ -49,6 +49,13 @@ def load(folder):
 
 
 def decorate(catalog, images):
+    coverage={r['selected_definition']:r for r in catalog.get('source_report',{}).get('coverage',[])}
+    observations={key:sorted({o['project'] for o in r['occurrences']}) for key,r in coverage.items()}
     for row in catalog['items']:
         row['image'] = images.get(row['id'], {}).get('metadata')
+        if row.get('source_project'):
+            row['observed_projects']=observations.get(row['id'],[row['source_project']])
+            entry=coverage.get(row['id'],{})
+            match=next((o for o in entry.get('occurrences',[]) if o['project']==row['source_project'] and o['root_path']==row['source_binding']['root_path']),{})
+            row['source_body_count']=match.get('part_count')
     return catalog

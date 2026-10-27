@@ -4,6 +4,8 @@
 bez uruchamiania IronCAD. Operuje wyłącznie częściami wybranymi w kroku 4.
 Późniejszy przyrost: [płynny ruch, środkowy przycisk, więcej uchwytów
 i rzędy zawiasów](STUDIO_INTERACTION.md).
+[Import z pozostałych projektów](STUDIO_SOURCE_PARTS.md) dodaje lokalnie 39
+wariantów źródłowych do palety; niepotwierdzone ramy używają znaczników.
 
 ## Użycie
 

@@ -3,6 +3,8 @@
 27.10.2026. Krok 4 działa w `wizard.html` po typie, otwieraniu i wymiarach.
 To wybór definicji do koncepcji. [Krok 5](WIZARD_PLACEMENT.md) dodaje teraz
 rozmieszczenie, liczby i kotwy na ściankach. Obróbki pozostają dalszym etapem.
+Nowszy przyrost z tego dnia: [39 wariantów z innych projektów](STUDIO_SOURCE_PARTS.md).
+Lokalnie razem 53 wpisy; poniższa tabela 14 pozycji opisuje bibliotekę bazową.
 
 ## Istniejące dane
 

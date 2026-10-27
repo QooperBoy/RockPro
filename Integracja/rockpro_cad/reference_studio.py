@@ -4,6 +4,7 @@ import base64
 import hashlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
+import os
 from pathlib import Path
 import secrets
 import re
@@ -14,6 +15,7 @@ from .family_concepts import build_catalog, validate_draft
 from . import configurator
 from . import studio_parts
 from . import part_images
+from . import source_parts
 
 STATIC = Path(__file__).with_name('reference_studio')
 IMPORT_MAP = '{"imports":{"three":"./vendor/three.module.min.js"}}'
@@ -159,9 +161,11 @@ def main():
     parser.add_argument('--workstation', type=Path, help='Receipt-bound converted native mesh folder')
     parser.add_argument('--previews', type=Path, help='Private index of receipt-bound preview datasets')
     parser.add_argument('--part-images', type=Path, help='Local verified part thumbnail folder')
+    parser.add_argument('--source-parts', type=Path, help='Optional source-bound candidate catalogue')
     parser.add_argument('--port', type=int, default=0)
     parser.add_argument('--session-token', help='Reuse a local session URL when restarting the prototype')
     args = parser.parse_args()
+    if args.source_parts:os.environ['ROCKPRO_SOURCE_PARTS']=str(args.source_parts.resolve(strict=True))
     catalog, images = build_catalog(args.bundle)
     preview = load_preview(args.workstation, catalog) if args.workstation else None
     previews = load_previews(args.previews, catalog) if args.previews else {}
@@ -182,6 +186,11 @@ def main():
         parser.error('Invalid local session token')
     image_folder = args.part_images or (part_images.DEFAULT_FOLDER if part_images.DEFAULT_FOLDER.exists() else None)
     hardware_images = part_images.load(image_folder)
+    source_images=source_parts.configured_path().parent/'images'
+    if source_images.is_dir():
+        imported_images=part_images.load(source_images)
+        if hardware_images.keys()&imported_images.keys():raise ValueError('Duplicate part image between packages')
+        hardware_images.update(imported_images)
     server = ThreadingHTTPServer(('127.0.0.1', args.port), make_handler(catalog, images, token, preview, previews, hardware_images))
     server.timeout = 1
     url = f'http://127.0.0.1:{server.server_port}/{token}/'

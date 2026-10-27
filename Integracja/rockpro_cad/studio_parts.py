@@ -10,12 +10,13 @@ import json
 from pathlib import Path
 
 from .part_registry import metadata
+from . import source_parts
 from .core_case.t1_mounting import HINGE_27095_OPENING
 
 CATEGORIES = {'handles': 'Uchwyty', 'latches': 'Zamki / zatrzaski',
               'hinges': 'Zawiasy', 'profiles': 'Profile', 'corners': 'Narożniki',
               'braces': 'Wzmocnienia', 'stacking_sockets': 'Gniazda do piętrowania',
-              'wheels': 'Koła'}
+              'wheels': 'Koła', 'wheel_pads':'Stopy i podstawy', 'unclassified':'Elementy źródłowe — funkcja do potwierdzenia'}
 # Stable definition IDs and family membership; aliases are not separate parts.
 FAMILIES = {'H7159': 'handles', 'H2026': 'handles', '17251S': 'latches',
             '270836': 'hinges', '2643': 'hinges', 'EG-0113': 'profiles',
@@ -76,16 +77,18 @@ def _definitions():
 
 
 def catalog():
-    rows = copy.deepcopy(_definitions())
+    imported=source_parts.catalog()
+    rows = copy.deepcopy(_definitions())+imported['items']
+    if len({r['id'] for r in rows})!=len(rows):raise ValueError('Duplicate part ID across catalogues')
     return dict(schema='rockpro.studio-parts/1', revision=_hash(rows), categories=dict(CATEGORIES),
                 items=rows, scope='existing_reference_and_prototype_candidates',
-                placement_available=True, placement_scope='section_relative_concept', inventory_connected=False)
+                source_report=imported.get('report',{}),placement_available=True, placement_scope='section_relative_concept', inventory_connected=False)
 
 
 def resolve(selection):
     if not isinstance(selection,list) or len(selection)>64:
         raise ValueError('Wybór części musi być listą do 64 pozycji katalogowych')
-    by_id = {r['id']: r for r in _definitions()}
+    by_id = {r['id']: r for r in catalog()['items']}
     seen = set(); result = []
     for ref in selection:
         if not isinstance(ref,dict) or set(ref)!={'part_id','revision'}:
@@ -111,6 +114,12 @@ def summarize(selection, covers):
             warnings.append('Profil '+row['id']+' ma parę '+row['paired_id']+' — nie została jeszcze wybrana.')
     if any(r['family_id']=='hinges' for r in rows) and all(c['kind']=='removable' for c in covers):
         warnings.append('Wybrano zawias przy zdejmowanych pokrywach. Sprawdź potrzebę jego zastosowania w kroku montażu.')
+    codes={r.get('catalog_code_raw') for r in rows}
+    for row in rows:
+        if row.get('component_only'):
+            warnings.append((row.get('catalog_code_raw') or row['name'])+': komponent lub zespół źródłowy, nie potwierdzony kompletny produkt zakupowy.')
+        overlap=codes.intersection(row.get('contained_codes',[]))
+        if overlap:warnings.append('Wybrano zespół '+row.get('catalog_code_raw',row['id'])+' i jego składniki '+', '.join(sorted(overlap))+'. Nie sumuj ich jako niezależnych produktów.')
     return dict(items=rows, definition_count=len(rows), warnings=warnings,
                 placement_status='not_started', purchase_bom_ready=False,
                 note='Wybrano rodzaje części. Liczby sztuk, ściany, kotwy i obróbki powstaną przy rozmieszczaniu.')
