@@ -5,7 +5,7 @@ export function estimateCosts(summary,catalog,assumePiece=true){
  const rows=[],totals=new Map();
  for(const item of summary?.rows??[]){
   const row={...item,price:null,amount:null,currency:null,reason:null,assumedUnit:false};
-  const matches=catalog.items.filter(p=>normalizeCode(p.code)===normalizeCode(item.part_id));
+  const matches=catalog.items.filter(p=>item.pricing_company_id?p.id===item.pricing_company_id:normalizeCode(p.code)===normalizeCode(item.sku??item.part_id));
   if(!matches.length)row.reason='Brak powiązanej pozycji cenowej';
   else if(matches.length!==1)row.reason='Kilka rekordów tego kodu — wybierz wariant';
   else{
@@ -16,11 +16,13 @@ export function estimateCosts(summary,catalog,assumePiece=true){
    else{
     row.price=price;row.currency=part.currency||'waluta nieoznaczona';
     const declaredPiece=['szt','szt.','piece','pcs'].includes(String(part.unit??'').toLowerCase());
-    const canAssume=assumePiece&&!part.unit&&pieceFamilies.has(item.family_id);
+    const packSize=item.pack_size??1;
+    const canAssume=assumePiece&&!part.unit&&(pieceFamilies.has(item.family_id)||packSize>1);
     if(item.unit!=='szt.'||!declaredPiece&&!canAssume)row.reason='Jednostka ceny do potwierdzenia';
     else{
-     row.assumedUnit=!declaredPiece;row.amount=Math.round(price*item.quantity*100)/100;
-     totals.set(row.currency,(totals.get(row.currency)??0)+Math.round(price*item.quantity*100));
+     row.assumedUnit=!declaredPiece;row.purchaseQuantity=Math.ceil(item.quantity/packSize);row.pack_size=packSize;
+     row.amount=Math.round(price*row.purchaseQuantity*100)/100;
+     totals.set(row.currency,(totals.get(row.currency)??0)+Math.round(price*row.purchaseQuantity*100));
     }
    }
   }

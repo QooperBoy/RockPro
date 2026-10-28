@@ -10,13 +10,13 @@ import json
 from pathlib import Path
 
 from .part_registry import metadata
-from . import source_parts
+from . import source_parts, studio_requested_parts
 from .core_case.t1_mounting import HINGE_27095_OPENING
 
 CATEGORIES = {'handles': 'Uchwyty', 'latches': 'Zamki / zatrzaski',
               'hinges': 'Zawiasy', 'profiles': 'Profile', 'corners': 'Narożniki',
               'braces': 'Wzmocnienia', 'stacking_sockets': 'Gniazda do piętrowania',
-              'wheels': 'Koła', 'wheel_pads':'Stopy i podstawy', 'unclassified':'Elementy źródłowe — funkcja do potwierdzenia'}
+              'wheels': 'Koła', 'wheel_pads':'Stopy i podstawy', 'feet':'Nóżki', 'vents':'Wentylacja', 'unclassified':'Elementy źródłowe — funkcja do potwierdzenia'}
 # Stable definition IDs and family membership; aliases are not separate parts.
 FAMILIES = {'H7159': 'handles', 'H2026': 'handles', '17251S': 'latches',
             '270836': 'hinges', '2643': 'hinges', 'EG-0113': 'profiles',
@@ -78,7 +78,7 @@ def _definitions():
 
 def catalog():
     imported=source_parts.catalog()
-    rows = copy.deepcopy(_definitions())+imported['items']
+    rows = copy.deepcopy(_definitions())+imported['items']+studio_requested_parts.definitions()
     if len({r['id'] for r in rows})!=len(rows):raise ValueError('Duplicate part ID across catalogues')
     return dict(schema='rockpro.studio-parts/1', revision=_hash(rows), categories=dict(CATEGORIES),
                 items=rows, scope='existing_reference_and_prototype_candidates',

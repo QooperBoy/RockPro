@@ -227,6 +227,8 @@ def main():
         imported_images=part_images.load(source_images)
         if hardware_images.keys()&imported_images.keys():raise ValueError('Duplicate part image between packages')
         hardware_images.update(imported_images)
+    requested_images=Path(__file__).resolve().parents[2]/'artifacts/studio-requested-parts/images'
+    if requested_images.is_dir():hardware_images.update(part_images.load(requested_images))
     server = ThreadingHTTPServer(('127.0.0.1', args.port), make_handler(catalog, images, token, preview, previews, hardware_images))
     server.timeout = 1
     url = f'http://127.0.0.1:{server.server_port}/{token}/'

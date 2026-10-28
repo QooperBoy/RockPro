@@ -16,7 +16,7 @@ FAMILIES = {
     'panels': 'plywood', 'profiles': 'profiles', 'corners': 'corners',
     'braces': 'corners', 'latches': 'closures', 'hinges': 'closures',
     'handles': 'handles', 'wheels': 'wheels', 'stacking_sockets': 'wheels',
-    'wheel_pads': 'wheels',
+    'wheel_pads': 'wheels', 'feet':'wheels', 'vents':'closures',
 }
 ALIASES = {'plate':'panels', 'plates':'panels','panel':'panels','plywood':'panels',
            'profile':'profiles','corner':'corners','brace':'braces','hinge':'hinges',

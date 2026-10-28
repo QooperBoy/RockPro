@@ -14,3 +14,7 @@ assert.equal(estimate([item('H7159')],[part('H7159','12')],false).unpriced,1);
 assert.equal(estimate([item('H7159')],[part('H7159','12','PLN','szt.')],false).totals[0].amount,24);
 assert.equal(estimate([item('A'),item('B')],[part('A','1','PLN','pcs'),part('B','2','EUR','pcs')]).totals.length,2);
 console.log('PASS: cost quantity changes, zero/missing prices, variants, units and currencies');
+const feet={...item('company-feet',8,'feet'),pricing_company_id:'company-4903M8AH',pack_size:8};
+assert.equal(estimate([feet],[part('4903M8AH','1.54')]).rows[0].amount,1.54);
+assert.equal(estimate([{...feet,quantity:9}],[part('4903M8AH','1.54')]).rows[0].amount,3.08);
+assert.equal(estimate([feet],[part('4903M8AH','1.54')],false).unpriced,1);

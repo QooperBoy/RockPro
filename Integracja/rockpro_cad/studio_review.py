@@ -49,6 +49,9 @@ def review(value):
         if group:target['part_id']=group['part_id']
         add(code,warning['message'],step,'error' if code in ERROR_CODES else 'warning',**target)
     if not definitions:add('missing_parts','Nie wybrano żadnych części z biblioteki.',4)
+    for key,definition in definitions.items():
+        if definition.get('geometry_status')=='dimensioned_concept_not_vendor_cad':
+            add('concept_geometry',definition['name']+': uproszczona bryła 3D; montaż i dokładność wymagają potwierdzenia. '+definition['note'],4,part_id=key)
     for message in model['hardware_summary']['warnings']:add('selection_inconsistency',message,4)
     for key in model['project_summary']['unplaced_selection']:
         family=families[key];step=6 if family in ('hinges','latches') else 5 if family=='handles' else 7

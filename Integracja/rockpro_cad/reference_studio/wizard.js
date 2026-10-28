@@ -152,8 +152,9 @@ function exportDraft(){
 }
 
 function renderConstruction(model){
- const supported=draft.type==='case';for(const id of ['construction-wheels','construction-stacking','construction-apply'])$(id).disabled=!supported;
+ const customKit=Boolean(draft.construction?.kit),supported=draft.type==='case';for(const id of ['construction-wheels','construction-stacking','construction-apply'])$(id).disabled=!supported||customKit;
  $('construction-help').textContent=supported?'Zestaw profili i okuć dla skrzyni z jednym górnym wiekiem o wysokości minimum 110 mm.':'Automatyczny zestaw profili jest obecnie dostępny dla T1. Ten projekt możesz zapisać i pobrać; konstrukcja pozostałych typów wymaga dalszego opracowania.';
+ if(customKit)$('construction-help').textContent='Zestaw Penn / Adam Hall: narożniki 30 mm i 8 nóżek (1 opakowanie). Bryły uproszczone; profil 30 mm i montaż do doboru. Uchwyty na zdejmowanym wieku wymagają sprawdzenia przenoszenia obciążeń przez zamki.';
  const summary=model.project_summary,table=document.createElement('table');table.className='parts-table';
  for(const row of summary.rows){const tr=document.createElement('tr');for(const text of [row.name,row.part_id.startsWith('plywood')?'Sklejka '+row.material_thickness_mm+' mm':row.part_id,row.quantity+' '+row.unit]){const td=document.createElement('td');td.textContent=text;tr.append(td);}table.append(tr);}
  $('construction-bom').replaceChildren(table);

@@ -1,7 +1,7 @@
 """Complete T1-style concept construction. Reference datums, never production approval."""
 from collections import Counter
 from .part_registry import metadata
-from . import studio_parts
+from . import studio_parts, studio_requested_parts
 from .core_case.t1_mounting import corner_pose,SOCKET_SEAT,support_dimensions
 from .core_case.machining_rules import minimum_lid_height
 
@@ -12,12 +12,19 @@ IDENTITY=[[1,0,0],[0,1,0],[0,0,1]]
 def validate(d):
     c=d.get('construction')
     if c is None:return
-    if not isinstance(c,dict) or set(c)!={'enabled','wheels','stacking'} or any(type(v) is not bool for v in c.values()):
+    if not isinstance(c,dict) or set(c) not in ({'enabled','wheels','stacking'},{'enabled','wheels','stacking','kit'}) or any(type(c[k]) is not bool for k in ('enabled','wheels','stacking')):
         raise ValueError('Konstrukcja wymaga trzech jawnych przełączników')
+    if 'kit' in c and c['kit']!=studio_requested_parts.KIT:raise ValueError('Nieznana recepta konstrukcyjna')
     if not c['enabled']:return
     if d['type']!='case' or len(d['covers'])!=1 or d['covers'][0]['face']!='top':
         raise ValueError('Kompletna konstrukcja jest obecnie dostępna dla skrzyni z jednym górnym wiekiem')
     if c['stacking'] and not c['wheels']:raise ValueError('Gniazda do piętrowania wymagają kół')
+    if c.get('kit')==studio_requested_parts.KIT:
+        if c['wheels'] or c['stacking']:raise ValueError('Ta recepta ma nóżki, bez kół i gniazd')
+        if min(d['internal_mm'][:2])<500 or d['internal_mm'][2]<250:raise ValueError('Recepta Penn wymaga wnętrza co najmniej 500 × 500 × 250 mm')
+        needed={studio_requested_parts.CORNER,studio_requested_parts.FEET,studio_requested_parts.ANGLE}
+        if needed-{r['part_id'] for r in d['hardware']}:raise ValueError('Brak części recepty Penn / nóżek')
+        return
     needed=REQUIRED+(['source-caster-epson'] if c['wheels'] else [])+(['W0968Z'] if c['stacking'] else [])
     selected={r['part_id'] for r in d['hardware']}
     if set(needed)-selected:raise ValueError('Wybierz części konstrukcji: '+', '.join(sorted(set(needed)-selected)))
@@ -27,6 +34,7 @@ def validate(d):
 
 def preview(d,sections,placement):
     if not d.get('construction',{}).get('enabled'):return dict(items=[],counts={},panel_count=0,total_count=0)
+    if d['construction'].get('kit')==studio_requested_parts.KIT:return studio_requested_parts.construction(d,sections,placement)
     body,cover=sections;w,depth,h=body['size_mm'];lid=cover['size_mm'][2];height=h+lid
     rows=[]
     def add(key,part,family,section,position,rotation=IDENTITY,**extra):
@@ -117,7 +125,9 @@ def summarize(d,panels,placement,construction):
                              material_thickness_mm=18,**metadata('wheel_pads')))
         else:
             definition=definitions[key]
-            rows.append(dict(part_id=key,name=definition['name'],quantity=quantity,unit='szt.',**metadata(definition['family_id'])))
+            rows.append(dict(part_id=key,name=definition['name'],quantity=quantity,unit='szt.',sku=definition.get('sku'),
+                pricing_company_id=('company-225ea8d0217ff507e8372022' if key=='H2026' and d.get('construction',{}).get('kit')==studio_requested_parts.KIT else definition.get('pricing_company_id')),pack_size=definition.get('pack_size',1),
+                geometry_status=definition.get('geometry_status'),**metadata(definition['family_id'])))
     return dict(rows=rows,total_count=sum(r['quantity'] for r in rows),
                 definition_count=len(rows),unplaced_selection=sorted(set(definitions)-set(counts)),
                 production_approved=False,purchase_bom_ready=False)

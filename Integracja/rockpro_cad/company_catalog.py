@@ -96,7 +96,9 @@ def picker_entries(parts, data=None):
     of customer projects. Duplicate SKU records keep their separate source IDs.
     """
     data = catalog(parts) if data is None else data
+    known_ids={r['id'] for r in parts['items']}
     for row in data['items']:
+        if row['id'] in known_ids:continue
         family = 'company:'+row['category']
         parts['categories'][family] = 'Excel · '+row['category']
         image = copy.deepcopy(row.get('image'))

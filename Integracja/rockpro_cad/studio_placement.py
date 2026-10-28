@@ -92,7 +92,8 @@ def preview(draft, sections, panels):
     definitions={r['id']:r for r in studio_parts.resolve(draft['hardware'])}
     joint_lines=studio_joints.lines(draft,sections,mount_faces);by_joint={j['id']:j for j in joint_lines}
     closure_lines=studio_closures.lines(draft,sections,mount_faces);by_seam={j['id']:j for j in closure_lines}
-    envelopes={**FOOTPRINTS,**studio_closures.envelopes()}
+    reference_envelopes={r['id']:r['concept_envelope_mm'] for r in definitions.values() if r.get('concept_envelope_mm')}
+    envelopes={**FOOTPRINTS,**studio_closures.envelopes(),**reference_envelopes,'H2026':[233.3,62.046]}
     items=[];warnings=[];unresolved=[];counts={}
     for g in sorted(draft.get('placements',[]),key=lambda g:g['pattern']=='closure_line'):
         label=definitions[g['part_id']].get('catalog_code_raw') or definitions[g['part_id']]['sku'] or definitions[g['part_id']]['name']
