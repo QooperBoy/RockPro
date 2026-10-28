@@ -1,3 +1,4 @@
+import {PartPreferences} from './part-preferences.js';
 // Step 4 selects versioned definitions. Placement and quantities belong to step 5.
 function element(tag,text,cls){const e=document.createElement(tag);if(text)e.textContent=text;if(cls)e.className=cls;return e;}
 const cutLabels={required:'Wycięcie w sklejce: wymagane',none:'Wycięcie w sklejce: niewymagane',unknown:'Wycięcie w sklejce: do ustalenia'};
@@ -11,16 +12,19 @@ export class PartsPicker {
   this.dialogImage=element('img');this.dialogCaption=element('p',null,'hint');this.dialog.append(close,this.dialogTitle,this.dialogImage,this.dialogCaption);
   this.dialog.addEventListener('click',e=>{if(e.target===this.dialog){const r=this.dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)this.dialog.close();}});
   document.body.append(this.dialog);
-  host.append(element('p',`Baza robocza: ${catalog.items.length} pozycji z dotychczasowych źródeł i prototypów. Pokazujemy kompletne części; źródłowe zespoły i niekompletne fragmenty są ukryte. Pełny katalog firmy zostanie dołączony później.`,'hint'));
+  host.append(element('p',`Baza robocza: ${catalog.items.length} pozycji z dotychczasowych źródeł i prototypów. Pokazujemy kompletne części; źródłowe zespoły i niekompletne fragmenty są ukryte. Firmowy wykaz jest dostępny w Katalogu firmowym.`,'hint'));
   const searchLabel=element('label','Szukaj części');this.search=element('input');this.search.type='search';this.search.id='parts-search';this.search.placeholder='SKU, nazwa, producent lub alias CAD';searchLabel.append(this.search);
   const categoryLabel=element('label','Kategoria');this.category=element('select');this.category.id='parts-category';
   this.category.append(new Option('Wszystkie kategorie',''));for(const [id,label]of Object.entries(catalog.categories))this.category.append(new Option(label,id));categoryLabel.append(this.category);
   const sourceLabel=element('label','Pochodzenie części');this.source=element('select');this.source.id='parts-source';this.source.append(new Option('Wszystkie źródła',''),new Option('Dotychczasowa biblioteka T1','base'),new Option('Pozostałe projekty — wszystkie','source'));for(const key of [...new Set(catalog.items.flatMap(r=>r.observed_projects??(r.source_project?[r.source_project]:[])))].sort())this.source.append(new Option('Zaobserwowane w projekcie '+key,key));sourceLabel.append(this.source);
   const onlyLabel=element('label',null,'parts-only');this.only=element('input');this.only.type='checkbox';this.only.id='parts-only-selected';onlyLabel.append(this.only,document.createTextNode('Pokaż tylko wybrane'));
   this.count=element('p',null,'hint');this.count.id='parts-count';this.list=element('div');this.list.id='parts-list';
-  host.append(searchLabel,categoryLabel,sourceLabel,onlyLabel,this.count,this.list);
-  for(const control of [this.search,this.category,this.source,this.only])control.addEventListener('input',()=>this.render());
-  this.render();
+  const favoriteLabel=element('label',null,'parts-only preference-filter');this.favoritesOnly=element('input');this.favoritesOnly.type='checkbox';this.favoritesOnly.id='parts-only-favorites';favoriteLabel.append(this.favoritesOnly,document.createTextNode('Tylko ulubione'));
+  const sortLabel=element('label','Kolejność');this.sort=element('select');this.sort.id='parts-sort';this.sort.append(new Option('Polecane: ulubione i często wybierane','recommended'),new Option('Najczęściej wybierane','frequent'),new Option('Nazwa A–Z','name'));sortLabel.append(this.sort);
+  this.preferences=new PartPreferences(()=>this.render(),message=>{this.count.textContent=message;});
+  host.append(searchLabel,categoryLabel,sourceLabel,sortLabel,onlyLabel,favoriteLabel,this.count,this.list);
+  for(const control of [this.search,this.category,this.source,this.sort,this.only,this.favoritesOnly])control.addEventListener('input',()=>this.render());
+  this.render();this.preferences.refresh();
  }
  setSelection(refs){this.selected=structuredClone(refs??[]);this.render();}
  toggle(row,checked){
@@ -39,16 +43,18 @@ export class PartsPicker {
  }
  render(){
   const selected=new Set(this.selected.map(r=>r.part_id)),query=this.search.value.trim().toLocaleLowerCase('pl');
-  const rows=this.catalog.items.filter(r=>r.show_as_complete_part!==false&&( !this.category.value||r.family_id===this.category.value)
+  const rows=this.preferences.sort(this.catalog.items.filter(r=>r.show_as_complete_part!==false&&( !this.category.value||r.family_id===this.category.value)
    &&(!this.source.value||(this.source.value==='base'?!r.source_project:this.source.value==='source'?!!r.source_project:(r.observed_projects??[r.source_project]).includes(this.source.value)))
    &&(!this.only.checked||selected.has(r.id))
-   &&[r.id,r.sku,r.catalog_code_raw,r.source_project,r.name,r.manufacturer,this.catalog.categories[r.family_id],...r.aliases].filter(Boolean).join(' ').toLocaleLowerCase('pl').includes(query));
+   &&(!this.favoritesOnly.checked||this.preferences.stat(r.id).favorite)
+   &&[r.id,r.sku,r.catalog_code_raw,r.source_project,r.name,r.manufacturer,this.catalog.categories[r.family_id],...r.aliases].filter(Boolean).join(' ').toLocaleLowerCase('pl').includes(query)),this.sort.value);
   this.count.textContent=`Widoczne: ${rows.length} / ${this.catalog.items.length} · wybrane rodzaje: ${selected.size}`;
   this.list.replaceChildren();
   if(!rows.length){this.list.append(element('p','Brak części pasujących do filtra.','hint'));return;}
   for(const row of rows){
    const card=element('article',null,'part-card'+(selected.has(row.id)?' selected':''));card.dataset.part=row.id;
-   card.append(this.image(row));
+   card.append(this.preferences.button(row.id,row.sku??row.catalog_code_raw??row.name),this.image(row));
+   const usage=this.preferences.stat(row.id).project_count;if(usage)card.append(element('p','Wybrano w '+usage+(usage===1?' projekcie':' projektach'),'part-usage'));
    const label=element('label',null,'part-choice'),check=element('input');check.type='checkbox';check.checked=selected.has(row.id);check.disabled=!row.selectable;check.dataset.part=row.id;check.setAttribute('aria-label','Wybierz '+(row.sku??row.name));
    check.onchange=()=>this.toggle(row,check.checked);
    const title=element('div');title.append(element('b',row.sku??row.catalog_code_raw??'SKU niepotwierdzone'),element('span',row.name));label.append(check,title);card.append(label);

@@ -1,9 +1,10 @@
-const $=id=>document.getElementById(id);let data;
+import {PartPreferences} from './part-preferences.js';
+const $=id=>document.getElementById(id);let data,preferences;
 const text=(tag,value,cls)=>{const node=document.createElement(tag);node.textContent=value;if(cls)node.className=cls;return node;};
 function display(value){if(value===null||value===undefined||value==='')return '—';const n=Number(value);return Number.isFinite(n)?new Intl.NumberFormat('pl-PL',{maximumFractionDigits:4}).format(n):value;}
 function render(){
  const query=$('company-search').value.trim().toLocaleLowerCase('pl'),category=$('company-category').value;
- const rows=data.items.filter(r=>(!category||r.category===category)&&(!$('company-cutouts').checked||r.cutout_note)&&(!$('company-models').checked||r.geometry_candidates.some(m=>m.has_mesh))&&(!query||[r.code,r.name,r.category,r.cutout_note].some(v=>String(v??'').toLocaleLowerCase('pl').includes(query))));
+ const rows=preferences.sort(data.items.filter(r=>(!category||r.category===category)&&(!$('company-favorites').checked||preferences.stat(r.id).favorite)&&(!$('company-cutouts').checked||r.cutout_note)&&(!$('company-models').checked||r.geometry_candidates.some(m=>m.has_mesh))&&(!query||[r.code,r.name,r.category,r.cutout_note].some(v=>String(v??'').toLocaleLowerCase('pl').includes(query)))),$('company-sort').value,r=>r.code+' '+r.name);
  $('company-result').textContent=rows.length+' z '+data.items.length+' pozycji';$('company-rows').replaceChildren();
  for(const row of rows){
   const tr=document.createElement('tr'),image=document.createElement('td');
@@ -18,7 +19,9 @@ function render(){
   const mesh=document.createElement('td'),candidates=row.geometry_candidates.filter(m=>m.has_mesh);
   mesh.append(text('span',candidates.length?'Model kandydujący':'Brak dopasowanego modelu',candidates.length?'':'muted'));
   for(const candidate of candidates)mesh.append(text('small',candidate.id));if(candidates.length)mesh.append(text('small','Wariant do sprawdzenia','muted'));
-  tr.append(image,item,stock,price,cut,mesh);$('company-rows').append(tr);
+  const favorite=document.createElement('td');favorite.className='company-favorite';favorite.append(preferences.button(row.id,row.code));
+  item.className='company-item';stock.classList.add('company-stock');price.className='company-price';cut.className='company-cutout';
+  tr.dataset.part=row.id;tr.append(favorite,image,item,stock,price,cut,mesh);$('company-rows').append(tr);
  }
 }
 async function init(){
@@ -27,6 +30,7 @@ async function init(){
  if(!data.source){$('company-source').textContent='Nie zaimportowano jeszcze firmowego Excela.';return;}
  $('company-source').textContent=data.source.filename+' · '+data.summary.unique_codes+' różnych kodów · '+data.summary.images+' zdjęć · '+data.summary.cutout_notes+' opisów wycięć.';
  for(const category of Object.keys(data.summary.categories))$('company-category').append(new Option(category,category));
- for(const id of ['company-search','company-category','company-cutouts','company-models'])$(id).addEventListener(id==='company-search'?'input':'change',render);render();
+ preferences=new PartPreferences(()=>render(),message=>$('company-result').textContent=message);
+ for(const id of ['company-search','company-category','company-sort','company-favorites','company-cutouts','company-models'])$(id).addEventListener(id==='company-search'?'input':'change',render);render();await preferences.refresh();
 }
 init().catch(e=>$('company-result').textContent=e.message);

@@ -13,7 +13,7 @@ const localKey='rockpro.configurator.recovery.v3'+(requestedDraft?'.'+requestedD
 const uiKey='rockpro.studio.context.'+token+(requestedDraft?'.'+requestedDraft:'');
 function rememberContext(){
  if(!draft||!view?.model)return;stored();
- try{sessionStorage.setItem(uiKey,JSON.stringify({name:draft.name,project:storage.id,step,position:view.camera.position.toArray(),target:view.controls.target.toArray(),motion:view.values,placement:placementEditor.selected,closure:closureEditor.selected,part:placementEditor.part,closurePart:closureEditor.part,filters:{search:partsPicker.search.value,category:partsPicker.category.value,source:partsPicker.source.value,only:partsPicker.only.checked}}));}catch{}
+ try{sessionStorage.setItem(uiKey,JSON.stringify({name:draft.name,project:storage.id,step,position:view.camera.position.toArray(),target:view.controls.target.toArray(),motion:view.values,placement:placementEditor.selected,closure:closureEditor.selected,part:placementEditor.part,closurePart:closureEditor.part,filters:{search:partsPicker.search.value,category:partsPicker.category.value,source:partsPicker.source.value,only:partsPicker.only.checked,favorites:partsPicker.favoritesOnly.checked,sort:partsPicker.sort.value}}));}catch{}
 }
 function restoreContext(){
  try{const c=JSON.parse(sessionStorage.getItem(uiKey));if(!c||c.name!==draft.name||c.project!==storage.id)return;
@@ -24,7 +24,7 @@ function restoreContext(){
   const vector=a=>Array.isArray(a)&&a.length===3&&a.every(x=>typeof x==='number'&&Number.isFinite(x)&&Math.abs(x)<1e6);
   if(vector(c.position)&&vector(c.target)&&Math.hypot(...c.position.map((x,k)=>x-c.target[k]))>.001){view.camera.position.fromArray(c.position);view.controls.target.fromArray(c.target);view.controls.update();}
   for(let pass=0;pass<draft.covers.length;pass++)for(const [id,value]of Object.entries(c.motion??{})){if(view.values[id]!==undefined&&typeof value==='number'&&value>=0&&value<=100)try{view.setMotion(id,value);}catch{}}motionInputs();
-  if(c.filters){partsPicker.search.value=String(c.filters.search??'');partsPicker.category.value=c.filters.category??'';partsPicker.source.value=c.filters.source??'';partsPicker.only.checked=c.filters.only===true;partsPicker.render();}
+  if(c.filters){partsPicker.search.value=String(c.filters.search??'');partsPicker.category.value=c.filters.category??'';partsPicker.source.value=c.filters.source??'';partsPicker.only.checked=c.filters.only===true;partsPicker.favoritesOnly.checked=c.filters.favorites===true;partsPicker.sort.value=['recommended','frequent','name'].includes(c.filters.sort)?c.filters.sort:'recommended';partsPicker.render();}
  }catch{}
 }
 
@@ -115,7 +115,7 @@ async function save(asNew=false){
  if(selectionPending()){status('Najpierw zastosuj wybrany typ (albo przejdź Dalej).',true);return;}
  $('save').disabled=$('save-copy').disabled=$('save-top').disabled=true;$('save-top').setAttribute('aria-busy','true');
  const version=serial,sent=structuredClone(draft);
- try{const saved=await api('wizard/save',{draft:sent,id:asNew?null:storage.id,expected_revision:asNew?0:storage.revision});storage={id:saved.id,revision:saved.revision};dirty=version!==serial;saveLabel();stored();await refreshList();status('Zapisano draft w lokalnej bazie · rewizja '+saved.revision+(dirty?' · kolejne zmiany nadal niezapisane.':'.'));}
+ try{const saved=await api('wizard/save',{draft:sent,id:asNew?null:storage.id,expected_revision:asNew?0:storage.revision});storage={id:saved.id,revision:saved.revision};dirty=version!==serial;saveLabel();stored();document.dispatchEvent(new CustomEvent('rockpro:project-saved'));await refreshList();status('Zapisano draft w lokalnej bazie · rewizja '+saved.revision+(dirty?' · kolejne zmiany nadal niezapisane.':'.'));}
  catch(e){status(e.message,true);}finally{$('save').disabled=$('save-copy').disabled=$('save-top').disabled=false;$('save-top').setAttribute('aria-busy','false');}
 }
 function showLegacy(value){pendingLegacy=structuredClone(value);$('legacy-notice').hidden=false;status('Archiwalny draft zachowany. Możesz pobrać jego oryginalny JSON lub jawnie utworzyć nowy draft w obecnych typach.',true);}

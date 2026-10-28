@@ -17,6 +17,7 @@ from . import studio_parts
 from . import part_images
 from . import source_parts
 from . import company_catalog
+from . import part_preferences
 
 STATIC = Path(__file__).with_name('reference_studio')
 IMPORT_MAP = '{"imports":{"three":"./vendor/three.module.min.js"}}'
@@ -78,6 +79,8 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
         ('company-parts.html','text/html; charset=utf-8'),
         ('company-parts.js','text/javascript; charset=utf-8'),
         ('company-parts.css','text/css; charset=utf-8'),
+        ('part-preferences.js','text/javascript; charset=utf-8'),
+        ('part-preferences.css','text/css; charset=utf-8'),
         ('placement_math.mjs', 'text/javascript; charset=utf-8'),
         ('scene-controls.js', 'text/javascript; charset=utf-8'),
         ('preview_math.mjs', 'text/javascript; charset=utf-8'), ('favicon.svg', 'image/svg+xml'))}
@@ -95,6 +98,9 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
     company_catalog.images()  # Verify the optional snapshot assets before serving.
     routes.update({row['metadata']['url']: (row['path'], row['mime']) for row in hardware_images.values()})
     routes.update({row['metadata']['mesh_url']: (row['mesh_path'], 'application/json') for row in hardware_images.values() if 'mesh_path' in row})
+    def preference_ids():
+        parts=part_images.decorate(studio_parts.catalog(),hardware_images)
+        return {r['id'] for r in parts['items'] if r['show_as_complete_part']}|{r['id'] for r in company_catalog.catalog()['items']}
     class Handler(BaseHTTPRequestHandler):
         def respond(self, status, body, mime='application/json; charset=utf-8'):
             self.send_response(status)
@@ -130,6 +136,9 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
                 else:self.respond(404,b'{"error":"Unknown company image"}')
             elif name == 'wizard/drafts':
                 self.respond(200, json.dumps(configurator.list_drafts(), ensure_ascii=False).encode())
+            elif name == 'parts/preferences':
+                try:self.respond(200,json.dumps(part_preferences.read(preference_ids()),ensure_ascii=False).encode())
+                except ValueError as exc:self.respond(400,json.dumps({'error':str(exc)},ensure_ascii=False).encode())
             elif name and name.startswith('wizard/drafts/'):
                 try:
                     self.respond(200, json.dumps(configurator.read_draft(name.rsplit('/', 1)[1]), ensure_ascii=False).encode())
@@ -143,7 +152,7 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
         def do_POST(self):
             origin = self.headers.get('Origin')
             expected_origin = 'http://127.0.0.1:' + str(self.server.server_port)
-            if self.endpoint() not in ('validate', 'wizard/preview', 'wizard/save', 'wizard/convert') or self.headers.get('X-RockPro-Session') != token or origin != expected_origin:
+            if self.endpoint() not in ('validate', 'wizard/preview', 'wizard/save', 'wizard/convert','parts/preferences') or self.headers.get('X-RockPro-Session') != token or origin != expected_origin:
                 self.respond(403, b'{}')
                 return
             try:
@@ -151,7 +160,9 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
                 if not 0 < length <= 32768:
                     raise ValueError('Nieprawidłowy rozmiar szkicu')
                 draft = json.loads(self.rfile.read(length).decode('utf-8'))
-                if self.endpoint() == 'wizard/preview':
+                if self.endpoint() == 'parts/preferences':
+                    receipt=part_preferences.set_favorite(draft,preference_ids())
+                elif self.endpoint() == 'wizard/preview':
                     receipt = configurator.preview(draft)
                 elif self.endpoint() == 'wizard/convert':
                     receipt = configurator.convert_legacy(draft)

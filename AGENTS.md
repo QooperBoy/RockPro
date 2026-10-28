@@ -1,5 +1,10 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
+- Ulubione i ranking Studio: [docs/STUDIO_PART_PREFERENCES.md](docs/STUDIO_PART_PREFERENCES.md).
+  Preferencje zapisuj w lokalnej bazie; użycie to różne zapisane projekty,
+  nie liczba otwarć lub rewizji. Nie łącz gwiazdek podobnych wariantów SKU
+  ani nie utożsamiaj rankingu z montażem lub rozchodem magazynowym.
+
 - Firmowy Excel i etap mini ERP: [docs/EXCEL_ERP_INTEGRATION.md](docs/EXCEL_ERP_INTEGRATION.md).
   Katalog firmowy to odczyt snapshotu, nie żywy stan ani zgoda CAD. Zachowuj
   puste wartości i zera, jednostki, warianty oraz zdublowane kody. Nie księguj
