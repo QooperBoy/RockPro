@@ -13,7 +13,7 @@ import sys
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'Integracja'))
-from rockpro_cad import studio_parts,part_images,manufacturer_images,company_catalog
+from rockpro_cad import studio_parts,part_images,manufacturer_images,company_catalog,studio_examples
 
 
 def main():
@@ -48,6 +48,10 @@ def main():
     photo_html=(public/'photos.html').read_text(encoding='utf-8').replace('data-studio-page="company"','data-studio-page="photos"')
     (public/'photos.html').write_text(photo_html,encoding='utf-8')
     cp(ROOT/'deploy/vercel/demo-library.html',public/'index.html')
+    examples=studio_examples.catalog();write(public/'examples.json',examples)
+    for example in examples['items']:
+        thumbnail=ROOT/'artifacts/studio-example-images'/(example['id']+'.png')
+        if thumbnail.exists():cp(thumbnail,public/example['image'])
     html=(public/'wizard.html').read_text(encoding='utf-8').replace('<head>','<head><script src="cloud-storage.js"></script><link rel="stylesheet" href="cloud.css">')
     html=html.replace('Studio · koncepcja','Demo · zapis w przeglądarce').replace('Zapis w lokalnej bazie zachowuje kolejne rewizje. JSON pozwala przenieść koncepcję. To nie jest plik CAD.','Drafty i ulubione są zapisane tylko w tej przeglądarce. Pobierz JSON, żeby przekazać projekt lub zachować kopię. Wersja demo bez połączenia z IronCAD i ERP.')
     html=html.replace('lokalnej bazie','przeglądarce').replace('w bazie','w przeglądarce')

@@ -26,6 +26,31 @@ automatycznie u drugiej osoby. Aby przekazać projekt, pobierz JSON. Wyczyszczen
 danych witryny usuwa zapisy przeglądarki; JSON jest przenośną kopią koncepcji.
 Podgląd nie zatwierdza wycięć ani gotowości produkcyjnej.
 
+## Gotowe projekty w bibliotece
+
+Biblioteka `index.html` zawiera też trzy gotowe, ogólne projekty T1:
+transportowy 600 × 500 × 800 mm (76 części), duży 900 × 700 × 900 mm
+(84 części) oraz bez kół 600 × 450 × 800 mm (64 części). Wymiary oznaczają
+wnętrze korpusu. Pokrywy mają odpowiednio 115, 125 i 110 mm. Wszystkie mieszczą
+się w zwykłej proporcji pokrywy; nie wymagają skrytego odstępstwa.
+
+`studio_examples.py` buduje recepty z istniejących części i sprawdza je wspólnym
+planerem. To warianty kompletnej konstrukcji T1, nie gotowe szafy ani T2.
+Otwarcie tworzy nowy draft w przeglądarce i przechodzi do końcowego kroku 7;
+nie nadpisuje szkicu z poprzedniej sesji. Wszystkie elementy i wymiary pozostają
+edytowalne. Miniatury pochodzą z rzeczywistego renderera Studio:
+
+```powershell
+node scripts/render_studio_examples.cjs http://127.0.0.1:51345 artifacts/WYDANIE
+node scripts/test_studio_examples.cjs https://rockpro-studio.vercel.app artifacts/examples-production
+```
+
+Pierwszy build udostępnia recepty do renderowania. Następny build do nowego
+katalogu kopiuje miniatury z `artifacts/studio-example-images` i obejmuje je
+manifestem. Opublikowane wydanie z wzorcami: `artifacts/vercel-studio-20261028-08`.
+Test trzech kopii, zapisu/odczytu, otwierania pokryw, ochrony wcześniejszego szkicu,
+miniatur i układu nocnego/mobile: `artifacts/examples-production/results.json`.
+
 ## Podsumowanie cenowe
 
 Na końcu kroku 7 `Podsumowanie cenowe części` korzysta z ilości wspólnego
