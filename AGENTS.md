@@ -1,5 +1,11 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
+- Demo Vercel i zdjęcia producentów: [docs/STUDIO_VERCEL.md](docs/STUDIO_VERCEL.md).
+  Publikuj tylko paczkę z jawnej allowlisty, nigdy checkout/artifacts w całości,
+  firmowego Excela, SQLite, cen, stanów ani modeli klientów. Zdjęcie musi pasować
+  do pełnego SKU (z wariantem); kod w produktach polecanych nie identyfikuje zdjęcia
+  głównego. Zachowaj siatkę CAD niezależnie od zmiany zdjęcia oraz źródło i SHA pliku.
+
 - Ulubione i ranking Studio: [docs/STUDIO_PART_PREFERENCES.md](docs/STUDIO_PART_PREFERENCES.md).
   Preferencje zapisuj w lokalnej bazie; użycie to różne zapisane projekty,
   nie liczba otwarć lub rewizji. Nie łącz gwiazdek podobnych wariantów SKU

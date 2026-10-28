@@ -1,0 +1,1 @@
+.demo-library{display:block;padding:clamp(24px,5vw,72px);overflow:auto}.demo-library section{max-width:1000px;margin:auto}.demo-patterns{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px;margin:32px 0}.demo-patterns>button{display:grid;gap:12px;padding:32px;text-align:left}.cloud-note{font-size:12px;opacity:.8;max-width:70ch}

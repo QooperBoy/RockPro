@@ -18,6 +18,7 @@ from . import part_images
 from . import source_parts
 from . import company_catalog
 from . import part_preferences
+from . import manufacturer_images
 
 STATIC = Path(__file__).with_name('reference_studio')
 IMPORT_MAP = '{"imports":{"three":"./vendor/three.module.min.js"}}'
@@ -98,6 +99,7 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
     company_catalog.images()  # Verify the optional snapshot assets before serving.
     routes.update({row['metadata']['url']: (row['path'], row['mime']) for row in hardware_images.values()})
     routes.update({row['metadata']['mesh_url']: (row['mesh_path'], 'application/json') for row in hardware_images.values() if 'mesh_path' in row})
+    routes.update({row['metadata']['url']: (row['path'], row['mime']) for row in manufacturer_images.routes().values()})
     def preference_ids():
         parts=part_images.decorate(studio_parts.catalog(),hardware_images)
         return {r['id'] for r in parts['items'] if r['show_as_complete_part']}|{r['id'] for r in company_catalog.catalog()['items']}
@@ -126,7 +128,7 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
             elif name == 'wizard/options':
                 self.respond(200, json.dumps(dict(types=configurator.TYPES, faces=configurator.FACES), ensure_ascii=False).encode())
             elif name == 'wizard/parts':
-                self.respond(200, json.dumps(company_catalog.decorate(part_images.decorate(studio_parts.catalog(), hardware_images)), ensure_ascii=False).encode())
+                self.respond(200, json.dumps(company_catalog.decorate(manufacturer_images.decorate(part_images.decorate(studio_parts.catalog(), hardware_images))), ensure_ascii=False).encode())
             elif name == 'company/catalog':
                 parts=part_images.decorate(studio_parts.catalog(),hardware_images)
                 self.respond(200,json.dumps(company_catalog.catalog(parts),ensure_ascii=False).encode())

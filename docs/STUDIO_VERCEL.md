@@ -1,0 +1,104 @@
+# RockPro Studio — demo Vercel i zdjęcia producentów
+
+Stan 28.10.2026. Adres dla Tomka: https://rockpro-studio.vercel.app.
+Publikacja w projekcie `modivo/rockpro-studio`, konto `qooperboy-3029`, została
+wyraźnie potwierdzona przez użytkownika. Git nie jest automatycznie podłączony
+do tego wdrożenia. Sam lokalny commit nie aktualizuje strony.
+
+## Co można sprawdzić
+
+- 3 typy konstrukcji, wieka, sekcje, zmiany wymiarów oraz interaktywny podgląd.
+- 14 bazowych pozycji katalogowych, z dostępnymi siatkami pojedynczych części;
+  źródłowe zespoły klientów nie są publikowane.
+- Rozmieszczenie uchwytów i zamknięć, konstrukcja, koła i gniazda.
+- 94 zdjęcia ze stron producentów z kodem, atrybucją i odsyłaczem do produktu.
+- Zapis/wczytanie draftu w tej samej przeglądarce, ulubione i ranking różnych
+  zapisanych projektów, eksport/import JSON.
+
+Demo nie łączy się z firmowym Excelem ani IronCADem. Nie ma wspólnej bazy
+projektów, magazynu ani cen. Zapis na jednym komputerze nie pojawia się
+automatycznie u drugiej osoby. Aby przekazać projekt, pobierz JSON. Wyczyszczenie
+danych witryny usuwa zapisy przeglądarki; JSON jest przenośną kopią koncepcji.
+Podgląd nie zatwierdza wycięć ani gotowości produkcyjnej.
+
+## Architektura i publikacja
+
+`deploy/vercel/` zawiera adapter demonstracyjny. `scripts/build_vercel_studio.py`
+tworzy nowy katalog wydania wewnątrz ignorowanego `artifacts/`, kopiując tylko
+jawną listę modułów, statyk, licencji i pojedynczych okuć. Nigdy nie publikuj
+katalogu repozytorium ani nadrzędnego `artifacts/`.
+
+```powershell
+Integracja\.venv\Scripts\python.exe scripts/build_vercel_studio.py --output artifacts/vercel-studio-NOWE-WYDANIE
+```
+
+Builder odmawia nadpisania wydania i generuje obok niego manifest plików z SHA.
+Wykrywa prywatne ścieżki oraz pola danych magazynowych w publicznym JSON.
+Python API wykonuje tylko `preview` i `convert` przez te same walidatory co Studio.
+Nie kopiuje modułu bazy projektów ani wykonawcy CAD. Import persystencji w lokalnym
+`configurator.py` jest leniwy: lokalne zapisy nadal korzystają z dotychczasowej SQLite.
+
+`cloud-storage.js` przechowuje drafty i preferencje w localStorage, kontroluje
+oczekiwaną rewizję, serializuje zapis przez Web Locks i zgłasza brak miejsca.
+Przeglądanie oraz kolejne rewizje nie zwiększają liczby różnych projektów.
+Nie wolno przedstawiać tego adaptera jako firmowego ERP lub wspólnej bazy.
+
+Po kontroli manifestu uruchom w katalogu konkretnego wydania:
+
+```powershell
+vercel deploy --prod --yes --project rockpro-studio --scope modivo
+```
+
+CLI musi być wcześniej zalogowane. Po publikacji sprawdź stronę anonimowo,
+nie tylko przez uwierzytelnione `vercel curl`. Lokalnie trasowanie można sprawdzić:
+
+```powershell
+Integracja\.venv\Scripts\python.exe scripts/serve_vercel_studio.py artifacts/vercel-studio-NOWE-WYDANIE
+node scripts/test_vercel_studio.cjs http://127.0.0.1:51345 artifacts/vercel-e2e-local
+node scripts/test_vercel_studio.cjs https://rockpro-studio.vercel.app artifacts/vercel-e2e-production
+```
+
+Test przeglądarki wymaga Playwright/Chrome i lokalnego przykładowego JSON T1;
+ścieżki środowiska testowego są jawne w skrypcie. Nie są zależnościami Vercela.
+
+## Zdjęcia producentów
+
+`scripts/fetch_manufacturer_images.py` czyta jawne adresy z katalogów. Pobiera
+tylko HTTPS z domen producentów, ogranicza rozmiar, weryfikuje pełny SKU oraz
+sygnaturę PNG/JPEG, zapisuje źródło, datę i SHA. Obsługuje SKU w JSON-LD oraz
+HTML Penn Elcom; nie dopasowuje zdjęć przez podobieństwo kodu, kategorię ani
+listę produktów polecanych. Brak zgodności pozostawia dotychczasowy obraz.
+Nie omija błędów dostępu. Raport zapisuje każdy brak lub odrzucone dopasowanie.
+
+```powershell
+Integracja\.venv\Scripts\python.exe scripts/fetch_manufacturer_images.py
+Integracja\.venv\Scripts\python.exe scripts/test_manufacturer_images.py -v
+```
+
+Opcjonalny overlay `artifacts/manufacturer-images/index.json` nie zmienia Excela,
+definicji części, zgód montażowych ani oryginalnych renderów. Moduł
+`manufacturer_images.py` sprawdza integralność i zachowuje metadane siatki przy
+podmianie obrazu. Katalog firmowy ma 90 zdjęć producentów i 232 pozycje ze zdjęciem
+łącznie; pozostałe obrazy pochodzą z zachowanego Excela. Pozostałe 4 zdjęcia
+producentów są przypisane do bazowych pozycji Studio. Wyświetlana informacja
+odróżnia zdjęcie producenta od renderu CAD.
+
+Przykłady odrzuceń: kod AH 4054 wskazuje stronę 4053; na wskazanej stronie W0968Z
+główny kod to D0941/5Z, a W0968Z występuje tylko w polecanych. Nie przenosimy
+takiego zdjęcia na wariant o innym SKU. Katalogi wariantów/serie wymagają strony
+jednego produktu lub ręcznego potwierdzenia.
+
+## Dowody bieżącej wersji
+
+- Pełny harness offline PASS: `artifacts/verification/20261028T121556408787Z/`.
+- 21 testów katalogu firmowego i konfiguratora PASS po zmianie podsumowania zdjęć.
+- 4 testy zdjęć PASS, w tym wariant SKU, polecany produkt, integralność i zachowanie siatki.
+- E2E anonimowej produkcji PASS: `artifacts/vercel-e2e-production/results.json`.
+  T1: 10 paneli, 8 okuć ręcznych i 58 części konstrukcji, razem 76 pozycji;
+  zmiana wymiaru, 3 rewizje, eksport JSON, konflikt rewizji, izolacja przeglądarek,
+  zdjęcia, 3 typy sekcji i układ mobilny.
+- Publiczna paczka: `artifacts/vercel-studio-20261028-04`, manifest obok katalogu.
+- Oryginalny Excel zachowuje SHA256
+  `7d2616b00b3433def8c4c9f0339b429c076ca1f67313b21859ee2185e23c8924`.
+
+Nie wykonywano nowych operacji natywnych CAD w tym zadaniu.

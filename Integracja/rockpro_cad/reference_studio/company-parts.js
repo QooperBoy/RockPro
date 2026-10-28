@@ -8,7 +8,7 @@ function render(){
  $('company-result').textContent=rows.length+' z '+data.items.length+' pozycji';$('company-rows').replaceChildren();
  for(const row of rows){
   const tr=document.createElement('tr'),image=document.createElement('td');
-  if(row.image){const img=document.createElement('img');img.src=row.image.url;img.alt=row.name;img.loading='lazy';image.append(img);}else image.append(text('span','Brak zdjęcia','muted'));
+  if(row.image){const img=document.createElement('img');img.src=row.image.url;img.alt=row.name;img.loading='lazy';image.append(img);if(row.image.source?.page_url){const a=text('a','Zdjęcie producenta ↗');a.href=row.image.source.page_url;a.target='_blank';a.rel='noopener noreferrer';image.append(a);}}else image.append(text('span','Brak zdjęcia','muted'));
   const item=document.createElement('td');item.append(text('strong',row.code),text('div',row.name),text('small',row.category,'muted'));
   if(row.duplicate_code)item.append(text('div','Kod występuje w dwóch kolumnach — do rozstrzygnięcia','company-warning'));
   if(row.source_url&&/^https?:\/\//.test(row.source_url)){const a=text('a','Producent ↗');a.href=row.source_url;a.target='_blank';a.rel='noopener noreferrer';item.append(a);}

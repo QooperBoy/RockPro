@@ -8,7 +8,6 @@ import json
 import math
 import uuid
 
-from .mcp import project_store
 from . import studio_parts
 from . import studio_placement
 from . import studio_structure
@@ -175,12 +174,14 @@ def _tables(conn):
 
 
 def list_drafts():
+    from .mcp import project_store
     with project_store.db() as conn:
         _tables(conn)
         return [dict(r) for r in conn.execute('SELECT id,revision,name,updated_at FROM configurator_drafts ORDER BY updated_at DESC LIMIT 100')]
 
 
 def read_draft(key):
+    from .mcp import project_store
     with project_store.db() as conn:
         _tables(conn)
         row = conn.execute('SELECT * FROM configurator_drafts WHERE id=?', (key,)).fetchone()
@@ -194,6 +195,7 @@ class DraftConflict(ValueError):
 
 
 def save_draft(value, key=None, expected_revision=0):
+    from .mcp import project_store
     d = preview(value)['draft']
     if type(expected_revision) is not int or expected_revision < 0:
         raise ValueError('Nieprawidłowa oczekiwana rewizja')

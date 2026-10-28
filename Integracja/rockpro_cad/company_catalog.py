@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import re
+from . import manufacturer_images
 
 DEFAULT_PATH=Path(__file__).resolve().parents[2]/'artifacts/erp-company-parts/catalog.json'
 
@@ -48,6 +49,10 @@ def catalog(parts=None):
             status='exact_code_candidate_requires_variant_review') for r in matches.values()]
         if row['image']:row['image']['url']='company-images/'+row['id']
     result['summary']['records_with_geometry_candidates']=sum(bool(r['geometry_candidates']) for r in result['items'])
+    manufacturer_images.decorate(result)
+    result['summary']['workbook_images']=sum(bool(r.get('image')) for r in _load(str(path.resolve()),path.stat().st_mtime_ns)['items'])
+    result['summary']['manufacturer_photos']=sum((r.get('image') or {}).get('kind')=='manufacturer_photo' for r in result['items'])
+    result['summary']['images']=sum(bool(r.get('image')) for r in result['items'])
     return result
 
 
@@ -60,7 +65,7 @@ def images():
 @lru_cache(maxsize=4)
 def _image_routes(path,stamp):
     path=Path(path)
-    data=catalog();folder=path.parent.resolve();result={}
+    data=_load(str(path),stamp);folder=path.parent.resolve();result={}
     for row in data['items']:
         if not row.get('image'):continue
         image=row['image'];file=(folder/image['file']).resolve(strict=True)
