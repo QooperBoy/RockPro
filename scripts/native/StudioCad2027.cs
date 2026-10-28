@@ -17,6 +17,9 @@ namespace RockPro { public static class LatchInProcess {
     static IZBaseApp App; static IZSceneDoc Scene; static IZDoc ResultDoc;
     static string Folder;
     static Dictionary<string,object> Parameters;
+    static Dictionary<string,object> Derived=new Dictionary<string,object>();
+    static HashSet<string> Dimensionless=new HashSet<string>();
+    static string[] GroupIds,GroupLabels;
     static void Step(string message) {File.AppendAllText(Path.Combine(Folder,"progress.log"),DateTime.UtcNow.ToString("o")+" "+message+Environment.NewLine);}
     static readonly Dictionary<string,IZSceneDoc> Sources=new Dictionary<string,IZSceneDoc>();
     static readonly Dictionary<string,IZElement> Nodes=new Dictionary<string,IZElement>();
@@ -49,6 +52,7 @@ namespace RockPro { public static class LatchInProcess {
     static int LeafCount(IZElement e) { return e.Type==eZElementType.Z_ELEMENT_PART?1:Children(e).Sum(x=>LeafCount(x)); }
     static string Name(Dictionary<string,object> s) { return (string)s["label"]+" | "+(string)s["id"]; }
     static string CutName(Dictionary<string,object> s) { return "RockPro | Obróbka | "+(string)s["id"]; }
+    static string GroupKey(Dictionary<string,object> s) {return (string)s[s.ContainsKey("physical_group")?"physical_group":"stage_id"];}
     static string LocalPath(string name) {
         if(String.IsNullOrWhiteSpace(name)||name!=Path.GetFileName(name)||name.IndexOfAny(Path.GetInvalidFileNameChars())>=0||name=="."||name=="..")throw new Exception("Expected a local basename");
         var p=Path.Combine(Folder,name);if(File.Exists(p)||Directory.Exists(p))throw new Exception("Refusing overwrite");return p;
@@ -61,9 +65,9 @@ namespace RockPro { public static class LatchInProcess {
             return String.Concat(Enumerable.Repeat("Parent\\",depth))+"Params\\"+m.Value;
         });
     }
-    static void Parameter(IZParameterMgr mgr,string name,string expr,string notes) {
+    static void Parameter(IZParameterMgr mgr,string name,string expr,string notes,bool scalar=false) {
         IZParameter p=null;for(int i=0;i<mgr.Count;i++)if(mgr.GetParameter(i).Name==name)p=mgr.GetParameter(i);
-        if(p==null)p=mgr.CreateParameter(eZParamType.Z_PARAMETER_TYPE_LENGTH,name,0);
+        if(p==null)p=mgr.CreateParameter(scalar?eZParamType.Z_PARAMETER_TYPE_SCALAR:eZParamType.Z_PARAMETER_TYPE_LENGTH,name,0);
         p.Expression=expr;p.Notes=notes;
     }
     static double[][] Rotation(Dictionary<string,object> s) {
@@ -111,7 +115,7 @@ namespace RockPro { public static class LatchInProcess {
         var cross=(IZSceneElement)((IZExtrudeFeature)f).CrossSection;var identity=cross.GetTransformToParent();identity.MakeIdentity();cross.SetTransformToParent(identity);
         var fe=(IZSceneElement)f;identity=fe.GetTransformToParent();identity.MakeIdentity();fe.SetTransformToParent(identity);
         part.Update();Step("panel before bind "+s["id"]+" "+J.Serialize(N(part.GetBody(true).GetBoundingBox())));((IZSizeBox)f).Reset(false);AnchorSize(f);
-        Groups[(string)s["stage_id"]].MoveChild(node,false);
+        Groups[GroupKey(s)].MoveChild(node,false);
         BindPose((IZSceneElement)part,s,2);Step("panel after pose "+s["id"]+" "+J.Serialize(N(part.GetBody(true).GetBoundingBox())));BindSize(f,s["size_expressions"],3);
         for(int axis=0;axis<3;axis++)fe.set_PositionTransformComponentExpression((eZTransformComponentType)axis,"0 mm");
         part.SurfaceFinish.Color=0x808040;part.BOMDescription="RockPro Studio: model prototypowy; odbiór produkcyjny nie został potwierdzony.";
@@ -127,7 +131,7 @@ namespace RockPro { public static class LatchInProcess {
             if(original.Type==eZElementType.Z_ELEMENT_PART)((IZPart)original).SaveAs(path,false);else ((IZAssembly)original).SaveAs(path,false);
             if(!File.Exists(path))throw new Exception("Catalogue extraction failed");cache.Add(key,path);
         }
-        Step("import "+s["id"]);var node=Groups[(string)s["stage_id"]].AddChildFromExternalFile(path,false);node.Name=Name(s);
+        Step("import "+s["id"]);var node=Groups[GroupKey(s)].AddChildFromExternalFile(path,false);node.Name=Name(s);
         int expected=LeafCount(original);if(expected<1||LeafCount(node)!=expected)throw new Exception("Incomplete catalogue subtree");
         Nodes.Add((string)s["id"],node);ExpectedLeafCounts.Add((string)s["id"],expected);
         Step("pose "+s["id"]);BindPose((IZSceneElement)node,s,2);
@@ -210,25 +214,33 @@ namespace RockPro { public static class LatchInProcess {
     }
     static void Values(Dictionary<string,object> values) {
         if(!new HashSet<string>(Parameters.Keys).SetEquals(values.Keys))throw new Exception("Check parameters are incomplete");
-        foreach(var p in values)Scene.ParameterMgr.GetParameterByName(p.Key).Expression=F(Convert.ToDouble(p.Value))+" mm";
+        foreach(var p in values)if(!Derived.ContainsKey(p.Key))Scene.ParameterMgr.GetParameterByName(p.Key).Expression=F(Convert.ToDouble(p.Value))+(Dimensionless.Contains(p.Key)?"":" mm");
         Step("parameters "+J.Serialize(values));
         Refresh();
+        MeasureParameters(values);
         if(Nodes.ContainsKey("structure/bottom/front")){
             var f=((IZPartFeatureMgr)Nodes["structure/bottom/front"]).GetFeatureAt(0);var box=(IZSizeBox)f;var p=((IZSceneElement)f).ParameterMgr.GetParameterByName("RP_DlugoscProfilu");
             Step("profile evaluated height="+F(box.Height*1000)+" expr="+box.HeightExpression+" parameter="+p.Expression+" value="+J.Serialize(p.Value));
         }
     }
+    static object MeasureParameters(Dictionary<string,object> expected) {
+        var rows=new List<object>();
+        foreach(var p in expected){var native=Scene.ParameterMgr.GetParameterByName(p.Key);double actual=Convert.ToDouble(native.Value)*(Dimensionless.Contains(p.Key)?1:1000);
+            Near(actual,Convert.ToDouble(p.Value),"Scene parameter "+p.Key,Dimensionless.Contains(p.Key)?1e-7:.015);
+            rows.Add(new{name=p.Key,value=actual,expression=native.Expression,notes=native.Notes,derived=Derived.ContainsKey(p.Key)});
+        }return rows;
+    }
     static double[][] Matrix(IZElement e) {
         var m=((IZSceneElement)e).GetTransformToGlobal();return Enumerable.Range(0,4).Select(i=>Enumerable.Range(0,4).Select(k=>m.GetValue(i,k)*(i==3&&k<3?1000:1)).ToArray()).ToArray();
     }
     static object Measure(object[] poses,object[] panels,object[] cuts,bool checkCutPoses=true) {
-        if(Scene.GetTopElement().GetChildrenCount()!=6)throw new Exception("Expected six stage groups");
+        if(Scene.GetTopElement().GetChildrenCount()!=Groups.Count)throw new Exception("Unexpected physical group count");
         if(Groups.Values.Sum(g=>g.GetChildrenCount())!=Nodes.Count)throw new Exception("Unexpected occurrence count");
         foreach(var n in Nodes)if(LeafCount(n.Value)!=ExpectedLeafCounts[n.Key])throw new Exception("Catalogue subtree count changed");
         var measured=new List<object>();
         foreach(object raw in poses){var s=O(raw);string id=(string)s["id"];var node=Nodes[id];var m=Matrix(node);var p=V(s["position_mm"]);var r=Rotation(s);
             for(int k=0;k<3;k++){Near(m[3][k],p[k],"Position "+id);for(int j=0;j<3;j++)Near(m[k][j],r[k][j],"Rotation "+id,1e-6);}
-            if(s.ContainsKey("stage_id")&&node.GetParent().Id!=((IZElement)Groups[(string)s["stage_id"]]).Id)throw new Exception("Wrong occurrence stage");
+            if(node.GetParent().Id!=((IZElement)Groups[GroupKey(s)]).Id)throw new Exception("Wrong occurrence physical group");
             if(s.ContainsKey("profile_length_mm")){
                 int axis=s.ContainsKey("profile_axis")?Convert.ToInt32(s["profile_axis"]):2;
                 var bound=N(((IZPart)node).GetBody(true).GetBoundingBox());
@@ -258,8 +270,8 @@ namespace RockPro { public static class LatchInProcess {
     }
     static void Reindex(Dictionary<string,object> req) {
         Nodes.Clear();Cuts.Clear();Groups.Clear();var roots=Children(Scene.GetTopElement());
-        for(int i=0;i<6;i++)Groups.Add(StageIds[i],(IZAssembly)roots.Single(e=>e.Name==StageLabels[i]));
-        foreach(object raw in A(req["panels"]).Concat(A(req["parts"]))){var s=O(raw);Nodes.Add((string)s["id"],Children((IZElement)Groups[(string)s["stage_id"]]).Single(e=>e.Name==Name(s)));}
+        for(int i=0;i<GroupIds.Length;i++)Groups.Add(GroupIds[i],(IZAssembly)roots.Single(e=>e.Name==GroupLabels[i]));
+        foreach(object raw in A(req["panels"]).Concat(A(req["parts"]))){var s=O(raw);Nodes.Add((string)s["id"],Children((IZElement)Groups[GroupKey(s)]).Single(e=>e.Name==Name(s)));}
         foreach(object raw in A(req["cuts"])){var s=O(raw);var mgr=(IZPartFeatureMgr)Nodes[(string)s["target_id"]];var found=new List<IZFeature>();for(int i=0;i<mgr.GetFeaturesCount();i++)if(((IZElement)mgr.GetFeatureAt(i)).Name==CutName(s))found.Add(mgr.GetFeatureAt(i));Cuts.Add((string)s["id"],found.Single());}
     }
     static object ResizeChecks(Dictionary<string,object> req) {
@@ -267,6 +279,29 @@ namespace RockPro { public static class LatchInProcess {
         try {foreach(object raw in A(req["check_cases"])){var c=O(raw);Values(O(c["parameters"]));result.Add(Measure(A(c["expectedposes"]),A(c["expectedpanels"]),c.ContainsKey("expectedcuts")?A(c["expectedcuts"]):A(req["cuts"]),c.ContainsKey("expectedcuts")));}}
         finally {Values(Parameters);}
         return new{status="PASS",cases=result};
+    }
+    static void CopyMeasuredModel(Dictionary<string,object> req) {
+        var src=O(A(req["sources"]).Single());string path=(string)src["path"];
+        if(Hash(path)!=(string)src["sha256"])throw new Exception("Model source SHA mismatch");
+        string copy=LocalPath("input-copy.ics");File.Copy(path,copy,false);
+        ResultDoc=OpenOwned(copy,false,true);Scene=(IZSceneDoc)ResultDoc;
+        var roots=Children(Scene.GetTopElement());var utility=(IZSceneDocUtility)Scene;
+        if(roots.Count!=6)throw new Exception("Expected measured legacy Studio hierarchy");
+        foreach(object raw in A(req["panels"]).Concat(A(req["parts"]))){
+            var s=O(raw);var node=utility.GetElementById(Convert.ToInt32(s["source_native_id"]));
+            if(node==null||node.Name!=(string)s["source_name"]||!roots.Any(g=>g.Id==node.GetParent().Id))throw new Exception("Source occurrence identity mismatch");
+            Nodes.Add((string)s["id"],node);ExpectedLeafCounts.Add((string)s["id"],LeafCount(node));
+            if(s.ContainsKey("size_expressions")||s.ContainsKey("profile_length_expression"))UpdatedParts.Add((string)s["id"]);
+        }
+        foreach(object raw in A(req["cuts"])){
+            var s=O(raw);var mgr=(IZPartFeatureMgr)Nodes[(string)s["target_id"]];var fs=new List<IZFeature>();
+            for(int i=0;i<mgr.GetFeaturesCount();i++)if(((IZElement)mgr.GetFeatureAt(i)).Name==CutName(s))fs.Add(mgr.GetFeatureAt(i));
+            Cuts.Add((string)s["id"],fs.Single());UpdatedParts.Add((string)s["target_id"]);
+        }
+        var top=(IZAssembly)Scene.GetTopElement();
+        for(int i=0;i<GroupIds.Length;i++){var group=top.CreateSubAssembly();((IZElement)group).Name=GroupLabels[i];Groups.Add(GroupIds[i],group);}
+        foreach(object raw in A(req["panels"]).Concat(A(req["parts"]))){var s=O(raw);var node=Nodes[(string)s["id"]];Groups[GroupKey(s)].MoveChild(node,false);node.Name=Name(s);}
+        foreach(var group in roots){if(group.GetChildrenCount()!=0)throw new Exception("Unmapped legacy children");group.Remove();}
     }
     public static int Run(string folder) {
         Folder=Path.GetFullPath(folder);var report=new Dictionary<string,object>{{"passed",false},{"production_approved",false}};
@@ -278,10 +313,17 @@ namespace RockPro { public static class LatchInProcess {
             if(!(bool)req["save_output"])throw new Exception("Explicit new-file save authorization is required");
             string output=LocalPath((string)req["output_filename"]);if(!output.EndsWith(".ics",StringComparison.OrdinalIgnoreCase))throw new Exception("Expected ICS output");
             show=req.ContainsKey("show_final")&&(bool)req["show_final"];
+            bool copyModel=req.ContainsKey("mode")&&(string)req["mode"]=="accessory-update";
+            GroupIds=req.ContainsKey("physical_groups")?A(req["physical_groups"]).Select(x=>(string)O(x)["id"]).ToArray():StageIds;
+            GroupLabels=req.ContainsKey("physical_groups")?A(req["physical_groups"]).Select(x=>(string)O(x)["label"]).ToArray():StageLabels;
+            Derived=req.ContainsKey("derived_parameters")?O(req["derived_parameters"]):new Dictionary<string,object>();
+            Dimensionless=req.ContainsKey("dimensionless_parameters")?new HashSet<string>(A(req["dimensionless_parameters"]).Select(Convert.ToString)):new HashSet<string>();
             var legacy=(LegacyApp)Marshal.GetActiveObject("IronCAD.Application");App=(IZBaseApp)legacy.ZIronCADApp;
             if(!App.ApiVersion.StartsWith("29.")||App.GetProcessID()!=Convert.ToInt32(req["expected_pid"]))throw new Exception("Expected pinned IronCAD 2027 process");
             priorActive=App.ActiveDoc;var priorDocs=Docs();before=State(priorDocs);existingKeys=new HashSet<string>(priorDocs.Select(DocumentKey));
             report["before"]=before;report["api_version"]=App.ApiVersion;
+            if(copyModel)CopyMeasuredModel(req);
+            else {
             int si=0;foreach(object raw in A(req["sources"])){var s=O(raw);string path=Path.GetFullPath((string)s["path"]);if(Hash(path)!=(string)s["sha256"])throw new Exception("Source SHA mismatch");
                 string copy=LocalPath("source-"+(si++).ToString("D3")+".ics");File.Copy(path,copy,false);if(Hash(copy)!=(string)s["sha256"])throw new Exception("Copied source mismatch");
                 var doc=OpenOwned(copy,true,false);
@@ -290,8 +332,11 @@ namespace RockPro { public static class LatchInProcess {
             var created=App.OpenNewDoc(eZDocType.Z_SCENE,false,true,"");
             if(existingKeys.Contains(DocumentKey(created)))throw new Exception("New scene ownership refused");
             ResultDoc=created;Scene=(IZSceneDoc)ResultDoc;
-            Parameters=O(req["parameters"]);foreach(var p in Parameters){if(!Regex.IsMatch(p.Key,@"^RP_[A-Za-z0-9_]+$"))throw new Exception("Invalid parameter name");Parameter(Scene.ParameterMgr,p.Key,F(Convert.ToDouble(p.Value))+" mm",req.ContainsKey("parameter_notes")?(string)O(req["parameter_notes"])[p.Key]:"Parametr RockPro Studio w milimetrach. Wymiary i położenia części wynikają z tego parametru.");}
-            var top=(IZAssembly)Scene.GetTopElement();for(int i=0;i<6;i++){var g=top.CreateSubAssembly();((IZElement)g).Name=StageLabels[i];var m=((IZSceneElement)g).GetTransformToParent();m.MakeIdentity();((IZSceneElement)g).SetTransformToParent(m);Groups.Add(StageIds[i],g);}
+            }
+            Parameters=O(req["parameters"]);foreach(var p in Parameters){if(!Regex.IsMatch(p.Key,@"^RP_[A-Za-z0-9_]+$"))throw new Exception("Invalid parameter name");Parameter(Scene.ParameterMgr,p.Key,F(Convert.ToDouble(p.Value))+(Dimensionless.Contains(p.Key)?"":" mm"),req.ContainsKey("parameter_notes")?(string)O(req["parameter_notes"])[p.Key]:"Parametr RockPro Studio w milimetrach. Wymiary i położenia części wynikają z tego parametru.",Dimensionless.Contains(p.Key));}
+            foreach(var p in Derived)Parameter(Scene.ParameterMgr,p.Key,Expr((string)p.Value,0),(string)O(req["parameter_notes"])[p.Key]);
+            if(!copyModel){
+            var top=(IZAssembly)Scene.GetTopElement();for(int i=0;i<GroupIds.Length;i++){var g=top.CreateSubAssembly();((IZElement)g).Name=GroupLabels[i];var m=((IZSceneElement)g).GetTransformToParent();m.MakeIdentity();((IZSceneElement)g).SetTransformToParent(m);Groups.Add(GroupIds[i],g);}
             var cache=new Dictionary<string,string>();
             foreach(string stage in StageIds){
                 Step("stage "+stage);
@@ -299,8 +344,9 @@ namespace RockPro { public static class LatchInProcess {
                 foreach(object raw in A(req["parts"]))if((string)O(raw)["stage_id"]==stage)ImportPart(O(raw),cache);
                 foreach(object raw in A(req["cuts"]))if((string)O(raw)["stage_id"]==stage)AddCut(O(raw));
             }
+            }
             FinalBindings(req);App.ActiveDoc=ResultDoc;Refresh();var poses=A(req["panels"]).Concat(A(req["parts"])).ToArray();
-            Step("baseline measurements");report["baseline"]=Measure(poses,A(req["panels"]),A(req["cuts"]));Step("resize checks");report["resize"]=ResizeChecks(req);
+            Step("baseline measurements");report["parameter_table"]=MeasureParameters(Parameters);report["baseline"]=Measure(poses,A(req["panels"]),A(req["cuts"]));Step("resize checks");report["resize"]=ResizeChecks(req);
             report["restored"]=Measure(poses,A(req["panels"]),A(req["cuts"]));
             if(File.Exists(output)||Directory.Exists(output))throw new Exception("Output appeared during build; refusing overwrite");
             Step("save new output");Scene.SaveAs(output,eZLinksSaveOptions.Z_LINKS_COPY_ALL,false);if(ResultDoc.Modified||!File.Exists(output))throw new Exception("Save failed");
@@ -317,6 +363,7 @@ namespace RockPro { public static class LatchInProcess {
             }
             string imagePath=LocalPath("RockPro_Studio_T1.png");Scene.ExportImage(imagePath,eZImageFormat.Z_IMAGE_PNG,1200,900,false);report["preview_path"]=imagePath;
             report["output_path"]=output;report["output_sha256"]=Hash(output);report["parameters"]=Parameters;
+            report["final_parameter_table"]=MeasureParameters(Parameters);report["physical_groups"]=GroupLabels;
             if(req.ContainsKey("plan_sha256"))report["plan_sha256"]=req["plan_sha256"];
             success=true;
         } catch(Exception e) {report["error"]=e.ToString();File.WriteAllText(Path.Combine(Folder,"failure-before-cleanup.json"),J.Serialize(report));}
@@ -349,6 +396,7 @@ namespace RockPro { public static class LatchInProcess {
             // COM graphs of closed sources and intermediate scenes in statics.
             Sources.Clear();Nodes.Clear();Cuts.Clear();Groups.Clear();ExpectedLeafCounts.Clear();OwnedSources.Clear();UpdatedParts.Clear();
             Scene=null;ResultDoc=null;App=null;Parameters=null;
+            Derived.Clear();Dimensionless.Clear();GroupIds=null;GroupLabels=null;
         }
         return success?0:1;
     }

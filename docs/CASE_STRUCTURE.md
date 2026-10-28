@@ -33,9 +33,10 @@ Drzewo CAD przedstawia fizyczną budowę modelu. Ustalony układ:
 - Przy zmianie hierarchii zachowaj położenia, orientacje i wymiary. Przelicz
   odwołania parametrów dla finalnych rodziców; sprawdź resize/powrót i reopen.
 
-**Stan wdrożenia:** reguła jest zapisana jako obowiązująca. Dotychczasowy
-wykonawca ROC-46 i pokazany model mają jeszcze historyczne sześć grup.
-Nie uznawaj wcześniejszych testów za dowód zgodności z nową hierarchią.
+**Stan wdrożenia:** kopia T1 z 28.10.2026 ma fizyczne zespoły i sprawdzone
+powiązania po zapisie/otwarciu; patrz [T1_ACCESSORY_PARAMETERS.md](T1_ACCESSORY_PARAMETERS.md).
+Domyślny przepływ budowy ROC-46 i wcześniejsze pliki mają jeszcze historyczne
+sześć grup. Nie uznawaj wcześniejszych testów za dowód zgodności z nową hierarchią.
 
 ## Historyczny układ według etapów — 26.10.2026
 

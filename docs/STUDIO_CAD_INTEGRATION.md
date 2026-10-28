@@ -1,5 +1,11 @@
 # Studio → IronCAD 2027 — ROC-46
 
+**28.10, późniejsza migracja wskazanej kopii T1:** wdrożono fizyczne zespoły
+oraz natywne parametry rozstawów/marginesów osprzętu, z dowodem po reopen.
+Patrz [T1_ACCESSORY_PARAMETERS.md](T1_ACCESSORY_PARAMETERS.md). To osobny tryb
+migracji kopii; nie oznacza dodania nowych kontrolek do kreatora ani odbioru
+nowych konturów zakończeń profili. Poniższy odbiór ROC-46 pozostaje historyczny.
+
 **Doprecyzowanie użytkownika 28.10.2026, po poniższym odbiorze:** obowiązuje
 drzewo fizycznych zespołów `Korpus 1…N` i `Podstawa` oraz licowanie okuć;
 profile mają kończyć się przy zewnętrznym kołnierzu zawiasu, nie przy otworze

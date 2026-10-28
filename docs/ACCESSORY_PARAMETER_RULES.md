@@ -4,6 +4,11 @@ Obowiązują we wszystkich rodzinach RockPro: w planie, kreatorze, tabeli parame
 CAD i podglądzie. To specyfikacja wspólnego standardu; zapis nie oznacza dodania
 wszystkich kontrolek do obecnego generatora ani zmiany istniejących ICS.
 
+Pierwsza wdrożona kopia T1: [T1_ACCESSORY_PARAMETERS.md](T1_ACCESSORY_PARAMETERS.md).
+Rozstawy, marginesy i oba tryby mają dowód natywny z zapisem/otwarciem;
+liczba części w tej kopii pozostaje stała. Standard dla pozostałych rodzin
+i kontrolki kreatora nadal wymagają osobnego wdrożenia.
+
 ## Wspólne znaczenie parametrów
 
 - Każda grupa ma stabilny identyfikator, SKU/recepturę, fizyczną sekcję i bazę
