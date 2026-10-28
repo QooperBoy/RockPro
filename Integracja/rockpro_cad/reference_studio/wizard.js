@@ -36,7 +36,7 @@ async function api(endpoint,data){const response=await fetch(endpoint,data===und
 function status(message,error=false){$('status').textContent=message;$('status').classList.toggle('error',error);}
 function stored(){try{localStorage.setItem(localKey,JSON.stringify({draft,storage,dirty}));}catch{status('Brak miejsca na awaryjny zapis w przeglądarce. Użyj zapisu draftu lub eksportu JSON.',true);}}
 function saveLabel(){ $('save-state').textContent=(storage.id?`Draft · rewizja ${storage.revision}`:'Nowy draft')+(dirty?' · niezapisane zmiany':' · zapisany w bazie');if(!storage.id&&!dirty)$('save-state').textContent='Jeszcze niezapisany w bazie.';}
-function changed(){dirty=true;placementView?.setEnabled(false);saveLabel();stored();clearTimeout(timer);const version=++serial;timer=setTimeout(()=>updatePreview(version),220);}
+function changed(){dirty=true;document.dispatchEvent(new CustomEvent('rockpro:preview-pending'));placementView?.setEnabled(false);saveLabel();stored();clearTimeout(timer);const version=++serial;timer=setTimeout(()=>updatePreview(version),220);}
 function selectOptions(select,entries,value){select.replaceChildren(...entries.map(([id,label])=>new Option(label,id)));select.value=value;}
 function processUI(){
  const names=['','Konstrukcja','Wieka i współpraca','Wymiary sekcji','Części i okucia','Uchwyty i ścianki','Zatrzaski i zawiasy','Konstrukcja i podstawa'];
@@ -103,6 +103,7 @@ async function updatePreview(version=++serial){
   $('placement-summary').textContent=model.placement.instance_count+' wystąpień w koncepcji · '+(draft.placements?.length??0)+' grup'+(model.placement.unresolved_groups.length?' · grupy bez docelowej ścianki: '+model.placement.unresolved_groups.length:'')+'.';
   partsPicker.renderSummary($('hardware-summary'),model.hardware_summary);
   renderConstruction(model);
+  document.dispatchEvent(new CustomEvent('rockpro:preview',{detail:model}));
   $('joint-fit-status').textContent=model.hardware_summary.definition_count?'do ustalenia po rozmieszczeniu i potwierdzeniu danych montażowych':'do ustalenia po wyborze okucia';
   $('preview-title').textContent=draft.name;$('preview-title').title=draft.name;$('section-sizes').replaceChildren();
   for(const s of model.sections){const e=document.createElement('div');e.className='section-size';e.textContent=s.label;const detail=document.createElement('span');detail.textContent=s.size_mm.map(x=>Number(x.toFixed(2))).join(' × ')+' mm · '+(s.id==='body'?'korpus':options.faces[s.face]);e.append(detail);$('section-sizes').append(e);}

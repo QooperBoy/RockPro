@@ -82,6 +82,8 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
         ('company-parts.css','text/css; charset=utf-8'),
         ('part-preferences.js','text/javascript; charset=utf-8'),
         ('part-preferences.css','text/css; charset=utf-8'),
+        ('cost-summary.js','text/javascript; charset=utf-8'),
+        ('cost_math.mjs','text/javascript; charset=utf-8'),
         ('placement_math.mjs', 'text/javascript; charset=utf-8'),
         ('scene-controls.js', 'text/javascript; charset=utf-8'),
         ('preview_math.mjs', 'text/javascript; charset=utf-8'), ('favicon.svg', 'image/svg+xml'))}
@@ -128,7 +130,7 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
             elif name == 'wizard/options':
                 self.respond(200, json.dumps(dict(types=configurator.TYPES, faces=configurator.FACES), ensure_ascii=False).encode())
             elif name == 'wizard/parts':
-                self.respond(200, json.dumps(company_catalog.decorate(manufacturer_images.decorate(part_images.decorate(studio_parts.catalog(), hardware_images))), ensure_ascii=False).encode())
+                self.respond(200, json.dumps(company_catalog.picker_entries(company_catalog.decorate(manufacturer_images.decorate(part_images.decorate(studio_parts.catalog(), hardware_images)))), ensure_ascii=False).encode())
             elif name == 'company/catalog':
                 parts=part_images.decorate(studio_parts.catalog(),hardware_images)
                 self.respond(200,json.dumps(company_catalog.catalog(parts),ensure_ascii=False).encode())

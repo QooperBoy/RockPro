@@ -12,11 +12,12 @@ export class PartsPicker {
   this.dialogImage=element('img');this.dialogCaption=element('p',null,'hint');this.dialog.append(close,this.dialogTitle,this.dialogImage,this.dialogCaption);
   this.dialog.addEventListener('click',e=>{if(e.target===this.dialog){const r=this.dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)this.dialog.close();}});
   document.body.append(this.dialog);
-  host.append(element('p',`Baza robocza: ${catalog.items.length} pozycji z dotychczasowych źródeł i prototypów. Pokazujemy kompletne części; źródłowe zespoły i niekompletne fragmenty są ukryte. Firmowy wykaz jest dostępny w Katalogu firmowym.`,'hint'));
+  host.append(element('p',`Baza części: ${catalog.items.length} pozycji, w tym ${catalog.company_record_count??0} rekordów z Excela. Pozycje katalogowe bez sprawdzonego modelu są widoczne, lecz nie można ich jeszcze rozmieszczać w 3D.`,'hint'));
+  const fullCatalog=element('a','Otwórz pełny katalog firmowy ↗');fullCatalog.href='company-parts.html'+location.search;fullCatalog.id='company-catalog-link';host.append(fullCatalog);
   const searchLabel=element('label','Szukaj części');this.search=element('input');this.search.type='search';this.search.id='parts-search';this.search.placeholder='SKU, nazwa, producent lub alias CAD';searchLabel.append(this.search);
   const categoryLabel=element('label','Kategoria');this.category=element('select');this.category.id='parts-category';
   this.category.append(new Option('Wszystkie kategorie',''));for(const [id,label]of Object.entries(catalog.categories))this.category.append(new Option(label,id));categoryLabel.append(this.category);
-  const sourceLabel=element('label','Pochodzenie części');this.source=element('select');this.source.id='parts-source';this.source.append(new Option('Wszystkie źródła',''),new Option('Dotychczasowa biblioteka T1','base'),new Option('Pozostałe projekty — wszystkie','source'));for(const key of [...new Set(catalog.items.flatMap(r=>r.observed_projects??(r.source_project?[r.source_project]:[])))].sort())this.source.append(new Option('Zaobserwowane w projekcie '+key,key));sourceLabel.append(this.source);
+  const sourceLabel=element('label','Pochodzenie części');this.source=element('select');this.source.id='parts-source';this.source.append(new Option('Wszystkie źródła',''),new Option('Biblioteka modeli T1','base'),new Option('Katalog z Excela — wszystkie pozycje','company'),new Option('Pozostałe projekty — wszystkie','source'));for(const key of [...new Set(catalog.items.flatMap(r=>r.observed_projects??(r.source_project?[r.source_project]:[])))].sort())this.source.append(new Option('Zaobserwowane w projekcie '+key,key));sourceLabel.append(this.source);
   const onlyLabel=element('label',null,'parts-only');this.only=element('input');this.only.type='checkbox';this.only.id='parts-only-selected';onlyLabel.append(this.only,document.createTextNode('Pokaż tylko wybrane'));
   this.count=element('p',null,'hint');this.count.id='parts-count';this.list=element('div');this.list.id='parts-list';
   const favoriteLabel=element('label',null,'parts-only preference-filter');this.favoritesOnly=element('input');this.favoritesOnly.type='checkbox';this.favoritesOnly.id='parts-only-favorites';favoriteLabel.append(this.favoritesOnly,document.createTextNode('Tylko ulubione'));
@@ -44,7 +45,7 @@ export class PartsPicker {
  render(){
   const selected=new Set(this.selected.map(r=>r.part_id)),query=this.search.value.trim().toLocaleLowerCase('pl');
   const rows=this.preferences.sort(this.catalog.items.filter(r=>r.show_as_complete_part!==false&&( !this.category.value||r.family_id===this.category.value)
-   &&(!this.source.value||(this.source.value==='base'?!r.source_project:this.source.value==='source'?!!r.source_project:(r.observed_projects??[r.source_project]).includes(this.source.value)))
+   &&(!this.source.value||(this.source.value==='company'?r.catalog_only:this.source.value==='base'?!r.source_project&&!r.catalog_only:this.source.value==='source'?!!r.source_project:(r.observed_projects??[r.source_project]).includes(this.source.value)))
    &&(!this.only.checked||selected.has(r.id))
    &&(!this.favoritesOnly.checked||this.preferences.stat(r.id).favorite)
    &&[r.id,r.sku,r.catalog_code_raw,r.source_project,r.name,r.manufacturer,this.catalog.categories[r.family_id],...r.aliases].filter(Boolean).join(' ').toLocaleLowerCase('pl').includes(query)),this.sort.value);
@@ -62,6 +63,7 @@ export class PartsPicker {
    const badges=element('div',null,'part-badges');badges.append(element('span',cutLabels[row.cutout_status],'part-badge'));
    badges.append(element('span',row.mounting_status==='prototype_specific'?'Dane prototypowe — do sprawdzenia w nowym układzie':'Montaż: dane niepotwierdzone','part-badge'));
    card.append(badges);
+   if(row.duplicate_code)card.append(element('p','Kod występuje w kilku rekordach Excela — warianty zachowane osobno.','part-blocked'));
    if(row.source_project)card.append(element('p','Wariant źródłowy · '+row.source_project+' · kod z CAD, SKU niezatwierdzony'+(row.component_only?' · zespół / komponent, nie komplet':''),'part-blocked'));
    if(!row.selectable)card.append(element('p',row.selection_blocker,'part-blocked'));
    const details=element('details'),summary=element('summary','Szczegóły i źródło');details.append(summary,element('p',row.description),element('p',row.note));

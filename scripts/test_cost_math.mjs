@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {estimateCosts} from '../Integracja/rockpro_cad/reference_studio/cost_math.mjs';
+const item=(id,quantity=2,family_id='handles')=>({part_id:id,name:id,quantity,unit:'szt.',family_id});
+const part=(code,price_raw,currency=null,unit=null)=>({id:'company-'+code,code,price_raw,currency,unit});
+const estimate=(rows,items,assume=true)=>estimateCosts({rows},{items},assume);
+assert.equal(estimate([item('H7159')],[part('PN - H7159','12.5')]).totals[0].amount,25);
+assert.equal(estimate([item('H7159',3)],[part('PN - H7159','12.5')]).totals[0].amount,37.5);
+assert.equal(estimate([item('H7159')],[part('H7159','0')]).rows[0].amount,0);
+assert.equal(estimate([item('H7159')],[part('H7159',null)]).rows[0].amount,null);
+assert.equal(estimate([item('H7159')],[part('H7159','12'),part('H7159','14')]).unpriced,1);
+assert.equal(estimate([item('H7159')],[part('H7159K','12')]).unpriced,1);
+assert.equal(estimate([item('EG-0113',16,'profiles')],[part('EG-0113','12')]).rows[0].amount,null);
+assert.equal(estimate([item('H7159')],[part('H7159','12')],false).unpriced,1);
+assert.equal(estimate([item('H7159')],[part('H7159','12','PLN','szt.')],false).totals[0].amount,24);
+assert.equal(estimate([item('A'),item('B')],[part('A','1','PLN','pcs'),part('B','2','EUR','pcs')]).totals.length,2);
+console.log('PASS: cost quantity changes, zero/missing prices, variants, units and currencies');

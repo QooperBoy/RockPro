@@ -87,3 +87,33 @@ def decorate(parts):
     for row in parts['items']:
         if row['id'] in refs:row['company_references']=refs[row['id']]
     return parts
+
+
+def picker_entries(parts, data=None):
+    """Expose every workbook record for browsing; never infer a mounting definition.
+
+    Explicit presentation allowlist excludes stock, prices, workbook cells and IDs
+    of customer projects. Duplicate SKU records keep their separate source IDs.
+    """
+    data = catalog(parts) if data is None else data
+    for row in data['items']:
+        family = 'company:'+row['category']
+        parts['categories'][family] = 'Excel · '+row['category']
+        image = copy.deepcopy(row.get('image'))
+        if image:
+            image = {k:v for k,v in image.items() if k in ('url','kind','label','source')}
+            image.setdefault('kind','workbook_photo')
+            image.setdefault('label','Zdjęcie z katalogu firmowego')
+            image.setdefault('source',dict(description='Obraz z przekazanego wykazu części. Nie potwierdza montażu ani modelu 3D.'))
+        parts['items'].append(dict(id=row['id'],revision=1,sku=row['code'],name=row['name'],
+            manufacturer=row.get('manufacturer'),aliases=[],family_id=family,
+            description=row['name'],note=row.get('cutout_note') or 'Brak opisu wycięcia w źródle.',
+            source_url=row.get('source_url'),source_document='Katalog firmowy',source_checked_on='Import katalogu',
+            catalog_only=True,catalog_source='company_workbook',duplicate_code=row.get('duplicate_code',False),
+            show_as_complete_part=True,selectable=False,component_only=False,
+            selection_blocker='Pozycja katalogowa z Excela. Wybór do montażu wymaga powiązania i sprawdzenia modelu 3D.',
+            cutout_status='required' if row.get('cutout_note') else 'unknown',mounting_status='unknown',
+            geometry_status='catalog_only',automatic_placement_approved=False,production_approved=False,
+            image=image))
+    parts['company_record_count']=len(data['items'])
+    return parts

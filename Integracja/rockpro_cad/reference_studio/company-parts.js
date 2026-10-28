@@ -12,8 +12,8 @@ function render(){
   const item=document.createElement('td');item.append(text('strong',row.code),text('div',row.name),text('small',row.category,'muted'));
   if(row.duplicate_code)item.append(text('div','Kod występuje w dwóch kolumnach — do rozstrzygnięcia','company-warning'));
   if(row.source_url&&/^https?:\/\//.test(row.source_url)){const a=text('a','Producent ↗');a.href=row.source_url;a.target='_blank';a.rel='noopener noreferrer';item.append(a);}
-  const stock=text('td',display(row.cached_stock_raw));stock.title='Stany magazynowe!'+row.source.stock_cell+' · jednostka wymaga potwierdzenia';
-  if(row.stock_error||Number(row.cached_stock_raw)<0)stock.className='company-warning';stock.append(text('small',row.source.stock_cell+' · z pliku','muted'));
+  const stock=text('td',display(row.cached_stock_raw));stock.title=row.source?'Stany magazynowe!'+row.source.stock_cell+' · jednostka wymaga potwierdzenia':'Stany nie są udostępniane online';
+  if(row.stock_error||Number(row.cached_stock_raw)<0)stock.className='company-warning';if(row.source)stock.append(text('small',row.source.stock_cell+' · z pliku','muted'));
   const price=text('td',display(row.price_raw));price.title='Cena jednostkowa z wiersza 7. Waluta i jednostka nie są jawnie oznaczone w katalogu.';
   const cut=text('td',row.cutout_note||'—');if(row.cutout_note)cut.append(text('small','Opis źródłowy · do potwierdzenia montażu','muted'));
   const mesh=document.createElement('td'),candidates=row.geometry_candidates.filter(m=>m.has_mesh);

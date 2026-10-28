@@ -3,7 +3,9 @@
 **Demo dla Tomka:** [rockpro-studio.vercel.app](https://rockpro-studio.vercel.app).
 Konfigurator, podgląd 3D i zdjęcia producentów. Drafty oraz ulubione są zapisywane
 tylko w przeglądarce; projekt przekaż przez eksport/import JSON. Bez firmowej bazy,
-stanów i cen oraz bez zdalnego sterowania IronCADem. [Wdrożenie i aktualizacja](docs/STUDIO_VERCEL.md).
+stanów magazynowych oraz bez zdalnego sterowania IronCADem. Pełny katalog ma
+265 rekordów z cenami; na końcu konfiguracji jest częściowa wycena okuć.
+[Wdrożenie i aktualizacja](docs/STUDIO_VERCEL.md).
 
 [Interfejs i proces Studio](docs/STUDIO_UX_DESIGN.md): kompas, narzędzia 3D,
 spójne kroki i kierunek dalszego rozwoju, wraz z przeglądem bibliotek UI/UX.

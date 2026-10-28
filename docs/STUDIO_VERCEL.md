@@ -8,18 +8,37 @@ do tego wdrożenia. Sam lokalny commit nie aktualizuje strony.
 ## Co można sprawdzić
 
 - 3 typy konstrukcji, wieka, sekcje, zmiany wymiarów oraz interaktywny podgląd.
-- 14 bazowych pozycji katalogowych, z dostępnymi siatkami pojedynczych części;
-  źródłowe zespoły klientów nie są publikowane.
+- 14 bazowych pozycji modeli oraz wszystkie 265 rekordów Excela (263 różne kody),
+  bez łączenia duplikatów. Krok 4 ma filtr `Katalog z Excela`, sidebar ma pełny
+  katalog firmowy z 232 obrazami. Brakujące obrazy nie ukrywają rekordów.
+  Pozycje bez sprawdzonego powiązania modelu są widoczne katalogowo, lecz mają
+  zablokowany wybór do montażu. Źródłowe zespoły klientów nie są publikowane.
 - Rozmieszczenie uchwytów i zamknięć, konstrukcja, koła i gniazda.
 - 94 zdjęcia ze stron producentów z kodem, atrybucją i odsyłaczem do produktu.
 - Zapis/wczytanie draftu w tej samej przeglądarce, ulubione i ranking różnych
   zapisanych projektów, eksport/import JSON.
 
-Demo nie łączy się z firmowym Excelem ani IronCADem. Nie ma wspólnej bazy
-projektów, magazynu ani cen. Zapis na jednym komputerze nie pojawia się
+Demo nie łączy się z żywym firmowym Excelem ani IronCADem. Nie ma wspólnej bazy
+projektów ani stanów magazynowych. Po dodatkowej, wyraźnej zgodzie użytkownika
+opublikowano nazwy, kody, kategorie, uwagi, zdjęcia i ceny wszystkich 265 rekordów.
+Osiem brakujących cen pozostaje brakiem, nie zerem. Zapis na jednym komputerze nie pojawia się
 automatycznie u drugiej osoby. Aby przekazać projekt, pobierz JSON. Wyczyszczenie
 danych witryny usuwa zapisy przeglądarki; JSON jest przenośną kopią koncepcji.
 Podgląd nie zatwierdza wycięć ani gotowości produkcyjnej.
+
+## Podsumowanie cenowe
+
+Na końcu kroku 7 `Podsumowanie cenowe części` korzysta z ilości wspólnego
+`project_summary` oraz cen katalogu. Dopasowuje pełny kod bez utożsamiania
+podobnych wariantów. Przy kilku rekordach kodu nie wybiera arbitralnie ceny.
+Zachowuje cenę zero, braki cen oraz oddzielne sumy różnych walut.
+
+Arkusz nie deklaruje waluty, netto/brutto i jednostek wszystkich cen. Widoczne
+założenie `Szacuj cenę okuć za sztukę` pozwala oszacować tylko okucia liczone
+w sztukach. Można je wyłączyć. Profile, płyty i pianki nie są mnożone przez
+liczbę elementów bez ustalenia jednostek i materiału. Wycena pokazuje pozycje
+pominięte i nie jest pełną ceną skrzyni. Zmiana ilości/układu odświeża zestawienie;
+w trakcie przeliczania poprzednia kwota jest ukrywana.
 
 ## Architektura i publikacja
 
@@ -93,11 +112,14 @@ jednego produktu lub ręcznego potwierdzenia.
 - Pełny harness offline PASS: `artifacts/verification/20261028T121556408787Z/`.
 - 21 testów katalogu firmowego i konfiguratora PASS po zmianie podsumowania zdjęć.
 - 4 testy zdjęć PASS, w tym wariant SKU, polecany produkt, integralność i zachowanie siatki.
-- E2E anonimowej produkcji PASS: `artifacts/vercel-e2e-production/results.json`.
+- E2E anonimowej produkcji PASS: `artifacts/vercel-full-catalog-production/results.json`.
   T1: 10 paneli, 8 okuć ręcznych i 58 części konstrukcji, razem 76 pozycji;
   zmiana wymiaru, 3 rewizje, eksport JSON, konflikt rewizji, izolacja przeglądarek,
   zdjęcia, 3 typy sekcji i układ mobilny.
-- Publiczna paczka: `artifacts/vercel-studio-20261028-04`, manifest obok katalogu.
+- Pełny katalog: 6 testów backendu PASS oraz test arytmetyki cen w
+  `scripts/test_cost_math.mjs` (brak/zero, warianty, jednostki, waluty, zmiana ilości).
+- Harness pełnego katalogu PASS: `artifacts/verification/20261028T124319772089Z/`.
+- Publiczna paczka: `artifacts/vercel-studio-20261028-06`, manifest obok katalogu.
 - Oryginalny Excel zachowuje SHA256
   `7d2616b00b3433def8c4c9f0339b429c076ca1f67313b21859ee2185e23c8924`.
 

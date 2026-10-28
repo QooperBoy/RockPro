@@ -12,7 +12,7 @@ folder=args.folder.resolve();spec=importlib.util.spec_from_file_location('cloud_
 class Handler(module.handler):
     def do_GET(self):
         route=urlsplit(self.path).path
-        route={'/':'/wizard.html','/wizard/options':'/options.json','/wizard/parts':'/catalog-parts.json'}.get(route,route)
+        route={'/':'/wizard.html','/wizard/options':'/options.json','/wizard/parts':'/catalog-parts.json','/company/catalog':'/company-catalog.json'}.get(route,route)
         path=(folder/'public'/route.lstrip('/')).resolve()
         if not path.is_relative_to(folder/'public') or not path.is_file():self.respond(404,dict(error='Not found'));return
         raw=path.read_bytes();self.send_response(200);self.send_header('Content-Type',mimetypes.guess_type(path)[0] or 'application/octet-stream');self.send_header('Content-Length',str(len(raw)));self.end_headers();self.wfile.write(raw)

@@ -2,7 +2,10 @@
 
 - Demo Vercel i zdjęcia producentów: [docs/STUDIO_VERCEL.md](docs/STUDIO_VERCEL.md).
   Publikuj tylko paczkę z jawnej allowlisty, nigdy checkout/artifacts w całości,
-  firmowego Excela, SQLite, cen, stanów ani modeli klientów. Zdjęcie musi pasować
+  firmowego Excela, SQLite, stanów ani modeli klientów. Ceny wymagają jawnej zgody;
+  28.10.2026 użytkownik zatwierdził publikację pełnych 265 rekordów i podsumowania
+  cenowego na istniejącym Vercelu. Zachowuj braki cen i jednostek, nie łącz wariantów
+  ani nie utożsamiaj orientacyjnej sumy okuć z pełną ceną skrzyni. Zdjęcie musi pasować
   do pełnego SKU (z wariantem); kod w produktach polecanych nie identyfikuje zdjęcia
   głównego. Zachowaj siatkę CAD niezależnie od zmiany zdjęcia oraz źródło i SHA pliku.
 

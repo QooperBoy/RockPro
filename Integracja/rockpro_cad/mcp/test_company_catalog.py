@@ -55,5 +55,17 @@ class CompanyCatalogueTests(unittest.TestCase):
     def test_missing_optional_provider_has_empty_view(self):
         self.assertEqual(c.catalog()['items'],[])
 
+    def test_all_picker_records_keep_duplicate_ids_without_financial_fields(self):
+        self.data['items']=[record(duplicate=True),record(suffix='2',duplicate=True)]
+        for row in self.data['items']:
+            row.update(name='Uchwyt',category='Uchwyty',manufacturer='Test',price_raw='secret-price')
+        self.write()
+        parts=c.picker_entries(dict(items=[],categories={}))
+        self.assertEqual(len(parts['items']),2)
+        self.assertNotEqual(parts['items'][0]['id'],parts['items'][1]['id'])
+        self.assertTrue(all(r['catalog_only'] and not r['selectable'] for r in parts['items']))
+        self.assertNotIn('secret-price',json.dumps(parts))
+        self.assertTrue(all('cached_stock_raw' not in r and 'source' not in r for r in parts['items']))
+
 
 if __name__=='__main__':unittest.main()
