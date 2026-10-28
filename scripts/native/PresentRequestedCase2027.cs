@@ -1,0 +1,15 @@
+// Show the exact saved review artifact, never an unrelated active document.
+using System;using System.IO;using System.Linq;using System.Collections.Generic;
+using System.Runtime.InteropServices;using System.Web.Script.Serialization;using interop.ICApiIronCAD;
+namespace RockPro {public static class LatchInProcess {
+static JavaScriptSerializer J=new JavaScriptSerializer();
+static string Hash(string p){using(var f=new FileStream(p,FileMode.Open,FileAccess.Read,FileShare.ReadWrite|FileShare.Delete))using(var h=System.Security.Cryptography.SHA256.Create())return BitConverter.ToString(h.ComputeHash(f)).Replace("-","").ToLowerInvariant();}
+static IZDoc D(object x){return x is IZDoc?(IZDoc)x:(IZDoc)Marshal.GetObjectForIUnknown(new IntPtr(Convert.ToInt64(x)));}
+static void Dirty(IZElement e){e.SetDirtyFlag(eZDirtyFlag.Z_DIRTY_GRAPHICS);if(e.Type==eZElementType.Z_ELEMENT_PART||e.GetChildrenCount()==0)return;var a=e.GetChildrenZArray();for(int i=0;i<e.GetChildrenCount();i++){object x;a.Get(i,out x);Dirty((IZElement)x);}}
+public static int Run(string folder){var result=new Dictionary<string,object>();bool pass=false;try{var r=(Dictionary<string,object>)J.DeserializeObject(File.ReadAllText(Path.Combine(folder,"request.json")));if((string)r["contract"]!="rockpro-requested-present-2027-v1"||System.Diagnostics.Process.GetCurrentProcess().Id!=Convert.ToInt32(r["expected_pid"]))throw new Exception("Wrong host/request");string path=(string)r["file"];if(Hash(path)!=(string)r["sha256"])throw new Exception("Saved file changed");dynamic legacy=Marshal.GetActiveObject("IronCAD.Application");var app=(IZBaseApp)legacy.ZIronCADApp;if(!app.ApiVersion.StartsWith("29."))throw new Exception("2027 required");
+ // This file was created by this operation. Reopen it visibly; the previous
+ // hidden verification window cannot be made visible just by ActiveDoc.
+ foreach(object raw in ((Array)app.GetAllOpenDocs()??new object[0])){var d=D(raw);if(String.Equals(d.Name,path,StringComparison.OrdinalIgnoreCase)){if(d.Modified){if(!r.ContainsKey("preserve_owned_presentation")||!(bool)r["preserve_owned_presentation"])throw new Exception("Review artifact has unsaved edits");string backup=Path.Combine(folder,"preserved-owned-presentation.ics");((IZSceneDoc)d).SaveAs(backup,eZLinksSaveOptions.Z_LINKS_COPY_ALL,false);result["preserved_owned_presentation"]=backup;}d.Close();}}
+ bool already;var doc=app.OpenFile2(path,false,true,out already);if(already)throw new Exception("Unexpected already-open review");var s=(IZSceneDoc)doc;app.ActiveDoc=doc;Dirty(s.GetTopElement());s.UpdateGraphics(0);s.Redraw();s.AdjustCameraToFitShapeInRect(1400,1100);s.ExportImage(Path.Combine(folder,"review.png"),eZImageFormat.Z_IMAGE_PNG,1400,1100,true);if(doc.Modified)s.SaveAs(path,eZLinksSaveOptions.Z_LINKS_COPY_ALL,false);result["file"]=path;result["sha256"]=Hash(path);result["visible"]=true;result["api_version"]=app.ApiVersion;pass=true;
+ }catch(Exception ex){result["error"]=ex.ToString();}result["passed"]=pass;File.WriteAllText(Path.Combine(folder,"result.json"),J.Serialize(result));return pass?0:1;}
+}}

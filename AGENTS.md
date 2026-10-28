@@ -1,5 +1,13 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
+- Przenoszenie zestawu Penn/Adam Hall do 2027: [docs/REQUESTED_CASE_2027.md](docs/REQUESTED_CASE_2027.md).
+  Nominalny wymiar otworu z katalogu może różnić się od gardzieli pobranego CAD;
+  sprawdź rzeczywistą interferencję. Dopasowane łuki są przybliżeniem prototypu,
+  nie oryginalnym splajnem ani zatwierdzeniem CNC. Nie używaj odczytu
+  `GetBSplineDataCOM` przez bufory `out double` w hoście z pracą użytkownika:
+  taka próba spowodowała awarię procesu. Eksperymenty z niezweryfikowanym
+  marshallingiem prowadź tylko w osobnym pustym hoście po snapshotach.
+
 - Studio kończy się krokiem 8 „Kontrola projektu”: wspólne `studio_review`,
   poziomy błędów/ostrzeżeń i odsyłacze do edycji konkretnej grupy. Nie utożsamiaj
   kontroli znanych obrysów 2D z odbiorem BRep/wycięć w CAD. Nie blokuj kopii JSON
