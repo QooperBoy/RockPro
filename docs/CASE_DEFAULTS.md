@@ -2,6 +2,16 @@
 
 Sklejka: RGB(64,128,128), #408080, ICAPI COLORREF 0x808040, zmierzone z T_1.
 
+## Wspólny standard parametrów osprzętu
+
+[ACCESSORY_PARAMETER_RULES.md](ACCESSORY_PARAMETER_RULES.md) definiuje liczność,
+rozstaw i marginesy od brzegów dla zawiasów i uchwytów oraz rozstaw X/Y kół
+i powiązanych górnych gniazd/profili pod koła. Rozstaw i oba marginesy nie mogą
+być jednocześnie niezależnymi sterowaniami. Wycięcia podążają za okuciem,
+a górny układ pod koła za rzeczywistymi punktami osadzenia odpowiadających kół.
+Obowiązuje dla wszystkich kolejnych rodzin i modeli; status wdrożenia w kodzie
+trzeba sprawdzać osobno.
+
 ## Globalne reguły budowy modelu — 28.10.2026
 
 Każdy model, niezależnie od rodziny i generatora, ma fizyczne zespoły

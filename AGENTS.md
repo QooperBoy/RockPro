@@ -2,6 +2,12 @@
 
 ## Globalne reguły modeli — decyzja użytkownika 28.10.2026
 
+- Wspólna parametryzacja osprzętu: docs/ACCESSORY_PARAMETER_RULES.md. Zawiasy
+  i uchwyty: liczność, rozstaw i marginesy od brzegów wskazanej ścianki; uchwyty
+  także wysokość montażu. Koła i górne gniazda/profile pod koła: układ X/Y,
+  sparowany przez rzeczywiste punkty osadzenia, razem z podporami i wycięciami.
+  Margines mierzy się do skraju okucia, rozstaw między kotwami. Jawny tryb
+  wybiera sterujące marginesy albo rozstaw; pozostałe wartości są wyliczone.
 - Drzewo każdego modelu CAD: korzeń dokumentu (ścieżka/nazwa pliku), następnie
   `Korpus 1`, `Korpus 2` i kolejne rzeczywiście występujące korpusy oraz `Podstawa`.
   Każda część należy do swojego fizycznego zespołu i ma czytelną polską nazwę.
