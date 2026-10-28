@@ -1,5 +1,10 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
+- Firmowy Excel i etap mini ERP: [docs/EXCEL_ERP_INTEGRATION.md](docs/EXCEL_ERP_INTEGRATION.md).
+  Katalog firmowy to odczyt snapshotu, nie żywy stan ani zgoda CAD. Zachowuj
+  puste wartości i zera, jednostki, warianty oraz zdublowane kody. Nie księguj
+  zapisanych stanów jako nowych dostaw ani ponownie całej historycznej konsumpcji.
+
 - Pełna konstrukcja w Studio: [docs/STUDIO_CONSTRUCTION.md](docs/STUDIO_CONSTRUCTION.md).
   Zachowaj opcjonalną receptę `construction`, wspólne `project_summary`, sztywne
   modele okuć i pary koło–gniazdo. Nie pokazuj samego wyboru katalogowego jako

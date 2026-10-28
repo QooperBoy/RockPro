@@ -41,7 +41,9 @@ body[data-theme=dark] .panel-splitter:hover::after,body[data-theme=dark] .panel-
  .panel-motion.preview-minimized .preview>:not(.preview-heading){display:block!important}.panel-motion.preview-minimized .preview-heading{flex-direction:row}
  .panel-motion .app-navigation span,.panel-motion #steps span:not(.step-number){display:inline-block!important;opacity:var(--motion-label-opacity);white-space:nowrap;overflow:hidden}
  .panel-motion .app-sidebar #steps button,.panel-motion .app-navigation a{justify-content:flex-start!important;white-space:nowrap;flex-shrink:0}
+@media(max-width:750px){.app-navigation{min-width:0;overflow-x:auto}.app-navigation a{flex-shrink:0}}
  .panel-motion .app-brand strong,.panel-motion .app-brand small,.panel-motion .app-section-title,.panel-motion .app-sidebar-footer{display:block!important;opacity:var(--motion-label-opacity);white-space:nowrap}
  .panel-motion .app-brand::before{display:none!important}.panel-motion .app-sidebar #steps{display:flex!important}
 }
 @media(prefers-reduced-motion:reduce){body.panel-motion{animation:none!important}}
+@media(max-width:480px){.app-navigation svg{width:19px;height:19px}.app-sidebar{overflow:hidden}.app-sidebar .app-navigation{min-width:0;max-width:100%}.app-sidebar .app-navigation a>span{display:none!important}.app-sidebar .app-navigation a{min-width:0;flex:1;justify-content:center}}

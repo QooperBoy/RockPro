@@ -62,6 +62,7 @@ export class PartsPicker {
    details.append(element('p',`Rewizja definicji: ${row.revision}. Źródło: ${row.source_document}; rozpoznanie: ${row.source_checked_on}.`,'hint'));
    if(row.observed_projects)details.append(element('p','Kod zaobserwowano w: '+row.observed_projects.join(', ')+'. Obraz przedstawia wybrany wariant '+row.source_project+'; inne wystąpienia nie zostały uznane za identyczne.','hint'));
    if(row.source_body_count!==undefined&&row.source_body_count!==null)details.append(element('p','Wybrane poddrzewo źródła: '+row.source_body_count+' brył CAD. To nie liczba kompletnych produktów. Podpis renderu wskazuje, czy pokazano całość, podczęść czy fragment profilu.','hint'));
+   for(const ref of row.company_references??[])details.append(element('p','Katalog firmowy: '+ref.code+' · stan zapisany w Excelu: '+(ref.cached_stock_raw??'brak danych')+' · komórka '+ref.source_cell+(ref.cutout_note?' · wycięcie: '+ref.cutout_note:''),'hint'));
    details.append(element('p','Wybór koncepcyjny. Brak zgody na automatyczny montaż lub produkcję. Jednostka zakupowa i stan magazynowy nie są potwierdzone.','hint'));
    if(row.source_url){const a=element('a','Źródło katalogowe ↗');a.href=row.source_url;a.target='_blank';a.rel='noreferrer noopener';details.append(a);}
    if(row.image?.source.page_url){const a=element('a','Źródło zdjęcia ↗');a.href=row.image.source.page_url;a.target='_blank';a.rel='noreferrer noopener';details.append(a);}

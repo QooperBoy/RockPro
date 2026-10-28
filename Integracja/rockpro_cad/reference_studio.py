@@ -16,6 +16,7 @@ from . import configurator
 from . import studio_parts
 from . import part_images
 from . import source_parts
+from . import company_catalog
 
 STATIC = Path(__file__).with_name('reference_studio')
 IMPORT_MAP = '{"imports":{"three":"./vendor/three.module.min.js"}}'
@@ -74,6 +75,9 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
         ('studio-shell.css', 'text/css; charset=utf-8'),
         ('placement3d.js', 'text/javascript; charset=utf-8'),
         ('structure3d.js', 'text/javascript; charset=utf-8'),
+        ('company-parts.html','text/html; charset=utf-8'),
+        ('company-parts.js','text/javascript; charset=utf-8'),
+        ('company-parts.css','text/css; charset=utf-8'),
         ('placement_math.mjs', 'text/javascript; charset=utf-8'),
         ('scene-controls.js', 'text/javascript; charset=utf-8'),
         ('preview_math.mjs', 'text/javascript; charset=utf-8'), ('favicon.svg', 'image/svg+xml'))}
@@ -88,6 +92,7 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
         for name, mime in (('model.json', 'application/json'), ('geometry.bin', 'application/octet-stream')):
             routes['models/' + key + '/' + name] = (folder / name, mime)
     routes.update({'images/' + name: (path, 'image/png') for name, path in images.items()})
+    company_catalog.images()  # Verify the optional snapshot assets before serving.
     routes.update({row['metadata']['url']: (row['path'], row['mime']) for row in hardware_images.values()})
     routes.update({row['metadata']['mesh_url']: (row['mesh_path'], 'application/json') for row in hardware_images.values() if 'mesh_path' in row})
     class Handler(BaseHTTPRequestHandler):
@@ -115,7 +120,14 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
             elif name == 'wizard/options':
                 self.respond(200, json.dumps(dict(types=configurator.TYPES, faces=configurator.FACES), ensure_ascii=False).encode())
             elif name == 'wizard/parts':
-                self.respond(200, json.dumps(part_images.decorate(studio_parts.catalog(), hardware_images), ensure_ascii=False).encode())
+                self.respond(200, json.dumps(company_catalog.decorate(part_images.decorate(studio_parts.catalog(), hardware_images)), ensure_ascii=False).encode())
+            elif name == 'company/catalog':
+                parts=part_images.decorate(studio_parts.catalog(),hardware_images)
+                self.respond(200,json.dumps(company_catalog.catalog(parts),ensure_ascii=False).encode())
+            elif name and name.startswith('company-images/'):
+                asset=company_catalog.images().get(name)
+                if asset:self.respond(200,asset[0].read_bytes(),asset[1])
+                else:self.respond(404,b'{"error":"Unknown company image"}')
             elif name == 'wizard/drafts':
                 self.respond(200, json.dumps(configurator.list_drafts(), ensure_ascii=False).encode())
             elif name and name.startswith('wizard/drafts/'):
