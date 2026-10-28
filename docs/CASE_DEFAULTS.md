@@ -1,6 +1,36 @@
-# Ustalenia użytkownika — aktualizacja 26.10.2026
+# Ustalenia użytkownika — aktualizacja 28.10.2026
 
 Sklejka: RGB(64,128,128), #408080, ICAPI COLORREF 0x808040, zmierzone z T_1.
+
+## Globalne reguły budowy modelu — 28.10.2026
+
+Każdy model, niezależnie od rodziny i generatora, ma fizyczne zespoły
+`Korpus 1`, `Korpus 2` i kolejne istniejące korpusy oraz `Podstawa`, pod korzeniem
+dokumentu (ścieżka/nazwa pliku). Powiązane części są przypisane do właściwego
+zespołu i czytelnie opisane po polsku. Etapy RC/Studio pozostają metadanymi
+procesu. Pełne zasady: [CASE_STRUCTURE.md](CASE_STRUCTURE.md).
+
+### Licowanie okuć i zakończenia profili
+
+- Współpracujące okucia i profile mają licować na przewidzianych powierzchniach
+  styku. Nie dopuszczaj niezamierzonych schodków, wystających krawędzi ani
+  przenikania metalu. Zamierzone zazębienie profili wynika z receptury złącza.
+- Odcinek profilu kończy się przy ZEWNĘTRZNEJ fizycznej krawędzi/kołnierzu
+  zamontowanego zawiasu, z luzem wynikającym z danego zestawu montażowego.
+  Nie prowadź go pod kołnierz aż do mniejszego otworu w sklejce.
+- Kontur wycięcia w sklejce, zewnętrzny obrys całego okucia oraz jego baza
+  montażowa są trzema różnymi informacjami. Nie używaj granicy otworu jako
+  granicy długości profilu. Obrys/bbox może służyć kontroli miejsca,
+  ale nie zastępuje rzeczywistego konturu obróbki ani powierzchni licowania.
+- Po zmianie wymiarów lub położenia zawiasu końce profili i wycięcia muszą
+  przeliczyć się z tych samych powiązań. Kontroluj obie połówki i oba poziomy
+  profilu przy złączu, również po ponownym otwarciu modelu.
+- Brak wymiarów zewnętrznego kołnierza albo właściwej bazy oznacza brak danych
+  montażowych. Nie zgaduj odsunięcia, nie skaluj katalogowego zawiasu i nie
+  powiększaj po cichu skrzyni w celu ukrycia konfliktu.
+
+Ta reguła obowiązuje w kolejnych modelach. Zapis dokumentacji nie naprawia
+automatycznie obecnego wykonawcy ani już utworzonych scen.
 
 ## Pokrywa — obowiązująca reguła
 

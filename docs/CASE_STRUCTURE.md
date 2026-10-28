@@ -1,6 +1,46 @@
-# Struktura sceny i kompletność obróbek T1
+# Struktura sceny i kompletność obróbek
 
-Stan: 26.10.2026. Źródłem numerów i nazw etapów jest `part_registry.STAGES`.
+## Obowiązująca globalna reguła — 28.10.2026
+
+Drzewo CAD przedstawia fizyczną budowę modelu. Ustalony układ:
+
+```text
+Ścieżka / nazwa pliku (korzeń dokumentu)
+├── Korpus 1
+│   └── Części przypisane do tej sekcji, z polskimi nazwami
+├── Korpus 2
+│   └── Części przypisane do tej sekcji, z polskimi nazwami
+├── Korpus 3…N (tylko gdy istnieją)
+│   └── Części przypisane do tej sekcji, z polskimi nazwami
+└── Podstawa
+    └── Elementy rzeczywistej podstawy i jej osprzęt
+```
+
+- Numer korpusu jest stabilnie powiązany z fizyczną sekcją w planie. Opis
+  wyjaśnia funkcję sekcji (np. korpus, wieko, klapa). Nie twórz fikcyjnych korpusów.
+- Sklejkę, profile, narożniki, uchwyty i właściwe połówki okuć umieszczaj
+  w zespole, do którego rzeczywiście należą. Gotowy element katalogowy
+  zachowuje swój kompletny, nieprzezroczysty podzespół.
+- Koła i podpory należą do podstawy, jeśli tam są montowane. Górne gniazda
+  pod koła należą do sekcji z płytą górną. Ich wspólny etap transportu i
+  powiązanie rozstawu pozostają zachowane mimo różnych rodziców w CAD.
+- Historia wycięcia pozostaje w obrabianej płycie/profilu; identyfikator
+  właściciela operacji łączy ją z właściwym okuciem także między zespołami.
+- Nazwy są polskie i opisowe, a klucze techniczne/stabilne ID są niezależne
+  od etykiet i kolejności w drzewie. Części nie mogą trafiać do przypadkowego korpusu.
+- Etapy `part_registry.STAGES` nadal opisują kolejność pracy, kolorowanie,
+  obserwację i filtry Studio. Nie wyznaczają nadrzędnego drzewa CAD.
+- Przy zmianie hierarchii zachowaj położenia, orientacje i wymiary. Przelicz
+  odwołania parametrów dla finalnych rodziców; sprawdź resize/powrót i reopen.
+
+**Stan wdrożenia:** reguła jest zapisana jako obowiązująca. Dotychczasowy
+wykonawca ROC-46 i pokazany model mają jeszcze historyczne sześć grup.
+Nie uznawaj wcześniejszych testów za dowód zgodności z nową hierarchią.
+
+## Historyczny układ według etapów — 26.10.2026
+
+Poniższy opis dokumentuje poprzednią implementację; nie wyznacza nowego standardu.
+Źródłem numerów i nazw etapów był `part_registry.STAGES`.
 `core_case/scene_structure.py` przypisuje części do tych samych etapów,
 których używa podgląd. W scenie powstaje sześć zespołów organizacyjnych:
 
@@ -16,13 +56,13 @@ Gniazda pozostają w etapie 6. Historia wycięcia pozostaje w płycie/profilu,
 który jest obrabiany; `owner` w planie wskazuje odpowiednie okucie.
 Gotowe okucia zachowują własną strukturę i geometrię katalogową.
 
-## Zasady dla kolejnych modeli
+## Zachowane zasady techniczne
 
 - Każde wystąpienie ma stabilny klucz techniczny w planie, ID CAD, polską nazwę,
-  rodzinę i grupę wynikającą ze wspólnego rejestru. Nie przypisywać po nazwie
+  rodzinę, fizyczny zespół oraz etap ze wspólnego rejestru. Nie przypisywać po nazwie
   wyświetlanej ani kolejności w drzewie. Kopia innego źródła wymaga nowej mapy ID.
-- Rozmiar i położenie wynikają z parametrów sceny; zespoły etapów mają macierz
-  jednostkową. Grupowanie nie zmienia gabarytów ani położeń części.
+- Rozmiar i położenie wynikają z parametrów sceny. Grupowanie w fizyczne zespoły
+  nie zmienia gabarytów ani światowych położeń i orientacji części.
 - Przeniesienie przez MoveChild potrafi wyzerować odwołania w wyrażeniach API
   2023. Odtwarzać powiązania z zatwierdzonego planu i nowej głębokości drzewa,
   zamiast przepisywać uszkodzone teksty pobrane po przeniesieniu.

@@ -1,5 +1,12 @@
 # Studio → IronCAD 2027 — ROC-46
 
+**Doprecyzowanie użytkownika 28.10.2026, po poniższym odbiorze:** obowiązuje
+drzewo fizycznych zespołów `Korpus 1…N` i `Podstawa` oraz licowanie okuć;
+profile mają kończyć się przy zewnętrznym kołnierzu zawiasu, nie przy otworze
+w sklejce. Zobacz CASE_STRUCTURE.md i CASE_DEFAULTS.md. Poniższe wyniki
+dokumentują poprzednią implementację sześciu grup i nie potwierdzają jeszcze
+wdrożenia tych nowych wymagań. W tej aktualizacji zapisano reguły, bez zmiany CAD.
+
 [ROC-46](https://linear.app/rock-pro/issue/ROC-46/studiocad-generowac-kompletna-skrzynie-z-kreatora-w-ironcad-2027)
 łączy zapisaną rewizję kreatora z nową sceną CAD. Adapter obejmuje T1:
 jedno górne wieko na zawiasach, sklejkę 9,8 mm, H7159, 17251S i 270836 oraz

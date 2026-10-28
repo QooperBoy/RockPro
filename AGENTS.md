@@ -1,5 +1,21 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
+## Globalne reguły modeli — decyzja użytkownika 28.10.2026
+
+- Drzewo każdego modelu CAD: korzeń dokumentu (ścieżka/nazwa pliku), następnie
+  `Korpus 1`, `Korpus 2` i kolejne rzeczywiście występujące korpusy oraz `Podstawa`.
+  Każda część należy do swojego fizycznego zespołu i ma czytelną polską nazwę.
+  Sześć etapów RC/Studio jest metadanymi procesu i filtrami obserwacji,
+  nie nadrzędnymi zespołami drzewa CAD. Nowa reguła zastępuje wcześniejsze
+  grupowanie według etapów. Szczegóły: docs/CASE_STRUCTURE.md.
+- Okucia i profile mają licować na właściwych powierzchniach montażowych.
+  Profil dochodzi do ZEWNĘTRZNEGO obrysu/kołnierza zawiasu, z wymaganym luzem,
+  a nie do konturu mniejszego wycięcia w sklejce. Obrys okucia, baza montażowa
+  i kontur obróbki są osobnymi danymi. Nie skaluj okuć i nie maskuj konfliktu
+  zmianą gabarytu. Szczegóły: docs/CASE_DEFAULTS.md.
+- To wymagania dla wszystkich rodzin, generatorów i kolejnych modeli. Sam zapis
+  reguł nie oznacza ich wdrożenia w istniejącym wykonawcy ani naprawy starych ICS.
+
 Studio → CAD 2027: [docs/STUDIO_CAD_INTEGRATION.md](docs/STUDIO_CAD_INTEGRATION.md),
 ROC-46. Studio ma przypięty plan, trwałą kolejkę i adapter natywny T1 dla
 H7159 + 17251S + 270836, sklejki 9,8 mm oraz wskazanego zestawu konstrukcyjnego.
@@ -30,8 +46,9 @@ Nie wywołuj Part.Update/Assembly.Update wewnątrz niezmienionych okuć T2 w cel
 samego odświeżenia grafiki. Sprawdzaj `native13-rejected.json` i nowsze wyniki.
 Szerokość T2 pozostaje stała dla tego wariantu racka; nie skalować katalogowych okuć.
 - Organizacja nowych scen: [docs/CASE_STRUCTURE.md](docs/CASE_STRUCTURE.md).
-  Stosuj sześć grup ze wspólnego rejestru; po grupowaniu odtwórz powiązania
-  z planu i sprawdź zmianę wymiarów. Dla T1 zawias wymaga wycięcia w sklejce
+  Stosuj fizyczne zespoły Korpus 1…N i Podstawa; etapy wspólnego rejestru
+  zachowaj jako metadane. Po grupowaniu odtwórz powiązania z planu i sprawdź
+  zmianę wymiarów. Dla T1 zawias wymaga wycięcia w sklejce
   ORAZ przerwy w profilu. Wykonuj validate_t1_machining przed CAD i kontrolę
   rzeczywistych operacji po wykonaniu. Brak informacji o wycięciu blokuje
   przyjęcie nowego SKU. Nie traktuj otworu L905/915 jako szablonu 27095.
