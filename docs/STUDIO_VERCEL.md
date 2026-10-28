@@ -178,3 +178,15 @@ jednego produktu lub ręcznego potwierdzenia.
   `7d2616b00b3433def8c4c9f0339b429c076ca1f67313b21859ee2185e23c8924`.
 
 Nie wykonywano nowych operacji natywnych CAD w tym zadaniu.
+
+## Aktualizacja modeli producenta — 28.10.2026
+
+Wdrożono 74 siatki i 81 definicji dostawców, miniatury oraz filtr
+„Modele 3D producenta — STEP”. Publiczny adres pozostaje bez zmian.
+Wydanie: `dpl_HMF12VLckssYmgWjgHPC3MHkFxWS` (READY), paczka
+`artifacts/studio-supplier-preview-final-20261028`, kod `3065e2f`.
+Anonimowy E2E produkcji PASS: 74 modele, integralność i dekompresja,
+rozmieszczanie, dodatkowe wystąpienie, resize, zapis/odczyt draftu.
+Dowody: `artifacts/supplier-studio-production-check/result.json` i zrzuty.
+Pobrany CAD nie zatwierdza montażu/wycięć. Zapis publikacji: ROC-61;
+pozostała kolejka: ROC-47–ROC-60, zgodnie z `TODO_20261028.md`.
