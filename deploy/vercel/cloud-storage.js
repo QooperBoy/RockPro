@@ -6,7 +6,7 @@
  const write=async action=>navigator.locks?navigator.locks.request(key,action):action();
  const preferences=db=>{
   const items={};for(const [id,favorite]of Object.entries(db.favorites))items[id]={favorite,project_count:0,last_used:null};
-  for(const draft of Object.values(db.drafts))for(const id of draft.used_parts){items[id]??={favorite:false,project_count:0,last_used:null};items[id].project_count++;if(!items[id].last_used||draft.updated_at>items[id].last_used)items[id].last_used=draft.updated_at;}
+  for(const draft of Object.values(db.drafts))for(const id of draft.used_parts??(draft.draft?.hardware??[]).map(r=>r.part_id)){items[id]??={favorite:false,project_count:0,last_used:null};items[id].project_count++;if(!items[id].last_used||draft.updated_at>items[id].last_used)items[id].last_used=draft.updated_at;}
   return {items,usage_basis:'distinct_saved_projects_across_revisions',scope:'this_browser_demo'};
  };
  window.fetch=async(input,init)=>{
@@ -20,11 +20,11 @@
     const saved=db.drafts[route.split('/').pop()];return saved?reply(saved):reply({error:'Ten draft nie jest zapisany w tej przeglądarce. Poproś autora o plik JSON i użyj importu.'},404);
    }
    const data=JSON.parse(init?.body??'null');
-   if(route==='parts/preferences'&&method==='POST')return write(()=>{if(!data||typeof data.part_id!=='string'||typeof data.favorite!=='boolean')throw Error('Nieprawidłowa ulubiona część.');const db=read();db.favorites[data.part_id]=data.favorite;localStorage.setItem(key,JSON.stringify(db));return reply(preferences(db));});
+   if(route==='parts/preferences'&&method==='POST')return await write(()=>{if(!data||typeof data.part_id!=='string'||typeof data.favorite!=='boolean')throw Error('Nieprawidłowa ulubiona część.');const db=read();db.favorites[data.part_id]=data.favorite;localStorage.setItem(key,JSON.stringify(db));return reply(preferences(db));});
    if(route==='wizard/save'&&method==='POST'){
     const check=await nativeFetch('wizard/preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data.draft)}),model=await check.json();
     if(!check.ok)return reply(model,400);
-    return write(()=>{
+    return await write(()=>{
      const db=read(),old=data.id?db.drafts[data.id]:null;
      if((data.id&&!old)||(old?.revision??0)!==data.expected_revision)return reply({error:'Draft zmienił się w innym oknie. Wczytaj go ponownie lub zapisz jako nowy.'},409);
      if(!old&&Object.keys(db.drafts).length>=100)throw Error('Limit 100 draftów w przeglądarce. Wyeksportuj projekty do JSON.');

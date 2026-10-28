@@ -7,7 +7,7 @@ from urllib.parse import urlsplit, parse_qs
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'Integracja'))
-from rockpro_cad import configurator
+from rockpro_cad import configurator,studio_review
 
 
 class handler(BaseHTTPRequestHandler):
@@ -24,7 +24,7 @@ class handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         route=parse_qs(urlsplit(self.path).query).get('endpoint',[''])[0]
-        if route not in ('preview','convert'):
+        if route not in ('preview','convert','review'):
             self.respond(404,dict(error='Nieznana operacja.'));return
         origin=self.headers.get('Origin')
         if origin and urlsplit(origin).netloc != self.headers.get('Host'):
@@ -33,7 +33,7 @@ class handler(BaseHTTPRequestHandler):
             length=int(self.headers.get('Content-Length','0'))
             if not 0<length<=32768: raise ValueError('Szkic musi mieć maksymalnie 32 KB.')
             data=json.loads(self.rfile.read(length).decode('utf-8'))
-            result=configurator.preview(data) if route=='preview' else configurator.convert_legacy(data)
+            result=studio_review.review(data) if route=='review' else configurator.preview(data) if route=='preview' else configurator.convert_legacy(data)
             self.respond(200,result)
         except (ValueError,TypeError,KeyError,OverflowError,RecursionError) as exc:
             self.respond(400,dict(error=str(exc)[:300]))

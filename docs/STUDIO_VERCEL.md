@@ -53,7 +53,7 @@ miniatur i układu nocnego/mobile: `artifacts/examples-production/results.json`.
 
 ## Podsumowanie cenowe
 
-Na końcu kroku 7 `Podsumowanie cenowe części` korzysta z ilości wspólnego
+W kroku 7 oraz na końcu kroku 8 `Podsumowanie cenowe części` korzysta z ilości wspólnego
 `project_summary` oraz cen katalogu. Dopasowuje pełny kod bez utożsamiania
 podobnych wariantów. Przy kilku rekordach kodu nie wybiera arbitralnie ceny.
 Zachowuje cenę zero, braki cen oraz oddzielne sumy różnych walut.
@@ -64,6 +64,35 @@ w sztukach. Można je wyłączyć. Profile, płyty i pianki nie są mnożone prz
 liczbę elementów bez ustalenia jednostek i materiału. Wycena pokazuje pozycje
 pominięte i nie jest pełną ceną skrzyni. Zmiana ilości/układu odświeża zestawienie;
 w trakcie przeliczania poprzednia kwota jest ukrywana.
+
+## Zakończenie i kontrola projektu
+
+Krok 7 kończy się aktywnym `Sprawdź projekt`, który prowadzi do kroku 8
+`Kontrola projektu`. Raport z `studio_review.py` wykorzystuje wspólny planner,
+nie niezależne obrysy. Wskazuje znane kolizje i rezerwy od krawędzi, brak miejsca
+na rząd zamknięć, niedopasowane złącza, wybrane lecz nierozmieszczone części,
+brak uchwytów/zawiasów/zatrzasków i brak lub nieobsługiwaną konstrukcję.
+Pominięcia wynikają z danych, nie z liczenia kliknięć w etapy.
+
+Każde zgłoszenie ma poziom, numer kroku i dostępne identyfikatory grup/sekcji.
+Przycisk otwiera odpowiedni edytor i zaznacza grupę; kolizja pozwala także wskazać
+drugą część. Po poprawce kontrola jest przeliczana. Błędne dane blokują zapis
+przez istniejący walidator; poprawny składniowo projekt z problemami układu można
+zachować jako draft. Raport nie ustawia zgody produkcyjnej. Kontrola kolizji to
+znane obrysy 2D na wspólnej ścianie, nie BRep ani pełna przestrzeń ruchu.
+
+Widoczny `Pobierz JSON` w nagłówku i `Pobierz projekt JSON` na końcu pobiera
+bieżące dane bez zależności od sieci. Plik nie jest modelem ICS i nie generuje
+automatycznie CAD. Wersja Vercel ma jawne `Zapisz w przeglądarce`, nie wspólną
+serwerową bazę. Zapis aktualizuje permalink, zapis kopii zachowuje oryginał,
+a błędy pamięci przeglądarki nie blokują pobrania pliku. Brak projektu pod
+linkiem nie wyłącza już importu i edytora. Kopie/recovery pozostają zachowane.
+
+Dowody: `artifacts/save-finish-production/results.json`,
+`artifacts/review-production/results.json`; testy backendu
+`rockpro_cad.mcp.test_studio_review` (7 przypadków) i pełny harness
+`artifacts/verification/20261028T152842874887Z/`. Aktualna paczka:
+`artifacts/vercel-studio-20261028-14` wraz z manifestem. Nie wykonywano CAD.
 
 ## Architektura i publikacja
 
@@ -144,7 +173,7 @@ jednego produktu lub ręcznego potwierdzenia.
 - Pełny katalog: 6 testów backendu PASS oraz test arytmetyki cen w
   `scripts/test_cost_math.mjs` (brak/zero, warianty, jednostki, waluty, zmiana ilości).
 - Harness pełnego katalogu PASS: `artifacts/verification/20261028T124319772089Z/`.
-- Publiczna paczka: `artifacts/vercel-studio-20261028-06`, manifest obok katalogu.
+- Historyczna paczka pełnego katalogu: `artifacts/vercel-studio-20261028-06`, manifest obok katalogu.
 - Oryginalny Excel zachowuje SHA256
   `7d2616b00b3433def8c4c9f0339b429c076ca1f67313b21859ee2185e23c8924`.
 

@@ -14,7 +14,8 @@ const paths={
  select:'m5 3 14 10-7 1-3 7z',save:'M4 3h13l4 4v14H3V3zM7 3v6h10V3M7 21v-7h10v7',
  chevron:'m9 5 7 7-7 7',box:'m3 7 9-4 9 4v10l-9 4-9-4zM3 7l9 4 9-4M12 11v10',
  hand:'M8 12V5a2 2 0 0 1 4 0v6-7a2 2 0 0 1 4 0v7-4a2 2 0 0 1 4 0v9l-3 5H9l-5-7a2 2 0 0 1 3-3l1 1',
- check:'m5 12 4 4L19 6'
+ check:'m5 12 4 4L19 6',
+ download:'M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5'
 };
 export function icon(name){const e=document.createElementNS('http://www.w3.org/2000/svg','svg');e.setAttribute('viewBox','0 0 24 24');e.setAttribute('fill','none');e.setAttribute('stroke','currentColor');e.setAttribute('stroke-width','1.7');e.setAttribute('stroke-linecap','round');e.setAttribute('stroke-linejoin','round');e.setAttribute('aria-hidden','true');const p=document.createElementNS(e.namespaceURI,'path');p.setAttribute('d',paths[name]??paths.box);e.append(p);return e;}
 const node=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text)e.textContent=text;return e;};
@@ -76,6 +77,6 @@ export class ViewportUI{
   }
  }
  render(){this.gizmo.render();}
- setContext(step,model){const names=['','Konstrukcja','Wieka i współpraca','Wymiary','Biblioteka części','Uchwyty i ścianki','Zatrzaski i zawiasy','Konstrukcja i podstawa'];this.hudText.textContent=names[step]+' · '+model.draft.internal_mm.join(' × ')+' mm wewnątrz';}
+ setContext(step,model){const names=['','Konstrukcja','Wieka i współpraca','Wymiary','Biblioteka części','Uchwyty i ścianki','Zatrzaski i zawiasy','Konstrukcja i podstawa','Kontrola projektu'];this.hudText.textContent=names[step]+' · '+model.draft.internal_mm.join(' × ')+' mm wewnątrz';}
  setSelection(text){this.selection.hidden=!text;this.selectionText.textContent=text??'';}
 }

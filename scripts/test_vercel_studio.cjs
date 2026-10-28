@@ -7,7 +7,7 @@ const {chromium}=require('C:/Users/zuzan/.cache/codex-runtimes/codex-primary-run
  const browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true,args:['--enable-unsafe-swiftshader']});
  try{
   const context=await browser.newContext({viewport:{width:1600,height:1000}}),page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.goto(base+'wizard.html');await page.waitForFunction(()=>window.rockproWizard);
+  await page.goto(base+'wizard.html');try{await page.waitForFunction(()=>window.rockproWizard);}catch(error){fs.writeFileSync(path.join(out,'startup-error.json'),JSON.stringify({errors,status:await page.locator('#status').textContent()},null,2));await page.screenshot({path:path.join(out,'startup-error.png')});throw error;}
   const parts=await page.evaluate(()=>fetch('wizard/parts').then(r=>r.json()));assert.equal(parts.items.length,279);assert.equal(parts.items.filter(r=>r.catalog_only).length,265);assert(!JSON.stringify(parts).includes('cached_stock_raw'));assert(!JSON.stringify(parts).includes('C:\\Users'));
   await page.evaluate(()=>window.rockproWizard.navigate(4));await page.locator('#parts-source').selectOption('company');assert.equal(await page.locator('#parts-list article').count(),265);await page.locator('#parts-search').fill('H1052S');assert.equal(await page.locator('#parts-list article').count(),2);assert.equal(await page.locator('#parts-list input:disabled').count(),2);await page.locator('#parts-search').fill('');await page.locator('#parts-source').selectOption('');
   const draft=JSON.parse(fs.readFileSync(path.resolve('artifacts/studio-complete-20261027/RockPro_T1_kompletna.json'),'utf8'));draft.name='Demo T1 · kompletna';

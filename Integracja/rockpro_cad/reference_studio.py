@@ -19,6 +19,7 @@ from . import source_parts
 from . import company_catalog
 from . import part_preferences
 from . import manufacturer_images
+from . import studio_review
 
 STATIC = Path(__file__).with_name('reference_studio')
 IMPORT_MAP = '{"imports":{"three":"./vendor/three.module.min.js"}}'
@@ -84,6 +85,7 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
         ('part-preferences.css','text/css; charset=utf-8'),
         ('cost-summary.js','text/javascript; charset=utf-8'),
         ('cost_math.mjs','text/javascript; charset=utf-8'),
+        ('review-panel.js','text/javascript; charset=utf-8'),
         ('placement_math.mjs', 'text/javascript; charset=utf-8'),
         ('scene-controls.js', 'text/javascript; charset=utf-8'),
         ('preview_math.mjs', 'text/javascript; charset=utf-8'), ('favicon.svg', 'image/svg+xml'))}
@@ -156,7 +158,7 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
         def do_POST(self):
             origin = self.headers.get('Origin')
             expected_origin = 'http://127.0.0.1:' + str(self.server.server_port)
-            if self.endpoint() not in ('validate', 'wizard/preview', 'wizard/save', 'wizard/convert','parts/preferences') or self.headers.get('X-RockPro-Session') != token or origin != expected_origin:
+            if self.endpoint() not in ('validate', 'wizard/preview', 'wizard/review', 'wizard/save', 'wizard/convert','parts/preferences') or self.headers.get('X-RockPro-Session') != token or origin != expected_origin:
                 self.respond(403, b'{}')
                 return
             try:
@@ -168,6 +170,8 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
                     receipt=part_preferences.set_favorite(draft,preference_ids())
                 elif self.endpoint() == 'wizard/preview':
                     receipt = configurator.preview(draft)
+                elif self.endpoint() == 'wizard/review':
+                    receipt = studio_review.review(draft)
                 elif self.endpoint() == 'wizard/convert':
                     receipt = configurator.convert_legacy(draft)
                 elif self.endpoint() == 'wizard/save':

@@ -29,7 +29,7 @@ def main():
         target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,target)
     package=ROOT/'Integracja/rockpro_cad';static=package/'reference_studio'
     # API has pure computation modules only: no project_store, executor or customer DB.
-    modules=['configurator.py','studio_parts.py','studio_placement.py','studio_structure.py','studio_closures.py','studio_joints.py','source_parts.py','part_registry.py',
+    modules=['configurator.py','studio_review.py','studio_parts.py','studio_placement.py','studio_structure.py','studio_closures.py','studio_joints.py','source_parts.py','part_registry.py',
              'core_case/t1_mounting.py','core_case/machining_rules.py','core_case/profile_rules.py']
     for name in modules:cp(package/name,out/'Integracja/rockpro_cad'/name)
     (out/'Integracja/rockpro_cad/__init__.py').write_text('',encoding='utf-8')
@@ -38,7 +38,7 @@ def main():
     cp(ROOT/'deploy/vercel/api/index.py',out/'api/index.py')
     names=['wizard.html','wizard.js','wizard.css','wizard3d.js','parts-picker.js','placement-editor.js','closure-editor.js','placement3d.js','structure3d.js',
            'placement_math.mjs','preview_math.mjs','scene-controls.js','viewport-ui.js','studio-shell.js','studio-shell.css','part-preferences.js','part-preferences.css','favicon.svg',
-           'company-parts.html','company-parts.js','company-parts.css','style.css','cost-summary.js','cost_math.mjs']
+           'company-parts.html','company-parts.js','company-parts.css','style.css','cost-summary.js','cost_math.mjs','review-panel.js']
     for name in names:cp(static/name,public/name)
     for name in ['three.module.min.js','three.core.min.js','OrbitControls.js','three-viewport-gizmo.js','LICENSE','three-viewport-gizmo.LICENSE','PROVENANCE.json']:
         cp(package/'viewer3d/vendor'/name,public/'vendor'/name)
@@ -55,6 +55,7 @@ def main():
     html=(public/'wizard.html').read_text(encoding='utf-8').replace('<head>','<head><script src="cloud-storage.js"></script><link rel="stylesheet" href="cloud.css">')
     html=html.replace('Studio · koncepcja','Demo · zapis w przeglądarce').replace('Zapis w lokalnej bazie zachowuje kolejne rewizje. JSON pozwala przenieść koncepcję. To nie jest plik CAD.','Drafty i ulubione są zapisane tylko w tej przeglądarce. Pobierz JSON, żeby przekazać projekt lub zachować kopię. Wersja demo bez połączenia z IronCAD i ERP.')
     html=html.replace('lokalnej bazie','przeglądarce').replace('w bazie','w przeglądarce')
+    html=html.replace('data-storage-mode="database"','data-storage-mode="browser"').replace('Zapisz draft','Zapisz w przeglądarce')
     (public/'wizard.html').write_text(html,encoding='utf-8')
     js=(public/'wizard.js').read_text(encoding='utf-8').replace('w lokalnej bazie','w tej przeglądarce').replace('w bazie','w przeglądarce')
     (public/'wizard.js').write_text(js,encoding='utf-8')
@@ -105,6 +106,7 @@ def main():
                           {'source':'/company/catalog','destination':'/company-catalog.json'},
                           {'source':'/wizard/parts','destination':'/catalog-parts.json'},
                           {'source':'/wizard/preview','destination':'/api/index?endpoint=preview'},
+                          {'source':'/wizard/review','destination':'/api/index?endpoint=review'},
                           {'source':'/wizard/convert','destination':'/api/index?endpoint=convert'}],
                 headers=[{'source':'/(.*)','headers':[{'key':'X-Content-Type-Options','value':'nosniff'},
                           {'key':'Referrer-Policy','value':'strict-origin-when-cross-origin'},

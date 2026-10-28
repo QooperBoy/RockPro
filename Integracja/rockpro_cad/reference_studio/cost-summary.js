@@ -23,4 +23,5 @@ function render(){
 assume.onchange=render;
 document.addEventListener('rockpro:preview',event=>{latest=event.detail;render();});
 document.addEventListener('rockpro:preview-pending',()=>{latest=null;render();});
+document.addEventListener('rockpro:step-changed',event=>{if(event.detail===7||event.detail===8){const target=document.getElementById('step-'+event.detail);if(target&&host.parentElement!==target)target.append(host);}});
 fetch('company/catalog').then(r=>{if(!r.ok)throw Error('katalog niedostępny');return r.json();}).then(data=>{catalog=data;render();}).catch(e=>{error=e.message;render();});

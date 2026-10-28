@@ -5,6 +5,9 @@ Konfigurator, podgląd 3D i zdjęcia producentów. Drafty oraz ulubione są zapi
 tylko w przeglądarce; projekt przekaż przez eksport/import JSON. Bez firmowej bazy,
 stanów magazynowych oraz bez zdalnego sterowania IronCADem. Pełny katalog ma
 265 rekordów z cenami; na końcu konfiguracji jest częściowa wycena okuć.
+Krok 8 „Kontrola projektu” zbiera błędy, braki i ostrzeżenia oraz prowadzi do
+odpowiednich kroków i grup okuć. Zapis w przeglądarce oraz pobranie JSON są
+oddzielnymi operacjami; Studio online nie generuje jeszcze pliku ICS.
 [Wdrożenie i aktualizacja](docs/STUDIO_VERCEL.md).
 
 [Interfejs i proces Studio](docs/STUDIO_UX_DESIGN.md): kompas, narzędzia 3D,

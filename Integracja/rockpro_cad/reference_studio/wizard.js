@@ -1,4 +1,5 @@
 import {StructureView} from './structure3d.js';
+import {ReviewPanel} from './review-panel.js';
 import {icon} from './viewport-ui.js';
 import {ConceptView} from './wizard3d.js';
 import {PartsPicker} from './parts-picker.js';
@@ -6,11 +7,19 @@ import {PlacementEditor} from './placement-editor.js';
 import {ClosureEditor} from './closure-editor.js';
 import {PlacementView} from './placement3d.js';
 const $=id=>document.getElementById(id),token=location.pathname.split('/').filter(Boolean)[0];
-let options,draft,storage={id:null,revision:0},step=1,view,timer,serial=0,dirty=false,pendingLegacy=null,partsPicker=null,placementEditor=null,placementView=null,closureEditor=null,partsCatalog;
+let options,draft,storage={id:null,revision:0},step=1,view,timer,serial=0,dirty=false,saving=false,pendingLegacy=null,partsPicker=null,placementEditor=null,placementView=null,closureEditor=null,partsCatalog;
 const queryDraft=new URLSearchParams(location.search).get('draft');
-const requestedDraft=/^[0-9a-f]{32}$/.test(queryDraft??'')?queryDraft:null;
-const localKey='rockpro.configurator.recovery.v3'+(requestedDraft?'.'+requestedDraft:'');
-const uiKey='rockpro.studio.context.'+token+(requestedDraft?'.'+requestedDraft:'');
+let requestedDraft=/^[0-9a-f]{32}$/.test(queryDraft??'')?queryDraft:null;
+let localKey='rockpro.configurator.recovery.v3'+(requestedDraft?'.'+requestedDraft:'');
+let uiKey='rockpro.studio.context.'+token+(requestedDraft?'.'+requestedDraft:'');
+function projectLocation(id){
+ requestedDraft=id;localKey='rockpro.configurator.recovery.v3'+(id?'.'+id:'');uiKey='rockpro.studio.context.'+token+(id?'.'+id:'');
+ const url=new URL(location.href);if(id)url.searchParams.set('draft',id);else url.searchParams.delete('draft');
+ try{history.replaceState(null,'',url);}catch{}
+ for(const a of document.querySelectorAll('.app-sidebar a')){const link=new URL(a.href);if(id)link.searchParams.set('draft',id);else link.searchParams.delete('draft');a.href=link.href;}
+}
+const storagePlace=()=>document.body.dataset.storageMode==='browser'?'tej przeglądarce':'lokalnej bazie';
+function actionFeedback(message,error=false){$('action-feedback').hidden=false;$('action-feedback').textContent=message;$('action-feedback').classList.toggle('error',error);}
 function rememberContext(){
  if(!draft||!view?.model)return;stored();
  try{sessionStorage.setItem(uiKey,JSON.stringify({name:draft.name,project:storage.id,step,position:view.camera.position.toArray(),target:view.controls.target.toArray(),motion:view.values,placement:placementEditor.selected,closure:closureEditor.selected,part:placementEditor.part,closurePart:closureEditor.part,filters:{search:partsPicker.search.value,category:partsPicker.category.value,source:partsPicker.source.value,only:partsPicker.only.checked,favorites:partsPicker.favoritesOnly.checked,sort:partsPicker.sort.value}}));}catch{}
@@ -28,23 +37,30 @@ function restoreContext(){
  }catch{}
 }
 
-let structureView=null;
+let structureView=null,reviewPanel=null;
 const labels={top:'Wieko górne',front:'Klapa przednia',rear:'Klapa tylna',left:'Pokrywa lewa',right:'Pokrywa prawa'};
 function cover(face='top',kind='hinged'){return {id:crypto.randomUUID(),label:labels[face],face,depth_mm:face==='top'?45:40,kind,hinge_edge:'high',requires:[],height_override:false};}
 function fresh(){return {schema:'rockpro.configurator/3',name:'Nowa skrzynia',type:'case',internal_mm:[600,500,350],thickness_mm:9.8,cooperation:'independent',covers:[cover()],hardware:[],placements:[]};}
 async function api(endpoint,data){const response=await fetch(endpoint,data===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json','X-RockPro-Session':token},body:JSON.stringify(data)});const value=await response.json();if(!response.ok)throw Error(value.error||'Błąd połączenia ze Studio');return value;}
 function status(message,error=false){$('status').textContent=message;$('status').classList.toggle('error',error);}
 function stored(){try{localStorage.setItem(localKey,JSON.stringify({draft,storage,dirty}));}catch{status('Brak miejsca na awaryjny zapis w przeglądarce. Użyj zapisu draftu lub eksportu JSON.',true);}}
-function saveLabel(){ $('save-state').textContent=(storage.id?`Draft · rewizja ${storage.revision}`:'Nowy draft')+(dirty?' · niezapisane zmiany':' · zapisany w bazie');if(!storage.id&&!dirty)$('save-state').textContent='Jeszcze niezapisany w bazie.';}
-function changed(){dirty=true;document.dispatchEvent(new CustomEvent('rockpro:preview-pending'));placementView?.setEnabled(false);saveLabel();stored();clearTimeout(timer);const version=++serial;timer=setTimeout(()=>updatePreview(version),220);}
+function saveLabel(){ $('save-state').textContent=(storage.id?`Draft · rewizja ${storage.revision}`:'Nowy draft')+(dirty?' · niezapisane zmiany':' · zapisany w '+storagePlace());if(!storage.id&&!dirty)$('save-state').textContent='Jeszcze niezapisany.';}
+function changed(){dirty=true;reviewPanel?.invalidate();document.dispatchEvent(new CustomEvent('rockpro:preview-pending'));placementView?.setEnabled(false);saveLabel();stored();clearTimeout(timer);const version=++serial;timer=setTimeout(()=>{updatePreview(version);if(step===8)reviewPanel?.check();},220);}
 function selectOptions(select,entries,value){select.replaceChildren(...entries.map(([id,label])=>new Option(label,id)));select.value=value;}
 function processUI(){
- const names=['','Konstrukcja','Wieka i współpraca','Wymiary sekcji','Części i okucia','Uchwyty i ścianki','Zatrzaski i zawiasy','Konstrukcja i podstawa'];
- $('process-caption').textContent='Etap '+step+' z 7 · '+names[step];$('process-progress').value=step;const mobileStep=document.querySelector('.mobile-step');if(mobileStep)mobileStep.value=String(step);
+ const names=['','Konstrukcja','Wieka i współpraca','Wymiary sekcji','Części i okucia','Uchwyty i ścianki','Zatrzaski i zawiasy','Konstrukcja i podstawa','Kontrola projektu'];
+ $('process-caption').textContent='Etap '+step+' z 8 · '+names[step];$('process-progress').value=step;const mobileStep=document.querySelector('.mobile-step');if(mobileStep)mobileStep.value=String(step);
  for(const b of $('steps').children){b.setAttribute('aria-current',Number(b.dataset.step)===step?'step':'false');b.classList.toggle('earlier',Number(b.dataset.step)<step);}
  if(view?.model)view.chrome.setContext(step,view.model);
+ document.dispatchEvent(new CustomEvent('rockpro:step-changed',{detail:step}));
 }
-function navigate(value){placementView?.setPart(null);if(value>step&&step===1&&$('type').value!==draft.type)$('apply-type').click();step=Math.min(7,Math.max(1,value));editors();for(let i=1;i<=7;i++)$('step-'+i).hidden=i!==step;for(const b of $('steps').children)b.classList.toggle('active',Number(b.dataset.step)===step);$('previous').disabled=step===1;$('next').disabled=step===7;processUI();placementView?.setEnabled(step>=5&&JSON.stringify(view.model.draft)===JSON.stringify(draft));}
+function navigate(value){placementView?.setPart(null);if(value>step&&step===1&&$('type').value!==draft.type)$('apply-type').click();step=Math.min(8,Math.max(1,value));editors();for(let i=1;i<=8;i++)$('step-'+i).hidden=i!==step;for(const b of $('steps').children)b.classList.toggle('active',Number(b.dataset.step)===step);$('previous').disabled=step===1;$('next').disabled=saving;$('next').textContent=step===8?'Zapisz draft':step===7?'Sprawdź projekt →':'Dalej →';$('download-final').hidden=step<7;processUI();placementView?.setEnabled(step>=5&&step<=7&&JSON.stringify(view?.model?.draft)===JSON.stringify(draft));if(step===8)reviewPanel?.check();}
+function goToIssue(issue){
+ const group=draft.placements?.find(g=>g.id===issue.group_id);navigate(group?(group.pattern==='closure_line'?6:5):issue.step);
+ if(group){if(group.pattern==='closure_line')closureEditor.selectGroup(group.id);else placementEditor.selectGroup(group.id);placementView?.select(group.id);}
+ else if(issue.part_id&&draft.hardware.some(r=>r.part_id===issue.part_id)){if(issue.step===5)placementEditor.choosePart(issue.part_id);else if(issue.step===6){closureEditor.part=issue.part_id;closureEditor.defaults=null;closureEditor.render();}}
+ document.querySelector('#step-'+issue.step+' h1')?.scrollIntoView({block:'nearest'});
+}
 
 function input(label,value,type='text') {const l=document.createElement('label');l.append(document.createTextNode(label));const e=document.createElement('input');e.type=type;e.value=value;l.append(e);return [l,e];}
 function select(label,entries,value){const l=document.createElement('label');l.append(document.createTextNode(label));const e=document.createElement('select');e.setAttribute('aria-label',label);selectOptions(e,entries,value);l.append(e);return [l,e];}
@@ -113,20 +129,31 @@ async function updatePreview(version=++serial){
 async function refreshList(){const rows=await api('wizard/drafts');selectOptions($('saved'),[['','Wybierz draft…'],...rows.map(r=>[r.id,r.name+' · rew. '+r.revision])],storage.id??'');}
 function selectionPending(){return $('type').value!==draft.type;}
 async function save(asNew=false){
- if(selectionPending()){status('Najpierw zastosuj wybrany typ (albo przejdź Dalej).',true);return;}
+ if(saving)return null;
+ if(step===8&&reviewPanel?.report?.data_valid===false){actionFeedback('Popraw błędy danych wskazane w kontroli przed zapisem. Kopię JSON możesz pobrać w każdej chwili.',true);return null;}
+ if(selectionPending()){actionFeedback('Najpierw zastosuj wybrany typ (albo przejdź Dalej).',true);return null;}
+ saving=true;$('next').disabled=true;actionFeedback('Zapisywanie projektu…');
  $('save').disabled=$('save-copy').disabled=$('save-top').disabled=true;$('save-top').setAttribute('aria-busy','true');
  const version=serial,sent=structuredClone(draft);
- try{const saved=await api('wizard/save',{draft:sent,id:asNew?null:storage.id,expected_revision:asNew?0:storage.revision});storage={id:saved.id,revision:saved.revision};dirty=version!==serial;saveLabel();stored();document.dispatchEvent(new CustomEvent('rockpro:project-saved'));await refreshList();status('Zapisano draft w lokalnej bazie · rewizja '+saved.revision+(dirty?' · kolejne zmiany nadal niezapisane.':'.'));}
- catch(e){status(e.message,true);}finally{$('save').disabled=$('save-copy').disabled=$('save-top').disabled=false;$('save-top').setAttribute('aria-busy','false');}
+ try{const saved=await api('wizard/save',{draft:sent,id:asNew?null:storage.id,expected_revision:asNew?0:storage.revision});storage={id:saved.id,revision:saved.revision};dirty=version!==serial;projectLocation(saved.id);saveLabel();stored();document.dispatchEvent(new CustomEvent('rockpro:project-saved'));try{await refreshList();}catch{}const message='Zapisano projekt w '+storagePlace()+' · rewizja '+saved.revision+(dirty?' · nowsze zmiany czekają na zapis.':'. Możesz teraz pobrać projekt JSON.');status(message);actionFeedback(message);return saved;}
+ catch(e){status(e.message,true);actionFeedback('Nie zapisano projektu: '+e.message+' Możesz pobrać kopię JSON.',true);return null;}finally{saving=false;$('next').disabled=$('save').disabled=$('save-copy').disabled=$('save-top').disabled=false;$('save-top').setAttribute('aria-busy','false');}
 }
 function showLegacy(value){pendingLegacy=structuredClone(value);$('legacy-notice').hidden=false;status('Archiwalny draft zachowany. Możesz pobrać jego oryginalny JSON lub jawnie utworzyć nowy draft w obecnych typach.',true);}
 async function load(saved){
  try{await api('wizard/preview',saved.draft);}catch(e){if(['rockpro.configurator/1','rockpro.configurator/2'].includes(saved.draft?.schema)){showLegacy(saved.draft);return false;}throw e;}
- draft=saved.draft;storage={id:saved.id??null,revision:saved.revision??0};dirty=!storage.id;pendingLegacy=null;$('legacy-notice').hidden=true;clearTimeout(timer);serial++;fill();stored();await updatePreview();return true;
+ draft=saved.draft;storage={id:saved.id??null,revision:saved.revision??0};dirty=!storage.id;projectLocation(storage.id);reviewPanel?.invalidate();pendingLegacy=null;$('legacy-notice').hidden=true;clearTimeout(timer);serial++;fill();stored();await updatePreview();if(step===8)reviewPanel?.check();return true;
 }
-function download(value,name){const url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function download(value,name){const url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=name;a.hidden=true;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);}
+function exportDraft(){
+ try{if(selectionPending())throw Error('Najpierw zastosuj wybrany typ.');if(!draft)throw Error('Projekt nie został jeszcze wczytany.');
+  const name=(draft.name||'projekt').replace(/[<>:"/\\|?*\x00-\x1f]/g,'_').slice(0,100);
+  download(draft,'RockPro_'+name+'.json');actionFeedback('Rozpoczęto pobieranie projektu JSON. Plik znajdziesz w pobranych plikach przeglądarki.');
+ }catch(e){actionFeedback(e.message,true);}
+}
 
 function renderConstruction(model){
+ const supported=draft.type==='case';for(const id of ['construction-wheels','construction-stacking','construction-apply'])$(id).disabled=!supported;
+ $('construction-help').textContent=supported?'Zestaw profili i okuć dla skrzyni z jednym górnym wiekiem o wysokości minimum 110 mm.':'Automatyczny zestaw profili jest obecnie dostępny dla T1. Ten projekt możesz zapisać i pobrać; konstrukcja pozostałych typów wymaga dalszego opracowania.';
  const summary=model.project_summary,table=document.createElement('table');table.className='parts-table';
  for(const row of summary.rows){const tr=document.createElement('tr');for(const text of [row.name,row.part_id.startsWith('plywood')?'Sklejka '+row.material_thickness_mm+' mm':row.part_id,row.quantity+' '+row.unit]){const td=document.createElement('td');td.textContent=text;tr.append(td);}table.append(tr);}
  $('construction-bom').replaceChildren(table);
@@ -147,9 +174,11 @@ async function init(){
  options=await api('wizard/options');partsCatalog=await api('wizard/parts');partsPicker=new PartsPicker($('parts-library'),partsCatalog,refs=>{const ids=new Set(refs.map(r=>r.part_id)),affected=(draft.placements??[]).filter(g=>!ids.has(g.part_id)||(g.mate_part_id&&!ids.has(g.mate_part_id)));if(affected.length&&!confirm('Usunięcie części z wyboru usunie także jej grupy rozmieszczenia ('+affected.length+'). Kontynuować?')){partsPicker.setSelection(draft.hardware);return;}draft.placements=(draft.placements??[]).filter(g=>ids.has(g.part_id)&&(!g.mate_part_id||ids.has(g.mate_part_id)));draft.hardware=refs;changed();});selectOptions($('type'),Object.entries(options.types).map(([id,t])=>[id,t.label]),'case');
  placementEditor=new PlacementEditor($('placement-editor'),partsCatalog,()=>draft,changed,id=>placementView?.select(id),id=>placementView?.setPart(id),message=>status(message));
  closureEditor=new ClosureEditor($('closure-editor'),partsCatalog,()=>draft,changed,id=>placementView?.select(id));
- draft=fresh();try{const recovery=JSON.parse(localStorage.getItem(localKey));if(recovery?.draft){await api('wizard/preview',recovery.draft);draft=recovery.draft;storage=recovery.storage;dirty=recovery.dirty;}}catch{}
- if(requestedDraft&&storage.id!==requestedDraft){const saved=await api('wizard/drafts/'+requestedDraft);draft=saved.draft;storage={id:saved.id,revision:saved.revision};dirty=false;step=7;}
- fill();await updatePreview();await refreshList();restoreContext();if(requestedDraft)navigate(step);
+ reviewPanel=new ReviewPanel($('review-panel'),()=>structuredClone(draft),goToIssue,report=>{if(step===8)$('next').textContent=report.counts.error?'Zapisz draft z problemami':'Zapisz draft';});
+ draft=fresh();let recovered=false;try{const recovery=JSON.parse(localStorage.getItem(localKey));if(recovery?.draft){await api('wizard/preview',recovery.draft);draft=recovery.draft;storage=recovery.storage??{id:null,revision:0};dirty=recovery.dirty;recovered=true;}}catch{}
+ if(requestedDraft&&recovered)step=7;
+ if(requestedDraft&&!recovered){try{const saved=await api('wizard/drafts/'+requestedDraft);draft=saved.draft;storage={id:saved.id,revision:saved.revision};dirty=false;step=7;}catch(e){actionFeedback('Nie znaleziono projektu pod tym linkiem w '+storagePlace()+'. Wczytaj plik JSON przyciskiem „Import JSON” lub wybierz zapisany projekt. '+e.message,true);document.querySelector('details.storage').open=true;}}
+ fill();await updatePreview();try{await refreshList();}catch(e){actionFeedback('Lista zapisanych projektów jest niedostępna: '+e.message+'. Nadal możesz pobrać projekt JSON.',true);}restoreContext();if(requestedDraft)navigate(step);
  window.addEventListener('pagehide',rememberContext);document.addEventListener('rockpro:before-navigation',rememberContext);document.addEventListener('rockpro:navigate-step',e=>navigate(e.detail));
  try{if(!localStorage.getItem(localKey)){const old=JSON.parse(localStorage.getItem('rockpro.configurator.recovery.v2')||localStorage.getItem('rockpro.configurator.recovery.v1'));if(old?.draft)showLegacy(old.draft);}}catch{}
  $('type').onchange=()=>status('Wybrany typ zostanie zastosowany przyciskiem „Zastosuj typ” lub „Dalej”.');
@@ -160,7 +189,7 @@ async function init(){
  $('name').oninput=()=>{draft.name=$('name').value;changed();};
  for(const [i,k] of ['x','y','z'].entries())$('dim-'+k).oninput=()=>{draft.internal_mm[i]=$('dim-'+k).value===''?null:Number($('dim-'+k).value);changed();};
  for(const [id,key]of[['thickness','thickness_mm']])$(id).oninput=()=>{draft[key]=$(id).value===''?null:Number($(id).value);changed();};
- for(const b of $('steps').children)b.onclick=()=>navigate(Number(b.dataset.step));$('previous').onclick=()=>navigate(step-1);$('next').onclick=()=>navigate(step+1);
+ for(const b of $('steps').children)b.onclick=()=>navigate(Number(b.dataset.step));$('previous').onclick=()=>navigate(step-1);$('next').onclick=async()=>{if(step<8)navigate(step+1);else if(await save()){document.querySelector('details.storage').open=true;$('action-feedback').scrollIntoView({block:'nearest'});}};
  const mayReplace=()=>!dirty||confirm('Masz niezapisane zmiany. Zastąpić bieżący draft?');
  $('save').onclick=()=>save();$('save-copy').onclick=()=>save(true);$('load').onclick=async()=>{if(!$('saved').value||!mayReplace())return;try{const item=await api('wizard/drafts/'+$('saved').value);await load(item);}catch(e){status(e.message,true);}};
  const startClean=async()=>{
@@ -174,9 +203,10 @@ async function init(){
  $('new').onclick=$('new-clean').onclick=startClean;
  document.addEventListener('rockpro:stop-placement',()=>{placementView?.cancelDrag();placementView?.setPart(null);});
  $('save-top').prepend(icon('save'));$('save-top').onclick=()=>$('save').click();
+ $('download-top').prepend(icon('download'));
  for(const b of $('steps').children){const n=b.dataset.step,title=b.querySelector('span');b.replaceChildren(Object.assign(document.createElement('span'),{className:'step-number',textContent:n}),title);}
  $('fit').onclick=()=>view?.chrome.frame();for(const [id,v]of[['open-all',100],['close-all',0]])$(id).onclick=()=>{view?.all(v);if(view)motionInputs();};
- $('export').onclick=async()=>{try{if(selectionPending())throw Error('Najpierw zastosuj wybrany typ.');await api('wizard/preview',draft);download(draft,'RockPro_koncepcja.json');}catch(e){status(e.message,true);}};
+ $('export').onclick=$('download-top').onclick=$('download-final').onclick=exportDraft;$('download-top').disabled=false;
  $('import').onclick=()=>$('file').click();$('file').onchange=async()=>{try{const f=$('file').files[0];if(!f)return;if(f.size>32768)throw Error('Maksymalny rozmiar draftu to 32 KB');const value=JSON.parse(await f.text());if(!mayReplace())return;if(await load({draft:value}))status('Wczytano JSON jako nowy draft. Zapisz go, aby zachować w bazie.');}catch(e){status(e.message,true);}finally{$('file').value='';}};
  window.rockproWizard={getDraft:()=>structuredClone(draft),getStorage:()=>({...storage}),preview:()=>updatePreview(),load,save,navigate};
 }

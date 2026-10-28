@@ -1,5 +1,11 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
+- Studio kończy się krokiem 8 „Kontrola projektu”: wspólne `studio_review`,
+  poziomy błędów/ostrzeżeń i odsyłacze do edycji konkretnej grupy. Nie utożsamiaj
+  kontroli znanych obrysów 2D z odbiorem BRep/wycięć w CAD. Nie blokuj kopii JSON
+  problemami geometrii ani brakiem sieci. Zapis na Vercelu jest w przeglądarce;
+  nie opisuj go jako współdzielonej bazy serwerowej. Szczegóły: docs/STUDIO_VERCEL.md.
+
 - Demo Vercel i zdjęcia producentów: [docs/STUDIO_VERCEL.md](docs/STUDIO_VERCEL.md).
   Publikuj tylko paczkę z jawnej allowlisty, nigdy checkout/artifacts w całości,
   firmowego Excela, SQLite, stanów ani modeli klientów. Ceny wymagają jawnej zgody;
