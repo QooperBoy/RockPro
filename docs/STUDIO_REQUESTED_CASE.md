@@ -32,3 +32,21 @@ kontrolne, po kopii SQLite. `--refresh` aktualizuje wyłącznie wskazany wcześn
 draft z kontrolą rewizji; poprzednie rewizje i pozostałe projekty zostają zachowane.
 Excel to snapshot z ilościami, opakowaniami i cenami; nie jest importem zmian do 3D.
 Ceny nie mają określonej waluty ani netto/brutto, więc suma jest tylko częściowa.
+
+## Przygotowanie natywne 2027 — niepełny transfer
+
+`artifacts/requested-native-20261028/body-01` zawiera dziesięć natywnych paneli
+z parametrami tego draftu; pomiar, zmiana wymiarów oraz zapis/otwarcie PASS.
+To korpus bez okuć i wycięć, nie ukończona skrzynia.
+`scripts/native/ExtractRequestedHandle2027.cs` wyodrębnia tylko kompletny H2026
+z przypiętego źródła M03. Próba `handle-02` potwierdza dwie bryły po ponownym
+otwarciu, niezmienność źródła i wszystkich wcześniej otwartych dokumentów.
+Pierwsza próba miała błędny tryb współdzielenia pliku podczas liczenia SHA;
+zachowana jest jako FAIL, mimo że sam eksport i odczyt brył się powiodły.
+Nie oznacza to zatwierdzenia bazy montażowej ani szablonu wycięcia H2026.
+
+Pozostałe cztery SKU wymagają modeli producenta. Portal 3D ContentCentral
+żąda zalogowania; nie zastępować pobrania STEP geometrią podglądu eDrawings.
+Pełny transfer pozostaje zablokowany do dostarczenia modeli i potwierdzenia
+konturów montażowych. Raport `TRANSFER_STATUS.json` obok folderu projektu
+zachowuje ten status; plik korpusu ma jawne oznaczenie `KORPUS_BEZ_OKUC`.
