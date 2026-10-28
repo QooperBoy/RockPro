@@ -286,7 +286,10 @@ namespace RockPro { public static class LatchInProcess {
         string copy=LocalPath("input-copy.ics");File.Copy(path,copy,false);
         ResultDoc=OpenOwned(copy,false,true);Scene=(IZSceneDoc)ResultDoc;
         var roots=Children(Scene.GetTopElement());var utility=(IZSceneDocUtility)Scene;
-        if(roots.Count!=6)throw new Exception("Expected measured legacy Studio hierarchy");
+        if(req.ContainsKey("input_groups")){
+            var expected=A(req["input_groups"]).Select(Convert.ToString).ToArray();
+            if(roots.Count!=expected.Length||!new HashSet<string>(roots.Select(g=>g.Name)).SetEquals(expected))throw new Exception("Source physical groups mismatch");
+        }else if(roots.Count!=6)throw new Exception("Expected measured legacy Studio hierarchy");
         foreach(object raw in A(req["panels"]).Concat(A(req["parts"]))){
             var s=O(raw);var node=utility.GetElementById(Convert.ToInt32(s["source_native_id"]));
             if(node==null||node.Name!=(string)s["source_name"]||!roots.Any(g=>g.Id==node.GetParent().Id))throw new Exception("Source occurrence identity mismatch");

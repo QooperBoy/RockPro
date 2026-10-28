@@ -2,22 +2,23 @@
 
 ## Obowiązująca globalna reguła — 28.10.2026
 
-Drzewo CAD przedstawia fizyczną budowę modelu. Ustalony układ:
+Drzewo CAD przedstawia fizyczną budowę modelu. Korekta konstruktora zastępuje
+wcześniejsze nazwy Korpus 1/2. Układ dla skrzyni z jedną pokrywą:
 
 ```text
 Ścieżka / nazwa pliku (korzeń dokumentu)
-├── Korpus 1
-│   └── Części przypisane do tej sekcji, z polskimi nazwami
-├── Korpus 2
-│   └── Części przypisane do tej sekcji, z polskimi nazwami
-├── Korpus 3…N (tylko gdy istnieją)
-│   └── Części przypisane do tej sekcji, z polskimi nazwami
+├── Wieko 1
+│   └── Płyty, profile, narożniki i osprzęt tej pokrywy
 └── Podstawa
-    └── Elementy rzeczywistej podstawy i jej osprzęt
+    └── Cały stały korpus: ściany, dno, rama i powiązany osprzęt/koła
 ```
 
-- Numer korpusu jest stabilnie powiązany z fizyczną sekcją w planie. Opis
-  wyjaśnia funkcję sekcji (np. korpus, wieko, klapa). Nie twórz fikcyjnych korpusów.
+- `Wieko 2` dodaj tylko, gdy istnieje druga rzeczywista pokrywa/klapa,
+  `Wieko 3` tylko przy trzeciej itd. Numer jest stabilnie powiązany z jej ID
+  w planie i nie zależy od strony otwierania ani kolejności etapów. Nie licz
+  nieruchomego korpusu jako wieka. Brak pokrywy oznacza brak fikcyjnego Wieka 1.
+- Dla tego T1 są dokładnie dwa zespoły: `Wieko 1` i `Podstawa`. Ściany
+  poprzedniego Korpusu 1 należą do Podstawy; poprzedni Korpus 2 to Wieko 1.
 - Sklejkę, profile, narożniki, uchwyty i właściwe połówki okuć umieszczaj
   w zespole, do którego rzeczywiście należą. Gotowy element katalogowy
   zachowuje swój kompletny, nieprzezroczysty podzespół.
@@ -27,7 +28,7 @@ Drzewo CAD przedstawia fizyczną budowę modelu. Ustalony układ:
 - Historia wycięcia pozostaje w obrabianej płycie/profilu; identyfikator
   właściciela operacji łączy ją z właściwym okuciem także między zespołami.
 - Nazwy są polskie i opisowe, a klucze techniczne/stabilne ID są niezależne
-  od etykiet i kolejności w drzewie. Części nie mogą trafiać do przypadkowego korpusu.
+  od etykiet i kolejności w drzewie. Części nie mogą trafiać do przypadkowego zespołu.
 - Etapy `part_registry.STAGES` nadal opisują kolejność pracy, kolorowanie,
   obserwację i filtry Studio. Nie wyznaczają nadrzędnego drzewa CAD.
 - Przy zmianie hierarchii zachowaj położenia, orientacje i wymiary. Przelicz

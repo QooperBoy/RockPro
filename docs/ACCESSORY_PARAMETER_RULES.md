@@ -104,8 +104,10 @@ i ich wycięcia przeliczają się razem z układem. Górne listwy/profile pod ko
 mają również parametry długości i zakończeń wynikające z ich funkcji.
 Profile krawędziowe obudowy nadal wynikają z jej gabarytu i reguły licowania.
 
-Fizycznie koła i podpory należą do Podstawy, górne gniazda do odpowiedniego
-Korpusu. Zachowują wspólny etap transportu i powiązania między zespołami.
+Fizycznie koła i podpory należą do Podstawy (cały nieruchomy korpus), górne
+gniazda do właściwego Wieka, jeśli na nim są montowane. Jedna pokrywa oznacza
+wyłącznie Wieko 1; Wieko 2/3 tworzymy tylko przy rzeczywistej drugiej/trzeciej.
+Zachowują wspólny etap transportu i powiązania między zespołami.
 
 ## Kontrola poprawności
 

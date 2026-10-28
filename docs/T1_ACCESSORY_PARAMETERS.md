@@ -1,5 +1,29 @@
 # Parametry osprzętu w kopii Studio T1 — 28.10.2026
 
+## Aktualna korekta drzewa: Wieko 1 i Podstawa
+
+Na późniejsze polecenie konstruktora scalono stały korpus z podstawą. Aktualna
+kopia ma dokładnie **Wieko 1** i **Podstawa**. Nie ma Korpusu 1/2 ani Wieka 2.
+Drugie wieko powstaje dopiero przy rzeczywistej drugiej pokrywie/klapie.
+Płyty boczne, rama korpusu i dolne połówki okuć należą do Podstawy; płyty pokrywy,
+jej osprzęt i górne połówki okuć do Wieka 1. Stałe ID i etapy są zachowane.
+
+PASS w API29: 41 parametrów, 72 wystąpienia, 48 obróbek, sześć prób przed i po
+zapisie/otwarciu oraz powrót. Źródło i wcześniej otwarte dokumenty zachowane,
+tymczasowy dodatek usunięty. Wynik jest otwarty w IronCADzie.
+Pełna regresja: PASS, 12 kroków, `artifacts/verification/20261028T103109840624Z/`;
+9 testów migracji obejmuje też scalenie korpusu z podstawą bez zmiany parametrów.
+Dowody: `artifacts/t1-wieko-podstawa-20261028-01/result.json` i `request.json`.
+Aktualny plik: `baseline-restored-12a9b7a668774473ab541c29c80a0f9f.ics`
+w tym katalogu, SHA256
+`d954255197192c766805d09ecf2f7de9bcc6efdd1fd8cb914883ed57eb70c13d`.
+CLI `parameterize_studio_t1.py --request <poprzedni-request> --receipt <kwit>
+--output <nowy-katalog> --pid <PID> --run` przenosi zapisaną, zidentyfikowaną
+kopię bez zmiany parametrów. Kontrola wejścia wiąże hash pliku, grupy i ID części.
+
+Poniższe szczegóły pierwszego odbioru zachowano jako historię; nazwy Korpus 1/2
+nie są już obowiązującą regułą.
+
 Wdrożono standard ACCESSORY_PARAMETER_RULES.md w nowej kopii wskazanego przez
 użytkownika modelu `baseline-restored-8c6cb82ab5bb499b82e47d8788706a14.ics`.
 Źródłowy plik, otwarte wcześniej dokumenty, drafty Studio i baza projektów
@@ -38,7 +62,7 @@ fikcyjnego parametru, który zmienia wyłącznie liczbę w tabeli.
 
 ## Drzewo i geometria
 
-Nowa kopia ma `Korpus 1` (korpus), `Korpus 2` (pokrywa) i `Podstawa`.
+Pierwsza kopia miała `Korpus 1` (korpus), `Korpus 2` (pokrywa) i `Podstawa`.
 Koła/podpory i dolna płyta są w podstawie; gniazda i górne narożniki w pokrywie.
 Etapy procesu pozostają metadanymi części, nie grupami nadrzędnymi CAD.
 Historia obróbek pozostaje w obrabianych płytach/profilach.

@@ -59,7 +59,7 @@ def section(spec, height):
         return 'lid'
     if spec.get('part_id') == '410429' and spec['position_mm'][2] > height:
         return 'lid'
-    return 'body'
+    return 'foundation'
 
 
 def evaluate(spec, overrides=None):
@@ -140,7 +140,7 @@ def migrate(request, inventory):
         out.pop(key, None)
     out['mode'] = 'accessory-update'
     out['sources'] = [dict(key='model',path=inventory['source'],sha256=inventory['source_sha256'])]
-    out['physical_groups'] = [dict(id='body',label='Korpus 1'),dict(id='lid',label='Korpus 2'),dict(id='foundation',label='Podstawa')]
+    out['physical_groups'] = [dict(id='lid',label='Wieko 1'),dict(id='foundation',label='Podstawa')]
     out['derived_parameters'] = {}
     out['scalar_parameters'] = []
     out['accessory_counts'] = dict(hinges=2,handles_per_wall=2,wheels=4,sockets=4)
@@ -251,4 +251,30 @@ def with_checks(spec):
     for name,changes in updates:
         expected=evaluate(spec,changes)
         out['check_cases'].append(dict(name=name,parameters=expected['parameters'],expectedposes=expected['panels']+expected['parts'],expectedpanels=expected['panels'],expectedcuts=expected['cuts']))
+    return out
+
+
+def regroup_saved_copy(spec, receipt):
+    """Migrate the identified saved parameterised copy, keeping its expressions.
+
+    The constructor corrected the physical meaning: the permanent body belongs
+    to Podstawa. Only an actual cover gets a numbered Wieko assembly.
+    """
+    if receipt.get('passed') is not True or receipt.get('sources_unchanged') is not True:
+        raise ValueError('Wymagany udany kwit wcześniejszej kopii')
+    final=receipt.get('final_file_reopened',{})
+    if final.get('passed') is not True or receipt.get('parameters') != spec.get('parameters'):
+        raise ValueError('Brak zgodnego pomiaru końcowego pliku')
+    measured={r['id']:r['native_id'] for r in final['occurrences']}
+    out=copy.deepcopy(spec)
+    out['sources']=[dict(key='model',path=receipt['output_path'],sha256=receipt['output_sha256'])]
+    out['input_groups']=[g['label'] for g in spec['physical_groups']]
+    out['physical_groups']=[dict(id='lid',label='Wieko 1'),dict(id='foundation',label='Podstawa')]
+    for row in out['panels']+out['parts']:
+        row['source_native_id']=measured[row['id']]
+        row['source_name']=row['label']+' | '+row['id']
+        if row['physical_group']=='body':row['physical_group']='foundation'
+    for case in out.get('check_cases',[]):
+        for row in case['expectedposes']+case['expectedpanels']:
+            if row['physical_group']=='body':row['physical_group']='foundation'
     return out

@@ -7,7 +7,8 @@ migracji kopii; nie oznacza dodania nowych kontrolek do kreatora ani odbioru
 nowych konturów zakończeń profili. Poniższy odbiór ROC-46 pozostaje historyczny.
 
 **Doprecyzowanie użytkownika 28.10.2026, po poniższym odbiorze:** obowiązuje
-drzewo fizycznych zespołów `Korpus 1…N` i `Podstawa` oraz licowanie okuć;
+drzewo fizycznych zespołów `Wieko 1…N` (tylko rzeczywiste pokrywy) i `Podstawa`
+(cały stały korpus), zgodnie z późniejszą korektą nazw, oraz licowanie okuć;
 profile mają kończyć się przy zewnętrznym kołnierzu zawiasu, nie przy otworze
 w sklejce. Zobacz CASE_STRUCTURE.md i CASE_DEFAULTS.md. Poniższe wyniki
 dokumentują poprzednią implementację sześciu grup i nie potwierdzają jeszcze

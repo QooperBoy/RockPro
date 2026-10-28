@@ -45,7 +45,27 @@ class AccessoryParameterTests(unittest.TestCase):
             for old,new in zip(req[collection],result[collection]):
                 for x,y in zip(old['position_mm'],new['position_mm']):self.assertAlmostEqual(x,y,places=7)
                 self.assertEqual(old['rotation'],new['rotation'])
-        self.assertEqual({p['physical_group'] for p in result['panels']+result['parts']},{'body','lid','foundation'})
+        self.assertEqual({p['physical_group'] for p in result['panels']+result['parts']},{'lid','foundation'})
+        self.assertEqual([g['label'] for g in result['physical_groups']],['Wieko 1','Podstawa'])
+        for p in result['panels']:
+            if p['id'].startswith('panel/body/'):
+                self.assertEqual(p['physical_group'],'foundation')
+
+    def test_regroup_existing_copy_preserves_parameters_and_cuts(self):
+        old=copy.deepcopy(self.spec)
+        old['physical_groups']=[dict(id='body',label='Korpus 1'),dict(id='lid',label='Korpus 2'),dict(id='foundation',label='Podstawa')]
+        for row in old['panels']+old['parts']:
+            if row.get('section_id')=='body':row['physical_group']='body'
+        receipt=dict(passed=True,sources_unchanged=True,parameters=old['parameters'],output_path='prior-copy.ics',output_sha256='b'*64,
+                     final_file_reopened=dict(passed=True,occurrences=[dict(id=r['id'],native_id=1000+i) for i,r in enumerate(old['panels']+old['parts'])]))
+        changed=a.regroup_saved_copy(old,receipt)
+        self.assertEqual(changed['parameters'],old['parameters'])
+        self.assertEqual(changed['cuts'],old['cuts'])
+        self.assertEqual([g['label'] for g in changed['physical_groups']],['Wieko 1','Podstawa'])
+        self.assertEqual(changed['sources'][0]['path'],'prior-copy.ics')
+        self.assertTrue(all(r['physical_group'] in ('lid','foundation') for r in changed['panels']+changed['parts']))
+        receipt['passed']=False
+        with self.assertRaises(ValueError):a.regroup_saved_copy(old,receipt)
 
     def test_hinge_pitch_moves_both_halves_and_cut(self):
         old=[p for p in self.spec['parts'] if p.get('part_id')=='270836']

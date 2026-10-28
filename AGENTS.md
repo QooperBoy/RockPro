@@ -8,12 +8,18 @@
   sparowany przez rzeczywiste punkty osadzenia, razem z podporami i wycięciami.
   Margines mierzy się do skraju okucia, rozstaw między kotwami. Jawny tryb
   wybiera sterujące marginesy albo rozstaw; pozostałe wartości są wyliczone.
-- Drzewo każdego modelu CAD: korzeń dokumentu (ścieżka/nazwa pliku), następnie
-  `Korpus 1`, `Korpus 2` i kolejne rzeczywiście występujące korpusy oraz `Podstawa`.
+- Drzewo CAD, korekta konstruktora 28.10.2026: pod korzeniem dokumentu
+  (ścieżka/nazwa pliku) jest `Wieko 1` i `Podstawa` dla jednej pokrywy.
+  `Wieko 2` twórz tylko przy rzeczywistym drugim wieku, `Wieko 3` przy trzecim
+  itd. Liczba wiek wynika z rzeczywistych pokryw/klap, nie liczby sekcji czy etapów.
+  `Podstawa` obejmuje cały stały korpus: ściany, dno, ramę i jego okucia/koła.
+  Każde wieko ma własne płyty, profile i właściwe połówki okuć. Nie twórz
+  `Korpus 1/2` ani dodatkowego wieka dla nieruchomego korpusu.
   Każda część należy do swojego fizycznego zespołu i ma czytelną polską nazwę.
   Sześć etapów RC/Studio jest metadanymi procesu i filtrami obserwacji,
   nie nadrzędnymi zespołami drzewa CAD. Nowa reguła zastępuje wcześniejsze
-  grupowanie według etapów. Szczegóły: docs/CASE_STRUCTURE.md.
+  grupowanie według etapów oraz wcześniejsze nazwy Korpus 1/2.
+  Szczegóły: docs/CASE_STRUCTURE.md.
 - Okucia i profile mają licować na właściwych powierzchniach montażowych.
   Profil dochodzi do ZEWNĘTRZNEGO obrysu/kołnierza zawiasu, z wymaganym luzem,
   a nie do konturu mniejszego wycięcia w sklejce. Obrys okucia, baza montażowa
@@ -52,7 +58,7 @@ Nie wywołuj Part.Update/Assembly.Update wewnątrz niezmienionych okuć T2 w cel
 samego odświeżenia grafiki. Sprawdzaj `native13-rejected.json` i nowsze wyniki.
 Szerokość T2 pozostaje stała dla tego wariantu racka; nie skalować katalogowych okuć.
 - Organizacja nowych scen: [docs/CASE_STRUCTURE.md](docs/CASE_STRUCTURE.md).
-  Stosuj fizyczne zespoły Korpus 1…N i Podstawa; etapy wspólnego rejestru
+  Stosuj fizyczne zespoły Wieko 1…N (tylko rzeczywiste wieka) i Podstawa; etapy wspólnego rejestru
   zachowaj jako metadane. Po grupowaniu odtwórz powiązania z planu i sprawdź
   zmianę wymiarów. Dla T1 zawias wymaga wycięcia w sklejce
   ORAZ przerwy w profilu. Wykonuj validate_t1_machining przed CAD i kontrolę

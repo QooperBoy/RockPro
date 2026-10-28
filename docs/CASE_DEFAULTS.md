@@ -15,8 +15,11 @@ trzeba sprawdzać osobno.
 ## Globalne reguły budowy modelu — 28.10.2026
 
 Każdy model, niezależnie od rodziny i generatora, ma fizyczne zespoły
-`Korpus 1`, `Korpus 2` i kolejne istniejące korpusy oraz `Podstawa`, pod korzeniem
-dokumentu (ścieżka/nazwa pliku). Powiązane części są przypisane do właściwego
+`Wieko 1` oraz `Podstawa` przy jednej pokrywie, pod korzeniem dokumentu
+(ścieżka/nazwa pliku). `Wieko 2` istnieje tylko przy drugiej pokrywie, `Wieko 3`
+przy trzeciej itd. Podstawa obejmuje cały stały korpus ze ścianami, dnem i jego
+osprzętem. Ta korekta zastępuje wcześniejsze nazwy Korpus 1/2.
+Powiązane części są przypisane do właściwego
 zespołu i czytelnie opisane po polsku. Etapy RC/Studio pozostają metadanymi
 procesu. Pełne zasady: [CASE_STRUCTURE.md](CASE_STRUCTURE.md).
 
