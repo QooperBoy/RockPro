@@ -1,5 +1,10 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
+- Siatki producentów w Studio: [docs/SUPPLIER_MODELS_STUDIO.md](docs/SUPPLIER_MODELS_STUDIO.md).
+  `assets/supplier-parts` jest przenośną biblioteką podglądu, bez danych klientów.
+  Zachowaj SHA, skalę i oddzielne ID niezgodnych wariantów; nie myl siatki
+  producenta z zatwierdzonym montażem/wycięciem. Nie wymagaj IronCAD do konwersji.
+
 - Przenoszenie zestawu Penn/Adam Hall do 2027: [docs/REQUESTED_CASE_2027.md](docs/REQUESTED_CASE_2027.md).
   Nominalny wymiar otworu z katalogu może różnić się od gardzieli pobranego CAD;
   sprawdź rzeczywistą interferencję. Dopasowane łuki są przybliżeniem prototypu,

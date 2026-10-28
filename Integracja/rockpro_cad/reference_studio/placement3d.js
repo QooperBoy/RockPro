@@ -1,6 +1,7 @@
 import * as THREE from './vendor/three.module.min.js';
 import {resolvePreview} from './placement_math.mjs';
 import {stopOrbitMotion} from './scene-controls.js';
+import {decodeMesh} from './mesh-codec.js';
 
 // One renderer shared with the plywood view; optional meshes are reference geometry.
 export class PlacementView {
@@ -66,7 +67,7 @@ export class PlacementView {
   if(!this.meshCache.has(row.id))this.meshCache.set(row.id,(async()=>{
    const res=await fetch(row.image.mesh_url);if(!res.ok)throw Error('Brak siatki '+row.id);const raw=await res.arrayBuffer();
    const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),v=>v.toString(16).padStart(2,'0')).join('');if(hash!==row.image.mesh_sha256)throw Error('Niezgodna siatka '+row.id);
-   const model=JSON.parse(new TextDecoder().decode(raw));if(model.schema!=='rockpro.part-mesh/1'||model.units!=='m'||model.frame!=='mount.local_uvn')throw Error('Nieobsługiwana siatka '+row.id);this.readyMeshes.set(row.id,model);return model;
+   const model=await decodeMesh(raw,row.image.mesh_compression);if(model.schema!=='rockpro.part-mesh/1'||model.units!=='m'||model.frame!=='mount.local_uvn')throw Error('Nieobsługiwana siatka '+row.id);this.readyMeshes.set(row.id,model);return model;
   })());
   return this.meshCache.get(row.id);
  }

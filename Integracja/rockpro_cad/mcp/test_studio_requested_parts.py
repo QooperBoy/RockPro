@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 from rockpro_cad import configurator,studio_requested_parts as p,studio_review,studio_parts,company_catalog
 
 class RequestedPartsTests(unittest.TestCase):
@@ -17,7 +18,10 @@ class RequestedPartsTests(unittest.TestCase):
             self.assertEqual(sum(x*y for x,y in zip(cross,c)),1)
             if row['part_id']==p.FEET:self.assertEqual(row['position_mm'][2],0)
     def test_concept_limits_are_not_hidden(self):
-        report=studio_review.review(p.draft())
+        # This test owns the original concept-only fixture. A separately installed
+        # supplier library can legitimately replace two of these approximations.
+        with patch('rockpro_cad.supplier_parts.definitions',return_value=[]):
+            report=studio_review.review(p.draft())
         self.assertEqual(report['counts']['error'],0)
         self.assertEqual(sum(r['code']=='concept_geometry' for r in report['issues']),5)
         self.assertFalse(report['production_approved'])

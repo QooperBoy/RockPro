@@ -16,7 +16,7 @@ from . import configurator
 from . import studio_parts
 from . import part_images
 from . import source_parts
-from . import company_catalog
+from . import company_catalog, supplier_parts
 from . import part_preferences
 from . import manufacturer_images
 from . import studio_review
@@ -77,6 +77,7 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
         ('studio-shell.js', 'text/javascript; charset=utf-8'),
         ('studio-shell.css', 'text/css; charset=utf-8'),
         ('placement3d.js', 'text/javascript; charset=utf-8'),
+        ('mesh-codec.js', 'text/javascript; charset=utf-8'),
         ('structure3d.js', 'text/javascript; charset=utf-8'),
         ('company-parts.html','text/html; charset=utf-8'),
         ('company-parts.js','text/javascript; charset=utf-8'),
@@ -104,6 +105,7 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
     routes.update({row['metadata']['url']: (row['path'], row['mime']) for row in hardware_images.values()})
     routes.update({row['metadata']['mesh_url']: (row['mesh_path'], 'application/json') for row in hardware_images.values() if 'mesh_path' in row})
     routes.update({row['metadata']['url']: (row['path'], row['mime']) for row in manufacturer_images.routes().values()})
+    routes.update(supplier_parts.routes())
     def preference_ids():
         parts=part_images.decorate(studio_parts.catalog(),hardware_images)
         return {r['id'] for r in parts['items'] if r['show_as_complete_part']}|{r['id'] for r in company_catalog.catalog()['items']}

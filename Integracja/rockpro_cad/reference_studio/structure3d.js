@@ -1,4 +1,5 @@
 import * as THREE from './vendor/three.module.min.js';
+import {decodeMesh} from './mesh-codec.js';
 
 // Complete opaque reference parts; only extruded profiles change axial length.
 export class StructureView {
@@ -10,7 +11,7 @@ export class StructureView {
    const response=await fetch(meta.mesh_url);if(!response.ok)throw Error('Nie można wczytać części '+row.id);
    const raw=await response.arrayBuffer(),sha=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),v=>v.toString(16).padStart(2,'0')).join('');
    if(sha!==meta.mesh_sha256)throw Error('Niezgodna suma geometrii '+row.id);
-   const model=JSON.parse(new TextDecoder().decode(raw));
+   const model=await decodeMesh(raw,meta.mesh_compression);
    if(model.schema!=='rockpro.part-mesh/1'||model.units!=='m'||!['source.local','mount.local_uvn'].includes(model.frame))throw Error('Nieobsługiwany model '+row.id);
    return model.elements.map(e=>{
     const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(e.positions,3));geometry.setAttribute('normal',new THREE.Float32BufferAttribute(e.normals,3));

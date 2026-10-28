@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 
 from .part_registry import metadata
-from . import source_parts, studio_requested_parts
+from . import source_parts, studio_requested_parts, supplier_parts
 from .core_case.t1_mounting import HINGE_27095_OPENING
 
 CATEGORIES = {'handles': 'Uchwyty', 'latches': 'Zamki / zatrzaski',
@@ -79,6 +79,15 @@ def _definitions():
 def catalog():
     imported=source_parts.catalog()
     rows = copy.deepcopy(_definitions())+imported['items']+studio_requested_parts.definitions()
+    # Exact Excel identities retain their IDs/revisions; ambiguous variants receive
+    # separate supplier IDs, never silently replace a similarly named part.
+    by_id={r['id']:r for r in rows}
+    for row in supplier_parts.definitions():
+        if row['id'] in by_id:
+            previous=by_id[row['id']]
+            previous.update({k:v for k,v in row.items() if k not in ('revision','cutout_status')})
+        else:
+            rows.append(row);by_id[row['id']]=row
     if len({r['id'] for r in rows})!=len(rows):raise ValueError('Duplicate part ID across catalogues')
     return dict(schema='rockpro.studio-parts/1', revision=_hash(rows), categories=dict(CATEGORIES),
                 items=rows, scope='existing_reference_and_prototype_candidates',

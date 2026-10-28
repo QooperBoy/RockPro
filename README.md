@@ -10,6 +10,13 @@ odpowiednich kroków i grup okuć. Zapis w przeglądarce oraz pobranie JSON są
 oddzielnymi operacjami; Studio online nie generuje jeszcze pliku ICS.
 [Wdrożenie i aktualizacja](docs/STUDIO_VERCEL.md).
 
+**Biblioteka CAD producenta (28.10):** 74 rzeczywiste modele Penn Elcom,
+81 osobnych definicji wariantów, miniatury i siatki 3D do rozmieszczania.
+W kroku 4 wybierz filtr **Modele 3D producenta — STEP**, a następnie umieszczaj
+części w krokach 5–6. Dane podglądu są w repozytorium, więc działają po klonowaniu.
+To geometria koncepcyjnego rozmieszczenia; montaż i wycięcia wymagają potwierdzenia.
+[Import i odtwarzanie siatek](docs/SUPPLIER_MODELS_STUDIO.md).
+
 [Interfejs i proces Studio](docs/STUDIO_UX_DESIGN.md): kompas, narzędzia 3D,
 spójne kroki i kierunek dalszego rozwoju, wraz z przeglądem bibliotek UI/UX.
 

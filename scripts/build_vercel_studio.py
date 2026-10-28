@@ -13,7 +13,7 @@ import sys
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'Integracja'))
-from rockpro_cad import studio_parts,part_images,manufacturer_images,company_catalog,studio_examples
+from rockpro_cad import studio_parts,part_images,manufacturer_images,company_catalog,studio_examples,supplier_parts
 
 
 def main():
@@ -29,14 +29,14 @@ def main():
         target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,target)
     package=ROOT/'Integracja/rockpro_cad';static=package/'reference_studio'
     # API has pure computation modules only: no project_store, executor or customer DB.
-    modules=['configurator.py','studio_review.py','studio_parts.py','studio_placement.py','studio_structure.py','studio_closures.py','studio_joints.py','source_parts.py','part_registry.py',
+    modules=['configurator.py','studio_review.py','studio_parts.py','supplier_parts.py','studio_requested_parts.py','studio_placement.py','studio_structure.py','studio_closures.py','studio_joints.py','source_parts.py','part_registry.py',
              'core_case/t1_mounting.py','core_case/machining_rules.py','core_case/profile_rules.py']
     for name in modules:cp(package/name,out/'Integracja/rockpro_cad'/name)
     (out/'Integracja/rockpro_cad/__init__.py').write_text('',encoding='utf-8')
     (out/'Integracja/rockpro_cad/core_case/__init__.py').write_text('',encoding='utf-8')
     cp(ROOT/'docs/catalog/hardware-reference.json',out/'docs/catalog/hardware-reference.json')
     cp(ROOT/'deploy/vercel/api/index.py',out/'api/index.py')
-    names=['wizard.html','wizard.js','wizard.css','wizard3d.js','parts-picker.js','placement-editor.js','closure-editor.js','placement3d.js','structure3d.js',
+    names=['wizard.html','wizard.js','wizard.css','wizard3d.js','parts-picker.js','placement-editor.js','closure-editor.js','placement3d.js','structure3d.js','mesh-codec.js',
            'placement_math.mjs','preview_math.mjs','scene-controls.js','viewport-ui.js','studio-shell.js','studio-shell.css','part-preferences.js','part-preferences.css','favicon.svg',
            'company-parts.html','company-parts.js','company-parts.css','style.css','cost-summary.js','cost_math.mjs','review-panel.js']
     for name in names:cp(static/name,public/name)
@@ -62,6 +62,9 @@ def main():
     # Only the generic base SKU definitions, never source-client candidates.
     catalog=studio_parts.catalog();catalog['items']=[r for r in catalog['items'] if not r.get('source_project') and not r['id'].startswith('source-') or r['id']=='source-caster-epson'];catalog['source_report']={}
     ids={r['id'] for r in catalog['items']}
+    cp(supplier_parts.FOLDER/'index.json',out/'assets/supplier-parts/index.json')
+    supplier_assets=supplier_parts.routes()
+    for route,(file,mime) in supplier_assets.items():cp(file,public/route)
     images={k:v for k,v in part_images.load(part_images.DEFAULT_FOLDER).items() if k in ids}
     part_images.decorate(catalog,images);manufacturer_images.decorate(catalog)
     photos=manufacturer_images.routes()
@@ -75,9 +78,13 @@ def main():
     for row in catalog['items']:
         image=row.get('image')
         if not image:continue
+        if image['url'].startswith('supplier-parts/'):
+            row.pop('company_references',None)
+            continue
         asset=photos.get(row['id']) or images[row['id']]
         cp(asset['path'],public/image['url'])
-        if image.get('mesh_url'):cp(images[row['id']]['mesh_path'],public/image['mesh_url'])
+        if image.get('mesh_url') and not image['mesh_url'].startswith('supplier-parts/'):
+            cp(images[row['id']]['mesh_path'],public/image['mesh_url'])
         # Keep attribution, without private native IDs/paths or source-project reports.
         if image['kind']=='cad_render':image['source']={'description':'Podgląd pojedynczej części katalogowej z lokalnego prototypu.'}
         row.pop('company_references',None)

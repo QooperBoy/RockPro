@@ -3,7 +3,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from . import studio_parts
+from . import studio_parts, supplier_parts
 
 DEFAULT_FOLDER = Path(__file__).resolve().parents[2] / 'artifacts/studio-part-images'
 
@@ -81,4 +81,4 @@ def decorate(catalog, images):
                  and image['display_body_count']<image['source_body_count'])
         row['show_as_complete_part']=bool(row.get('selectable') and not row.get('component_only')
             and row.get('family_id')!='unclassified' and not partial)
-    return catalog
+    return supplier_parts.decorate(catalog)
