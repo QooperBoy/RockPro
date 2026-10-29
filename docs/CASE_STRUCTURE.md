@@ -61,6 +61,11 @@ gabarytów skrzyni. Zmiana SKU wymaga osobnego szablonu.
 W odzyskanej rewizji konstruktora tylne otwory miały oznaczenia L905/915
 i rozmiary 76 × 52 oraz 76 × 22 mm. Próba wykazała kolizję z 27095;
 nie przyjmować tych otworów jako zweryfikowanego szablonu nowego zawiasu.
+
+Dla rodziny telewizyjnej obowiązuje również kontrola właściwego konturu
+`HWDrill` w samym okuciu: obrys kołnierza nie jest wycięciem montażowym.
+Obróbki obu połówek muszą zachować wspólną kotwę z okuciem po zmianie wymiarów.
+Zobacz [adapter prototypu telewizyjnego](TELEVISION_PARAMETRIC_PROTOTYPE.md).
 Model CAD wymaga też normalizacji ramy szkicu tworzonego przez szablon hosta:
 przesunięcie (10,10,1 mm) nie może przesuwać konturu montażowego.
 

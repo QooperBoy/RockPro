@@ -35,3 +35,12 @@ Backend porównuje 6 orientacji × 3 kierunki rozmieszczenia (18 układów linio
 Lista orientacji jest sortowana przy bieżącym kierunku, lista kierunków przy bieżącej orientacji. Po przeliczeniu zachowany jest wybrany klucz — zmiana kolejności nie zmienia urządzenia ani kierunku. Wybór najlepszego wariantu spośród 18 następuje przyciskiem „Zastosuj najmniejszą objętość”. Nie zmienia się samoczynnie po edycji wymiarów.
 
 Zielony = najmniejsza objętość w danej liście, czerwony = największa, odcienie pośrednie = względny wynik `(V − Vmin)/(Vmax − Vmin)`. Remisy mają jednakowy kolor; gdy wszystkie objętości są równe, wszystkie są zielone. Warianty niedopuszczalne są na końcu, szare i opisane jako niedostępne. Każdy wariant pokazuje litry, skrajne także min/max. Objętość pod tabelą porównuje aktualny wybór z minimum wszystkich 18 kombinacji.
+
+## Prototyp telewizyjny — przyrost lokalny 29.10.2026
+
+`scripts/prepare_tv_parametric.py` i osobne adaptery `scripts/native/*Television*2027.cs`
+przygotowują źródłowo przypiętą kopię 2027, z parametrami konstrukcji i konturami
+montażowymi HWDrill. `test_tv_parametric_math.py` sprawdza składanie ram operacji.
+Szczegóły: [TELEVISION_PARAMETRIC_PROTOTYPE.md](docs/TELEVISION_PARAMETRIC_PROTOTYPE.md).
+To prototyp do odbioru, bez rozszerzenia publicznego kontraktu MCP lub Studio;
+modele, mapy ID i dowody są prywatne i pozostają poza Gitem.

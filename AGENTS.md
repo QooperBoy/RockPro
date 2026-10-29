@@ -1,5 +1,11 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
+- Prototyp telewizyjny 2027: [docs/TELEVISION_PARAMETRIC_PROTOTYPE.md](docs/TELEVISION_PARAMETRIC_PROTOTYPE.md).
+  Kontur kołnierza nie zastępuje HWDrill właściwego okucia. Badaj ramę operacji
+  razem z ramą części, używając różnych przyrostów wysokości i głębokości.
+  Widoczność kompletnego modelu sprawdzaj również przez IsHidden części/zespołów;
+  same ogólne flagi stanu nie potwierdzają widocznego podglądu.
+
 - Siatki producentów w Studio: [docs/SUPPLIER_MODELS_STUDIO.md](docs/SUPPLIER_MODELS_STUDIO.md).
   `assets/supplier-parts` jest przenośną biblioteką podglądu, bez danych klientów.
   Zachowaj SHA, skalę i oddzielne ID niezgodnych wariantów; nie myl siatki
