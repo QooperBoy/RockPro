@@ -15,7 +15,7 @@ static void Walk(IZElement e,int parent,int depth,List<object> rows){
  if(e.Type==eZElementType.Z_ELEMENT_PART){var p=(IZPart)e;r["bounds_m"]=N(p.GetBody(true).GetBoundingBox());var fm=(IZPartFeatureMgr)p;var fs=new List<object>();
   for(int i=0;i<fm.GetFeaturesCount();i++){try{var f=fm.GetFeatureAt(i);var fe=(IZElement)f;var fr=new Dictionary<string,object>{{"id",fe.Id},{"name",fe.Name},{"operation",f.OperationType.ToString()},{"matrix_m",Matrix((IZSceneElement)f,false)}};var ex=f as IZExtrudeFeature;
    var box=f as IZSizeBox;if(box!=null)fr["expressions"]=new[]{box.LengthExpression,box.WidthExpression,box.HeightExpression};
-   if(ex!=null){fr["extrude"]=true;fr["forward_m"]=ex.get_ExtrudeDistance(eZExtrudeDirectionType.Z_EXTRUDE_DIRECTION_FORWARD);fr["backward_m"]=ex.get_ExtrudeDistance(eZExtrudeDirectionType.Z_EXTRUDE_DIRECTION_BACKWARD);fr["profile_matrix_m"]=Matrix((IZSceneElement)ex.CrossSection,false);fr["curves"]=((Array)ex.CrossSection.GetCurveIds()).Cast<object>().Select(raw=>ex.CrossSection.GetCurveType(Convert.ToInt32(raw)).ToString()).ToArray();}
+   if(ex!=null){fr["extrude"]=true;fr["forward_m"]=ex.get_ExtrudeDistance(eZExtrudeDirectionType.Z_EXTRUDE_DIRECTION_FORWARD);fr["backward_m"]=ex.get_ExtrudeDistance(eZExtrudeDirectionType.Z_EXTRUDE_DIRECTION_BACKWARD);fr["profile_matrix_m"]=Matrix((IZSceneElement)ex.CrossSection,false);fr["curves"]=((Array)ex.CrossSection.GetCurveIds()??new object[0]).Cast<object>().Select(raw=>ex.CrossSection.GetCurveType(Convert.ToInt32(raw)).ToString()).ToArray();}
    fs.Add(fr);}catch(COMException featureError){fs.Add(new{index=i,error=featureError.Message});}}
   r["features"]=fs;
  }

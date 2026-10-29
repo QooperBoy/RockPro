@@ -1,5 +1,11 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
+- Druga rodzina parametryczna 2027: [docs/WING_COMPACT_PARAMETRIC.md](docs/WING_COMPACT_PARAMETRIC.md).
+  Wing Compact ma wysoką zdejmowaną czapkę nad płaską podstawą; zachowaj jej
+  topologię. Kieszenie pianki pod nóżki urządzenia nie są otworami pod stopki
+  skrzyni. Nie mapuj rezerwowego otworu pianki do uchwytu na innej ścianie.
+  Wymiary obrysu sklejki nie są wymiarami wnętrza. Nie skaluj przekrojów ani SKU.
+
 - Działające regulacje telewizora R002: [docs/TELEVISION_MOUNTING_CONTROLS.md](docs/TELEVISION_MOUNTING_CONTROLS.md).
   34 parametry sceny, w tym 28 montażowych, sterują okuciami i 56 obróbkami.
   Przed wiązaniem SizeBox nowej operacji wygeneruj jej bryłę; zastępczy sześcian
