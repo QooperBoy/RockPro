@@ -8,6 +8,31 @@ Prywatne mapowanie, geometria i wyniki natywne pozostają poza Gitem.
 
 ## Parametry użytkownika
 
+### Wymagane rozszerzenie montażu — 29.10.2026
+
+Wersja r001 ma sześć głównych parametrów i **nie realizuje jeszcze** poniższego
+sterowania okuciami. Jest to wymaganie następnej rewizji, a nie opis gotowych funkcji.
+
+| Grupa | Parametry do udostępnienia |
+|---|---|
+| Zamki na każdej linii złącza | Liczba kompletnych zamków, rozstaw równy/ręczny, margines lewy/prawy, przesunięcie rzędu, odległość od linii podziału |
+| Uchwyty na każdej ścianie/sekcji | Liczba, wysokość środka, położenie wzdłuż ściany, rozstaw, symetria i obrót dopuszczalny przez montaż |
+| Pozostałe elementy | Odpowiednie dla ich funkcji kotwy, odsunięcia, orientacja, liczba i symetria; przekrój lub grubość tylko dla materiału konstrukcyjnego |
+
+Podstawą jest wspólny opis wystąpienia: ID, SKU, sekcja/ściana, kotwa montażowa,
+reguła rozmieszczenia i ID powiązanych obróbek. Parametry powinny sterować tym
+opisem, a wykonawca tworzyć części oraz wycięcia z tego samego planu. Dwie
+połówki zamka zachowują parę i wspólną pozycję wzdłuż złącza. Nie oferować
+niezależnego przesuwania samego otworu ani skalowania katalogowego okucia.
+
+Zmiana liczby wymaga dodania/usunięcia właściwych wystąpień i ich obróbek.
+Jeżeli wymaga przebudowy przez wykonawcę, interfejs musi to jasno wskazywać;
+nie przedstawiać jej jako zwykłego, działającego natywnie parametru długości.
+Testy muszą obejmować przesunięcie jednego rzędu, niezależną wysokość uchwytów,
+różne rozstawy i liczby, kompletność otworów, brak kolizji oraz zapis/otwarcie.
+
+### Parametry dostępne w r001
+
 | Parametr sceny | Znaczenie |
 |---|---|
 | `RP_SzerokoscSkrzyni` | Zewnętrzna szerokość obrysu sklejki, bez wystających okuć |

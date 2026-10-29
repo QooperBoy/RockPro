@@ -1,5 +1,14 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
+- Wymaganie konstruktora 29.10.2026: większość elementów wymaga parametrów
+  montażowych, nie tylko zależności od gabarytów. Zamki/zawiasy: liczba, linia
+  złącza, rozstaw i odsunięcia. Uchwyty: liczba na ścianę, ściana/sekcja, pozycja,
+  wysokość, rozstaw i symetria; orientacja, gdy dopuszcza ją montaż.
+  Polski opis, jednostka, zakres i zgodność ze sceną są obowiązkowe. Okucie,
+  jego wycięcie i przerwa w profilu mają wspólną kotwę. Zmiana liczby oznacza
+  przebudowę części i obróbek — sam liczbowy wpis w tabeli nie realizuje funkcji.
+  Nie skaluj SKU. Weryfikuj zmianę montażu niezależnie od gabarytów i po otwarciu.
+
 - Prototyp telewizyjny 2027: [docs/TELEVISION_PARAMETRIC_PROTOTYPE.md](docs/TELEVISION_PARAMETRIC_PROTOTYPE.md).
   Kontur kołnierza nie zastępuje HWDrill właściwego okucia. Badaj ramę operacji
   razem z ramą części, używając różnych przyrostów wysokości i głębokości.
