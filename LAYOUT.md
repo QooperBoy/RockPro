@@ -38,6 +38,10 @@ Zielony = najmniejsza objętość w danej liście, czerwony = największa, odcie
 
 ## Prototyp telewizyjny — przyrost lokalny 29.10.2026
 
+R002 dodaje `prepare_tv_mounting.py`, `TelevisionMounting2027.cs` i osobną
+prezentację: 28 nowych parametrów montażowych, 56 powiązanych obróbek i polskie
+opisy wystąpień. [Sterowanie montażem](docs/TELEVISION_MOUNTING_CONTROLS.md).
+
 `scripts/prepare_tv_parametric.py` i osobne adaptery `scripts/native/*Television*2027.cs`
 przygotowują źródłowo przypiętą kopię 2027, z parametrami konstrukcji i konturami
 montażowymi HWDrill. `test_tv_parametric_math.py` sprawdza składanie ram operacji.

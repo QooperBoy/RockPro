@@ -1,5 +1,9 @@
 # Prototyp parametryczny skrzyni telewizyjnej — IronCAD 2027
 
+Bieżące rozszerzenie: [R002 — 34 parametry i sterowanie montażem](TELEVISION_MOUNTING_CONTROLS.md).
+Poniższy opis sześciu parametrów dotyczy bazowej rewizji R001; R002 dodaje
+rzeczywiste rozstawy i pozycje okuć oraz czytelne nazwy drzewa.
+
 Osobny adapter developerski odtwarza dziesięć płyt sklejki i wiąże wymiary
 54 elementów konstrukcyjnych z parametrami sceny. Zachowuje geometrię okuć,
 wkładów, profili i logo z przypiętej rewizji źródła. Nie jest automatycznym

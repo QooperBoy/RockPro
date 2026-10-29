@@ -1,5 +1,11 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
+- Działające regulacje telewizora R002: [docs/TELEVISION_MOUNTING_CONTROLS.md](docs/TELEVISION_MOUNTING_CONTROLS.md).
+  34 parametry sceny, w tym 28 montażowych, sterują okuciami i 56 obróbkami.
+  Przed wiązaniem SizeBox nowej operacji wygeneruj jej bryłę; zastępczy sześcian
+  potrafi przeskalować przekrój. Operacje odtwarzanych profili mapuj po trwałym ID,
+  nie indeksie historii. Liczba i obrót nie są jeszcze regulacjami tego adaptera.
+
 - Drzewo sceny: każde wystąpienie ma polski opis rodzaju, SKU, sekcji, ściany
   i pozycji, np. „Uchwyt H7159 — korpus — przód — lewy”. Same kody, powtarzające
   się etykiety i ogólne „konstrukcja/koła/Część…” nie wystarczają. Opisuj także
