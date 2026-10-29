@@ -1,5 +1,12 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
+- Drzewo sceny: każde wystąpienie ma polski opis rodzaju, SKU, sekcji, ściany
+  i pozycji, np. „Uchwyt H7159 — korpus — przód — lewy”. Same kody, powtarzające
+  się etykiety i ogólne „konstrukcja/koła/Część…” nie wystarczają. Opisuj także
+  grupy. Zachowaj osobno stabilne ID i SKU; etykieta nie może być kluczem logiki.
+  Strony określaj w stałej ramie projektu, nie względem kamery. Nieustalone role
+  jawnie oznaczaj „do identyfikacji”; nie nadawaj domyślnie pozornej identyfikacji.
+
 - Wymaganie konstruktora 29.10.2026: większość elementów wymaga parametrów
   montażowych, nie tylko zależności od gabarytów. Zamki/zawiasy: liczba, linia
   złącza, rozstaw i odsunięcia. Uchwyty: liczba na ścianę, ściana/sekcja, pozycja,

@@ -8,6 +8,27 @@ Prywatne mapowanie, geometria i wyniki natywne pozostają poza Gitem.
 
 ## Parametry użytkownika
 
+### Czytelne drzewo sceny — wymaganie 29.10.2026
+
+Nazwy wystąpień muszą wskazywać rodzaj części, kod katalogowy, sekcję,
+ścianę oraz pozycję w ustalonej ramie projektu. Przykłady:
+
+- `Uchwyt H7159 — korpus — przód — lewy`
+- `Profil EG-0100 — czapka — tył — góra`
+- `Narożnik C1341-30-33 — czapka — przód/lewa — góra`
+- `Zamek L905/915 — przód — środkowy — połówka czapki`
+
+Grupa również opisuje zawartość, np. `Profile krawędziowe EG-0100 — czapka`.
+Nazwy ogólne lub sam kod nie spełniają wymagania. Powtarzalne części rozróżnia
+pozycja lub numer w rzędzie, liczony od jawnie opisanej krawędzi. Wkłady, dociski
+i elementy o niepotwierdzonej funkcji wymagają identyfikacji; brak wiedzy należy
+oznaczyć wprost. SKU i źródłowe/natywne ID pozostają w mapie niezależnie od nazwy.
+Logika nie może wyszukiwać elementu po etykiecie użytkownika.
+
+W r001 poprawiono nazwy dziesięciu płyt i głównych sekcji; pozostała część
+drzewa nadal wymaga tej migracji. Zmiana etykiet wymaga kontroli, czy natywne
+odwołania wyrażeń i zapis/ponowne otwarcie pozostały poprawne.
+
 ### Wymagane rozszerzenie montażu — 29.10.2026
 
 Wersja r001 ma sześć głównych parametrów i **nie realizuje jeszcze** poniższego
