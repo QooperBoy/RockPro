@@ -1,5 +1,13 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
+- Hisense R003: [docs/TELEVISION_QUANTITY_CONTROLS.md](docs/TELEVISION_QUANTITY_CONTROLS.md).
+  Liczba bocznych okuć jest obsługiwana przez osobny kontroler RockPro, nie sam
+  wpis w tabeli ani agent AI. Zachowuj powiązane wygaszenie okuć, wycięć i profili.
+  Nie licz wygaszonych rezerw jako aktywnego BOM. Kompiluj nowe źródła z jawnym
+  UTF-8; opisy użytkownika są po polsku, a logika używa stabilnych ID, nie etykiet.
+  Kopie ICS mogą mieć ten sam FileGUID: do ochrony otwartych dokumentów używaj
+  także pełnej ścieżki. Nie zamykaj dokumentu tylko dlatego, że GUID pasuje.
+
 - Kufry/racki/serwisy: [docs/REMAINING_CASE_FAMILIES.md](docs/REMAINING_CASE_FAMILIES.md).
   To rodziny konstrukcji, nie liczba plików ICS. Plik może zawierać osobne stany
   złożone/rozłożone — nie dubluj BOM. Szyny 19 cali/9U pozostają sztywne.
