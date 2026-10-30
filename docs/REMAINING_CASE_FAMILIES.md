@@ -39,10 +39,39 @@ geometry/anchor checks do not constitute full BRep collision or CNC approval.
 
 ## Rack and drawer families
 
-Next reference copies: Rack 9U and 4 Drawers + Table. The source-pinned
-`native/FamilyParametric2027.cs` has been compiled but has not yet been exercised
-on either model. Do not report the preparation as a working parametric template.
-Keep rack rails/catalog geometry rigid and separate drawer motion from resizing.
+Rack 9U has a body and two removable end covers. Its source-pinned plan has
+19 controls, 451 physical parts, 55 dimensioned material parts and 28 available
+subtractions. The 19-inch mounting width is fixed; the 410-mm rails keep 9U.
+Height adjustment adds free space above the rails rather than inventing U units.
+Both cover depths/openings, latch heights, handle rows, rail offsets and paired
+wheel/socket adjustments have separate controls.
+
+The reference has a front plywood cover 7 mm lower than its frame and front
+latch halves 3.5 mm too low. The explicit correction parameter defaults to 7 mm;
+the source mounting cuts were already at the correct height and do not receive
+that correction. The two right handle contours are the same 130 × 78 mm as the
+left templates, but their source placement was offset. Their coordinates are
+corrected to the corresponding H7159 anchors, retaining the opposite side's
+0.2-mm template Z datum. This is a source-layout repair, not a vendor CNC approval.
+
+Rack native evidence `artifacts/rack-20261030/build-01`: seven checks PASS,
+including save/reopen and mounting edits afterwards. Physical roof/panel
+alignment passes at baseline and resized dimensions. `present-02` additionally
+checks all four latch-half Z centers (agreement within 1e-9 mm), preserves poses
+and formulas, and sets the 244 plywood face appearances to green. Imported
+per-face colors had overridden the part color. The documented IZBodyFace API
+is used; no surface geometry or spline buffers are edited. The first snapshot
+is preserved; CURRENT.json points at the new SNAPSHOT_KOLOR copy.
+
+Offline repository/backend/parts/core-design/core-contracts/QA/harness PASS,
+evidence `artifacts/verification/20261030T125428228936Z`. Constructor/BRep/CNC
+approval remains separate. Drawer reference: 4 Drawers + Table contains folded
+and deployed states of the case. Inspect and select the canonical state rather
+than counting both as purchased parts. Keep catalog geometry rigid and separate
+drawer motion from resizing.
+
+The shared managed adapter clears job-local ID maps and geometry baselines at
+each invocation, because the bridge can reuse a loaded assembly between jobs.
 
 ## Shared handover
 

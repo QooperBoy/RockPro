@@ -118,6 +118,10 @@ public static class LatchInProcess {
     public static int Run(string folder){
         var result=new Dictionary<string,object>();var checks=new List<object>();IZDoc owned=null;bool passed=false;Progress=Path.Combine(folder,"progress.txt");
         try{
+            Aliases=new Dictionary<int,int>();Features=new Dictionary<int,int>();
+            PartMatrices=new Dictionary<int,double[]>();Bounds=new Dictionary<int,double[]>();
+            CutMatrices=new Dictionary<int,double[]>();Lengths=new Dictionary<int,double[]>();
+            Defaults=new Dictionary<string,string>();S=null;U=null;
             Q=O(J.DeserializeObject(File.ReadAllText(Path.Combine(folder,"request.json"))));
             if((string)Q["contract"]!="rockpro-kufer-parametric-v1"||System.Diagnostics.Process.GetCurrentProcess().Id!=I(Q["expected_pid"]))throw new Exception("Wrong source adapter or host");
             dynamic legacy=Marshal.GetActiveObject("IronCAD.Application");var app=(IZBaseApp)legacy.ZIronCADApp;if(!app.ApiVersion.StartsWith("29."))throw new Exception("2027 required");

@@ -1,5 +1,13 @@
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
+- Kufry/racki/serwisy: [docs/REMAINING_CASE_FAMILIES.md](docs/REMAINING_CASE_FAMILIES.md).
+  To rodziny konstrukcji, nie liczba plików ICS. Plik może zawierać osobne stany
+  złożone/rozłożone — nie dubluj BOM. Szyny 19 cali/9U pozostają sztywne.
+  Regeneruj zerowe obrysy importowanych brył przed pomiarem bazowym. Czyść mapy
+  ID i wzorce geometrii na początku każdego joba przy ponownym użyciu DLL.
+  Kolor części może być przesłonięty wyglądem poszczególnych powierzchni;
+  użyj udokumentowanego IZBodyFace i sprawdź eksport podglądu.
+
 - Druga rodzina parametryczna 2027: [docs/WING_COMPACT_PARAMETRIC.md](docs/WING_COMPACT_PARAMETRIC.md).
   Wing Compact ma wysoką zdejmowaną czapkę nad płaską podstawą; zachowaj jej
   topologię. Kieszenie pianki pod nóżki urządzenia nie są otworami pod stopki

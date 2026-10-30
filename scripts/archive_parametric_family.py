@@ -3,6 +3,7 @@ import argparse
 import csv
 import hashlib
 import json
+import re
 import shutil
 from pathlib import Path
 
@@ -15,7 +16,7 @@ def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def archive(plan_file, native_folder, presentation_folder):
+def archive(plan_file, native_folder, presentation_folder, snapshot_tag='SNAPSHOT'):
     q=read(plan_file)
     native=Path(native_folder);presentation=Path(presentation_folder)
     r=read(native/'result.json');p=read(presentation/'result.json')
@@ -26,7 +27,9 @@ def archive(plan_file, native_folder, presentation_folder):
         raise ValueError('Expected a review revision in its private project folder')
     if sha(q['source'])!=q['sha256']:
         raise ValueError('Reference source changed')
-    snapshot=project/'04_Snapshoty'/(model.stem+'_SNAPSHOT.ics')
+    if not re.fullmatch(r'[A-Za-z0-9_-]+',snapshot_tag):
+        raise ValueError('Invalid snapshot tag')
+    snapshot=project/'04_Snapshoty'/(model.stem+'_'+snapshot_tag+'.ics')
     if snapshot.exists():
         raise FileExistsError('Snapshots are immutable by convention; select a new revision')
     snapshot.parent.mkdir(exist_ok=True)
@@ -56,4 +59,5 @@ def archive(plan_file, native_folder, presentation_folder):
 if __name__=='__main__':
     parser=argparse.ArgumentParser()
     parser.add_argument('plan');parser.add_argument('native');parser.add_argument('presentation')
-    args=parser.parse_args();archive(args.plan,args.native,args.presentation)
+    parser.add_argument('--snapshot-tag',default='SNAPSHOT')
+    args=parser.parse_args();archive(args.plan,args.native,args.presentation,args.snapshot_tag)
