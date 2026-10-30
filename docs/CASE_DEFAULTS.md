@@ -130,3 +130,14 @@ Nowa wersja zachowuje zieloną sklejkę i pokrywę 81 mm; poprzednie pliki pozos
   Sprawdź oba kierunki zmiany wymiarów, styk montażowy i zapis/otwarcie.
 - Test natywny działającego kontrolera nie zastępuje testu autostartu po restarcie
   ani testu zmiany przez rzeczywistą tabelę parametrów i przycisk Zastosuj.
+
+
+### Przenoszenie okuć na inne ściany
+
+Przy zmianie ściany/sekcji przelicz wspólną lokalną ramę montażu, a następnie
+przełącz obróbki do właściwej sklejki i profili. Stary otwór ma zniknąć.
+Sprawdź właściciela operacji, zachowanie konturu i rzeczywiste usunięcie
+materiału, nie tylko położenie znacznika/profilu. Zatrzask wymaga istniejącej
+linii złącza. Liczba jest liczbą instancji w danym rzędzie; sumę całej ściany
+podawaj osobno, uwzględniając inne zachowane rzędy.
+Aktualny adapter i parametry: [TELEVISION_WALL_MOUNTS.md](TELEVISION_WALL_MOUNTS.md).

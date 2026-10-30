@@ -1,3 +1,11 @@
+- R005 — [docs/TELEVISION_WALL_MOUNTS.md](docs/TELEVISION_WALL_MOUNTS.md):
+  przenośny rząd ma ścianę/sekcję i wspólną ramę dla okucia, sklejki i profili.
+  Sam obrót okucia lub przesunięcie starego otworu nie zmienia właściciela
+  operacji. Sprawdzaj nową część docelową i rzeczywiste usuwanie materiału.
+  Liczba dotyczy rzędu, nie sumy wszystkich historycznych okuć na ścianie.
+  Nie akceptuj zamka poza złączem ani kolizji z ostatnim poprawnym stanem
+  odrzuconego rzędu. Manifest v3 wymaga kontrolera 0.10 lub nowszego.
+
 # Instrukcje dla agenta pracującego nad RockPro CAD
 
 - Hisense R003: [docs/TELEVISION_QUANTITY_CONTROLS.md](docs/TELEVISION_QUANTITY_CONTROLS.md).

@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using System.Web.Script.Serialization;
 using interop.ICApiIronCAD;
 
-[assembly:System.Reflection.AssemblyVersion("0.9.0.0")]
+[assembly:System.Reflection.AssemblyVersion("0.10.0.0")]
 namespace RockPro.CAD {
     [ComVisible(true), Guid("93C43C38-9891-44D5-85A9-A07D513C3C21")]
     [ProgId("RockPro.CAD.MountCounts2027"), ClassInterface(ClassInterfaceType.None)]
@@ -44,6 +44,12 @@ namespace RockPro.CAD {
                 string signature=String.Join("|",Enumerable.Range(0,scene.ParameterMgr.Count).Select(i=>scene.ParameterMgr.GetParameter(i)).Where(p=>p.Type!=eZParamType.Z_PARAMETER_TYPE_TEXT).Select(p=>p.Name+":"+p.Expression+":"+p.Value));
                 var utility=(IZSceneDocUtility)scene;
                 signature+="|"+String.Join("",((object[])q["rows"]).Select(O).SelectMany(r=>(object[])r["slots"]).SelectMany(s=>(object[])s).Select(id=>utility.GetElementById(Convert.ToInt32(id)).GetStateStatus(eZElementState.Z_SUPPRESSED)?"1":"0"));
+                if(q.ContainsKey("portable_rows")){
+                    var ids=((object[])q["portable_rows"]).Select(O).SelectMany(row=>
+                        ((object[])row["roots"]).SelectMany(slot=>(object[])slot).Select(Convert.ToInt32).Concat(
+                        ((object[])row["bags"]).Select(O).SelectMany(bag=>(object[])bag["features"]).Select(O).Select(f=>Convert.ToInt32(f["id"]))));
+                    signature+="|"+String.Join("",ids.Select(id=>utility.GetElementById(id).GetStateStatus(eZElementState.Z_SUPPRESSED)?"1":"0"));
+                }
                 string previous;if(fingerprints.TryGetValue(key,out previous)&&previous==signature)return;
                 try {Apply(scene);Status(scene,"OK — liczba okuć i wycięcia są zsynchronizowane.");}
                 catch(Exception error){Status(scene,"BŁĄD — "+error.GetBaseException().Message);throw;}
@@ -67,7 +73,7 @@ namespace RockPro.CAD {
         }
 
         static double[] Numbers(object x){return ((Array)x).Cast<object>().Select(Convert.ToDouble).ToArray();}
-        static double[] Matrix(IZSceneElement e){var m=e.GetTransformToGlobal();return Enumerable.Range(0,16).Select(i=>m.GetValue(i/4,i%4)).ToArray();}
+        public static double[] Matrix(IZSceneElement e){var m=e.GetTransformToGlobal();return Enumerable.Range(0,16).Select(i=>m.GetValue(i/4,i%4)).ToArray();}
         public static double[] ContourCenter(IZProfile profile){
             var points=new List<double[]>();foreach(object raw in (Array)profile.GetCurveIds()){
                 int id=Convert.ToInt32(raw);object a,b;double radius;var kind=profile.GetCurveType(id).ToString();
@@ -79,7 +85,7 @@ namespace RockPro.CAD {
             var center=new[]{(points.Min(p=>p[0])+points.Max(p=>p[0]))/2,(points.Min(p=>p[1])+points.Max(p=>p[1]))/2,0};
             var m=Matrix((IZSceneElement)profile);return Enumerable.Range(0,3).Select(j=>m[12+j]+Enumerable.Range(0,3).Sum(k=>center[k]*m[k*4+j])).ToArray();
         }
-        static void SetWorld(IZSceneElement e,double[] world){
+        public static void SetWorld(IZSceneElement e,double[] world){
             var actual=Matrix(e);if(Enumerable.Range(0,16).Max(i=>Math.Abs(actual[i]-world[i]))<1e-11)return;
             var parent=(IZSceneElement)((IZElement)e).GetParent();var p=Matrix(parent);var local=new double[16];local[15]=1;
             for(int a=0;a<3;a++){for(int b=0;b<3;b++)local[a*4+b]=Enumerable.Range(0,3).Sum(k=>world[a*4+k]*p[b*4+k]);local[12+a]=Enumerable.Range(0,3).Sum(k=>(world[12+k]-p[12+k])*p[a*4+k]);}
@@ -161,7 +167,7 @@ namespace RockPro.CAD {
         public static int Apply(IZSceneDoc scene) {
             var text=Manifest(scene);if(text==null)throw new InvalidOperationException("Quantity manifest missing.");
             var q=O(Json.DeserializeObject(text));
-            if((string)q["contract"]!="rockpro-tv-counts-v2")throw new InvalidOperationException("Unsupported quantity contract.");
+            if((string)q["contract"]!="rockpro-tv-counts-v2"&&(string)q["contract"]!="rockpro-tv-counts-v3")throw new InvalidOperationException("Unsupported quantity contract.");
             scene.Update();
             var utility=(IZSceneDocUtility)scene;
             var changes=new List<Tuple<IZElement,bool>>();
@@ -215,6 +221,7 @@ namespace RockPro.CAD {
                 scene.Update();scene.Redraw();
             }
             MateCuts(scene,activePlan);
+            errors.AddRange(WallMountMapper.Apply(scene,q));
             if(errors.Count>0)throw new InvalidOperationException(String.Join("; ",errors)+" Pozostałe poprawne rzędy zostały przeliczone.");
             return changed.Length;
         }
