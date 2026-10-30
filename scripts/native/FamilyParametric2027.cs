@@ -88,19 +88,28 @@ public static class LatchInProcess {
     static double Value(string n){return P(S.ParameterMgr,n).Value*1000;}
     static void Update(){((IZAssembly)S.GetTopElement()).RegenerateParts(true);S.Update();}
     static void Values(Dictionary<string,object> values){foreach(var kv in Defaults)P(S.ParameterMgr,kv.Key).Expression=kv.Value;foreach(var kv in values)P(S.ParameterMgr,kv.Key).Expression=F(Convert.ToDouble(kv.Value))+" mm";Update();}
+    static int CountParts(IZElement e){if(e.Type==eZElementType.Z_ELEMENT_PART)return 1;int count=0;var children=e.GetChildrenZArray();for(int k=0;k<e.GetChildrenCount();k++){object raw;children.Get(k,out raw);var child=(IZElement)raw;if(child.Type==eZElementType.Z_ELEMENT_PART||child.Type==eZElementType.Z_ELEMENT_ASSEMBLY)count+=CountParts(child);}return count;}
     static Dictionary<string,object> Check(string name){
         var errors=new List<object>();double poseMax=0,sizeMax=0,cutMax=0;var delta=A("primary").Select((x,k)=>Value((string)x)-N(Q["primary_base"])[k]).ToArray();
+        int actualCount=CountParts(S.GetTopElement());if(actualCount!=PartMatrices.Count)errors.Add(new{part_count=actualCount,expected=PartMatrices.Count});
         foreach(var p in A("parts").Select(O)){
             int id=I(p["id"]);var e=(IZSceneElement)E(id);var a=Matrix(e,true);var old=PartMatrices[id];var move=Shift((IZSceneElement)E(I(p["owner"])));double pose=0,size=0;
             for(int k=0;k<3;k++)pose=Math.Max(pose,Math.Abs((a[12+k]-old[12+k])*1000-move[k]));
             for(int k=0;k<12;k++)pose=Math.Max(pose,Math.Abs(a[k]-old[k])*1000);
             var bounds=N(((IZPart)e).GetBody(true).GetBoundingBox());var initial=Bounds[id];var growth=(object[])p["growth"];
-            for(int axis=0;axis<3;axis++){
+            if(p.ContainsKey("local_min_growth")){
+                var low=(object[])p["local_min_growth"];var high=(object[])p["local_max_growth"];
+                for(int axis=0;axis<3;axis++){
+                    double expectedLow=initial[axis]*1000+Enumerable.Range(0,delta.Length).Sum(k=>N(low[axis])[k]*delta[k]);
+                    double expectedHigh=initial[axis+3]*1000+Enumerable.Range(0,delta.Length).Sum(k=>N(high[axis])[k]*delta[k]);
+                    size=Math.Max(size,Math.Abs(bounds[axis]*1000-expectedLow));size=Math.Max(size,Math.Abs(bounds[axis+3]*1000-expectedHigh));
+                }
+            }else for(int axis=0;axis<3;axis++){
                 double expected=(initial[axis+3]-initial[axis])*1000;
                 for(int j=0;j<3;j++)expected+=Math.Abs(old[axis*4+j])*Enumerable.Range(0,delta.Length).Sum(k=>N(growth[j])[k]*delta[k]);
                 size=Math.Max(size,Math.Abs((bounds[axis+3]-bounds[axis])*1000-expected));
             }
-            if(delta.All(x=>Math.Abs(x)<1e-6)||growth.All(x=>N(x).All(v=>Math.Abs(v)<1e-9)))for(int k=0;k<6;k++)size=Math.Max(size,Math.Abs(bounds[k]-initial[k])*1000);
+            if(!p.ContainsKey("local_min_growth")&&(delta.All(x=>Math.Abs(x)<1e-6)||growth.All(x=>N(x).All(v=>Math.Abs(v)<1e-9))))for(int k=0;k<6;k++)size=Math.Max(size,Math.Abs(bounds[k]-initial[k])*1000);
             if(pose>.08||size>.08)errors.Add(new{part=id,pose_mm=pose,size_mm=size});poseMax=Math.Max(poseMax,pose);sizeMax=Math.Max(sizeMax,size);
         }
         foreach(var op in A("operations").Select(O)){
@@ -121,6 +130,23 @@ public static class LatchInProcess {
             }
             if(Math.Abs(bounds[0]-bounds[1])>.08)errors.Add(new{alignment=align,error_mm=bounds[0]-bounds[1]});
         }
+        if(Q.ContainsKey("gaps"))foreach(var spec in A("gaps").Select(O)){
+            int axis=I(spec["axis"]);var edges=new List<double>();
+            foreach(string key in new[]{"a","b"}){
+                var e=(IZSceneElement)E(I(spec[key]));var m=Matrix(e,true);var b=N(((IZPart)e).GetBody(true).GetBoundingBox());
+                var points=Enumerable.Range(0,8).Select(v=>1000*(m[12+axis]+Enumerable.Range(0,3).Sum(k=>b[k+3*((v>>k)&1)]*m[k*4+axis]))).ToArray();
+                edges.Add((string)spec["edge_"+key]=="max"?points.Max():points.Min());
+            }
+            double gap=edges[1]-edges[0],minimum=spec.ContainsKey("minimum_param")?Value((string)spec["minimum_param"]):Convert.ToDouble(spec["minimum_mm"]);
+            if(gap<minimum-.08)errors.Add(new{clearance=spec,gap_mm=gap,minimum_mm=minimum});
+        }
+        if(Q.ContainsKey("offset_pairs"))foreach(var spec in A("offset_pairs").Select(O)){
+            int a=I(spec["a"]),b=I(spec["b"]);var ma=Matrix((IZSceneElement)E(a),true);var mb=Matrix((IZSceneElement)E(b),true);var expected=(object[])spec["expected"];
+            for(int k=0;k<3;k++){
+                double change=1000*(ma[12+k]-mb[12+k]-PartMatrices[a][12+k]+PartMatrices[b][12+k]);double target=expected[k]==null?0:Value((string)expected[k]);
+                if(Math.Abs(change-target)>.08)errors.Add(new{offset_pair=spec,axis=k,error_mm=change-target});
+            }
+        }
         return new Dictionary<string,object>{{"name",name},{"passed",errors.Count==0},{"parts",PartMatrices.Count},{"cuts",CutMatrices.Count},{"pose_error_mm",poseMax},{"size_error_mm",sizeMax},{"cut_error_mm",cutMax},{"errors",errors}};
     }
     static void Picture(string path){var c=(IZCamera)S.CameraMgr.ActiveCamera;c.Perspective=false;c.Direction=new double[]{.45,.8,-.5};c.Up=new double[]{0,0,1};S.AdjustCameraToFitShapeInRect(1400,1100);S.Redraw();S.ExportImage(path,eZImageFormat.Z_IMAGE_PNG,1400,1100,true);}
@@ -135,11 +161,16 @@ public static class LatchInProcess {
             Defaults=new Dictionary<string,string>();S=null;U=null;
             Q=O(J.DeserializeObject(File.ReadAllText(Path.Combine(folder,"request.json"))));
             if(!new[]{"rockpro-rack-parametric-v1","rockpro-szuflady-parametric-v1"}.Contains((string)Q["contract"])||System.Diagnostics.Process.GetCurrentProcess().Id!=I(Q["expected_pid"]))throw new Exception("Wrong source adapter or host");
+            var physicalIds=new HashSet<int>(A("parts").Select(p=>I(O(p)["id"])));
+            foreach(string key in new[]{"gaps","offset_pairs","alignment"})if(Q.ContainsKey(key))foreach(var spec in A(key).Select(O))
+                if(!physicalIds.Contains(I(spec["a"]))||!physicalIds.Contains(I(spec["b"])))throw new Exception("Plan verification must reference physical part IDs: "+key);
             dynamic legacy=Marshal.GetActiveObject("IronCAD.Application");var app=(IZBaseApp)legacy.ZIronCADApp;if(!app.ApiVersion.StartsWith("29."))throw new Exception("2027 required");
             var before=((Array)app.GetAllOpenDocs()).Cast<object>().Select(Doc).ToDictionary(d=>d.FileGUID,d=>d.Modified);
             string source=(string)Q["source"],output=(string)Q["output"];if((string)Q["sha256"]!=((string)Q["contract"]=="rockpro-rack-parametric-v1"?"11e7004b61054dbc4796c1f254c288f6b6fe5ba3f3dd3933f2539181d51d68c3":"180b57705df95eca65db4ad80133ce13d31210b373fa02a71969702a4637d9bb")||Hash(source)!=(string)Q["sha256"])throw new Exception("Source hash mismatch");if(File.Exists(output))throw new Exception("Output exists");
             string copy=Path.Combine(folder,"Family_working.ics");File.Copy(source,copy,false);bool already;owned=app.OpenFile2(copy,false,true,out already);if(already){owned=null;throw new Exception("Copy already open");}
-            S=(IZSceneDoc)owned;U=(IZSceneDocUtility)S;S.ConstraintSolver=false;Rows=A("inventory").Select(O).ToDictionary(r=>I(r["id"]));Capture();Mark("captured original");
+            S=(IZSceneDoc)owned;U=(IZSceneDocUtility)S;S.ConstraintSolver=false;Rows=A("inventory").Select(O).ToDictionary(r=>I(r["id"]));
+            if(Q.ContainsKey("remove_roots"))foreach(object root in A("remove_roots")){E(I(root)).Remove();Mark("removed alternate state on copy "+root);}
+            Capture();Mark("captured original");
             Rebuild();Mark("material histories rebuilt");
             foreach(var p in A("parameters").Select(O)){Param(S.ParameterMgr,(string)p["name"],(string)p["expression"],(string)p["notes"]);Defaults[(string)p["name"]]=(string)p["expression"];}
             foreach(var d in A("dimensions").Select(O))BindSize(d);Mark("dimensions bound");

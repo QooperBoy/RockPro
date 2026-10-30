@@ -80,3 +80,11 @@ each invocation, because the bridge can reuse a loaded assembly between jobs.
 checks the preserved source hash and refuses an existing snapshot before copying
 the model and exporting parameter/part-map CSVs. All actual manifests, models,
 customer descriptions and native evidence stay outside public source history.
+
+## Drawer/workstation completed
+
+Native `artifacts/szuflady-20261030/build-02`: seven scenarios PASS; presentation-01 PASS (422 names, 24 cuts, 322 green plywood faces). 26 controls, 380 physical parts, 76 dimensioned materials. Only the deployed source state is retained in the new copy; the folded duplicate remains in the original. Drawers are numbered bottom to top. Four independent extensions and front heights, body dimensions, top lid, handle/latch positions, table XY and leg Z are editable. Source top lid angle is 105 degrees, not a folding animation.
+
+Rotated material growth uses local feature axes and six local bounds, with analytical anchor drift compensation. Table connectors follow cabinet-depth peg spacing; cabinet pegs preserve working height. Tests check front gaps >=6 mm, upper reserve and physical connector/hinge offsets. Mapping validation rejected an assembly ID in the first diagnostic; final checks use physical hinge leaves 1693/1700. Catalog shapes remain rigid. Pads are not certified runner models, leg ground contact needs constructor review, and native checks are not complete BRep/CNC approval.
+
+Final offline seven groups PASS: `artifacts/verification/20261030T132924106935Z`. Separate native evidence is above; the offline harness does not operate IronCAD. Long native jobs can report a wrapper AddOns.Count cleanup COM error after managed success; check native and CLR results before any retry. Separate presentation/save completed. Reference copies were checkpointed and closed, with other documents preserved; capture immutable document GUIDs before closing COM document objects. All three families have preserved snapshots and guides; constructor acceptance remains pending.
