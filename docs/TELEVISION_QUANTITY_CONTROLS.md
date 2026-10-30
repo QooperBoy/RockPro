@@ -119,3 +119,91 @@ otwartego ICS bez FileShare.Write. Finalny kontroler oblicza pozycje w C#,
 sprawdza stany po zbiorczym wywołaniu i w razie potrzeby ustawia je indywidualnie;
 pliki hashuje z FileShare.ReadWrite/Delete. Nie promowano błędnych prób jako
 gotowych modeli.
+
+
+## Poprawka R004: pojemność ścianki i wspólne podwozie
+
+Reguła liczności dla dodatniej liczby `n`:
+
+```
+n * w + (n - 1) * g + m_lewy + m_prawy <= L
+```
+
+`w` to pełna szerokość montażowa sztywnego okucia w kierunku rzędu;
+`g` to minimalny odstęp, `m` margines krawędzi, a `L` dostępna długość.
+Dla jednakowych marginesów maksymalna pojemność wynosi
+`floor((L - 2*m + g)/(w + g))`, co najmniej zero. Dodatkowo kontrolowane są
+rzeczywiste położenie środka i rozstaw osi: skrajny obrys musi pozostać w
+marginesach, a odstęp sąsiednich osi wynosi co najmniej `w + g`.
+Pojemność geometryczna i liczba zbudowanych wystąpień CAD to osobne wartości.
+
+Dla istniejącego bocznego rzędu H7159: L=772 mm, w=161 mm, g=m=12 mm.
+Cztery sztuki zajmują minimum 704 mm, pięć 877 mm. Przy rozstawie skrajnych
+osi 532 mm cztery sztuki mają odstęp osi 177,33 mm, wymagany co najmniej 173 mm.
+Wystąpienia rezerwowe w R003/R004 nadal ograniczają model do czterech na rząd;
+na większej ściance kontroler rozróżnia tę granicę od braku miejsca.
+
+Nieprawidłowy rząd zachowuje ostatnią poprawną geometrię i zgłasza błąd.
+Pozostałe poprawne rzędy są stosowane wraz z obróbkami. Parametr żądanej
+liczby nie jest automatycznie przycinany. Przy wpisie 5 widoczny stan ostatniej
+poprawnej liczby nie jest akceptacją pięciu okuć. Po zapisie/otwarciu status
+kontrolera nadal sygnalizuje ten problem.
+
+Ta walidacja rzędu nie jest pełnym testem wszystkich kolizji BRep ani
+wielorzędowym algorytmem omijania dowolnych innych okuć. Znane strefy profili,
+narożników i pozostałych części muszą stanowić wejście rozszerzanego planera;
+nie wolno deklarować ich sprawdzenia na podstawie samego bilansu długości.
+
+Podwozie R004 ma dwa podłużne wsporniki 120 mm × (głębokość dna − 70 mm)
+× 18 mm i cztery sztywne koła. Pięć parametrów `RP_Podwozie_*` reguluje
+szerokość/grubość podpory, margines końca, odsunięcie od boku i odsunięcie osi
+koła od końca podpory. Wsporniki dotykają dna; płyty kół dotykają spodu
+wsporników i mieszczą się w ich obrysie. Grupa ma wspólną receptę montażową
+w manifeście i jest przeliczana przez ten sam kontroler. Nie jest to fizyczne
+związanie mechaniczne/nośnościowe ani skalowanie zespołu kół.
+
+Regresja użytkownika: kontroler nie był załadowany w nowym PID 31852, a jego
+rejestracja COM była nieobecna w rejestrze widzianym przez hosta. Testy R003
+wykonywano po ręcznym uruchomieniu kontrolera w poprzednim procesie; nie
+obejmowały restartu ani rzeczywistego przycisku Zastosuj. Dodatkowo dawny
+Apply odrzucał wszystkie rzędy przy jednym błędnym wpisie. To były braki
+implementacji i zakresu weryfikacji, nie ręczne przestawienie okuć przez AI.
+
+Dowody R004: `artifacts/tv-counts-20261030/snapshot-r003` (zmiany użytkownika),
+`repair-r004` (pierwszy montaż), `check-r004b` (sześć prób geometrii, liczności,
+wycięć i ponownego otwarcia). `Test-MountRowLayout.ps1` sprawdza jedenaście
+przypadków rachunkowych bez hosta. Wyniki autostartu i UI zapisuj osobno.
+
+
+Dodatkowa przyczyna wykryta podczas testu restartu R004: IronCAD zapisuje
+włączenie aplikacji pod **dokładną nazwą** z klucza COM `Name`.
+Instalator używał `RockPro Ilość okuć`, podczas gdy zarejestrowana nazwa to
+`RockPro — Ilość okuć`. Wpis aplikacji miał LoadOnStartup=1, ale właściwa
+pozycja w menedżerze była odznaczona. Poprawiono instalator, zachowując stary
+wpis; nie usunięto wcześniejszych ustawień. Dowód różnicy zapisanej przez hosta:
+`registry-enable.diff`. Samo utworzenie serwera COM nie potwierdza autostartu.
+
+Rzeczywista tabela parametrów i przycisk Zastosuj: zmiana lewego rzędu uchwytów
+korpusu z trzech do jednego przeliczyła okucia i wycięcia mimo pozostawienia
+błędnego żądania pięciu uchwytów na prawej czapce. `ui-read/result.json`: jedna
+aktywna sztuka, pozostałe poprawne rzędy zgodne, zero ręcznych wywołań Apply,
+Start lub Load. Po teście przywrócono żądane trzy sztuki. To oddzielny dowód
+od wcześniejszych prób setterów SDK.
+
+
+Końcowy autostart R004 **PASS**: drugi pełny restart, PID 3364, automatycznie
+załadowany zestaw `RockPro.MountCounts_5A6E91DC8DF2` 0.9.0.0, aktywny timer,
+bez ręcznego Load/Start: `startup2-probe/result.json`. Końcowy odczyt
+`final-read/result.json`: żądane/aktywne rzędy 3/3, 4/4, 1/1, 4/4, 5/4, 3/3.
+Żądanie 5/4 jest jawnie błędne; cztery to ostatni poprawny stan, a nie
+zaakceptowana realizacja piątki. Zapisano 54 parametry i zachowano oryginalne
+żądanie użytkownika. Model jest do przeglądu, z jednym błędem liczności.
+
+Offline siedem grup PASS: `artifacts/verification/20261030T214013773443Z`.
+Wcześniejsze nieudane przebiegi zachowano: jeden zatrzymał się na uprawnieniach
+katalogu tymczasowego sandboxa, drugi na globalnej blokadzie CAD, gdy testy
+atrap uruchomiono podczas pracy natywnego wykonawcy. Końcowy przebieg wykonano
+sekwencyjnie. Pierwszy pomocniczy zapis przed restartem po zamknięciu dokumentów
+zgłosił null przy odczycie pustej listy SDK; snapshot i plik były już zapisane.
+Kolejna próba obsłużyła null, potwierdziła zero dokumentów i zakończyła się PASS
+(`pre-restart2`). Nie zmieniono kryteriów testów montażu dla uzyskania PASS.

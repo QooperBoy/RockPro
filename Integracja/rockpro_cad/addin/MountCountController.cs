@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using System.Web.Script.Serialization;
 using interop.ICApiIronCAD;
 
-[assembly:System.Reflection.AssemblyVersion("0.8.0.0")]
+[assembly:System.Reflection.AssemblyVersion("0.9.0.0")]
 namespace RockPro.CAD {
     [ComVisible(true), Guid("93C43C38-9891-44D5-85A9-A07D513C3C21")]
     [ProgId("RockPro.CAD.MountCounts2027"), ClassInterface(ClassInterfaceType.None)]
@@ -29,7 +29,7 @@ namespace RockPro.CAD {
         public static void Start(IZBaseApp host) {
             if(!host.ApiVersion.StartsWith("29."))throw new InvalidOperationException("Quantity controller requires IronCAD 2027.");
             if(timer!=null)return;
-            app=host;timer=new Timer();timer.Interval=600;timer.Tick+=Tick;timer.Start();
+            app=host;File.AppendAllText(Path.Combine(Path.GetDirectoryName(typeof(MountCountController).Assembly.Location),"quantity-startup.log"),DateTime.UtcNow.ToString("o")+" PID="+System.Diagnostics.Process.GetCurrentProcess().Id+" "+typeof(MountCountController).Assembly.FullName+Environment.NewLine);timer=new Timer();timer.Interval=600;timer.Tick+=Tick;timer.Start();
         }
         public static void Stop() { if(timer!=null){timer.Stop();timer.Dispose();timer=null;}app=null;fingerprints.Clear(); }
         static void Tick(object sender,EventArgs args) {
@@ -123,6 +123,41 @@ namespace RockPro.CAD {
             }
         }
 
+        public static double[] WorldBounds(IZPart part){
+            var b=Numbers(part.GetBody(true).GetBoundingBox());var m=Matrix((IZSceneElement)part);
+            var points=Enumerable.Range(0,8).Select(mask=>Enumerable.Range(0,3).Select(j=>m[12+j]+Enumerable.Range(0,3).Sum(k=>b[k+3*((mask>>k)&1)]*m[k*4+j])).ToArray()).ToArray();
+            return Enumerable.Range(0,6).Select(j=>j<3?points.Min(p=>p[j]):points.Max(p=>p[j-3])).ToArray();
+        }
+        public static void Transport(IZSceneDoc scene,Dictionary<string,object> q){
+            if(!q.ContainsKey("transport"))return;var t=O(q["transport"]);var u=(IZSceneDocUtility)scene;
+            double width=P(scene,"RP_Podwozie_SzerokoscPodpory").Value*1000;
+            double thickness=P(scene,"RP_Podwozie_GruboscPodpory").Value*1000;
+            double edge=P(scene,"RP_Podwozie_MarginesKonca").Value*1000;
+            double inset=P(scene,"RP_Podwozie_OdsuniecieBoku").Value*1000;
+            double wheelInset=P(scene,"RP_Podwozie_OdsuniecieKol").Value*1000;
+            var floor=WorldBounds((IZPart)u.GetElementById(Convert.ToInt32(t["floor"])));
+            double length=(floor[4]-floor[1])*1000-2*edge;
+            if(width<120||thickness<12||edge<35||inset<width/2+35||length<180||wheelInset<50||2*wheelInset+80>length||2*(inset+width/2)>(floor[3]-floor[0])*1000)
+                throw new InvalidOperationException("Podwozie: brak miejsca na podpory i sztywne płyty kół. Sprawdź marginesy, szerokość podpory i odsunięcia.");
+            foreach(var rail in ((object[])t["rails"]).Select(O)){
+                int id=Convert.ToInt32(rail["id"]);var part=(IZPart)u.GetElementById(id);var mgr=(IZPartFeatureMgr)part;var f=mgr.GetFeatureAt(0);var box=(IZSizeBox)f;
+                // The source plate is a single rectangular native extrude.
+                double[] sizes={width,length,thickness};
+                double[] actual={box.Length*1000,box.Width*1000,box.Height*1000};
+                for(int k=0;k<3;k++)if(Math.Abs(actual[k]-sizes[k])>1e-7){string v=sizes[k].ToString("G16",System.Globalization.CultureInfo.InvariantCulture)+" mm";if(k==0)box.LengthExpression=v;else if(k==1)box.WidthExpression=v;else box.HeightExpression=v;}
+                part.Update();var bounds=WorldBounds(part);bool right=(bool)rail["right"];
+                double cx=right?floor[3]-inset/1000:floor[0]+inset/1000;
+                double cy=(floor[1]+floor[4])/2,top=floor[2];var m=Matrix((IZSceneElement)part);
+                m[12]+=cx-(bounds[0]+bounds[3])/2;m[13]+=cy-(bounds[1]+bounds[4])/2;m[14]+=top-bounds[5];SetWorld((IZSceneElement)part,m);
+                foreach(var wheel in ((object[])rail["wheels"]).Select(O)){
+                    var wm=Numbers(wheel["world"]);var offset=Numbers(wheel["mount_offset"]);
+                    wm[12]=cx-offset[0];wm[13]=((bool)wheel["rear"]?floor[4]-(edge+wheelInset)/1000:floor[1]+(edge+wheelInset)/1000)-offset[1];
+                    wm[14]=top-thickness/1000-offset[2];SetWorld((IZSceneElement)u.GetElementById(Convert.ToInt32(wheel["id"])),wm);
+                }
+            }
+            scene.Update();
+        }
+
         public static int Apply(IZSceneDoc scene) {
             var text=Manifest(scene);if(text==null)throw new InvalidOperationException("Quantity manifest missing.");
             var q=O(Json.DeserializeObject(text));
@@ -131,18 +166,20 @@ namespace RockPro.CAD {
             var utility=(IZSceneDocUtility)scene;
             var changes=new List<Tuple<IZElement,bool>>();
             double depth=P(scene,"RP_GlebokoscSkrzyni").Value*1000;
+            var validRows=new List<Dictionary<string,object>>();
+            var errors=new List<string>();
+            try{Transport(scene,q);}catch(Exception ex){errors.Add(ex.GetBaseException().Message);}
             foreach(var row in ((object[])q["rows"]).Select(O)) {
                 double value=P(scene,(string)row["count"]).Value;
-                int n=(int)Math.Round(value);var slots=(object[])row["slots"];
-                if(Math.Abs(n-value)>1e-8||n<Convert.ToInt32(row["minimum"])||n>slots.Length)
-                    throw new InvalidOperationException((string)row["count"]+": wpisz całkowitą liczbę od "+row["minimum"]+" do "+slots.Length+".");
+                var slots=(object[])row["slots"];
                 double center=P(scene,(string)row["center"]).Value*1000;
                 double spread=P(scene,(string)row["spread"]).Value*1000;
-                double half=Convert.ToDouble(row["half_width"]),clearance=Convert.ToDouble(row["clearance"]);
-                double actualSpan=n>1?spread:0;
-                if(n>0&&(spread<0||center-actualSpan/2-half<clearance||center+actualSpan/2+half>depth-clearance||
-                    (n>1&&spread/(n-1)<2*half+clearance)))
-                    throw new InvalidOperationException((string)row["count"]+": brak miejsca na równy rozstaw; zwiększ głębokość lub zmniejsz liczbę/rozstaw.");
+                string error=MountRowLayout.Validate(value,Convert.ToInt32(row["minimum"]),slots.Length,
+                    depth,center,spread,2*Convert.ToDouble(row["half_width"]),
+                    Convert.ToDouble(row["clearance"]),Convert.ToDouble(row["clearance"]));
+                if(error!=null){errors.Add((string)row["count"]+": "+error);continue;}
+                int n=(int)Math.Round(value);
+                validRows.Add(row);
                 for(int i=0;i<slots.Length;i++)foreach(object raw in (object[])slots[i]) {
                     var e=utility.GetElementById(Convert.ToInt32(raw));
                     if(e==null)throw new InvalidOperationException("Missing quantity member "+raw);
@@ -150,7 +187,15 @@ namespace RockPro.CAD {
                     changes.Add(Tuple.Create(e,i>=n));
                 }
             }
-            Position(scene,q);
+            // A rejected row keeps its last valid geometry. Independent valid
+            // rows still update, including their associated machining features.
+            var accepted=new HashSet<string>(validRows.Select(row=>(string)row["count"]));
+            var memberIds=new HashSet<int>(validRows.SelectMany(row=>(object[])row["slots"]).SelectMany(slot=>(object[])slot).Select(Convert.ToInt32));
+            var activePlan=new Dictionary<string,object>(q);
+            activePlan["rows"]=validRows.Cast<object>().ToArray();
+            activePlan["poses"]=((object[])q["poses"]).Select(O).Where(p=>accepted.Contains((string)p["count"])).Cast<object>().ToArray();
+            activePlan["mates"]=((object[])q["mates"]).Select(O).Where(m=>memberIds.Contains(Convert.ToInt32(m["id"]))).Cast<object>().ToArray();
+            Position(scene,activePlan);
             var changed=changes.Where(c=>c.Item1.GetStateStatus(eZElementState.Z_SUPPRESSED)!=c.Item2).ToArray();
             if(changed.Length>0){
                 var batchUtility=scene.GetTopElement().Application.Utility;
@@ -169,7 +214,8 @@ namespace RockPro.CAD {
                 foreach(var target in targets)((IZPart)target).Update();
                 scene.Update();scene.Redraw();
             }
-            MateCuts(scene,q);
+            MateCuts(scene,activePlan);
+            if(errors.Count>0)throw new InvalidOperationException(String.Join("; ",errors)+" Pozostałe poprawne rzędy zostały przeliczone.");
             return changed.Length;
         }
     }

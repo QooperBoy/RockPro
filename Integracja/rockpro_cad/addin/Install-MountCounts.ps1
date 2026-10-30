@@ -30,7 +30,8 @@ $cls.CreateSubKey('Name').SetValue('','RockPro — Ilość okuć')
 $cls.CreateSubKey('Description').SetValue('','Liczba okuć i powiązanych wycięć w oznaczonych modelach RockPro. IronCAD 2027.')
 $cls.CreateSubKey('AddIn Version Compatibility\GreaterThanAndEqualTo').SetValue('','29..')
 $root.CreateSubKey("Software\Classes\$prog\CLSID").SetValue('',$guid)
-$app=$root.CreateSubKey('Software\IronCAD\IRONCAD 29.0\Applications\RockPro Ilość okuć')
+# IronCAD persists startup settings under the exact registered Name label.
+$app=$root.CreateSubKey('Software\IronCAD\IRONCAD 29.0\Applications\RockPro — Ilość okuć')
 $app.SetValue('',$guid);$app.SetValue('LoadOnStartup',1,[Microsoft.Win32.RegistryValueKind]::DWord)
 $app.SetValue('ShowInList',1,[Microsoft.Win32.RegistryValueKind]::DWord)
 Write-Output "Registered separate quantity controller for IronCAD 2027: $dll"

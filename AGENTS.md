@@ -155,3 +155,26 @@ Nowe projekty: stosuj [docs/CASE_DEFAULTS.md](docs/CASE_DEFAULTS.md): zielonkawa
 - Aktualna korekta: bez przycisków Menu/Ustawienia/Podgląd 3D w nagłówku. Rozmiar, zwijanie i przywracanie realizują uchwyty granic; muszą zostać osiągalne po ukryciu panelu. W nagłówku pozostają motyw i zapis.
 
 - Przejścia stanów paneli Studio mają być płynne, krótkie i spójne po obu stronach; zwykły resize bez opóźnień. Respektuj prefers-reduced-motion i nie kolejkuj przerwanych animacji.
+
+
+## Wymagania montażowe 30.10.2026: liczność i podwozie
+
+- Liczba okuć wynika z dostępnego miejsca na konkretnej ścianie i sekcji:
+  `n * szerokość_montażowa + (n - 1) * odstęp + margines_lewy + margines_prawy <= długość_dostępna`.
+  Dla zera elementów nie stosuj wyrazu `(n - 1)`. Szerokość oznacza pełny,
+  sztywny obrys montażowy okucia, nie szerokość samego otworu w sklejce.
+  Sprawdź także wysokość, środek rzędu, faktyczny rozstaw osi i znane strefy
+  zajęte przez profile, narożniki i inne okucia. Rzędu nie wolno zaakceptować
+  tylko dlatego, że spełnia bilans długości. Strefy kolizji zależą od wysokości.
+- Rozdziel pojemność geometryczną od liczby przygotowanych wystąpień CAD.
+  Komunikat podaje przyczynę i maksymalną liczbę przy danych warunkach.
+  Nie skaluj SKU i nie zmieniaj żądanej liczby po cichu. Nieprawidłowy rząd
+  zachowuje ostatni poprawny stan; niezależne poprawne rzędy nadal się przeliczają.
+  Zmiana liczby obejmuje okucia oraz ich otwory i przerwy w profilach.
+- Podpory dolne i koła tworzą jeden logiczny moduł transportowy. Długość,
+  szerokość, grubość i odsunięcia podpór są parametryczne; koła pozostają
+  sztywne i podążają za kotwami podpór. Płyta montażowa koła dotyka spodu
+  podpory, podpora dotyka dna i kończy się przed strefą profilu krawędziowego.
+  Sprawdź oba kierunki zmiany wymiarów, styk montażowy i zapis/otwarcie.
+- Test natywny działającego kontrolera nie zastępuje testu autostartu po restarcie
+  ani testu zmiany przez rzeczywistą tabelę parametrów i przycisk Zastosuj.
