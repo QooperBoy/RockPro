@@ -7,7 +7,7 @@ from urllib.parse import urlsplit, parse_qs
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'Integracja'))
-from rockpro_cad import configurator,studio_review
+from rockpro_cad import configurator,studio_review,process_runs
 
 
 class handler(BaseHTTPRequestHandler):
@@ -24,16 +24,25 @@ class handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         route=parse_qs(urlsplit(self.path).query).get('endpoint',[''])[0]
-        if route not in ('preview','convert','review'):
+        if route not in ('preview','convert','review','process-report'):
             self.respond(404,dict(error='Nieznana operacja.'));return
         origin=self.headers.get('Origin')
         if origin and urlsplit(origin).netloc != self.headers.get('Host'):
             self.respond(403,dict(error='Nieprawidłowe źródło żądania.'));return
         try:
             length=int(self.headers.get('Content-Length','0'))
-            if not 0<length<=32768: raise ValueError('Szkic musi mieć maksymalnie 32 KB.')
+            if not 0<length<=(8*1024*1024 if route=='process-report' else 32768): raise ValueError('Przekroczono limit danych.')
             data=json.loads(self.rfile.read(length).decode('utf-8'))
-            result=studio_review.review(data) if route=='review' else configurator.preview(data) if route=='preview' else configurator.convert_legacy(data)
+            if route=='process-report':
+                clean=configurator.preview(data['draft'])['draft']
+                identity=data['draft_id'];revision=data['revision']
+                if not configurator.re_id(identity) or type(revision) is not int or revision<1:raise ValueError('Nieprawidłowe powiązanie draftu')
+                import hashlib
+                bound=dict(draft_id=identity,draft_revision=revision,draft_sha256=hashlib.sha256(process_runs.canonical(clean).encode()).hexdigest())
+                result=process_runs.validate_report(data['report'],bound)
+                result['summary']=process_runs.summarize(result['events'])
+            else:
+                result=studio_review.review(data) if route=='review' else configurator.preview(data) if route=='preview' else configurator.convert_legacy(data)
             self.respond(200,result)
         except (ValueError,TypeError,KeyError,OverflowError,RecursionError) as exc:
             self.respond(400,dict(error=str(exc)[:300]))

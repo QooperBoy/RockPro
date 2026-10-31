@@ -1,3 +1,4 @@
+import {ProcessPanel} from './process-panel.js';
 import {StructureView} from './structure3d.js';
 import {ReviewPanel} from './review-panel.js';
 import {icon} from './viewport-ui.js';
@@ -7,7 +8,7 @@ import {PlacementEditor} from './placement-editor.js';
 import {ClosureEditor} from './closure-editor.js';
 import {PlacementView} from './placement3d.js';
 const $=id=>document.getElementById(id),token=location.pathname.split('/').filter(Boolean)[0];
-let options,draft,storage={id:null,revision:0},step=1,view,timer,serial=0,dirty=false,saving=false,pendingLegacy=null,partsPicker=null,placementEditor=null,placementView=null,closureEditor=null,partsCatalog;
+let options,draft,storage={id:null,revision:0},step=1,view,timer,serial=0,dirty=false,saving=false,pendingLegacy=null,partsPicker=null,placementEditor=null,placementView=null,closureEditor=null,partsCatalog,processPanel;
 const queryDraft=new URLSearchParams(location.search).get('draft');
 let requestedDraft=/^[0-9a-f]{32}$/.test(queryDraft??'')?queryDraft:null;
 let localKey='rockpro.configurator.recovery.v3'+(requestedDraft?'.'+requestedDraft:'');
@@ -107,6 +108,7 @@ function motionInputs(){
  }
 }
 async function updatePreview(version=++serial){
+ processPanel?.clearLayer();
  try{const model=await api('wizard/preview',draft);if(version!==serial)return;
   if(!view)view=new ConceptView($('viewport'));
   if(!placementView)placementView=new PlacementView(view,hit=>placementEditor.drop(hit),id=>{const g=draft.placements.find(g=>g.id===id);if(g?.pattern==='closure_line'){navigate(6);closureEditor.selectGroup(id);}else placementEditor.selectGroup(id);},message=>status(message),hit=>placementEditor.candidate(hit));
@@ -115,7 +117,7 @@ async function updatePreview(version=++serial){
   placementEditor.setModel(model);closureEditor.setModel(model);placementView.setEnabled(step>=5);
   await placementView.update(model,partsCatalog,step===6?closureEditor.selected:placementEditor.selected);if(version!==serial)return;
   if(!structureView)structureView=new StructureView(view);await structureView.update(model,partsCatalog);if(version!==serial)return;window.rockproStructureView=structureView;
-  window.rockproPlacementView=placementView;processUI();
+  window.rockproPlacementView=placementView;processUI();processPanel?.applyLayer();
   $('placement-summary').textContent=model.placement.instance_count+' wystąpień w koncepcji · '+(draft.placements?.length??0)+' grup'+(model.placement.unresolved_groups.length?' · grupy bez docelowej ścianki: '+model.placement.unresolved_groups.length:'')+'.';
   partsPicker.renderSummary($('hardware-summary'),model.hardware_summary);
   renderConstruction(model);
@@ -140,8 +142,9 @@ async function save(asNew=false){
 }
 function showLegacy(value){pendingLegacy=structuredClone(value);$('legacy-notice').hidden=false;status('Archiwalny draft zachowany. Możesz pobrać jego oryginalny JSON lub jawnie utworzyć nowy draft w obecnych typach.',true);}
 async function load(saved){
+ processPanel?.clearLayer();
  try{await api('wizard/preview',saved.draft);}catch(e){if(['rockpro.configurator/1','rockpro.configurator/2'].includes(saved.draft?.schema)){showLegacy(saved.draft);return false;}throw e;}
- draft=saved.draft;storage={id:saved.id??null,revision:saved.revision??0};dirty=!storage.id;projectLocation(storage.id);reviewPanel?.invalidate();pendingLegacy=null;$('legacy-notice').hidden=true;clearTimeout(timer);serial++;fill();stored();await updatePreview();if(step===8)reviewPanel?.check();return true;
+ draft=saved.draft;storage={id:saved.id??null,revision:saved.revision??0};dirty=!storage.id;projectLocation(storage.id);reviewPanel?.invalidate();pendingLegacy=null;$('legacy-notice').hidden=true;clearTimeout(timer);serial++;fill();stored();await updatePreview();if(step===8)reviewPanel?.check();processPanel?.refresh();return true;
 }
 function download(value,name){const url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=name;a.hidden=true;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);}
 function exportDraft(){
@@ -209,6 +212,7 @@ async function init(){
  $('fit').onclick=()=>view?.chrome.frame();for(const [id,v]of[['open-all',100],['close-all',0]])$(id).onclick=()=>{view?.all(v);if(view)motionInputs();};
  $('export').onclick=$('download-top').onclick=$('download-final').onclick=exportDraft;$('download-top').disabled=false;
  $('import').onclick=()=>$('file').click();$('file').onchange=async()=>{try{const f=$('file').files[0];if(!f)return;if(f.size>32768)throw Error('Maksymalny rozmiar draftu to 32 KB');const value=JSON.parse(await f.text());if(!mayReplace())return;if(await load({draft:value}))status('Wczytano JSON jako nowy draft. Zapisz go, aby zachować w bazie.');}catch(e){status(e.message,true);}finally{$('file').value='';}};
+ processPanel=new ProcessPanel($('process-panel'),{api,context:()=>({...storage,dirty}),view:()=>view});window.rockproProcessPanel=processPanel;
  window.rockproWizard={getDraft:()=>structuredClone(draft),getStorage:()=>({...storage}),preview:()=>updatePreview(),load,save,navigate};
 }
 init().catch(e=>status('Nie można uruchomić kreatora: '+e.message,true));

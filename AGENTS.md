@@ -1,3 +1,16 @@
+## Rejestr przebiegu Studio — 31.10.2026
+
+Przy nowych wykonaniach zapisuj pochodzenie decyzji oddzielnie od wykonawcy.
+`origin=standard/ai/manual/unknown`, `executor=sdk/python/agent/constructor/unknown`.
+AI zlecające SDK nie tworzy drugiej operacji. Używaj stabilnego run_id, rewizji
+i SHA draftu oraz ID wystąpienia. Zapisz krótki powód interwencji i jej wynik,
+nie ukryte rozumowanie modelu. Nie zgaduj udziału AI ze starych plików CAD,
+liczby części ani autora skryptu. Brak dowodów = unknown.
+Wspólny runner przyjmuje `studio_trace`; szczegóły i komendy w
+[docs/RELIABILITY_AND_OBSERVER.md](docs/RELIABILITY_AND_OBSERVER.md).
+Obecność logu/koloru nie oznacza zatwierdzenia geometrii. Tryb simulation musi
+pozostać jawny. Nie zapisuj przykładowych zdarzeń jako rzeczywistego wykonania.
+
 ## Aktualna decyzja użytkownika — 31.10.2026
 
 **Nie parametryzuj liczby wystąpień okuć w IronCADzie.** Dotyczy uchwytów,

@@ -1,3 +1,8 @@
+> Aktualizacja 31.10.2026: część propozycji jest wdrożona — rejestr przebiegów
+> w SQLite, panel Studio, pochodzenie operacji, interwencje i warstwa 3D.
+> Zakres i ograniczenia: [RELIABILITY_AND_OBSERVER.md](RELIABILITY_AND_OBSERVER.md).
+> Poniższy opis zachowuje historyczną propozycję; nie oznacza wdrożenia wszystkich punktów.
+
 # Propozycja: panel przebiegu i kontroli produktu RockPro
 
 Status: pomysł do oceny, nie zaimplementowany interfejs. Prośba użytkownika

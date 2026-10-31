@@ -20,6 +20,7 @@ from . import company_catalog, supplier_parts
 from . import part_preferences
 from . import manufacturer_images
 from . import studio_review
+from . import process_runs
 
 STATIC = Path(__file__).with_name('reference_studio')
 IMPORT_MAP = '{"imports":{"three":"./vendor/three.module.min.js"}}'
@@ -87,6 +88,8 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
         ('cost-summary.js','text/javascript; charset=utf-8'),
         ('cost_math.mjs','text/javascript; charset=utf-8'),
         ('review-panel.js','text/javascript; charset=utf-8'),
+        ('process-panel.js','text/javascript; charset=utf-8'),
+        ('process-panel.css','text/css; charset=utf-8'),
         ('placement_math.mjs', 'text/javascript; charset=utf-8'),
         ('scene-controls.js', 'text/javascript; charset=utf-8'),
         ('preview_math.mjs', 'text/javascript; charset=utf-8'), ('favicon.svg', 'image/svg+xml'))}
@@ -144,6 +147,16 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
                 else:self.respond(404,b'{"error":"Unknown company image"}')
             elif name == 'wizard/drafts':
                 self.respond(200, json.dumps(configurator.list_drafts(), ensure_ascii=False).encode())
+            elif name and name.startswith('process/runs/'):
+                try:
+                    self.respond(200, json.dumps(process_runs.list_runs(name.rsplit('/',1)[1]), ensure_ascii=False).encode())
+                except ValueError as exc:
+                    self.respond(400, json.dumps({'error': str(exc)}, ensure_ascii=False).encode())
+            elif name and name.startswith('process/run/'):
+                try:
+                    self.respond(200, json.dumps(process_runs.read(name.rsplit('/',1)[1]), ensure_ascii=False).encode())
+                except ValueError as exc:
+                    self.respond(404, json.dumps({'error': str(exc)}, ensure_ascii=False).encode())
             elif name == 'parts/preferences':
                 try:self.respond(200,json.dumps(part_preferences.read(preference_ids()),ensure_ascii=False).encode())
                 except ValueError as exc:self.respond(400,json.dumps({'error':str(exc)},ensure_ascii=False).encode())
@@ -160,15 +173,24 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
         def do_POST(self):
             origin = self.headers.get('Origin')
             expected_origin = 'http://127.0.0.1:' + str(self.server.server_port)
-            if self.endpoint() not in ('validate', 'wizard/preview', 'wizard/review', 'wizard/save', 'wizard/convert','parts/preferences') or self.headers.get('X-RockPro-Session') != token or origin != expected_origin:
+            if self.endpoint() not in ('validate', 'wizard/preview', 'wizard/review', 'wizard/save', 'wizard/convert','parts/preferences','process') or self.headers.get('X-RockPro-Session') != token or origin != expected_origin:
                 self.respond(403, b'{}')
                 return
             try:
                 length = int(self.headers.get('Content-Length', '0'))
-                if not 0 < length <= 32768:
+                if not 0 < length <= (8*1024*1024 if self.endpoint() == 'process' else 32768):
                     raise ValueError('Nieprawidłowy rozmiar szkicu')
                 draft = json.loads(self.rfile.read(length).decode('utf-8'))
-                if self.endpoint() == 'parts/preferences':
+                if self.endpoint() == 'process':
+                    action=draft.get('action')
+                    if action == 'create':
+                        receipt=process_runs.create(draft['draft_id'],draft['revision'],draft['label'],draft.get('mode','actual'))
+                    elif action == 'append':
+                        receipt=process_runs.append(draft['run_id'],draft.get('events'),draft.get('state'))
+                    elif action == 'import':
+                        receipt=process_runs.import_report(draft['report'],draft['draft_id'],draft['revision'])
+                    else: raise ValueError('Nieznana operacja rejestru')
+                elif self.endpoint() == 'parts/preferences':
                     receipt=part_preferences.set_favorite(draft,preference_ids())
                 elif self.endpoint() == 'wizard/preview':
                     receipt = configurator.preview(draft)
@@ -201,8 +223,12 @@ def main():
     parser.add_argument('--part-images', type=Path, help='Local verified part thumbnail folder')
     parser.add_argument('--source-parts', type=Path, help='Optional source-bound candidate catalogue')
     parser.add_argument('--port', type=int, default=0)
+    parser.add_argument('--database', type=Path, help='Explicit local Studio database; omit to keep the existing registry')
     parser.add_argument('--session-token', help='Reuse a local session URL when restarting the prototype')
     args = parser.parse_args()
+    if args.database:
+        from .mcp import project_store
+        project_store.DB_PATH=args.database.resolve()
     if args.source_parts:os.environ['ROCKPRO_SOURCE_PARTS']=str(args.source_parts.resolve(strict=True))
     catalog, images = build_catalog(args.bundle)
     preview = load_preview(args.workstation, catalog) if args.workstation else None

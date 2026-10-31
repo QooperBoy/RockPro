@@ -4,6 +4,24 @@
  const read=()=>{const raw=localStorage.getItem(key);return raw?JSON.parse(raw):{drafts:{},favorites:{}};};
  const reply=(value,status=200)=>new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json'}});
  const write=async action=>navigator.locks?navigator.locks.request(key,action):action();
+ const processRequest=async(route,method,init)=>{
+  try{
+   const db=read(),runs=db.processRuns??{};
+   if(method==='GET'&&route.startsWith('process/runs/'))return reply(Object.values(runs).filter(r=>r.binding.draft_id===route.split('/').pop()).sort((a,b)=>b.updated_at.localeCompare(a.updated_at)));
+   if(method==='GET'&&route.startsWith('process/run/'))return runs[route.split('/').pop()]?reply(runs[route.split('/').pop()]):reply({error:'Brak przebiegu w tej przeglądarce.'},404);
+   if(method!=='POST'||route!=='process')return reply({error:'Nieobsługiwana operacja historii.'},405);
+   const data=JSON.parse(init?.body??'null');if(data?.action!=='import')return reply({error:'Wersja online przechowuje importowane logi w przeglądarce. Wykonawca CAD działa lokalnie.'},400);
+   return await write(async()=>{
+    const db=read(),saved=db.drafts[data.draft_id];if(!saved||saved.revision!==data.revision)return reply({error:'Wczytaj i zapisz bieżący draft przed importem logu.'},409);
+    const response=await nativeFetch('api/index?endpoint=process-report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({draft:saved.draft,draft_id:saved.id,revision:saved.revision,report:data.report})});
+    const result=await response.json();if(!response.ok)return reply(result,response.status);
+    db.processRuns??={};const old=db.processRuns[result.id];
+    if(old&&JSON.stringify(old)!==JSON.stringify(result))return reply({error:'ID przebiegu już ma inną treść.'},409);
+    if(!old&&Object.keys(db.processRuns).length>=100)throw Error('Limit 100 przebiegów w przeglądarce.');
+    db.processRuns[result.id]=result;localStorage.setItem(key,JSON.stringify(db));return reply(result);
+   });
+  }catch(e){return reply({error:e.name==='QuotaExceededError'?'Brak miejsca w przeglądarce. Zachowaj log JSON na dysku.':e.message},400);}
+ };
  const preferences=db=>{
   const items={};for(const [id,favorite]of Object.entries(db.favorites))items[id]={favorite,project_count:0,last_used:null};
   for(const draft of Object.values(db.drafts))for(const id of draft.used_parts??(draft.draft?.hardware??[]).map(r=>r.part_id)){items[id]??={favorite:false,project_count:0,last_used:null};items[id].project_count++;if(!items[id].last_used||draft.updated_at>items[id].last_used)items[id].last_used=draft.updated_at;}
@@ -11,6 +29,7 @@
  };
  window.fetch=async(input,init)=>{
   const url=new URL(typeof input==='string'?input:input.url,location.href),route=url.pathname.replace(/^\//,''),method=(init?.method??'GET').toUpperCase();
+  if(url.origin===location.origin&&(route==='process'||/^process\/runs?\/[a-f0-9]{32}$/.test(route)))return processRequest(route,method,init);
   if(url.origin!==location.origin||!['wizard/drafts','wizard/save','parts/preferences'].includes(route)&&!/^wizard\/drafts\/[a-f0-9]{32}$/.test(route))return nativeFetch(input,init);
   try{
    if(method==='GET'){

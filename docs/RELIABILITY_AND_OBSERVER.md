@@ -155,3 +155,102 @@ zmienionego dokumentu. PASS natywny na kopii lekkiego szkieletu: zmiana długoś
 wartości. Oryginał i aktywny kontekst bez zmian. Dowód:
 artifacts/overnight-20261024/catalog-cleanup-native/verification.json.
 PASS pełny harness: artifacts/verification/20261024T215741060210Z/results.json.
+
+
+## 31.10.2026 — rejestr wykonania zapisany w Studio (część ROC-56)
+
+Wdrożono `process_runs.py` i panel „Przebieg wykonania · SDK / AI” pod podglądem.
+Każdy przebieg jest osobnym, trwałym zapisem w tej samej SQLite co drafty,
+związanym z ID, rewizją i SHA treści draftu. Nie zmienia kontraktu draftu,
+nie zapisuje danych obserwacji w geometrii i nie parametryzuje liczby okuć.
+Odczyt/import/eksport logu JSON, lista historycznych przebiegów, filtr po
+pochodzeniu, wyszukiwanie części/etapu, powody interwencji i czasy operacji.
+
+### Co oznaczają liczniki
+
+- Operacja to nazwany krok roboczy, np. wstawienie elementu, regeneracja,
+  pomiar lub zapis. Nie oznacza pojedynczego wywołania COM ani liczby trójkątów.
+- `operation_id` ma kolejne próby. Start i wynik tej samej próby liczą się raz;
+  ponowienie pokazujemy osobno. Zakończone operacje to ostatnie udane wyniki.
+- `origin` wyznacza rozłączne grupy standard / AI / konstruktor / nieustalone.
+  `executor` jest drugą osią. 270 standard + 30 AI może nadal oznaczać 300 SDK.
+- Interwencja AI ma osobne ID, SKU, etap i krótki powód, np. brak mapy otworu.
+  Operacje AI wskazują jej ID. Jedna interwencja może dotyczyć 30 operacji;
+  nie oznacza to 30 osobnych decyzji lub wywołań modelu.
+- Nadrzędny czas etapu (`span`) nie wchodzi do licznika operacji ani sumy ich
+  czasów. Suma prób może różnić się od czasu zegarowego całego przebiegu.
+- Nieustalone pochodzenie pozostaje w mianowniku; pusty przebieg ma brak
+  procentu, nie 100% automatyzacji. Raportowanie jest deklaracją wykonawcy,
+  nie automatycznym dowodem autorstwa decyzji ani odbiorem CAD.
+
+### Uruchomienie pomiaru i integracja wykonawcy
+
+Zapisz draft. W panelu kliknij „Przygotuj pomiar” i skopiuj run_id.
+Przycisk zakłada rejestr; nie uruchamia IronCADa. Alternatywnie:
+
+```powershell
+Integracja/.venv/Scripts/python.exe scripts/studio_process_run.py start ID_DRAFTU 1 "T1 — wykonanie CAD"
+Integracja/.venv/Scripts/python.exe scripts/studio_process_run.py append RUN_ID zdarzenia.json
+Integracja/.venv/Scripts/python.exe scripts/studio_process_run.py finish RUN_ID completed
+Integracja/.venv/Scripts/python.exe scripts/studio_process_run.py export RUN_ID nowy_log.json
+```
+
+Żądanie wspólnego `scripts/run_t1_machining_job.py` może zawierać:
+
+```json
+{"studio_trace":{"run_id":"ID_PRZEBIEGU","origin":"standard","stage":"handles","part_id":"H7159"}}
+```
+
+Nowy element bez mapy: najpierw append zdarzenia `kind=intervention`,
+`operation_id=ID_INTERWENCJI`, `origin=ai`, `executor=agent`, `status=requested`,
+`reason` i `part_id`. Każde zdarzenie ma unikalny `event_id`, `stage` i
+opcjonalne `occurrence_id`. Wynik interwencji (resolved/failed) jest kolejnym
+zdarzeniem tego samego operation_id. W żądaniu wykonawcy ustaw origin=ai
+oraz intervention_id=ID_INTERWENCJI. Dopiero wtedy wolno przypisać operacje AI.
+
+`process_capture.py` mierzy wywołanie wykonawcy jako span i importuje szczegółowy
+`native_progress.jsonl` z jawnych zdarzeń native.create/regenerate/measure/save/reopen.
+Zachowuje SHA dowodu i ID wystąpień. Nie tworzy operacji z BOM ani z liczby części.
+Starszy helper bez śladu szczegółowego dostaje tylko pomiar całego etapu i jawny
+komunikat o braku szczegółów. Aby objąć inny wykonawca, trzeba przekazać to samo
+run_id i emitować ten protokół; nie wszystkie historyczne skrypty są zinstrumentowane.
+Agent poza tym przepływem nie jest wykrywany automatycznie. Nie wdrożono tu
+samodzielnego generowania/akceptacji map dla nieznanych części ani pomiaru tokenów/kosztu LLM.
+
+### Warstwa 3D, zapis i wersja online
+
+Zielony = standard, fioletowy = udział AI, bursztynowy = konstruktor,
+szary = nieustalone. Kolory używają dokładnego ID wystąpienia, nigdy podobieństwa
+SKU/nazwy. Brakujące ID są pokazane jako niedopasowane. Gdy przy części jest
+zarówno standard, jak i AI, kolor AI pokazuje jej udział; liczby pozostają per
+operacja. Zmiana draftu lub rewizji wyłącza historyczne kolory, zachowując log.
+Materiały podglądu są klonowane i przywracane; CAD i wspólne zasoby nie zmieniają się.
+
+W przygotowanej paczce Vercel można importować i eksportować log JSON; walidator
+jest bezstanowy, a zapis pozostaje w tej przeglądarce. To nie współdzielona baza
+logów online i nie dostęp przeglądarki do IronCADa. Nie wykonano publikacji tej
+zmiany na Vercelu. Lokalny zapis Studio jest w SQLite.
+
+### Weryfikacja i granice
+
+- 12 testów procesu PASS: 300/270/30 bez podwójnego liczenia, ponowienia,
+  nieustalone źródło, interwencje, granice rewizji/importu, atomowość partii,
+  częściowy ślad po błędzie, brak wymyślonych operacji, HTTP/session/origin.
+- Pełny harness offline `artifacts/verification/20261031T161004138899Z`: 7 grup PASS;
+  po dodaniu dodatkowych blokad i testu HTTP ponownie 12 testów procesu PASS.
+- `artifacts/process-runs-e2e/result.json`: panel, filtry, kolory modeli,
+  eksport/import, zapis/odczyt, wyłączenie starej warstwy i układ mobilny PASS.
+- `artifacts/process-cloud-e2e/result.json`: import/reload, odrzucenie innej
+  rewizji, izolacja przeglądarek na lokalnej paczce Vercel PASS.
+- Natywny CAD w tej zmianie: NOT RUN. Test adaptera używa kontrolowanego śladu;
+  nie przedstawia tych wyników jako nowego narysowania skrzyni w IronCADzie.
+- Przykład 270+30 jest mode=simulation na nowym draftcie, z jawną etykietą.
+
+
+Dla płyt warstwa używa `panel/<key ramy montażu>`, dla okuć `placement.items[].id`,
+dla konstrukcji `construction.items[].id`. Gdy native_progress ma inne ID,
+wykonawca przekazuje jawną `occurrence_map` w studio_trace. Brak takiej mapy
+nie uruchamia zgadywania po SKU. Niezarejestrowane obiekty są szare przy włączonej
+warstwie. Wyłączenie warstwy przywraca zwykły wygląd sklejki i okuć.
+
+Końcowa regresja: `artifacts/verification/20261031T162023509924Z` — wszystkie 7 grup PASS. Końcowe 12 prób procesu: `artifacts/process-runs-tests-final.log` — PASS.

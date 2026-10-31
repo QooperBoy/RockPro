@@ -26,7 +26,7 @@ def current_interop(folder):
     (folder/'interop-generation.json').write_text(json.dumps(evidence,indent=2),encoding='utf-8')
     if result.returncode:raise RuntimeError('Local interop generation failed; see interop-generation.json')
     return vendor
-def run(folder,source,request):
+def _run(folder,source,request):
     request=dict(request)
     if request.get('contract') in ('rockpro-t1-mounting-repair-v1','rockpro-t1-structure-v1'):
         from rockpro_cad.core_case.scene_structure import validate_t1_machining
@@ -90,6 +90,12 @@ def run(folder,source,request):
     print(json.dumps({k:v for k,v in result.items() if k!='data'},ensure_ascii=False,indent=2))
     if not result['passed']:raise RuntimeError('Native job failed')
     return result
+def run(folder,source,request):
+    from rockpro_cad.process_capture import capture
+    request=dict(request)
+    descriptor=request.pop('studio_trace',None)
+    with capture(descriptor,folder):
+        return _run(folder,source,request)
 if __name__=='__main__':
     sys.stdout.reconfigure(encoding='utf-8')
     run(sys.argv[1],sys.argv[2],json.loads(Path(sys.argv[3]).read_text(encoding='utf-8-sig')))

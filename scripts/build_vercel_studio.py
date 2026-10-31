@@ -29,7 +29,7 @@ def main():
         target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,target)
     package=ROOT/'Integracja/rockpro_cad';static=package/'reference_studio'
     # API has pure computation modules only: no project_store, executor or customer DB.
-    modules=['configurator.py','studio_review.py','studio_parts.py','supplier_parts.py','studio_requested_parts.py','studio_placement.py','studio_structure.py','studio_closures.py','studio_joints.py','source_parts.py','part_registry.py',
+    modules=['configurator.py','process_runs.py','studio_review.py','studio_parts.py','supplier_parts.py','studio_requested_parts.py','studio_placement.py','studio_structure.py','studio_closures.py','studio_joints.py','source_parts.py','part_registry.py',
              'core_case/t1_mounting.py','core_case/machining_rules.py','core_case/profile_rules.py']
     for name in modules:cp(package/name,out/'Integracja/rockpro_cad'/name)
     (out/'Integracja/rockpro_cad/__init__.py').write_text('',encoding='utf-8')
@@ -38,7 +38,7 @@ def main():
     cp(ROOT/'deploy/vercel/api/index.py',out/'api/index.py')
     names=['wizard.html','wizard.js','wizard.css','wizard3d.js','parts-picker.js','placement-editor.js','closure-editor.js','placement3d.js','structure3d.js','mesh-codec.js',
            'placement_math.mjs','preview_math.mjs','scene-controls.js','viewport-ui.js','studio-shell.js','studio-shell.css','part-preferences.js','part-preferences.css','favicon.svg',
-           'company-parts.html','company-parts.js','company-parts.css','style.css','cost-summary.js','cost_math.mjs','review-panel.js']
+           'company-parts.html','company-parts.js','company-parts.css','style.css','cost-summary.js','cost_math.mjs','review-panel.js','process-panel.js','process-panel.css']
     for name in names:cp(static/name,public/name)
     for name in ['three.module.min.js','three.core.min.js','OrbitControls.js','three-viewport-gizmo.js','LICENSE','three-viewport-gizmo.LICENSE','PROVENANCE.json']:
         cp(package/'viewer3d/vendor'/name,public/'vendor'/name)
