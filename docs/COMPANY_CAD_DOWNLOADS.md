@@ -46,3 +46,29 @@ Dowody bieżącej sesji: ignorowane `artifacts/company-cad-20261028/`.
 
 Testy offline: `Integracja/.venv/Scripts/python.exe scripts/test_company_cad.py`.
 Nowe pobranie nie jest automatyczną zgodą na publikację modeli lub push binariów.
+
+
+## Lista do Tomka — przygotowana 31.10.2026
+
+Zamknięto przygotowanie materiału do ROC-51: 16 pozycji do identyfikacji,
+35 rozbieżności kodów/konfiguracji w osobnej sekcji oraz sześć pytań o produkcję.
+Pakiet lokalny workspace: `raporty/Katalog_do_potwierdzenia_20261031/`.
+`PYTANIA_DO_TOMKA.html` jest czytelny w przeglądarce i nadaje się do wydruku;
+`ODPOWIEDZI_DO_UZUPELNIENIA.json` zachowuje stabilne ID, pola odpowiedzi i SHA źródła.
+Nie wysłano wiadomości i nie zmieniono firmowego Excela, manifestu ani mapowań.
+To stan danych z 28.10, nie nowy skan portali dostawców ani aktualizacja dostępu Adam Hall.
+
+Powtarzalne generowanie (nowy, nieistniejący katalog wyjściowy):
+
+```powershell
+Integracja/.venv/Scripts/python.exe scripts/prepare_catalog_questions.py MANIFEST.json NOWY_KATALOG --date 2026-10-31
+Integracja/.venv/Scripts/python.exe scripts/test_catalog_questions.py -v
+```
+
+Generator eksportuje wyłącznie dozwolone pola identyfikacyjne, bez cen, stanów,
+ścieżek prywatnych zasobów, klientów i modeli. Warianty oraz powtórzone kody
+zachowują osobne ID; żaden kandydat nie otrzymuje zatwierdzenia automatycznie.
+Walidacja pakietu: 51 unikalnych rekordów, zgodność HTML/JSON, brak zmiany SHA
+manifestu i sześć testów generatora PASS. Natywne CAD: NOT RUN, nie dotyczy.
+
+Pełny harness offline: `artifacts/verification/20261031T152508363894Z` — siedem grup PASS. Pierwsze próby w sandboxie odmówiły dostępu do Windows Temp; powtórzenie w standardowym środowisku Windows przeszło.
