@@ -1,3 +1,18 @@
+## Aktualna decyzja użytkownika — 31.10.2026
+
+**Nie parametryzuj liczby wystąpień okuć w IronCADzie.** Dotyczy uchwytów,
+zawiasów, zamków/zatrzasków, narożników i podobnych elementów. Nie dodawaj pól
+`*_Liczba`, szyków sterowanych taką liczbą ani automatycznego dodawania/usuwania
+okuć po zmianie gabarytów. Wcześniejsze polecenie użytkownika dotyczące tego
+mechanizmu jest wycofane; opisy R003–R005 są historią, nie wymaganiem dalszego rozwoju.
+
+Parametryzuj wymiary konstrukcji, położenie, rozstaw, ścianę/sekcję i powiązane
+wycięcia istniejących okuć. Zmiana zestawu części jest świadomą edycją układu
+przez konstruktora i nową rewizją projektu. Sprawdzaj, czy wybrany zestaw mieści
+się na ścianie; przy braku miejsca zgłoś konflikt, nie zmieniaj jego liczby.
+BOM nadal liczy rzeczywiste wystąpienia. Ilość zamawianych skrzyń w zleceniu/ERP
+pozostaje osobną daną. Nie cofaj innych usprawnień montażu ani modułu podwozia.
+
 # Indywidualny proces konfiguracji skrzyni — wymagania i realizacja
 
 27.10.2026. Wymagania użytkownika: jedenaście etapów, od typu konstrukcji do
@@ -236,3 +251,24 @@ klienta/zlecenie/rewizję. Nie są potrzebne hasła ani tokeny w rozmowie.
 
 Weryfikacja dokumentu: przegląd aktualnych modułów i kontraktów, audyt repozytorium
 oraz odnośników. Bez zmian runtime, zapisów CAD i dostępu do firmowego Excela.
+
+## Docelowy przebieg pracy konstruktora — uzgodnienie 31.10.2026
+
+1. Zlecenie: klient, urządzenie/ładunek, wymagane wnętrze, liczba skrzyń i termin.
+2. Studio: rodzina/wzorzec, sekcje i otwieranie, materiały, wyposażenie wnętrza.
+3. Świadomy wybór i rozmieszczenie całych okuć z biblioteki; liczba wystąpień
+   wynika z zatwierdzonego układu, nie z parametru ilości w IronCADzie.
+4. Kontrola draftu: braki danych, obrysy, prześwity, złącza i odsyłacze do poprawek.
+5. Wersjonowany pakiet projektu do lokalnego wykonawcy Python/ICAPI. Wstępne
+   obliczenia przed CAD, jeden wykonawca, nowa kopia i dziennik operacji.
+6. IronCAD: natywne części i obróbki, korekty wymiarów/położenia, kontrola
+   konstruktora. Zmiana zestawu okuć wraca do jawnej edycji i nowej rewizji.
+7. Akceptacja konkretnej rewizji CAD i BOM. Rysunki/listy cięcia/formaty maszynowe
+   według potwierdzonego procesu firmy, nie domysłów na podstawie podglądu.
+8. Zlecenie produkcyjne: zapotrzebowanie × liczba skrzyń, koszt i braki,
+   rezerwacja, kontrolowana wymiana z lokalnym Excelem, wydanie i zwroty.
+9. Archiwum: źródło, draft, CAD, eksporty, snapshoty, odbiór i historia rewizji.
+
+To scenariusz docelowy. Uogólniony transfer każdej rodziny, pełna walidacja
+montażu, dokumentacja produkcyjna i zapis do firmowego Excela wymagają domknięcia.
+AI pomaga przy nieznanych przypadkach, nie prowadzi ręcznie każdej operacji CAD.

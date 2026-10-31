@@ -1,3 +1,8 @@
+> Aktualizacja 31.10.2026: użytkownik wycofał parametryzację liczby okuć.
+> Pola liczności opisane poniżej dotyczą zachowanych modeli historycznych.
+> Nie rozwijać ani nie przenosić tego mechanizmu do nowych modeli. Wymiary,
+> położenie i powiązane wycięcia pozostają w zakresie. Patrz CASE_DEFAULTS.md.
+
 # Hisense R003 — liczba bocznych okuć
 
 Rozszerzenie R002 na nowej kopii aktualnego modelu użytkownika. Snapshot

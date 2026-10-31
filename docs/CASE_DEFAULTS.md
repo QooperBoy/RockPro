@@ -1,3 +1,18 @@
+## Aktualna decyzja użytkownika — 31.10.2026
+
+**Nie parametryzuj liczby wystąpień okuć w IronCADzie.** Dotyczy uchwytów,
+zawiasów, zamków/zatrzasków, narożników i podobnych elementów. Nie dodawaj pól
+`*_Liczba`, szyków sterowanych taką liczbą ani automatycznego dodawania/usuwania
+okuć po zmianie gabarytów. Wcześniejsze polecenie użytkownika dotyczące tego
+mechanizmu jest wycofane; opisy R003–R005 są historią, nie wymaganiem dalszego rozwoju.
+
+Parametryzuj wymiary konstrukcji, położenie, rozstaw, ścianę/sekcję i powiązane
+wycięcia istniejących okuć. Zmiana zestawu części jest świadomą edycją układu
+przez konstruktora i nową rewizją projektu. Sprawdzaj, czy wybrany zestaw mieści
+się na ścianie; przy braku miejsca zgłoś konflikt, nie zmieniaj jego liczby.
+BOM nadal liczy rzeczywiste wystąpienia. Ilość zamawianych skrzyń w zleceniu/ERP
+pozostaje osobną daną. Nie cofaj innych usprawnień montażu ani modułu podwozia.
+
 # Ustalenia użytkownika — aktualizacja 26.10.2026
 
 Sklejka: RGB(64,128,128), #408080, ICAPI COLORREF 0x808040, zmierzone z T_1.

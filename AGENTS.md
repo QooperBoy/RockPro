@@ -1,3 +1,18 @@
+## Aktualna decyzja użytkownika — 31.10.2026
+
+**Nie parametryzuj liczby wystąpień okuć w IronCADzie.** Dotyczy uchwytów,
+zawiasów, zamków/zatrzasków, narożników i podobnych elementów. Nie dodawaj pól
+`*_Liczba`, szyków sterowanych taką liczbą ani automatycznego dodawania/usuwania
+okuć po zmianie gabarytów. Wcześniejsze polecenie użytkownika dotyczące tego
+mechanizmu jest wycofane; opisy R003–R005 są historią, nie wymaganiem dalszego rozwoju.
+
+Parametryzuj wymiary konstrukcji, położenie, rozstaw, ścianę/sekcję i powiązane
+wycięcia istniejących okuć. Zmiana zestawu części jest świadomą edycją układu
+przez konstruktora i nową rewizją projektu. Sprawdzaj, czy wybrany zestaw mieści
+się na ścianie; przy braku miejsca zgłoś konflikt, nie zmieniaj jego liczby.
+BOM nadal liczy rzeczywiste wystąpienia. Ilość zamawianych skrzyń w zleceniu/ERP
+pozostaje osobną daną. Nie cofaj innych usprawnień montażu ani modułu podwozia.
+
 - R005 — [docs/TELEVISION_WALL_MOUNTS.md](docs/TELEVISION_WALL_MOUNTS.md):
   przenośny rząd ma ścianę/sekcję i wspólną ramę dla okucia, sklejki i profili.
   Sam obrót okucia lub przesunięcie starego otworu nie zmienia właściciela
@@ -43,13 +58,12 @@
   Strony określaj w stałej ramie projektu, nie względem kamery. Nieustalone role
   jawnie oznaczaj „do identyfikacji”; nie nadawaj domyślnie pozornej identyfikacji.
 
-- Wymaganie konstruktora 29.10.2026: większość elementów wymaga parametrów
-  montażowych, nie tylko zależności od gabarytów. Zamki/zawiasy: liczba, linia
-  złącza, rozstaw i odsunięcia. Uchwyty: liczba na ścianę, ściana/sekcja, pozycja,
+- Wymaganie konstruktora 29.10.2026 (liczność wycofana 31.10): większość elementów wymaga parametrów
+  montażowych, nie tylko zależności od gabarytów. Zamki/zawiasy: linia
+  złącza, rozstaw i odsunięcia. Uchwyty: ściana/sekcja, pozycja,
   wysokość, rozstaw i symetria; orientacja, gdy dopuszcza ją montaż.
   Polski opis, jednostka, zakres i zgodność ze sceną są obowiązkowe. Okucie,
-  jego wycięcie i przerwa w profilu mają wspólną kotwę. Zmiana liczby oznacza
-  przebudowę części i obróbek — sam liczbowy wpis w tabeli nie realizuje funkcji.
+  jego wycięcie i przerwa w profilu mają wspólną kotwę. Zmiana zestawu okuć jest jawną edycją układu, nie parametrem liczby.
   Nie skaluj SKU. Weryfikuj zmianę montażu niezależnie od gabarytów i po otwarciu.
 
 - Prototyp telewizyjny 2027: [docs/TELEVISION_PARAMETRIC_PROTOTYPE.md](docs/TELEVISION_PARAMETRIC_PROTOTYPE.md).
@@ -165,7 +179,7 @@ Nowe projekty: stosuj [docs/CASE_DEFAULTS.md](docs/CASE_DEFAULTS.md): zielonkawa
 - Przejścia stanów paneli Studio mają być płynne, krótkie i spójne po obu stronach; zwykły resize bez opóźnień. Respektuj prefers-reduced-motion i nie kolejkuj przerwanych animacji.
 
 
-## Wymagania montażowe 30.10.2026: liczność i podwozie
+## Historyczne wymagania 30.10.2026: liczność wycofana 31.10; podwozie aktualne
 
 - Liczba okuć wynika z dostępnego miejsca na konkretnej ścianie i sekcji:
   `n * szerokość_montażowa + (n - 1) * odstęp + margines_lewy + margines_prawy <= długość_dostępna`.
