@@ -1,3 +1,11 @@
+## Nowy deweloper lub agent — 03.11.2026
+
+Zacznij od [docs/KUBA_HANDOVER.md](docs/KUBA_HANDOVER.md), następnie tego pliku
+i [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md). Handover rozdziela główną gałąź,
+osobny tor T2, zasoby prywatne, podgląd Studio i natywne wykonanie CAD.
+Nie używaj starego main jako aktualnego stanu; brak prywatnego pakietu danych
+nie upoważnia do tworzenia sztucznych manifestów ani publikowania modeli klienta.
+
 ## Rejestr przebiegu Studio — 31.10.2026
 
 Przy nowych wykonaniach zapisuj pochodzenie decyzji oddzielnie od wykonawcy.

@@ -1,5 +1,11 @@
 # RockPro CAD / Studio
 
+**Pierwsze uruchomienie przez Kubę lub nowego agenta AI:**
+[aktualna instrukcja przekazania — 03.11.2026](docs/KUBA_HANDOVER.md).
+Zawiera mapę kodu, uruchomienie Studio, paczki danych z SHA, parametry CAD,
+testy, ograniczenia i prompt pierwszej sesji. Zacznij od tej instrukcji;
+starsze opisy poniżej zachowują kontekst wcześniejszych wydań.
+
 **Demo dla Tomka:** [rockpro-studio.vercel.app](https://rockpro-studio.vercel.app).
 Konfigurator, podgląd 3D i zdjęcia producentów. Drafty oraz ulubione są zapisywane
 tylko w przeglądarce; projekt przekaż przez eksport/import JSON. Bez firmowej bazy,
@@ -28,11 +34,11 @@ przez części i ich montaż, do kontrolowanego projektu IronCAD, snapshotu
 oraz zestawienia materiałów i firmowego Excela. Obliczenia mają wykonywać
 skrypty; AI pomaga w propozycjach i wyjątkach przez te same operacje.
 
-**Stan: 27.10.2026 — prototyp, bez odbioru produkcyjnego.** Aktualne Studio
+**Stan przekazania: 03.11.2026 — prototyp, bez odbioru produkcyjnego.** Aktualne Studio
 jest na gałęzi `codex/roc42-catalog-continuation`. `main` zawiera wcześniejszą
 integrację T1/T2; ten push nie scala ani nie nadpisuje innych gałęzi.
 
-## Start dla udreka13
+## Start dla Kuby / udreka13
 
 Przyjmij zaproszenie do prywatnego repozytorium i pobierz właściwą gałąź:
 
@@ -81,7 +87,7 @@ nie uruchomisz pełnego Studio z samego klona; poproś prowadzącego o paczki.
 Nie zastępuj ich sztucznymi źródłami ani nie commituj modeli klienta.
 
 Serwer wypisze własny adres `http://127.0.0.1:<port>/<sesja>/` i otworzy
-przeglądarkę. Z galerii wybierz **Nowa konstrukcja · kreator 1–5**.
+przeglądarkę. Z galerii przejdź do kreatora.
 Możesz też dopisać `wizard.html` do adresu sesji. Adres z komputera autora
 nie zadziała na Twoim komputerze. Zatrzymanie serwera: Ctrl+C w jego terminalu.
 
@@ -93,7 +99,7 @@ nie zadziała na Twoim komputerze. Zatrzymanie serwera: Ctrl+C w jego terminalu.
 | Krok 1 | Dokładnie trzy typy: Skrzynia, Szafa, Skrzynia 3-elementowa; brak podtypów i wariantu dwojga drzwi |
 | Krok 2 | Skrzynia: wieko na zawiasach albo zdejmowane. Szafa: jedna przednia powłoka otwierana lub zdejmowana. Typ 3-elementowy: zdejmowany przód i góra; współpraca pokryw i zależności otwierania |
 | Krok 3 | Wymiary wnętrza korpusu, grubość sklejki, wysokość/głębokość pokryw, aktualizowany schemat 3D. Przód wariantu 3-elementowego automatycznie licuje z górą |
-| Krok 4 | Baza 14 pozycji i opcjonalny pakiet innych projektów (lokalnie +39, razem 53); rendery, kategorie, filtr pochodzenia i wybór wersjonowanych definicji |
+| Krok 4 | Katalog 265 rekordów firmowych, definicje bazowe, opcjonalne części źródłowe i 81 definicji wariantów producenta; rendery, kategorie, filtry i wersjonowane definicje. Rekord katalogu nie oznacza gotowego montażu CAD |
 | Krok 5 | Płynny drag and drop, obrót środkowym przyciskiem, 1–16 uchwytów/ściankę, symetria, równe rzędy zawiasów na styku sekcji, wstępne ostrzeżenia i zapis |
 | Draft | Zapis/odczyt w SQLite, historia rewizji, konflikt starszego zapisu, odzyskiwanie przeglądarki oraz JSON. Format aktualny: `rockpro.configurator/3`; stare formaty są zachowane i konwertowane jawnie jako nowe |
 | Dotychczasowy dodatek | C# / WinForms, Python MCP, karty projektów, układ, snapshoty i ograniczone operacje na znanym szkielecie; pełne prototypy CAD to osobny tor od Studio |

@@ -1,5 +1,8 @@
 # RockPro CAD
 
+For first-time onboarding, read [the current Kuba/AI handover](../docs/KUBA_HANDOVER.md).
+It identifies the working branch, private asset packages, startup and known gaps.
+
 Read [AGENTS.md](../AGENTS.md) and [docs/DEVELOPMENT.md](../docs/DEVELOPMENT.md). They define the scope, verification commands and CAD invariants. Use the actual .NET Framework/WinForms compiler boundary, not a modern web template.
 
 For feature or architecture work, read [rockpro-scope-check](../.agents/skills/rockpro-scope-check/SKILL.md). Surface a concrete recovery prompt when scope expands or evidence is missing; continue authorized work that is not blocked. Before handoff, use [rockpro-verification](../.agents/skills/rockpro-verification/SKILL.md).

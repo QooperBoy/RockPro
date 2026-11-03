@@ -1,0 +1,47 @@
+{
+  "created_on": "2026-11-03",
+  "delivery": "Separate private channel; not Git assets",
+  "archives": [
+    {
+      "bytes": 201157356,
+      "uncompressed_bytes": 430331054,
+      "files": 845,
+      "sha256": "966e688ac4508f425eaf31cb7d8c824f0569902637b68f9c45268520168437d6",
+      "crc": true,
+      "all_entry_sha256": true,
+      "file": "RockPro_CZESCI_20261103.zip"
+    },
+    {
+      "bytes": 2661013139,
+      "uncompressed_bytes": 3335023931,
+      "files": 544,
+      "sha256": "a068f28fb3fc643681e4203b7f0cc1930f7aa30ed90167a572e4b59948cf254b",
+      "crc": true,
+      "all_entry_sha256": true,
+      "file": "RockPro_MODELE_20261103.zip"
+    },
+    {
+      "file": "RockPro_KOD_AI_KATALOG_20261103.zip",
+      "bytes": 6171081,
+      "sha256": "63b4fa2d4bc743647fe995218815cea4f62581099efbcb45f02b84ec15fcaa39",
+      "note": "Historical code snapshot before onboarding push; prefer Git for latest source."
+    }
+  ],
+  "model_groups": 8,
+  "input_ics": 36,
+  "parametric_families": 6,
+  "missing_parametric_families": [
+    "hoists",
+    "lighting"
+  ],
+  "constructor_approved": false,
+  "native_cad_retested_during_packaging": false,
+  "studio_smoke": {
+    "passed": true,
+    "company_records": 265,
+    "entries_with_mesh": 135,
+    "reference_previews": 7,
+    "sample_mesh_fetch": true,
+    "draft_save": true
+  }
+}
