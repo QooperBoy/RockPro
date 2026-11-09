@@ -1,0 +1,2391 @@
+{
+  "snapshot_date": "2026-11-09",
+  "scope": "Own local source snapshots only; no CAD inputs, databases, rendered reports or downloaded dependencies. Identical code already tracked is omitted. Historical code is not the runtime entry point.",
+  "files": [
+    {
+      "source": "workspace/narzedzia/audyt_transferu.py",
+      "file": "tools/workspace/narzedzia/audyt_transferu.py",
+      "sha256": "31b95c306ed2593a5aafdf3428c50029e1db575dd3054ff2004d1a5f96ee02f1"
+    },
+    {
+      "source": "workspace/narzedzia/finalizuj_paczki.py",
+      "file": "tools/workspace/narzedzia/finalizuj_paczki.py",
+      "sha256": "e0c4ae97a38a52f01b431ebd3dedd2cd5f3426179e8e0d68589d94ba5ef9ce78"
+    },
+    {
+      "source": "workspace/narzedzia/importuj_wzorce.py",
+      "file": "tools/workspace/narzedzia/importuj_wzorce.py",
+      "sha256": "e3def1f79fc0d9458bff2eaacb12428c8ead997579399d902d5d9d24c54a1787"
+    },
+    {
+      "source": "workspace/narzedzia/Install-RockPro.ps1",
+      "file": "tools/workspace/narzedzia/Install-RockPro.ps1",
+      "sha256": "02c6999f099119c54332f8a4d0515fbc15ebe5391ef2bd2487c7f80f758448a9"
+    },
+    {
+      "source": "workspace/narzedzia/spakuj_czesci_modele.py",
+      "file": "tools/workspace/narzedzia/spakuj_czesci_modele.py",
+      "sha256": "3bc75479e9bbe8609f230260469aa0d3fa27030bdc660f742e0c1ee5c846f1c6"
+    },
+    {
+      "source": "workspace/narzedzia/spakuj_kod_ai.py",
+      "file": "tools/workspace/narzedzia/spakuj_kod_ai.py",
+      "sha256": "2fe6e77812be1da03e40900c1c33f5f727e64a585a45a5ecc2fb1f3f111e89d5"
+    },
+    {
+      "source": "workspace/narzedzia/utworz_mape_folderow.py",
+      "file": "tools/workspace/narzedzia/utworz_mape_folderow.py",
+      "sha256": "a575d5e6b1f50c2540002295f77b80eee31d39ebf1d6573b7b866c4e8dad67a8"
+    },
+    {
+      "source": "workspace/narzedzia/zloz_przekazanie.py",
+      "file": "tools/workspace/narzedzia/zloz_przekazanie.py",
+      "sha256": "5092ded30df4154bfa7f36a29bd3e3a970898718e6554ffcefb61ceae3864e1c"
+    },
+    {
+      "source": "preserved-deployment/audit_assembly.py",
+      "file": "legacy/local-code/preserved-deployment/audit_assembly.py",
+      "sha256": "0c8477a45763bc36d2c9f6735fb707e1a9f1142e9946c553126b5eb16cb9a244"
+    },
+    {
+      "source": "preserved-deployment/audit_clean_skeleton_readonly.py",
+      "file": "legacy/local-code/preserved-deployment/audit_clean_skeleton_readonly.py",
+      "sha256": "147db0a5b491550580f652424fc82dd07bced95f0f13f8a251821910196250fa"
+    },
+    {
+      "source": "preserved-deployment/audit_native_table_live.py",
+      "file": "legacy/local-code/preserved-deployment/audit_native_table_live.py",
+      "sha256": "052a48d7a0c227e589e412990957749f309db43321405597090d15e841431290"
+    },
+    {
+      "source": "preserved-deployment/build_clean_skeleton.py",
+      "file": "legacy/local-code/preserved-deployment/build_clean_skeleton.py",
+      "sha256": "a0c365e5cbbaf5163acdf5499de56c296638f8e0da06159281a2be171dc8f33b"
+    },
+    {
+      "source": "preserved-deployment/build_wholecase_manifest.py",
+      "file": "legacy/local-code/preserved-deployment/build_wholecase_manifest.py",
+      "sha256": "a0a595f102168aad9d58b3adeb766c8c95133f5675c668a7a137815a83826224"
+    },
+    {
+      "source": "preserved-deployment/capture_cutouts.py",
+      "file": "legacy/local-code/preserved-deployment/capture_cutouts.py",
+      "sha256": "b3e13fcac5e6c26fdbbae34bc8e8b597e2c44cbb3a21babe218a2fd99a13730a"
+    },
+    {
+      "source": "preserved-deployment/capture_legacy_panels.py",
+      "file": "legacy/local-code/preserved-deployment/capture_legacy_panels.py",
+      "sha256": "8707aa87f97b508344e74983fa35ecdbe36a30d2a7d2f559f19534da73ae93d8"
+    },
+    {
+      "source": "preserved-deployment/check_baseline_regeneration.py",
+      "file": "legacy/local-code/preserved-deployment/check_baseline_regeneration.py",
+      "sha256": "d70b53311f08e3a5db42947a616099bd40dec01892bdc7e4737046fab389bc25"
+    },
+    {
+      "source": "preserved-deployment/create_legacy_probe.py",
+      "file": "legacy/local-code/preserved-deployment/create_legacy_probe.py",
+      "sha256": "2ccc77342344849a14dcd546eecfab0f847a699e8042c136e732d1800a437cc3"
+    },
+    {
+      "source": "preserved-deployment/diagnose_cut_locks.py",
+      "file": "legacy/local-code/preserved-deployment/diagnose_cut_locks.py",
+      "sha256": "a344b8c9de94bd09554a01db5fc2cae747f0e073d728001199bee4a2db2ca4e7"
+    },
+    {
+      "source": "preserved-deployment/Dokumentacja/build_document.py",
+      "file": "legacy/local-code/preserved-deployment/Dokumentacja/build_document.py",
+      "sha256": "d917aa2aa922aed9b37459ed06bb4cfb9a99d6b5af92a3ac84220921fdb7809d"
+    },
+    {
+      "source": "preserved-deployment/Dokumentacja/build_pdf.py",
+      "file": "legacy/local-code/preserved-deployment/Dokumentacja/build_pdf.py",
+      "sha256": "db1384994ef51764158bfa9219f1d12d330d72b4b574091ad01a276c1ac656d2"
+    },
+    {
+      "source": "preserved-deployment/finish_skeleton.py",
+      "file": "legacy/local-code/preserved-deployment/finish_skeleton.py",
+      "sha256": "77625a97708b28c26e529689c7373816d08880ae807700033ff014a477c8890e"
+    },
+    {
+      "source": "preserved-deployment/inspect_auxiliary.py",
+      "file": "legacy/local-code/preserved-deployment/inspect_auxiliary.py",
+      "sha256": "b7053003f949e18e6d359a53545737bb2ae04251ac800db372ef20e1bc45535c"
+    },
+    {
+      "source": "preserved-deployment/inspect_dll_registration.py",
+      "file": "legacy/local-code/preserved-deployment/inspect_dll_registration.py",
+      "sha256": "2374307bb3d6c1fd660659efb68b28ea6e103df1ef27778b72af4cecea8a08d8"
+    },
+    {
+      "source": "preserved-deployment/inspect_model.py",
+      "file": "legacy/local-code/preserved-deployment/inspect_model.py",
+      "sha256": "6c6576caf12ccec9660462a4211f93c500f6ecf539db2bb165325c7b3996a606"
+    },
+    {
+      "source": "preserved-deployment/inspect_target.py",
+      "file": "legacy/local-code/preserved-deployment/inspect_target.py",
+      "sha256": "c3ada9dd4bcab61ca2504951910e1d2c6b092761d9bf870f49cff9bce5331700"
+    },
+    {
+      "source": "preserved-deployment/inspect_wholecase_features.py",
+      "file": "legacy/local-code/preserved-deployment/inspect_wholecase_features.py",
+      "sha256": "64089f86ed5eef1686429e5d296a4b97c390ccb300704a35f2605fe405d36f81"
+    },
+    {
+      "source": "preserved-deployment/install_wholecase_links.py",
+      "file": "legacy/local-code/preserved-deployment/install_wholecase_links.py",
+      "sha256": "308d30c68dc4f3536d82343b27573cf907e2e26da21cac567fe30679ff8388c0"
+    },
+    {
+      "source": "preserved-deployment/ironcad_adapter.py",
+      "file": "legacy/local-code/preserved-deployment/ironcad_adapter.py",
+      "sha256": "2a610b07f0d20dfd7666978c8ed94e68570093c128454a9075ddccd78b981d59"
+    },
+    {
+      "source": "preserved-deployment/native_drop_probe.py",
+      "file": "legacy/local-code/preserved-deployment/native_drop_probe.py",
+      "sha256": "7efd468df2334fa1a580e8652873b18fcebc786ddf848becc5c3030a45313527"
+    },
+    {
+      "source": "preserved-deployment/native_skeleton_probe.py",
+      "file": "legacy/local-code/preserved-deployment/native_skeleton_probe.py",
+      "sha256": "0f1298a1cbf5800fde0da2495ab102336d828109d84009013e00a7964dfa0a40"
+    },
+    {
+      "source": "preserved-deployment/native_skeleton_probe2.py",
+      "file": "legacy/local-code/preserved-deployment/native_skeleton_probe2.py",
+      "sha256": "b7b2438716593abb9d71f5aaf30888afbbe2769a06e7f83536bad308f42e154f"
+    },
+    {
+      "source": "preserved-deployment/open_after_restart.py",
+      "file": "legacy/local-code/preserved-deployment/open_after_restart.py",
+      "sha256": "cb4b66d602ec37cb4d3d254bf8bbfdd76853a1973dd6608a3ddf7d8ca0a37c9d"
+    },
+    {
+      "source": "preserved-deployment/parameter_panel.py",
+      "file": "legacy/local-code/preserved-deployment/parameter_panel.py",
+      "sha256": "63c4ce7c910413286db9b1959e867af669061d1d4d61dbe0ce801360eac77293"
+    },
+    {
+      "source": "preserved-deployment/prepare_wholecase.py",
+      "file": "legacy/local-code/preserved-deployment/prepare_wholecase.py",
+      "sha256": "101589687ccb7bbb15180c1314290445daaef36defcad8757336f9c68ea1a715"
+    },
+    {
+      "source": "preserved-deployment/probe_api.py",
+      "file": "legacy/local-code/preserved-deployment/probe_api.py",
+      "sha256": "effcac3e24f8c6f7401109f30763614d8d148e300fb040c2e0e895ae939e5eb0"
+    },
+    {
+      "source": "preserved-deployment/probe_catalog_legacy.py",
+      "file": "legacy/local-code/preserved-deployment/probe_catalog_legacy.py",
+      "sha256": "b04ef70d766866e8fc013457ab6c6f2fac67ccab2204c502bb53931de1b6185c"
+    },
+    {
+      "source": "preserved-deployment/probe_current.py",
+      "file": "legacy/local-code/preserved-deployment/probe_current.py",
+      "sha256": "69fc7c34c71ffd51e5c6de1bf19fcc7d8c970149744cbd8cc9b24c5b870c5f45"
+    },
+    {
+      "source": "preserved-deployment/probe_dll_exports.py",
+      "file": "legacy/local-code/preserved-deployment/probe_dll_exports.py",
+      "sha256": "80ccb41883762e1e2a545d61f88bf2a2c25a8d6d782936d0f673a0ba13866477"
+    },
+    {
+      "source": "preserved-deployment/probe_document.py",
+      "file": "legacy/local-code/preserved-deployment/probe_document.py",
+      "sha256": "ca44b362895767706ff1da66f13e18ad74ae9fb4ceb34c9702cc0d20e2d15044"
+    },
+    {
+      "source": "preserved-deployment/probe_elevation.py",
+      "file": "legacy/local-code/preserved-deployment/probe_elevation.py",
+      "sha256": "8d845781219c7da44f3e4cf4547d74e88d49859e1eb65974959565807f41fdf1"
+    },
+    {
+      "source": "preserved-deployment/probe_legacy.py",
+      "file": "legacy/local-code/preserved-deployment/probe_legacy.py",
+      "sha256": "d03985c8fd99cd4e50f0eeaa679a1a47fc5241c190f3500a72eff421a8f4ea6f"
+    },
+    {
+      "source": "preserved-deployment/probe_legacy_bbox.py",
+      "file": "legacy/local-code/preserved-deployment/probe_legacy_bbox.py",
+      "sha256": "bf70b4934aad68431130759919aa470997352d1fdb03e890d4365ef3ac0f2e4b"
+    },
+    {
+      "source": "preserved-deployment/probe_motion.py",
+      "file": "legacy/local-code/preserved-deployment/probe_motion.py",
+      "sha256": "9a9b8814728b6c901f7d6850294b1317de169624fa74263b85007e0027a470ef"
+    },
+    {
+      "source": "preserved-deployment/probe_native_links.py",
+      "file": "legacy/local-code/preserved-deployment/probe_native_links.py",
+      "sha256": "ad50c94c5b1e57d1e110691ec7d329dcedad28b89280a4d0ccc84bc5fb77d885"
+    },
+    {
+      "source": "preserved-deployment/probe_registration.py",
+      "file": "legacy/local-code/preserved-deployment/probe_registration.py",
+      "sha256": "9ef9b153c101df947708440b27fac07ff4a024bdf82413871b62e08720439c8a"
+    },
+    {
+      "source": "preserved-deployment/probe_rot.py",
+      "file": "legacy/local-code/preserved-deployment/probe_rot.py",
+      "sha256": "041503acc32483fb72abface1aa33ee3c4b0808a7de40631d15c8391145ffd31"
+    },
+    {
+      "source": "preserved-deployment/probe_typerefs.py",
+      "file": "legacy/local-code/preserved-deployment/probe_typerefs.py",
+      "sha256": "95492c2a5861eb76cab8a2213223b3356d1c79239ab6b1c6f208a2ff6073d6c8"
+    },
+    {
+      "source": "preserved-deployment/probe_vendor_registration.py",
+      "file": "legacy/local-code/preserved-deployment/probe_vendor_registration.py",
+      "sha256": "1730872332b5d0386fc3e629c7607d27158bb589ff33df32e76384f5d4fe3468"
+    },
+    {
+      "source": "preserved-deployment/read_legacy_panels.py",
+      "file": "legacy/local-code/preserved-deployment/read_legacy_panels.py",
+      "sha256": "125c820c9caaa271aa575669c9dfc62cd58aa79c7ac0403453308eda05cf08e7"
+    },
+    {
+      "source": "preserved-deployment/read_skeleton_copy.py",
+      "file": "legacy/local-code/preserved-deployment/read_skeleton_copy.py",
+      "sha256": "72a6ab83cbc13789331b0dc8b2992d69a704db6b1bb143dbb3743cf24563bb39"
+    },
+    {
+      "source": "preserved-deployment/recognize_skeleton.py",
+      "file": "legacy/local-code/preserved-deployment/recognize_skeleton.py",
+      "sha256": "42a1b2fe54f96b09757c1bdad9cc71d4aaed39fe3b37613731c42dc0a0aef086"
+    },
+    {
+      "source": "preserved-deployment/refresh_skeleton_dependencies.py",
+      "file": "legacy/local-code/preserved-deployment/refresh_skeleton_dependencies.py",
+      "sha256": "9058665037d2ef2f23cd5d3f1e5a3b6ca55735f8d10dd384ba3783b03da1bc6e"
+    },
+    {
+      "source": "preserved-deployment/register_typelib_user.py",
+      "file": "legacy/local-code/preserved-deployment/register_typelib_user.py",
+      "sha256": "1a44ae3124f7795dd62ccbc5a8e7ac55262cc6957058727406104d7c54af317f"
+    },
+    {
+      "source": "preserved-deployment/reopen_skeleton_test.py",
+      "file": "legacy/local-code/preserved-deployment/reopen_skeleton_test.py",
+      "sha256": "ab2f5b249b3eeca0b8a6270eccb9d939d0050da6130fea1996d1f29ad754a0f5"
+    },
+    {
+      "source": "preserved-deployment/restart_saved_copy.py",
+      "file": "legacy/local-code/preserved-deployment/restart_saved_copy.py",
+      "sha256": "f7611605c5b4debf554cea560ac16e3f4c58e1bc7dd4c5ec592a44aa768ab8d2"
+    },
+    {
+      "source": "preserved-deployment/retry_registration.py",
+      "file": "legacy/local-code/preserved-deployment/retry_registration.py",
+      "sha256": "5e6ba15c44c1e234d587aa0db59154bed89503d9a5b05b04311dc9fe4a70f318"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/acceptance_live.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/acceptance_live.py",
+      "sha256": "4e289c30322441008ce217d4c32b742c04992f3a3d1cb0d1ae79b531278c6f3b"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/addin/Build.ps1",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/addin/Build.ps1",
+      "sha256": "fe4dcfb4e3515ad8dc933b1456c03f5ef191e387bc014f1e61b8a26cd7f56e92"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/addin/CasePlanForm.cs",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/addin/CasePlanForm.cs",
+      "sha256": "61ab84668abcbdf5a94ddd5afa2f89eb01aad36f927c554f2f199f351e556d2d"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/addin/Install-User.ps1",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/addin/Install-User.ps1",
+      "sha256": "35b3d5952af6fad4b528c32864eae4994ed7791f045d8509aeb0d58b7ce65e2c"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/addin/LayoutForm.cs",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/addin/LayoutForm.cs",
+      "sha256": "e0517ee254f91de5acebc8533e0b3cf972f2548d1e80c14816241af2129c7844"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/addin/Repair-IcApi.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/addin/Repair-IcApi.py",
+      "sha256": "e7818aad7a44d0c391cdb4af3c8f8a72c3cb75dde1abe76f541218b0af0cac50"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/addin/RockProAddin.cs",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/addin/RockProAddin.cs",
+      "sha256": "191d2f6a28b78f7aeb5e933d98a3ebd9ccdea5b7969bd8ac9c0e36758ca9d0c6"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/addin/RockProPanel.cs",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/addin/RockProPanel.cs",
+      "sha256": "d57f9a8548d2b707d279de02525a95c22ca8464f8266590e5b04a64f57d316f2"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/cad_lock.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/cad_lock.py",
+      "sha256": "fd3f2e7941fd409a434f0c2384e7a9c736c04023808c19cf6f872a34e4710a44"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/core_case/catalog_native.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/core_case/catalog_native.py",
+      "sha256": "ef606705b75009b1e47397a719dc656a713c24d4bfe961f7ac823136e6dd582d"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/core_case/native.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/core_case/native.py",
+      "sha256": "f85c9b37e6b28d202e24f8b5f47ce399c80c45b678b6797ad1c6150fd643c86e"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/core_case/native_reader.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/core_case/native_reader.py",
+      "sha256": "a08673bff84fcec8f591f27a85c308107c86f531fa62ad052949e3b6673c46a8"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/core_case/NativeSceneBridge.cs",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/core_case/NativeSceneBridge.cs",
+      "sha256": "e57f689bc447cd26403c79823c6cf51254726303f94a42e8c93fd92e2fa60add"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/mcp/core_service.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/mcp/core_service.py",
+      "sha256": "a335423ee72da59cf18716b34f9d805b5e661c58f008b8fda3018f7526d80f49"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/mcp/layout.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/mcp/layout.py",
+      "sha256": "75fb47445960c34997c755eb5e327d90679a8c866e28a71a47f42323be51e2dc"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/mcp/server.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/mcp/server.py",
+      "sha256": "4a685fb59a928d80c3701a47a99b036ede6950325ff5788ef0edf0648f8b9cb8"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/mcp/test_layout.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/mcp/test_layout.py",
+      "sha256": "975760141d1fdbd62487b1ec3b84ac1a10401a792172a7a52f284186f7cabdfb"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/mcp/worker.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/mcp/worker.py",
+      "sha256": "82d37251aa96b1fa5983b4b8e6ec29787e8014285bd0ffd5cf1b73613f9510db"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/parts/native.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/parts/native.py",
+      "sha256": "79543aec3a3a77bc4e2eb1fcf05805f8726286f2b754c6dd28d7608092a5d383"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/parts/operation_log.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/parts/operation_log.py",
+      "sha256": "9c2e55f89c91a123431bde625040474050f8e636887aed70fe2c588618878659"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/prepare_restart.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/prepare_restart.py",
+      "sha256": "e07cbe7a058fe3a8f53b85228a9b612312c7be7cf2b98991665822715952e808"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/qa/audit_live_evidence.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/qa/audit_live_evidence.py",
+      "sha256": "c72e2cf4b5f1d178155a26ea602740d091a69063d1adcea1ac346b0506f27c1b"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/qa/audit_ui_evidence.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/qa/audit_ui_evidence.py",
+      "sha256": "4d5f0c33cae2afc2143289ecf1fb755f7de1fb5c7bc5fcb0658e0631243e2484"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/qa/layout_demo.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/qa/layout_demo.py",
+      "sha256": "e9ab2b9ddbc3f2f6aaabdbb84c70d85bcd74966b6a0482a7c2be93c278fc7706"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/qa/layout_restart.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/qa/layout_restart.py",
+      "sha256": "121c07761e972d9314747bf9f5a80f4c4d86a8ba4b251748facfc4a9a991c14b"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/qa/layout_session.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/qa/layout_session.py",
+      "sha256": "95571eace3f8817eca2d3f4a35dfc883d33247fb88117b2409eb7c6f58a35935"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/qa/reopen_layout.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/qa/reopen_layout.py",
+      "sha256": "bc21b71c134069ef664bf5621539127ce64d80e0e1216f27c8d5a8a2760c7967"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/qa/test_acceptance.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/qa/test_acceptance.py",
+      "sha256": "f56128db0b5d2de096590a03ec02cc0b83fdedf7b7f0940c9a9df5bc152360d6"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/qa/verify_layout.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/qa/verify_layout.py",
+      "sha256": "b0853f1e860424cb15a5fbe73a68014c48b85dc92d8641d76502fd0e0b5098b8"
+    },
+    {
+      "source": "preserved-deployment/rockpro_cad/restart_checked.py",
+      "file": "legacy/local-code/preserved-deployment/rockpro_cad/restart_checked.py",
+      "sha256": "ca4dc4c552521e92a763cdbdb31909fbfacb35350f182b04ad75460b22f0b1bf"
+    },
+    {
+      "source": "preserved-deployment/run_mvp.py",
+      "file": "legacy/local-code/preserved-deployment/run_mvp.py",
+      "sha256": "ea810b7668125652606f0296c8e7af94d56e897767abe16f0df1a65fbb330e47"
+    },
+    {
+      "source": "preserved-deployment/size_drop_probe.py",
+      "file": "legacy/local-code/preserved-deployment/size_drop_probe.py",
+      "sha256": "a17e0eed30392f96c89a210d0e7cc3bd79a3454dc325490eaa41bb1db6ddd435"
+    },
+    {
+      "source": "preserved-deployment/size_skeleton_probe.py",
+      "file": "legacy/local-code/preserved-deployment/size_skeleton_probe.py",
+      "sha256": "b1d6ebe5826a6e49892465e74a821e12cc2c20031f52f5e88b614946b6968886"
+    },
+    {
+      "source": "preserved-deployment/skeleton_panel_labels.py",
+      "file": "legacy/local-code/preserved-deployment/skeleton_panel_labels.py",
+      "sha256": "ea2d7e46daa52fdb359f4f9677c6dfb9b1a6bf29c13a2e83b4128ae7fa38c993"
+    },
+    {
+      "source": "preserved-deployment/skeleton_parameter_notes.py",
+      "file": "legacy/local-code/preserved-deployment/skeleton_parameter_notes.py",
+      "sha256": "537e2705a95d9118cb792aea2f1fd081a065d2dba6cc5846fc9c9b0a7010d736"
+    },
+    {
+      "source": "preserved-deployment/snapshot_legacy.py",
+      "file": "legacy/local-code/preserved-deployment/snapshot_legacy.py",
+      "sha256": "6409ea5acd85acb49684edfbcf7a3e336d81e76b432af22c7564c3d1c07b7c25"
+    },
+    {
+      "source": "preserved-deployment/Start-MVP.ps1",
+      "file": "legacy/local-code/preserved-deployment/Start-MVP.ps1",
+      "sha256": "b9bf0af1a6925a95432c1250e6504ebfda161ec9707f9b038c795a50980fe00c"
+    },
+    {
+      "source": "preserved-deployment/test_clean_skeleton.py",
+      "file": "legacy/local-code/preserved-deployment/test_clean_skeleton.py",
+      "sha256": "64d7862b66edc8cf9ea40074095067532ffc79d4393c2112ec1831c118d2369c"
+    },
+    {
+      "source": "preserved-deployment/test_validation.py",
+      "file": "legacy/local-code/preserved-deployment/test_validation.py",
+      "sha256": "960385fdd6f3edaccd91c150c6bd6f0bb86165acadfb9911151a9e491b7a9e0b"
+    },
+    {
+      "source": "preserved-deployment/test_wholecase_live.py",
+      "file": "legacy/local-code/preserved-deployment/test_wholecase_live.py",
+      "sha256": "47a9c4133c3b50ddce83f89eed61eeeea3a938bcb376142aa7ea97318cdab1b0"
+    },
+    {
+      "source": "preserved-deployment/update_skeleton_labels.py",
+      "file": "legacy/local-code/preserved-deployment/update_skeleton_labels.py",
+      "sha256": "10fc96e4899b3fafd2afd7ed771f3e0b2d173817af879a63fcc9c677671a984f"
+    },
+    {
+      "source": "preserved-deployment/update_skeleton_notes.py",
+      "file": "legacy/local-code/preserved-deployment/update_skeleton_notes.py",
+      "sha256": "559111d5110ce2f58dac43c6092c7666fba6312b94518be7da530e3be69490f1"
+    },
+    {
+      "source": "preserved-deployment/write_skeleton_report.py",
+      "file": "legacy/local-code/preserved-deployment/write_skeleton_report.py",
+      "sha256": "67097bf1601e431aa2c56cf841fbae5e81d633a051d0de42bb7f67651cbb1f93"
+    },
+    {
+      "source": "generated-diagnostics/backup_data.py",
+      "file": "legacy/local-code/generated-diagnostics/backup_data.py",
+      "sha256": "5dc115270a5913b284fc6064ad6accaaaa001b91bb37d2d9a384758e81ae25a1"
+    },
+    {
+      "source": "generated-diagnostics/check-compact-cube.cjs",
+      "file": "legacy/local-code/generated-diagnostics/check-compact-cube.cjs",
+      "sha256": "aea41fd67ab60fe6e78fcd48584d1c3b11f2d9c44a5252fb1617132e336add88"
+    },
+    {
+      "source": "generated-diagnostics/check-complete-parts.cjs",
+      "file": "legacy/local-code/generated-diagnostics/check-complete-parts.cjs",
+      "sha256": "bbfa9376a01833e9a85850c5efd34b5b7a9a82b7a71175b3fa9fa3012b405de2"
+    },
+    {
+      "source": "generated-diagnostics/check-face-labels.cjs",
+      "file": "legacy/local-code/generated-diagnostics/check-face-labels.cjs",
+      "sha256": "53f8a5af1d300c695a5bb56550ada327c27538ad16d516b334153ff9eb1e25de"
+    },
+    {
+      "source": "generated-diagnostics/check-new-clean.cjs",
+      "file": "legacy/local-code/generated-diagnostics/check-new-clean.cjs",
+      "sha256": "885aeaf0e4132c15ad327417556aa81a11db13cc34666d3f9643a17aee03cdd9"
+    },
+    {
+      "source": "generated-diagnostics/check_installed_core.py",
+      "file": "legacy/local-code/generated-diagnostics/check_installed_core.py",
+      "sha256": "4dd1c551a6e172a35a500fc1f19753a8ae9f8aa33a3161008e8e5d8db486dfa0"
+    },
+    {
+      "source": "generated-diagnostics/consistent-splitters-20261027/check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/consistent-splitters-20261027/check.cjs",
+      "sha256": "117778bc8350d11faa3be58b47cb50bf4c5b9d3ff27508427797405d99d3ddde"
+    },
+    {
+      "source": "generated-diagnostics/core-native/audit_corner_hidden.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/audit_corner_hidden.py",
+      "sha256": "8b61591b827f552762d964a7ecb0794dcb59607f41a543ccd4e702adc1bf8e2e"
+    },
+    {
+      "source": "generated-diagnostics/core-native/audit_corner_panels.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/audit_corner_panels.py",
+      "sha256": "9a9472a590d93cde45d2219ec12a8e6d4d155c09e39eb746e9dd27709a39d033"
+    },
+    {
+      "source": "generated-diagnostics/core-native/audit_corner_readonly.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/audit_corner_readonly.py",
+      "sha256": "67bb443798e6c3eda865dcdac32447064546f209347429330086f24c7a5cf015"
+    },
+    {
+      "source": "generated-diagnostics/core-native/audit_h7159_flange.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/audit_h7159_flange.py",
+      "sha256": "3ccae6a5914b506ede44e83d0eb2bcc6bf9d379232d98254753fe0f263864ee9"
+    },
+    {
+      "source": "generated-diagnostics/core-native/audit_poc_native_global.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/audit_poc_native_global.py",
+      "sha256": "dfc8127ac14517c7c8dfd17fd2fbeae3a98a6079733982a706531ee5ed8a4c34"
+    },
+    {
+      "source": "generated-diagnostics/core-native/audit_save_all.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/audit_save_all.py",
+      "sha256": "67889179fed5a458bc5e3c902c3420bfc7a50eacde57cd1a8f88816caf34cb35"
+    },
+    {
+      "source": "generated-diagnostics/core-native/check_corner_volume_fix.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/check_corner_volume_fix.py",
+      "sha256": "5dd8b00d006003390f0fce732120c004693c43b1eeb8066f340cd2ce1e9c8530"
+    },
+    {
+      "source": "generated-diagnostics/core-native/check_poc03_bbox.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/check_poc03_bbox.py",
+      "sha256": "5713fcd8671201653892c75c7eacf79f193230f1b03c56f27016301a0bc04001"
+    },
+    {
+      "source": "generated-diagnostics/core-native/close_owned_empty.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/close_owned_empty.py",
+      "sha256": "2162a49b4634bb562e18acda015d570115a6ee248f5151efa264717587141c56"
+    },
+    {
+      "source": "generated-diagnostics/core-native/compare_original_H7159.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/compare_original_H7159.py",
+      "sha256": "eb842c2adeba10500fa3c0d1fc81ac2d7d6111e0e8d4683cd749a1d4f0a41b06"
+    },
+    {
+      "source": "generated-diagnostics/core-native/deliver_h7159_poc.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/deliver_h7159_poc.py",
+      "sha256": "00f572871230818ebe9bb3fb6f0eb6ca6e47a74cab0b1a5db9225611916c40d5"
+    },
+    {
+      "source": "generated-diagnostics/core-native/diagnose_corner_reopen.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/diagnose_corner_reopen.py",
+      "sha256": "9ec1b7b29d63b7746ac534af4d5554b3d1e2ebb469fc6284a1aa11d66de20685"
+    },
+    {
+      "source": "generated-diagnostics/core-native/exit_clean.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/exit_clean.py",
+      "sha256": "c675593862e0d330e4bd545a5df18d689a97abfd01e128ceb81d9199a4d6c56a"
+    },
+    {
+      "source": "generated-diagnostics/core-native/finish_cleanup_checkpoint.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/finish_cleanup_checkpoint.py",
+      "sha256": "e93d68a9b0de83ea24a392172e3ee78db73f0bb812a2a297118bca5d2eb632f8"
+    },
+    {
+      "source": "generated-diagnostics/core-native/inspect_mount_evidence.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/inspect_mount_evidence.py",
+      "sha256": "6b52b30975c1f0ea42f8b60d87baf54095ec7453645685a9097cb5efda50767b"
+    },
+    {
+      "source": "generated-diagnostics/core-native/lifecycle_final_audit.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/lifecycle_final_audit.py",
+      "sha256": "46fb3ff3af130757d64c788159c58219040ae86469304c7c07fff45552d06c76"
+    },
+    {
+      "source": "generated-diagnostics/core-native/normalize_corner_evidence.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/normalize_corner_evidence.py",
+      "sha256": "3824f339c3dc654a085d2aaf17861633945e56d5fbdff2f984b9fb2eb0000436"
+    },
+    {
+      "source": "generated-diagnostics/core-native/patch_driver.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/patch_driver.py",
+      "sha256": "e68557bd4615be0ddae689c4798cd01eefe0c96891fa27d460efc328a52357c8"
+    },
+    {
+      "source": "generated-diagnostics/core-native/present_h7159_dirty.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/present_h7159_dirty.py",
+      "sha256": "eb69ad33da90ffc69dc55c9c1bdf42472174ea9f867bd53ac4557167c89f8b6e"
+    },
+    {
+      "source": "generated-diagnostics/core-native/present_h7159_poc.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/present_h7159_poc.py",
+      "sha256": "40e7707bbf88d75f2ca6a1a69249ee18d5fe25c7a6f58b738564dc914ceb6b5c"
+    },
+    {
+      "source": "generated-diagnostics/core-native/PrototypeCleanup.cs",
+      "file": "legacy/local-code/generated-diagnostics/core-native/PrototypeCleanup.cs",
+      "sha256": "d7fe89fe88b4d2b4950f0ed30ee38c34b072a8b52aca2874efffca28f29715f7"
+    },
+    {
+      "source": "generated-diagnostics/core-native/read_poses.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/read_poses.py",
+      "sha256": "c36c6cb2ba111c7604936ccfd8b3d16b823d1f7970fe4c4b0bda6ab0c6895b8b"
+    },
+    {
+      "source": "generated-diagnostics/core-native/run_native_A.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/run_native_A.py",
+      "sha256": "21c512ae927022d784b79f41a6ac619aa0fdfb9e2984f3986d4e50c8d1c84698"
+    },
+    {
+      "source": "generated-diagnostics/core-native/run_native_A2.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/run_native_A2.py",
+      "sha256": "8bfbc8aba7c4a491a7abf855769b64f2cca722d310e925213f498fc0d707a948"
+    },
+    {
+      "source": "generated-diagnostics/core-native/run_real_H7159.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/run_real_H7159.py",
+      "sha256": "4ba8103f2b060cbb3c1a6e3b3ce09273d0e5038240ef2726d10ca6632e3097a8"
+    },
+    {
+      "source": "generated-diagnostics/core-native/run_real_H7159_v2.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/run_real_H7159_v2.py",
+      "sha256": "b3ffb354638ad30a07845b0db1d0c9e0d3c4d9c12d95d7df1c02c5ea94959f04"
+    },
+    {
+      "source": "generated-diagnostics/core-native/run_real_H7159_v3.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/run_real_H7159_v3.py",
+      "sha256": "bb33c4cf16e1b65f0a1459bfc9ee54088f643d2215e858ab870a698a5adc1d6a"
+    },
+    {
+      "source": "generated-diagnostics/core-native/run_urgent_cleanup.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/run_urgent_cleanup.py",
+      "sha256": "713766a482c6174e4c735890d4cc4d447dd8825ec2da6fe8dbac05aaec9debf5"
+    },
+    {
+      "source": "generated-diagnostics/core-native/save_all_authorized.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/save_all_authorized.py",
+      "sha256": "4e26f892bbb2248b60e32cb8285e5858de4458820459464aef7197b0e4ea8009"
+    },
+    {
+      "source": "generated-diagnostics/core-native/save_all_resumed.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/save_all_resumed.py",
+      "sha256": "870c4daded7a832742fb73f8cf3f35a24d49db0cde57f1de3f324b55ef0db933"
+    },
+    {
+      "source": "generated-diagnostics/core-native/save_remaining.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/save_remaining.py",
+      "sha256": "f9af4c5bd05bd657a03dfe1c492c1102d3222cc9de79be2064704873b6f18f61"
+    },
+    {
+      "source": "generated-diagnostics/core-native/sdk/DocumentLifecycle.cs",
+      "file": "legacy/local-code/generated-diagnostics/core-native/sdk/DocumentLifecycle.cs",
+      "sha256": "13de0c847b1fb2751f7c8ae5f66c32196e97ab1d273674c36b1eb594c922e1ae"
+    },
+    {
+      "source": "generated-diagnostics/core-native/sdk/patch_audit_empty.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/sdk/patch_audit_empty.py",
+      "sha256": "b771534437092e89a5519ce6531ca1cd1f99c99d778e1f7bb605ce205132fad0"
+    },
+    {
+      "source": "generated-diagnostics/core-native/sdk/patch_close_empty.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/sdk/patch_close_empty.py",
+      "sha256": "2807f54c3bb6f44595c518f028ddf7d26a6a57cb0d50e4b23b9f5ee448be06ce"
+    },
+    {
+      "source": "generated-diagnostics/core-native/sdk/patch_continue.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/sdk/patch_continue.py",
+      "sha256": "88a11cb9c3cc898d77a99799cc6900a49ca2d089afae323f33a9a5a2e209128a"
+    },
+    {
+      "source": "generated-diagnostics/core-native/sdk/patch_lifecycle.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/sdk/patch_lifecycle.py",
+      "sha256": "9ad4809f4215f229db4c791947b1a7354d3e9e27ac24bc8d9bcd4d1735e90756"
+    },
+    {
+      "source": "generated-diagnostics/core-native/sdk/prepare_lifecycle.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/sdk/prepare_lifecycle.py",
+      "sha256": "0538ae63641811836525e3fd9ca3e2ae86a8e2716cdfa228f676455826b6c7dd"
+    },
+    {
+      "source": "generated-diagnostics/core-native/sdk/prepare_request.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/sdk/prepare_request.py",
+      "sha256": "a8a2e138b682d885ba7cf4d667156ebd06d79967446881855fbdd6542b8ac0d1"
+    },
+    {
+      "source": "generated-diagnostics/core-native/sdk/verify_result.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/sdk/verify_result.py",
+      "sha256": "941da6b21474eb2d62ed144f91a310bf4f16a71486f9e437409a8764d254d8c3"
+    },
+    {
+      "source": "generated-diagnostics/core-native/spike_hidden_panels.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/spike_hidden_panels.py",
+      "sha256": "cbcf99d0ada6a04561c950bbbadee1e4394d9ee7589f51e3062920f6454beea2"
+    },
+    {
+      "source": "generated-diagnostics/core-native/spike_hidden_panels_02.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/spike_hidden_panels_02.py",
+      "sha256": "365e3a2e813f752a815718a2f35088bcf31bad389e062ca0f3db885824dae184"
+    },
+    {
+      "source": "generated-diagnostics/core-native/summarize_corner_faces.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/summarize_corner_faces.py",
+      "sha256": "233c555595a5d4ec75fd4fa3c252e39e587184c7c85e1aa9f7b1be5fe96f65a2"
+    },
+    {
+      "source": "generated-diagnostics/core-native/summarize_corner_panels.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/summarize_corner_panels.py",
+      "sha256": "42dbff985d5e786eead5830119b99c1d9b48fb8ad0cfa8abd9a2fb1f9f108dfe"
+    },
+    {
+      "source": "generated-diagnostics/core-native/urgent_prototype_inventory.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/urgent_prototype_inventory.py",
+      "sha256": "72efa4c54428a58f271591f4fb5f698477e10bd60179f755ff99232a6c95d9ac"
+    },
+    {
+      "source": "generated-diagnostics/core-native/write_checkpoint.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/write_checkpoint.py",
+      "sha256": "fdc5b161881ed5c72c8d6e2bf6e50338589a1699990a0b3665e1ded61f96cb38"
+    },
+    {
+      "source": "generated-diagnostics/core-native/write_code_audit.py",
+      "file": "legacy/local-code/generated-diagnostics/core-native/write_code_audit.py",
+      "sha256": "6c8febb9ddffd0cc1bbe65f4d68bcfc0fe633c8dad58bf62e5b2674ef99bdc43"
+    },
+    {
+      "source": "generated-diagnostics/cube1000-compile-20261022-01/managed_identity.cs",
+      "file": "legacy/local-code/generated-diagnostics/cube1000-compile-20261022-01/managed_identity.cs",
+      "sha256": "d350bdb7cb632f5ba298610a7b390e81a7e8f7c00b1e2197ee8264b3e4f122ac"
+    },
+    {
+      "source": "generated-diagnostics/cube1000-compile-20261022-02/managed_identity.cs",
+      "file": "legacy/local-code/generated-diagnostics/cube1000-compile-20261022-02/managed_identity.cs",
+      "sha256": "c638b3108a4b37a817e13fa7f5cea72190849c90278972b56dd6cbc602c4db80"
+    },
+    {
+      "source": "generated-diagnostics/cube1000-native-20261022-01/managed_identity.cs",
+      "file": "legacy/local-code/generated-diagnostics/cube1000-native-20261022-01/managed_identity.cs",
+      "sha256": "fff6ad1aab96540242d4be9d59213b5fc82fa576d832251d3c99a8977ca61d15"
+    },
+    {
+      "source": "generated-diagnostics/deploy_core.py",
+      "file": "legacy/local-code/generated-diagnostics/deploy_core.py",
+      "sha256": "427e762cef3eedb3d6e3144c7c30bca789ee2418cea71b136d3b1cab8b94c51f"
+    },
+    {
+      "source": "generated-diagnostics/deployment-20261021T221115Z/runtime-before/addin/Build.ps1",
+      "file": "legacy/local-code/generated-diagnostics/deployment-20261021T221115Z/runtime-before/addin/Build.ps1",
+      "sha256": "7d933188d878cac51b8c1e0ebc2f3512d45af34dea9538b3cf02e95dfc2733c1"
+    },
+    {
+      "source": "generated-diagnostics/deployment-20261021T221115Z/runtime-before/addin/LayoutForm.cs",
+      "file": "legacy/local-code/generated-diagnostics/deployment-20261021T221115Z/runtime-before/addin/LayoutForm.cs",
+      "sha256": "7ead311b985559aba61280e61a696467b3862553a144ddb2833d0a66ef813ea0"
+    },
+    {
+      "source": "generated-diagnostics/deployment-20261021T221115Z/runtime-before/addin/RockProAddin.cs",
+      "file": "legacy/local-code/generated-diagnostics/deployment-20261021T221115Z/runtime-before/addin/RockProAddin.cs",
+      "sha256": "619f4fda7f4166cdac54cd5a227bc8a4fb9c34d55bf2b248d3b8251f2981afd1"
+    },
+    {
+      "source": "generated-diagnostics/deployment-20261021T221115Z/runtime-before/addin/RockProPanel.cs",
+      "file": "legacy/local-code/generated-diagnostics/deployment-20261021T221115Z/runtime-before/addin/RockProPanel.cs",
+      "sha256": "e98d1600b6d098c2bb34eecbae323a1d2377157d782d043231eb1f7db6707f16"
+    },
+    {
+      "source": "generated-diagnostics/deployment-20261021T221115Z/runtime-before/mcp/server.py",
+      "file": "legacy/local-code/generated-diagnostics/deployment-20261021T221115Z/runtime-before/mcp/server.py",
+      "sha256": "65e57a232f211f6a1ac6427cd8c02b65f8d18f2ab07ef7b4a38cdd5e4307a4ac"
+    },
+    {
+      "source": "generated-diagnostics/deployment-20261021T221115Z/runtime-before/mcp/worker.py",
+      "file": "legacy/local-code/generated-diagnostics/deployment-20261021T221115Z/runtime-before/mcp/worker.py",
+      "sha256": "3494ddb2eb6e93f8bef887f20c9500f481523f445a1e4cbd64b855ee886e9888"
+    },
+    {
+      "source": "generated-diagnostics/docs_versions.py",
+      "file": "legacy/local-code/generated-diagnostics/docs_versions.py",
+      "sha256": "759baaccc73e1630db1df95d2e2ff70318266687f4caade839e286544657c3d1"
+    },
+    {
+      "source": "generated-diagnostics/drafts/whole_component/component_placement.py",
+      "file": "legacy/local-code/generated-diagnostics/drafts/whole_component/component_placement.py",
+      "sha256": "871345b2e387b803db056de64ead998d122411944e25c0a80d0de0edaf44b91a"
+    },
+    {
+      "source": "generated-diagnostics/drafts/whole_component/test_component_placement.py",
+      "file": "legacy/local-code/generated-diagnostics/drafts/whole_component/test_component_placement.py",
+      "sha256": "3ebc6feb1b1c0e21d1d22be165e6bd4a504890cde08cc54b1403a3bcdd613e0d"
+    },
+    {
+      "source": "generated-diagnostics/eb-l630u-prototype-20261024-01/check_saved_copy.py",
+      "file": "legacy/local-code/generated-diagnostics/eb-l630u-prototype-20261024-01/check_saved_copy.py",
+      "sha256": "7a0ce83a2d1d764be76f9ef764c8ce1f89667898a42d5b626de5d503d793e694"
+    },
+    {
+      "source": "generated-diagnostics/eb-l630u-prototype-20261024-01/finalize_handle_delivery.py",
+      "file": "legacy/local-code/generated-diagnostics/eb-l630u-prototype-20261024-01/finalize_handle_delivery.py",
+      "sha256": "a5b3364ccc7ba118baf9bd1f1d3f4adede986ec7a63d44c5688193dbdb26ffcd"
+    },
+    {
+      "source": "generated-diagnostics/eb-l630u-prototype-20261024-01/finalize_report.py",
+      "file": "legacy/local-code/generated-diagnostics/eb-l630u-prototype-20261024-01/finalize_report.py",
+      "sha256": "f7b6b247c6145100f1ddf7d8e3664cc19c2324736d08a6da78790d91d2ab7214"
+    },
+    {
+      "source": "generated-diagnostics/eb-l630u-prototype-20261024-01/finalize_shallow_report.py",
+      "file": "legacy/local-code/generated-diagnostics/eb-l630u-prototype-20261024-01/finalize_shallow_report.py",
+      "sha256": "710b8d20d7aeb17feeaf259dfc12f38563f04d58630c86a55811e197535b6fe4"
+    },
+    {
+      "source": "generated-diagnostics/eb-l630u-prototype-20261024-01/inspect_reference.py",
+      "file": "legacy/local-code/generated-diagnostics/eb-l630u-prototype-20261024-01/inspect_reference.py",
+      "sha256": "bceb9b73ed70425dfbc2a47d4d3568d4ae9dc956ec959aac61211351211f76a7"
+    },
+    {
+      "source": "generated-diagnostics/eb-l630u-prototype-20261024-01/show_delivery.py",
+      "file": "legacy/local-code/generated-diagnostics/eb-l630u-prototype-20261024-01/show_delivery.py",
+      "sha256": "5e2c5096684ca8fc2e3bb125b20630bbbdd1f2560b9ba6c4fd07f8bd76d62902"
+    },
+    {
+      "source": "generated-diagnostics/eb-l630u-prototype-20261024-01/show_handle_delivery.py",
+      "file": "legacy/local-code/generated-diagnostics/eb-l630u-prototype-20261024-01/show_handle_delivery.py",
+      "sha256": "64eb2cc5a8bd1a865c14b9b170ebf1b04b75b274c7a4a72ded1978833146cb2f"
+    },
+    {
+      "source": "generated-diagnostics/eb-l630u-prototype-20261024-01/update_opposing_handles.py",
+      "file": "legacy/local-code/generated-diagnostics/eb-l630u-prototype-20261024-01/update_opposing_handles.py",
+      "sha256": "2522cdfbf7168a8bd25c14d547dd205e373a0e80ddfe7184f64da3ad428b12b5"
+    },
+    {
+      "source": "generated-diagnostics/eb-l630u-prototype-20261024-01/update_shallow_docs.py",
+      "file": "legacy/local-code/generated-diagnostics/eb-l630u-prototype-20261024-01/update_shallow_docs.py",
+      "sha256": "b29bde019794c8cbcf3a7e16981c6594889cfd66808814ee7e5ee7b433089d98"
+    },
+    {
+      "source": "generated-diagnostics/eb-l630u-prototype-20261024-01/update_shallow_policy.py",
+      "file": "legacy/local-code/generated-diagnostics/eb-l630u-prototype-20261024-01/update_shallow_policy.py",
+      "sha256": "7caa378e44a57cb7c8158a6b76392e0f921e683452994ea6d81a7260e3e76563"
+    },
+    {
+      "source": "generated-diagnostics/edge-only-panels-20261027/check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/edge-only-panels-20261027/check.cjs",
+      "sha256": "47d88af2bc7537cacc71a4175b91e03ba8bb32a8f3f690639872fd64998ddec7"
+    },
+    {
+      "source": "generated-diagnostics/erp-import-20261028/browser-check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/erp-import-20261028/browser-check.cjs",
+      "sha256": "456c1ca2a45d18516fd3ff3c6a9d28a92e813b87995ac5125fea6d0e1fe75e6c"
+    },
+    {
+      "source": "generated-diagnostics/evidence_doc.py",
+      "file": "legacy/local-code/generated-diagnostics/evidence_doc.py",
+      "sha256": "cb2d4ea00dbc1aed6a74a51c532ceba17bece6a1765cc8575c1985ce886c2810"
+    },
+    {
+      "source": "generated-diagnostics/family-3d-20261027/check_all.cjs",
+      "file": "legacy/local-code/generated-diagnostics/family-3d-20261027/check_all.cjs",
+      "sha256": "65d8ae0fd1290a946b4c2421e4566b9af1be33cd369cc1afbd1eaff4f00f4042"
+    },
+    {
+      "source": "generated-diagnostics/family-3d-20261027/CloseExportDisplayCopy.cs",
+      "file": "legacy/local-code/generated-diagnostics/family-3d-20261027/CloseExportDisplayCopy.cs",
+      "sha256": "633283d2c9778c8b01b42fc0ddf61e8abc2b0fc64520b864dd423ff7d48fec0e"
+    },
+    {
+      "source": "generated-diagnostics/family-3d-20261027/export_kernel_fast.py",
+      "file": "legacy/local-code/generated-diagnostics/family-3d-20261027/export_kernel_fast.py",
+      "sha256": "55a2c2963b6b0b93ceb60ebc48d31b8cbb06783ec779b9a4cc856bfbd6204a35"
+    },
+    {
+      "source": "generated-diagnostics/family-3d-20261027/export_kernel_library.py",
+      "file": "legacy/local-code/generated-diagnostics/family-3d-20261027/export_kernel_library.py",
+      "sha256": "a99d7ad52c77b6b95113e14a8c0ebc8993c83138bfe8adf8a3e0cc38bab76bf3"
+    },
+    {
+      "source": "generated-diagnostics/family-3d-20261027/export_kernel_safe.py",
+      "file": "legacy/local-code/generated-diagnostics/family-3d-20261027/export_kernel_safe.py",
+      "sha256": "352de5c1987c4485d6951c64495f8b025e8fb94e01a968bcf8404cd18975386e"
+    },
+    {
+      "source": "generated-diagnostics/family-3d-20261027/prepare_library.py",
+      "file": "legacy/local-code/generated-diagnostics/family-3d-20261027/prepare_library.py",
+      "sha256": "c02724971d39128d503600a90bccf0e49c6f53f94e36d2633d8010ea1ebe8a42"
+    },
+    {
+      "source": "generated-diagnostics/family-3d-20261027/ProbeBodyMesh.cs",
+      "file": "legacy/local-code/generated-diagnostics/family-3d-20261027/ProbeBodyMesh.cs",
+      "sha256": "dfe0b38a1cec757edd8afccddbf1d743399ae76b516be53d306947d9408f1f60"
+    },
+    {
+      "source": "generated-diagnostics/family-3d-20261027/ProbeGeometryRouting.cs",
+      "file": "legacy/local-code/generated-diagnostics/family-3d-20261027/ProbeGeometryRouting.cs",
+      "sha256": "f75b1a3c0f640c1f6cdcc7673fb904fbfae3d1f1d8d3c8fc3756eb73b9f734b2"
+    },
+    {
+      "source": "generated-diagnostics/family-3d-20261027/run_fast_when_idle.py",
+      "file": "legacy/local-code/generated-diagnostics/family-3d-20261027/run_fast_when_idle.py",
+      "sha256": "1a0a9b1ae7362b81c58e9d2439bde82a264ffb42e37e804a0133ef8e79af8605"
+    },
+    {
+      "source": "generated-diagnostics/favorites-20261028/browser-check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/favorites-20261028/browser-check.cjs",
+      "sha256": "ea85124dbeb94b0447f66c897a6080589b94885085c5144423575d08baab892d"
+    },
+    {
+      "source": "generated-diagnostics/finish_ui_verification.py",
+      "file": "legacy/local-code/generated-diagnostics/finish_ui_verification.py",
+      "sha256": "94dc73a7a98af7886b75a1b7fd86e1d621c856d2ab3e2baca4be503677788a76"
+    },
+    {
+      "source": "generated-diagnostics/hinge-transport-20261024-01/extract.py",
+      "file": "legacy/local-code/generated-diagnostics/hinge-transport-20261024-01/extract.py",
+      "sha256": "1425ff03a28e8e2b72810c667a75276861247cb90763de6786b68be1a1b00e55"
+    },
+    {
+      "source": "generated-diagnostics/implement_versions.py",
+      "file": "legacy/local-code/generated-diagnostics/implement_versions.py",
+      "sha256": "8eb39df4f1d8fc5fc3457c1a1f4ac62328d000626aec915e013b8b32ebeff45d"
+    },
+    {
+      "source": "generated-diagnostics/inspect-remnant.cs",
+      "file": "legacy/local-code/generated-diagnostics/inspect-remnant.cs",
+      "sha256": "8b46e837a4329e031d20c8ae39cec245631d6e231cd956bbe7409f50d3aa0cb7"
+    },
+    {
+      "source": "generated-diagnostics/inspect-wall-api.cs",
+      "file": "legacy/local-code/generated-diagnostics/inspect-wall-api.cs",
+      "sha256": "64194c41d983bdcab9e2e9ea8d302ed47674c9432b483b2a2105ae4949d0659d"
+    },
+    {
+      "source": "generated-diagnostics/ironcad2023-compatibility/legacy_expression_probe.py",
+      "file": "legacy/local-code/generated-diagnostics/ironcad2023-compatibility/legacy_expression_probe.py",
+      "sha256": "cfa8401ab5819db6f2004b8f14d4cc24c86f4c26c907046410b57f6d69e291c4"
+    },
+    {
+      "source": "generated-diagnostics/ironcad2023-compatibility/legacy_expression_probe2.py",
+      "file": "legacy/local-code/generated-diagnostics/ironcad2023-compatibility/legacy_expression_probe2.py",
+      "sha256": "572f1793cf0e0aa415923a3775be4c17de314bc33c580debbbdd306c9e9bc08f"
+    },
+    {
+      "source": "generated-diagnostics/ironcad2023-compatibility/probe_original.py",
+      "file": "legacy/local-code/generated-diagnostics/ironcad2023-compatibility/probe_original.py",
+      "sha256": "6b564949bb3d0e9fdf2a0d7a9d8365fc04ed4c159f3c6515302e38430847314d"
+    },
+    {
+      "source": "generated-diagnostics/ironcad2023-compatibility/probe_preserved_original.py",
+      "file": "legacy/local-code/generated-diagnostics/ironcad2023-compatibility/probe_preserved_original.py",
+      "sha256": "3720be57c0d015f0f4961cbce9efb1ba7be4c1031ddea0fe3f8b6f93a053755b"
+    },
+    {
+      "source": "generated-diagnostics/ironcad2023-compatibility/probe_t2_original.py",
+      "file": "legacy/local-code/generated-diagnostics/ironcad2023-compatibility/probe_t2_original.py",
+      "sha256": "4bfffac5e8c63aaa670e1ba74d1e18eeebc0078bbf9d6ba7bdb8ffe501b230dc"
+    },
+    {
+      "source": "generated-diagnostics/ironcad2023-compatibility/read-tools/OleFileIO_PL.py",
+      "file": "legacy/local-code/generated-diagnostics/ironcad2023-compatibility/read-tools/OleFileIO_PL.py",
+      "sha256": "ce4c968e16bf24c3c0e2c41a260d7d350d5d0c9a868117824b919dc0bdb6116b"
+    },
+    {
+      "source": "generated-diagnostics/ironcad2023-pu1sp1-validation/t2_roundtrip.py",
+      "file": "legacy/local-code/generated-diagnostics/ironcad2023-pu1sp1-validation/t2_roundtrip.py",
+      "sha256": "057e98b114637b408d1dbba90f183481a5425c6a3e23a3e3404b47bf3857d509"
+    },
+    {
+      "source": "generated-diagnostics/ironcad2023-pu1sp1-validation/t2_roundtrip_02.py",
+      "file": "legacy/local-code/generated-diagnostics/ironcad2023-pu1sp1-validation/t2_roundtrip_02.py",
+      "sha256": "631c7d879cb8c4ecc6c867e4fd310279b57bb65449705b2f7832d86107151648"
+    },
+    {
+      "source": "generated-diagnostics/ironcad2023-pu1sp1-validation/t2_roundtrip_03.py",
+      "file": "legacy/local-code/generated-diagnostics/ironcad2023-pu1sp1-validation/t2_roundtrip_03.py",
+      "sha256": "900bf8bd1edd17df429006780b633d7fe6b132e6aa7856f9cf8d968896b487d2"
+    },
+    {
+      "source": "generated-diagnostics/latch17251-api-repair-20261022-02/fresh_load_probe.py",
+      "file": "legacy/local-code/generated-diagnostics/latch17251-api-repair-20261022-02/fresh_load_probe.py",
+      "sha256": "e1a1ed16c933643478315af5fbc90a0e33529b719555699ab27cbd14948b7624"
+    },
+    {
+      "source": "generated-diagnostics/latch17251-compile-20261022-01/apply_targeted_aliases.py",
+      "file": "legacy/local-code/generated-diagnostics/latch17251-compile-20261022-01/apply_targeted_aliases.py",
+      "sha256": "62827ff15f2a8b7dc04e9572f26c82badfd57237fc5fe4cebbfca72a10812359"
+    },
+    {
+      "source": "generated-diagnostics/latch17251-compile-20261022-01/apply_targeted_aliases_fresh.py",
+      "file": "legacy/local-code/generated-diagnostics/latch17251-compile-20261022-01/apply_targeted_aliases_fresh.py",
+      "sha256": "04acc18fb67f70a5c625816dddb25b65ee397d26808eaf68d8f0273e3836bbc7"
+    },
+    {
+      "source": "generated-diagnostics/latch17251-compile-20261022-01/AttachProbe.cs",
+      "file": "legacy/local-code/generated-diagnostics/latch17251-compile-20261022-01/AttachProbe.cs",
+      "sha256": "e257c23a45ea4f4b2690994b94404b619917d00e2c3d8fae5841497cd29e8af0"
+    },
+    {
+      "source": "generated-diagnostics/latch17251-compile-20261022-01/bootstrap_factory_runner.py",
+      "file": "legacy/local-code/generated-diagnostics/latch17251-compile-20261022-01/bootstrap_factory_runner.py",
+      "sha256": "3bd05f45b13d3d27de046820ce66613622aa3fb64239b7d098b1e26d70e83e92"
+    },
+    {
+      "source": "generated-diagnostics/latch17251-compile-20261022-01/inspect_resource_typelibs.py",
+      "file": "legacy/local-code/generated-diagnostics/latch17251-compile-20261022-01/inspect_resource_typelibs.py",
+      "sha256": "d189cafe1b14cc989e8158529a525685e20ea9d278e9cde03462da65970da9ed"
+    },
+    {
+      "source": "generated-diagnostics/latch17251-compile-20261022-01/inspect_typelib_readonly.py",
+      "file": "legacy/local-code/generated-diagnostics/latch17251-compile-20261022-01/inspect_typelib_readonly.py",
+      "sha256": "eb446738df1d8feaf63e5b7fb663e70ed0d0212647f0a86dfeeb77936f3050c3"
+    },
+    {
+      "source": "generated-diagnostics/latch17251-compile-20261022-01/probe_actual_typeinfo.py",
+      "file": "legacy/local-code/generated-diagnostics/latch17251-compile-20261022-01/probe_actual_typeinfo.py",
+      "sha256": "ae68f5111ce76676653990e2589b38b54eee408d04bab9d3b307d4613b2bca64"
+    },
+    {
+      "source": "generated-diagnostics/latch17251-compile-20261022-01/repair_peruser_once.py",
+      "file": "legacy/local-code/generated-diagnostics/latch17251-compile-20261022-01/repair_peruser_once.py",
+      "sha256": "2ae1ae3f0a9ca2d724baf853735997202211bec524c4441a936d8b00f18baa94"
+    },
+    {
+      "source": "generated-diagnostics/latch17251-inprocess-final-compile-20261022-01/managed_identity.cs",
+      "file": "legacy/local-code/generated-diagnostics/latch17251-inprocess-final-compile-20261022-01/managed_identity.cs",
+      "sha256": "99252fddb95007fe979d91ce5bdb50bef9d015c9f505d75587a989e19a04c473"
+    },
+    {
+      "source": "generated-diagnostics/latch17251-inprocess-native-20261022-02/managed_identity.cs",
+      "file": "legacy/local-code/generated-diagnostics/latch17251-inprocess-native-20261022-02/managed_identity.cs",
+      "sha256": "a3516780ebe633fb7afc8d6935c8b1d2a49fc13ba05d8e35329efad07f60826f"
+    },
+    {
+      "source": "generated-diagnostics/latch17251-inprocess-native-20261022-03/managed_identity.cs",
+      "file": "legacy/local-code/generated-diagnostics/latch17251-inprocess-native-20261022-03/managed_identity.cs",
+      "sha256": "6614ee45401fd72b16b22e9e7963e28071689c5f5db36bb1cd5b5d84b83d88fe"
+    },
+    {
+      "source": "generated-diagnostics/latch17251-inprocess-native-20261022-08/managed_identity.cs",
+      "file": "legacy/local-code/generated-diagnostics/latch17251-inprocess-native-20261022-08/managed_identity.cs",
+      "sha256": "84d3e4f18f39fd3e57c729de491f93a3bb6ac6c544600f6e429d45f42c272490"
+    },
+    {
+      "source": "generated-diagnostics/localize_panel.py",
+      "file": "legacy/local-code/generated-diagnostics/localize_panel.py",
+      "sha256": "10be296b7477972f218b176028ca6105dae07888f05464ebe5ba4349cae6d4fa"
+    },
+    {
+      "source": "generated-diagnostics/localize_panel_finish.py",
+      "file": "legacy/local-code/generated-diagnostics/localize_panel_finish.py",
+      "sha256": "5d39294cba240efa30d4827d09ab54c316d9cd97d3450b18db5b003c2116fef1"
+    },
+    {
+      "source": "generated-diagnostics/localize_panel_last.py",
+      "file": "legacy/local-code/generated-diagnostics/localize_panel_last.py",
+      "sha256": "fb8359c3101440f1acd56b2b8058440e06a2f5b2fcb87b0785411439a388bfb6"
+    },
+    {
+      "source": "generated-diagnostics/localize_panel_polish.py",
+      "file": "legacy/local-code/generated-diagnostics/localize_panel_polish.py",
+      "sha256": "8248f956805b1f60a337a014e918fe1bccdc17dc3244fdc390d933af726fc4d5"
+    },
+    {
+      "source": "generated-diagnostics/native_versions.py",
+      "file": "legacy/local-code/generated-diagnostics/native_versions.py",
+      "sha256": "27a35b5d31c4d383fbbe789b6d437ad13e3210b243c7e986ddec0e7056046fb2"
+    },
+    {
+      "source": "generated-diagnostics/other-project-parts-20261027/check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/other-project-parts-20261027/check.cjs",
+      "sha256": "e676b86ca6f209d3050ad4061071e4bceae0e7277b3f82c833fe945b8f0e47f1"
+    },
+    {
+      "source": "generated-diagnostics/other-project-parts-20261027/inspect_open.py",
+      "file": "legacy/local-code/generated-diagnostics/other-project-parts-20261027/inspect_open.py",
+      "sha256": "4fb33aa27872cef1fbb73fcb22f54922d79983bd52f31f2af8bdee48da527232"
+    },
+    {
+      "source": "generated-diagnostics/other-project-parts-20261027/serve_test.py",
+      "file": "legacy/local-code/generated-diagnostics/other-project-parts-20261027/serve_test.py",
+      "sha256": "915bd4a4fa01c9e65497bc5344fceeccf445291dc3942cccf4adf2dd969e6a10"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/excel-builder/build.mjs",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/excel-builder/build.mjs",
+      "sha256": "28b0b9007ff19b29e20ef6d88ebdc9ea088b532e3bad496a6951a5e60bf713eb"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/prove_catalog_cleanup.py",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/prove_catalog_cleanup.py",
+      "sha256": "a237d1845b3de3ff8ac979f6da5a2cc7724a8219ede1226cd7990c22d9bf1f97"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/projekty/Skrzynia_2000x3000x4000/warsztat/build_case.py",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/projekty/Skrzynia_2000x3000x4000/warsztat/build_case.py",
+      "sha256": "ce173c1da45ba4486b97badee25da345632ed502eca3c84ebed9e4135eb18c06"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/projekty/Skrzynia_2000x3000x4000/warsztat/finish_case.py",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/projekty/Skrzynia_2000x3000x4000/warsztat/finish_case.py",
+      "sha256": "805103e867fcef3153eeadbb331fc92daafad792e73eaa71d9d4c530a49f599a"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/projekty/Skrzynia_2000x3000x4000/warsztat/inspect_case.py",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/projekty/Skrzynia_2000x3000x4000/warsztat/inspect_case.py",
+      "sha256": "d0917ed50e63dc644e4c91d00080dab5d19552cd73bc62208c122c835e717965"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/projekty/Skrzynia_2000x3000x4000/warsztat/probe_size.py",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/projekty/Skrzynia_2000x3000x4000/warsztat/probe_size.py",
+      "sha256": "7bf9c06b7b587d8634aa841add7e7ff156bc335d40122400245c43e149209e85"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/projekty/Skrzynia_2000x3000x4000/warsztat/probe_size2.py",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/projekty/Skrzynia_2000x3000x4000/warsztat/probe_size2.py",
+      "sha256": "9e8652c04972bd1f333721376cde993137d38fdb350bac1daacb9bc44df98249"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/configure.py",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/configure.py",
+      "sha256": "3a7954f92dc63002b6bf2d3d0f7f0fc3a8c2ce6f9568d0661b95c2d17739ba0d"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/addin/Build.ps1",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/addin/Build.ps1",
+      "sha256": "9d8c7df8a03c14e5176bd177a7e85541384fb3724c8bd5b626f2d0e78f2cad4e"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/addin/LayoutForm.cs",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/addin/LayoutForm.cs",
+      "sha256": "b37199e6dd28cca76594391ac16dbd073971f72602086d5e72464480f6575951"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/addin/Repair-IcApi.py",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/addin/Repair-IcApi.py",
+      "sha256": "57218753d85ae4cd08091eeb1df70dd66b6609393c4cb5f22f65a5819cb0b498"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/addin/RockProPanel.cs",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/addin/RockProPanel.cs",
+      "sha256": "edf0bd7b324dc7e156fa69360a3ad27af08037724e32ada0d565dfceacc6a650"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/core_case/catalog_native.py",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/core_case/catalog_native.py",
+      "sha256": "c340be633917d77f560276f4ab0145faa27a368d674a6224d27da38db7b10b84"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/core_case/corner_native.py",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/core_case/corner_native.py",
+      "sha256": "4bd7d0df246f2cec995ba66a320ee44671ee9a057e19e6b6593094574d07d738"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/core_case/native.py",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/core_case/native.py",
+      "sha256": "09c6db274db82d75da8542d228744f3c978a189d54162eeeac193707974dcc29"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/core_case/source_capture.py",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/core_case/source_capture.py",
+      "sha256": "19fc0327767d76453a5c8d2e26a4f5cd8e37563528f78f09d3cffb772477841e"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/core_case/test_catalog_cleanup.py",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/core_case/test_catalog_cleanup.py",
+      "sha256": "846575009ce203c7868f4dc31a39998d59103eb27851711099fe3110198db5d9"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/core_case/test_transport_rules.py",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/core_case/test_transport_rules.py",
+      "sha256": "957db7fb1055fa903eccc3d60a0289385e8885cfd4a567fb1e8710dd1807316d"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/core_case/transport_rules.py",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/core_case/transport_rules.py",
+      "sha256": "9a711c4c08d4b355a649ee30d3a898857b177a0057d87644be1677f795a15c90"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/mcp/core_service.py",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/mcp/core_service.py",
+      "sha256": "f2c446aad3f271f3afc6872747a74f21f5d61e4632badb023a1c74f6ee930a5f"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/mcp/layout.py",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/mcp/layout.py",
+      "sha256": "38cf399174a2afbdffbf2c2a1900cf1f4feddfc82e1ad53dea276febff3af990"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/mcp/server.py",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/mcp/server.py",
+      "sha256": "25e5720cc8f84eb48c96146364f16fd5b457724edec66295d1a2cfc17cbdcab2"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/mcp/worker.py",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/mcp/worker.py",
+      "sha256": "7a2d2dc75b914bcc2c9856e48ef612f801eacfa9e0941ba834c3fc50018eace3"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/part_registry.py",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/part_registry.py",
+      "sha256": "62c275ed9ded77285e9b2af33f5699b54517528148d719597425e9707de8c4df"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/qa/CasePlanUiChecks.cs",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/qa/CasePlanUiChecks.cs",
+      "sha256": "e96cbc1d56028f94bc37651ffc43be4e1165b210a8b276b4ee71cc9d749dda45"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/qa/LayoutUiChecks.cs",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/Integracja/rockpro_cad/qa/LayoutUiChecks.cs",
+      "sha256": "1ece8c9b3459e5c71fa3b317d3a4c6deac315bda28a83e9ef76092aea040e47e"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/scripts/Verify.ps1",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/scripts/Verify.ps1",
+      "sha256": "d38b342cf6e87e38b0e897d96e8ca08ce619d109232dfc04a52a76c2c6b8b165"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/scripts/verify.py",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/scripts/verify.py",
+      "sha256": "74c288ba232c3c3975b8587e0778ea3ce01260eaee06dbc3e93126d47ae8b07f"
+    },
+    {
+      "source": "generated-diagnostics/overnight-20261024/restore-exercise/files/source/Setup.ps1",
+      "file": "legacy/local-code/generated-diagnostics/overnight-20261024/restore-exercise/files/source/Setup.ps1",
+      "sha256": "b4056f2c58e0ec0b08611c49defacaf010f23b7581b8a4edf7e3fcdf46e8fef4"
+    },
+    {
+      "source": "generated-diagnostics/panel-motion-20261027/check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/panel-motion-20261027/check.cjs",
+      "sha256": "f1406fcba3390101e3429ebe110661531c38238d780626c854b0d77b1e267d41"
+    },
+    {
+      "source": "generated-diagnostics/panel-motion-20261027/drag-regression.cjs",
+      "file": "legacy/local-code/generated-diagnostics/panel-motion-20261027/drag-regression.cjs",
+      "sha256": "bd88896a05aee1832ab372be9fe8feb5b30e7637f5f53a47c359b97fa1a40933"
+    },
+    {
+      "source": "generated-diagnostics/part-images-20261027/check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/part-images-20261027/check.cjs",
+      "sha256": "f6c50ddf191f6751c7bb3375af9a2208cae1ba002cf42405c6b881ce450080ab"
+    },
+    {
+      "source": "generated-diagnostics/part-images-20261027/inspect.py",
+      "file": "legacy/local-code/generated-diagnostics/part-images-20261027/inspect.py",
+      "sha256": "bd00e9fc12ce33e88fcef9806d2bef6f53569365c8f2b5d3598b7157c14a37c7"
+    },
+    {
+      "source": "generated-diagnostics/part-images-20261027/photo27095.py",
+      "file": "legacy/local-code/generated-diagnostics/part-images-20261027/photo27095.py",
+      "sha256": "1d0d95dcf4db65536c43a71b81d46b5196022fa5f33cd27cd31e3115e5765675"
+    },
+    {
+      "source": "generated-diagnostics/part-images-20261027/prepare.py",
+      "file": "legacy/local-code/generated-diagnostics/part-images-20261027/prepare.py",
+      "sha256": "682a10b54655ca432f0445b433f8b707f7b0ce71fedb97b4dd5cc6d2fd1a2936"
+    },
+    {
+      "source": "generated-diagnostics/part-images-20261027/refine.py",
+      "file": "legacy/local-code/generated-diagnostics/part-images-20261027/refine.py",
+      "sha256": "429230cee29612863e7e678dfeee820a6edf6267f506e9881c0eee23433bc630"
+    },
+    {
+      "source": "generated-diagnostics/part-images-20261027/supplier_images.py",
+      "file": "legacy/local-code/generated-diagnostics/part-images-20261027/supplier_images.py",
+      "sha256": "4acfc4a26a5bb078bcdb328df7eb4f8a8895570f52505602680b8492896dd633"
+    },
+    {
+      "source": "generated-diagnostics/parts-identification/read_parts.py",
+      "file": "legacy/local-code/generated-diagnostics/parts-identification/read_parts.py",
+      "sha256": "8d404cff0472aa828bf01ab1ce0eab0ad8db96556fe6b2ad52d1e0fdcc8af961"
+    },
+    {
+      "source": "generated-diagnostics/parts-identification/write_report.py",
+      "file": "legacy/local-code/generated-diagnostics/parts-identification/write_report.py",
+      "sha256": "a03ed91ed161b62e1fa9c4f30200d10ee6ab1d8b7754037f0e71e7e87a591e7d"
+    },
+    {
+      "source": "generated-diagnostics/pre-versioning-backup/addin/LayoutForm.cs",
+      "file": "legacy/local-code/generated-diagnostics/pre-versioning-backup/addin/LayoutForm.cs",
+      "sha256": "45a4effe153e9fa743389ed6729e53d800818448e6b9740e0ab2707ab64cd690"
+    },
+    {
+      "source": "generated-diagnostics/pre-versioning-backup/addin/RockProPanel.cs",
+      "file": "legacy/local-code/generated-diagnostics/pre-versioning-backup/addin/RockProPanel.cs",
+      "sha256": "634d0f2a2def2536f45d3d0a5a289d9859aa30d447a83783d91844f775832509"
+    },
+    {
+      "source": "generated-diagnostics/pre-versioning-backup/mcp/layout.py",
+      "file": "legacy/local-code/generated-diagnostics/pre-versioning-backup/mcp/layout.py",
+      "sha256": "1d1966503c4740a8f4dba6d9ee185d83a146760956447e543a34ecd54f752e00"
+    },
+    {
+      "source": "generated-diagnostics/pre-versioning-backup/mcp/project_store.py",
+      "file": "legacy/local-code/generated-diagnostics/pre-versioning-backup/mcp/project_store.py",
+      "sha256": "9c9772f3e34ef8d9ef36ea8c8a0818a69ac97dd1b0317965b4e7c30289ae75c7"
+    },
+    {
+      "source": "generated-diagnostics/pre-versioning-backup/mcp/server.py",
+      "file": "legacy/local-code/generated-diagnostics/pre-versioning-backup/mcp/server.py",
+      "sha256": "89f15d61006755644a7169713704634ae4c7df9ab40d88c9b3579547bbd10fb1"
+    },
+    {
+      "source": "generated-diagnostics/pre-versioning-backup/mcp/test_layout.py",
+      "file": "legacy/local-code/generated-diagnostics/pre-versioning-backup/mcp/test_layout.py",
+      "sha256": "e7fac3c4fc1dfc1a9a95ff27775ab754ab58da83d8b62e754e0daf7e33d320cb"
+    },
+    {
+      "source": "generated-diagnostics/pre-versioning-backup/mcp/test_mcp.py",
+      "file": "legacy/local-code/generated-diagnostics/pre-versioning-backup/mcp/test_mcp.py",
+      "sha256": "333ed702e1f6783b1f220a57654baab04739d5fdbd8568cbf9f33e926f25b574"
+    },
+    {
+      "source": "generated-diagnostics/pre-versioning-backup/mcp/test_projects.py",
+      "file": "legacy/local-code/generated-diagnostics/pre-versioning-backup/mcp/test_projects.py",
+      "sha256": "34669da7a2ed97284a78e12d55e1475f139cf5ed34529db32bc32c79a16fd324"
+    },
+    {
+      "source": "generated-diagnostics/pre-versioning-backup/mcp/worker.py",
+      "file": "legacy/local-code/generated-diagnostics/pre-versioning-backup/mcp/worker.py",
+      "sha256": "e9a6fab62febff514f3d124f93de4d84428ef2609265e1308d7aee2d08e536db"
+    },
+    {
+      "source": "generated-diagnostics/process-layer-cloud-20261031/Integracja/rockpro_cad/__init__.py",
+      "file": "legacy/local-code/generated-diagnostics/process-layer-cloud-20261031/Integracja/rockpro_cad/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "generated-diagnostics/profile-readback-compile-20261022-01/managed_identity.cs",
+      "file": "legacy/local-code/generated-diagnostics/profile-readback-compile-20261022-01/managed_identity.cs",
+      "sha256": "6fd01594c4b5a48ae27e260e3f6c6d3cca7d8f71960c520cbb19a4c925e26203"
+    },
+    {
+      "source": "generated-diagnostics/profile-spike-compile-20261023-01/managed_identity.cs",
+      "file": "legacy/local-code/generated-diagnostics/profile-spike-compile-20261023-01/managed_identity.cs",
+      "sha256": "c0521147d95529256253bed986ea31afc4ac38451fbde679dac5b05a380d6563"
+    },
+    {
+      "source": "generated-diagnostics/profiles-2000x3000x4000-20261024-01/extract_probe.py",
+      "file": "legacy/local-code/generated-diagnostics/profiles-2000x3000x4000-20261024-01/extract_probe.py",
+      "sha256": "114aa76ccbdf808010e0b7fee662b7f5a8fe9ff6f47de3c5defc23422e956932"
+    },
+    {
+      "source": "generated-diagnostics/read-fixed-failed.cs",
+      "file": "legacy/local-code/generated-diagnostics/read-fixed-failed.cs",
+      "sha256": "6e99337222defe7e1e07f46804a5cc229e95b66f3e0782fdd717c39d8c823524"
+    },
+    {
+      "source": "generated-diagnostics/reopen-final.cs",
+      "file": "legacy/local-code/generated-diagnostics/reopen-final.cs",
+      "sha256": "d4aa149c64ba944c81c5de0a1c0ca01f37917483231a34224f9909446efa0004"
+    },
+    {
+      "source": "generated-diagnostics/roc15-42-review/independent_review.py",
+      "file": "legacy/local-code/generated-diagnostics/roc15-42-review/independent_review.py",
+      "sha256": "01b53dca02a39592fc3731eb73b0b897488b13b6ccb23b2df4ecc4c17b5bf6a8"
+    },
+    {
+      "source": "generated-diagnostics/roc22-predeploy/mcp/layout.py",
+      "file": "legacy/local-code/generated-diagnostics/roc22-predeploy/mcp/layout.py",
+      "sha256": "e86fe240f257e4a677ab2e5091a20e301947b22fa8f07a39b7360eb3fc955baa"
+    },
+    {
+      "source": "generated-diagnostics/roc22-predeploy/mcp/project_store.py",
+      "file": "legacy/local-code/generated-diagnostics/roc22-predeploy/mcp/project_store.py",
+      "sha256": "26036ea8db14f554874049a4f3ed1538d8de68643e800113794c3641ca82e906"
+    },
+    {
+      "source": "generated-diagnostics/roc22-predeploy/mcp/server.py",
+      "file": "legacy/local-code/generated-diagnostics/roc22-predeploy/mcp/server.py",
+      "sha256": "d303c26ee7c11a59543a316e9c028a7e903f39a89d10c94a4272ea54901ab99a"
+    },
+    {
+      "source": "generated-diagnostics/roc22-predeploy/mcp/test_layout.py",
+      "file": "legacy/local-code/generated-diagnostics/roc22-predeploy/mcp/test_layout.py",
+      "sha256": "23ecf59cbe77da04e43ca52c3a0378fcd6ffc527231668dafffebe7607c45309"
+    },
+    {
+      "source": "generated-diagnostics/roc22-predeploy/mcp/test_versions.py",
+      "file": "legacy/local-code/generated-diagnostics/roc22-predeploy/mcp/test_versions.py",
+      "sha256": "d32f87e71901236ffeeb2e06ef7cbb4240280b7fe542b33b9d87bac91e930f55"
+    },
+    {
+      "source": "generated-diagnostics/roc22-predeploy/mcp/worker.py",
+      "file": "legacy/local-code/generated-diagnostics/roc22-predeploy/mcp/worker.py",
+      "sha256": "77b4e56a6e31cfaefdd60c280592cd0e9ea91e31bc15c4abc72c401f7afb0e80"
+    },
+    {
+      "source": "generated-diagnostics/roc22-stage/Integracja/rockpro_cad/mcp/layout.py",
+      "file": "legacy/local-code/generated-diagnostics/roc22-stage/Integracja/rockpro_cad/mcp/layout.py",
+      "sha256": "e50465725e6428aedb157ce59b380b43174200c30658005317fd3a3e91ebaf7b"
+    },
+    {
+      "source": "generated-diagnostics/roc22-stage/live_rpc_test.py",
+      "file": "legacy/local-code/generated-diagnostics/roc22-stage/live_rpc_test.py",
+      "sha256": "e865fd8a2914a48fd4f9936e6f9c7ed990079bcbdb5a0bea7074002031dcd22f"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/Faces.cs",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/Faces.cs",
+      "sha256": "9005cc5884287f708b2dcf5d580d4218acf3809536171d033959e36df6c97562"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/__init__.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/__init__.py",
+      "sha256": "8bc6b38c1f1be4a67a10c62d86a965adc0ef6a1c53e3b41e12aa033fefa0fa13"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/_coverage.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/_coverage.py",
+      "sha256": "ea48465095eb0d8085de3c2f6a0d1209e001ebafb3c0a058a785966135b5f1e0"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/_enum.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/_enum.py",
+      "sha256": "221169173ab39aadc6971bcc37f784814861f7c3f1aeeda6f1d026057abf3151"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/_geometry.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/_geometry.py",
+      "sha256": "76c54b9e6c73c495418b473e8b19db3bbe835c35a0a3bf8e3b274bf196f4120f"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/_ragged_array.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/_ragged_array.py",
+      "sha256": "89410200398bb2dbcb1ea91475c8c64ff977b56572e0490d48b914bf2ad09baf"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/_version.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/_version.py",
+      "sha256": "7714047df05dbe64bc3b6a524adb45550025b6b75a84717cc801641797074ebf"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/affinity.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/affinity.py",
+      "sha256": "fa6039b475d0bbf24655135edf8bb93f3eba635402b5c03ae10e837f74aa2d71"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/algorithms/__init__.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/algorithms/__init__.py",
+      "sha256": "80a1e2e5b80c243158d754d121045cd6d9907e6eb54805623d02e1ea5376267d"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/algorithms/_oriented_envelope.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/algorithms/_oriented_envelope.py",
+      "sha256": "9435b14637d88241b48f6ae9a1dcf4200d53e7746d7ef416549bbd7139d25121"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/algorithms/cga.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/algorithms/cga.py",
+      "sha256": "517b0980df5667d863d8a7b82171301b41939dab65d7dc0191df66c1d5eca26a"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/algorithms/polylabel.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/algorithms/polylabel.py",
+      "sha256": "f2b2a2dba22bec209209f6542dc6693a12b4c4855e535f57796b0ba36ad195d1"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/conftest.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/conftest.py",
+      "sha256": "3163bf43ae87f9f329beec687bbec02f82e9a0d02f84e47d6a0f2caa4c8318cd"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/constructive.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/constructive.py",
+      "sha256": "44df96cd12cf564945b0d109df5316c6dede4e2371fbcdc73963efed8e84ac96"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/coordinates.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/coordinates.py",
+      "sha256": "c84ab60023470fe260a53c087ae0f3e0dbc56802b735ec99128ab62740711684"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/coords.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/coords.py",
+      "sha256": "f006120e1f0595d14b5f184bdf16d381cac0e859317b6914daf89704b15e560e"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/creation.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/creation.py",
+      "sha256": "960c6027ed7e3e94d5db3733e7f456212051065866a2eb6c7016497b847c9729"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/decorators.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/decorators.py",
+      "sha256": "dce6814b95dfd163b015c534dd137d778915c9e282a8c75e991d73e0595118fc"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/errors.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/errors.py",
+      "sha256": "277976794a26358c88c8915354aeeed3f2cad60d271dd71dd51c6179d831c6db"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geometry/__init__.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geometry/__init__.py",
+      "sha256": "5ce6fb811fc28893b658c4e7c898d48a9a0d84e2683409fae8c9f7783e270cf7"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geometry/base.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geometry/base.py",
+      "sha256": "e3b240679140d8df0b0dd4c215cf854dfbcfa00b46e4ee6adecf8290b270d4b6"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geometry/collection.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geometry/collection.py",
+      "sha256": "2cbe3c61b123305ad23910d8d82542da54912b3d0ec096e20752efa7b51dc94c"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geometry/geo.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geometry/geo.py",
+      "sha256": "b502c5784e6e61d0c7084ab53113df89bacef6fe91441015fd1a05c2a95947a0"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geometry/linestring.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geometry/linestring.py",
+      "sha256": "f1d54547cf1f51ca2d302a1a355f5c8d57218d29c00c84a5a1b1c518cb645a4d"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geometry/multilinestring.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geometry/multilinestring.py",
+      "sha256": "0201f0feab98c59bf2bfaff49ccc159450fe7cac001ef9152e686f3e0bb8f853"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geometry/multipoint.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geometry/multipoint.py",
+      "sha256": "d9d8bb9bb9deb52e53aec470cfbb03eee319287aa1be4dbdfcc51e7456c4ac48"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geometry/multipolygon.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geometry/multipolygon.py",
+      "sha256": "54ecdcf019cea2c650f0c7e65ffbe7cfd4a15493adec5e3e9b489d0c440037e6"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geometry/point.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geometry/point.py",
+      "sha256": "ea5158a1a04b7476524f0e0204ee3074b1844524c7f9938e01eb183151e712e7"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geometry/polygon.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geometry/polygon.py",
+      "sha256": "75cd5397557b3e40651822bc4e53d0cebe5163bb07b8c218b21236052b433932"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geos.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/geos.py",
+      "sha256": "17342ddd744c7af6889ef34d1aa82178850291b69d0e39b4435e9d3affea1a91"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/io.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/io.py",
+      "sha256": "4044de93769d7f8213586389655dcd5ba2dc2f8030ea78be0da62ad260f4ccfd"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/linear.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/linear.py",
+      "sha256": "5b0b6f4982e618e5df6f99193ca756419660b8a3beb146eeefd8ae45fcaf413b"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/measurement.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/measurement.py",
+      "sha256": "d07c5f6f6cb03c13356efb1407fc80e02597e702fc0fd599ad76421926b9fe59"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/ops.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/ops.py",
+      "sha256": "4f8a5d922b0166fd285e3c01fdd655da5b05d64ccf64c58adf9c89d167c4d4ab"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/plotting.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/plotting.py",
+      "sha256": "8b3ad59b6519b46da5e688a67b1d8095525a80594d33bb68fc966cf03002d65f"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/predicates.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/predicates.py",
+      "sha256": "328bc2fa0e030a1e9cd3912bec86d11335aa946f54701451b102fffbe499db03"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/prepared.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/prepared.py",
+      "sha256": "95572af279db105af45cd142d504fbd4aa912c8434b9b4a1743fcc10f99eb5fd"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/set_operations.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/set_operations.py",
+      "sha256": "e0e3184600f849f84955f9a1e3c7558666ce433432aa2f60773642e66d2d244c"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/speedups.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/speedups.py",
+      "sha256": "23ba04c587a56f4d82bf517ed53791940de8496c12c569690faba99f00011f47"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/strtree.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/strtree.py",
+      "sha256": "9535bbef96fbcec13a1b7b493ee167981d2c4a96293ddfa5e2bc85a5a873f09b"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/testing.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/testing.py",
+      "sha256": "d21f073fbe9511b4312132c63a5466444c897fe7734310b649b589322edd1990"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/common.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/common.py",
+      "sha256": "8410d543b8d6148a3143676baa4cd2b2ec3c750594df90e067d4b31394cbbd17"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_collection.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_collection.py",
+      "sha256": "f313b093f5c2dac540ad5311103424a4322df93b8711eb889c26a1a462633cb6"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_coords.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_coords.py",
+      "sha256": "2d92bedfe0f38bb43a70fbf9289ef7bbecd05d9f8d07ccf56e38a505678e6b31"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_decimal.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_decimal.py",
+      "sha256": "e0c68d45c95a5610d4db270da7c9e1d547d6e942e1547dce4bf9f86ad3eab31c"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_emptiness.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_emptiness.py",
+      "sha256": "cbee6ab4ea2f2ca0a2314d3078cdee55cd7d6d78f0da8626d79ee3294e618228"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_equality.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_equality.py",
+      "sha256": "7ca4c4e0f240fdcd354b0ada2e0ba556580ed24398a605fc681373f7c2f244cb"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_format.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_format.py",
+      "sha256": "aa1bda8c71c290e43a1a242631e682bad20f920d281463d8c02e85a56174a4dd"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_geometry_base.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_geometry_base.py",
+      "sha256": "a12a6b5c36cea0d72e833a44368ce64e3b2cfe3726be81b75987b493c4153e93"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_hash.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_hash.py",
+      "sha256": "a91f92aa572cddc0b31cab0bdd80b9535f9db85e97f340bbc0ab0c5b699d0665"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_linestring.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_linestring.py",
+      "sha256": "7aac15fdbcd67f5efe27db8cc5a89b925bb195e5df40483e403ab0049ad1aa6e"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_multi.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_multi.py",
+      "sha256": "56ce0058b6e3e88c4266b36ae173f34d02ceb8c3064b41dccba72f707107db94"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_multilinestring.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_multilinestring.py",
+      "sha256": "1b65523ff6b6bd672fd5f017c8c4361319ce785874f9a171d246fe32d613bef5"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_multipoint.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_multipoint.py",
+      "sha256": "434b7b643b47de7438c7fa500185765e068f03cfc860745a3ea00431f4671fe2"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_multipolygon.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_multipolygon.py",
+      "sha256": "9d566871e2e8e2dee008884cd00b68d433df3c9561f3710b8220d4c1304bb7f3"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_point.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_point.py",
+      "sha256": "97b38689524836057e8b36c7dab0452000d670c18ebd99f83f3cbebbf4158bb1"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_polygon.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/geometry/test_polygon.py",
+      "sha256": "ab14a98effed2d1627078921606e3ee35658e05606c0ac72e602936a07c06b2f"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/conftest.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/conftest.py",
+      "sha256": "a7a8c964aca50cd847974c9c29e882948b3292ea9d5f0bfa6e44636fcd059c2f"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_affinity.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_affinity.py",
+      "sha256": "c413a61dc94c106636d45fb88e52fb2c9d3c0c3f8b774720a15e9d4282238db4"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_box.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_box.py",
+      "sha256": "494961ae058e217904dfca4d3ced1eda769b0c55c3d662c15737bb2278973bc1"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_buffer.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_buffer.py",
+      "sha256": "85138808d078ed1e2f2597da7f1ca94dcc0fee2e72a5d4eefdff5f7e07d6f759"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_cga.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_cga.py",
+      "sha256": "c712d9520e6dd093b4f325d663cf90e07de777a2d63830151b73ffb6b59935cf"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_clip_by_rect.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_clip_by_rect.py",
+      "sha256": "43d6e01e51711a7646fb2aadb69bf4aa75966c287c90d58bee24aa3c9653007d"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_create_inconsistent_dimensionality.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_create_inconsistent_dimensionality.py",
+      "sha256": "b0fee86acc5401a4336a46c034b5477fb85a44f3863704b84c69600621a4b719"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_delaunay.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_delaunay.py",
+      "sha256": "5eca1aa01e4da4a1dffe78d61692cef1a3222535b05b03dfec5f9901e4117a66"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_empty_polygons.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_empty_polygons.py",
+      "sha256": "346c26bb8ed830422553284cbbafb43614f0a677696f5d1df0838f8d9cc48fc5"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_equality.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_equality.py",
+      "sha256": "0eb93641c40f1980609436343cbde2709dac21c11f33116b060fcac12e318a74"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_geointerface.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_geointerface.py",
+      "sha256": "9ce56eb78c5d06dce1714b59d676025087d32ed51bda97f4af304d8876da921b"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_invalid_geometries.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_invalid_geometries.py",
+      "sha256": "c32e785eb9fe1cd1fe34714cf799e5a2d22a8c9caf80ed390a95d346895ffa83"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_linear_referencing.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_linear_referencing.py",
+      "sha256": "e03935c3e22abc3cfbaac71bdde8679fbcad3a8e5cebfe0f288ea3b93b3114ae"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_linemerge.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_linemerge.py",
+      "sha256": "e74ca9292bbade918f92ea43351ec8b11abc952c38b34ba6f81ae7bcbee69779"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_locale.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_locale.py",
+      "sha256": "94acab16dfb318c2bdbd7e9ea6ef7f720f74d054e89f245721f8a88bd69a0a61"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_make_valid.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_make_valid.py",
+      "sha256": "3d6cef03715f1f3013fa7eeca55faaf91d4c73fda3cc4ed258f64ffcdfd07204"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_mapping.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_mapping.py",
+      "sha256": "2c32d5b771a989488372d9a244645c06f5a205aa673a32aba024ecebd6d722c3"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_minimum_clearance.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_minimum_clearance.py",
+      "sha256": "54ac0ff5ad68fd871e8fcd2fcc914aea8951df6e7fb97a82b40c216d30b5ec32"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_ndarrays.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_ndarrays.py",
+      "sha256": "089aad42cc0f5bfe7325b36fc96ac08bc0e0218b5bae01893785aa6948654bea"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_nearest.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_nearest.py",
+      "sha256": "b7695a6833b3acba7437792877f740b15136561e7903bbf7884fde34a148ba3b"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_operations.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_operations.py",
+      "sha256": "30ccfa73e03340d78827cc89750f9c0ccf50a29cbef7e9d22f06c22f795bfdcf"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_operators.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_operators.py",
+      "sha256": "ead06be2382e5907ef08dd0f1ca4fb73be5c43c56ece145ab53c82953da16b54"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_orient.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_orient.py",
+      "sha256": "6bc139130d3dd7b37a1f2ef8ad502c7ce843122e81d4cc45d410b3be5976bfa5"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_parallel_offset.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_parallel_offset.py",
+      "sha256": "3d38102346114e654e677849bc0f266c86abbfa5757b2fcfbd8403c044c50028"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_persist.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_persist.py",
+      "sha256": "f1f65c6dbffd8ab731fb3ac72df7bf3128d921485da5dcedb0d93706ec641c87"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_pickle.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_pickle.py",
+      "sha256": "08e0b8a2419463dde867873c754a0d5f6942e592e7755a1793a03b941349b46d"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_polygonize.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_polygonize.py",
+      "sha256": "69f977de65df951895fa3a57c3d221d433b8322414845060c44f5544084ba984"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_polylabel.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_polylabel.py",
+      "sha256": "19fc9ad433dffac516f05c18b71c40aa8e7e9b13d3057e724efa99849d3c746c"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_predicates.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_predicates.py",
+      "sha256": "516a3ec2018f77e3819aa1b2d651f4b9e8f2dfca04880d4303534f6057beb206"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_prepared.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_prepared.py",
+      "sha256": "ca9bb057d5b3aa917d07866f149e678018a936b1efad529b2e58d2312ce976fa"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_products_z.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_products_z.py",
+      "sha256": "654230bc18676f513bc274879903181339c30140c37ba66ba6a4f36f7cce47f4"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_shape.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_shape.py",
+      "sha256": "21b73ef28281c1f466ffba9d0e83782f177fad32e2c9048f43bb65e7bb959806"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_shared_paths.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_shared_paths.py",
+      "sha256": "0bce6c42b73a2d69065f550aef43271976a024e61d4ef7a175f09f3a2bc5fac7"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_singularity.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_singularity.py",
+      "sha256": "d510355703a999b63277c679d4bf1664fd9e0c41b5afd55b4a06b88d948884e8"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_snap.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_snap.py",
+      "sha256": "64a6013539baae99fc4657d9e695fc235097635cfbdb66c75cc3d42efa3f0b2d"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_split.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_split.py",
+      "sha256": "5e8609fbdd6a1fdf3f6e5e88df44292bde352c0fcacd07ae80081245b4b42545"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_substring.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_substring.py",
+      "sha256": "12d044975d33b4b31b36fe020f3920a99e3a2c6ba1d56ee2b8c0d460ae0cf89a"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_svg.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_svg.py",
+      "sha256": "a84f2c15fb83a1080073ff622f95d3802f6074dc46347677aed4a97fd0260116"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_transform.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_transform.py",
+      "sha256": "e7977f5f28b5c4c32e11b6dad6941d3fc8e2eab74f0013eb138689062a1a912d"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_union.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_union.py",
+      "sha256": "b1c7ce5bce9d65068b5d657b5e85c1cd58f349be6f14b4ad15497fb37f19a8bf"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_validation.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_validation.py",
+      "sha256": "a45d78de8ab9770ae2d30822af2708c130de5c672de58d207ea3111dec053df3"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_vectorized.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_vectorized.py",
+      "sha256": "418602733afd951e5406ccbe410726731443cc302052f14722d6c4efea449225"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_voronoi_diagram.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_voronoi_diagram.py",
+      "sha256": "adf6ea8fcb64bd42d0301b1c3d2501be6a7b39efab896d494e781c65eb447e11"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_wkb.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_wkb.py",
+      "sha256": "5662d0cdf98c450af4ba0684620147f543028ab84604b7c808007c8719ffe39f"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_wkt.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/test_wkt.py",
+      "sha256": "7cada3cec8d5784e2e35ef8e7f7c3cae86c2d1c320c645a6deb884d1a9224c37"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/threading_test.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/legacy/threading_test.py",
+      "sha256": "f44689e5030f28f1c74ceb3e6f25f5555be66fb2112b7d57c3aece1d1335255b"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_constructive.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_constructive.py",
+      "sha256": "483a39a076a45f6d6febad1cad6c0391612d42cb978e6197594e82e978d693e0"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_coordinates.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_coordinates.py",
+      "sha256": "3f36476e59e58ee05338b3085036a722ed2c487a392877cb3cd15a2119237772"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_coverage.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_coverage.py",
+      "sha256": "3489de14f53b8aee9459891065c0f91dbc6ca12e44641dbd75df6fd269edbfff"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_creation.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_creation.py",
+      "sha256": "9dc094bfea4223687d01640c72c7e32b88192000b1af7219a0dbd53259fab3dc"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_creation_indices.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_creation_indices.py",
+      "sha256": "6cd4d511085714661eaa03359b1389cdbab4e2086c180d9e1221da2a10e3592c"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_decorators.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_decorators.py",
+      "sha256": "7e9b48be092c820b22955b1cc681e0beafdf9a90e55891687e3c19945a9be4b3"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_geometry.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_geometry.py",
+      "sha256": "eed6945e5a07a597320d3f0290410bee563814a8b8aea28ee2a43e8dd2303c7b"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_io.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_io.py",
+      "sha256": "e1b1bfadf473d25710bc4670a963d8e0c93fbd56d4640c2640bdbf7b27dd13b9"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_linear.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_linear.py",
+      "sha256": "78cd328174289cb35412064a4f2494b5a2001bd5c2cf0efe62f2dd1facecc1d3"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_measurement.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_measurement.py",
+      "sha256": "7366b2ab8b06562230986d3063d104333405c820b401c3ccdf046661b4de4997"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_misc.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_misc.py",
+      "sha256": "7fbe7faf9e220d2a2e92560f227386b724766dd32d9506446539897b6ee2009e"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_plotting.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_plotting.py",
+      "sha256": "774985c3cf768cfede02fdca7f59bb3d57222dd3f838d5e95bbdda3884e274bb"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_predicates.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_predicates.py",
+      "sha256": "dd5367da8c4d0ad91a108ed20f10ee648b515944ef87a7c5b17bd81f2a2faf88"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_ragged_array.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_ragged_array.py",
+      "sha256": "cc027dc6e0afc2bfc090f234d3b6d34bc497551a5e21580aea64fcea693395c8"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_set_operations.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_set_operations.py",
+      "sha256": "52cb47ca0749697ecb8afa8dc1792407576a5d1a0b0beea50425f62ac8e8b397"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_strtree.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_strtree.py",
+      "sha256": "dc268db3f8c780bcbadb5a2b9453f1b759d15b974cce4f15edc98cd181c0d45a"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_testing.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/tests/test_testing.py",
+      "sha256": "205211d3b721fce15229b3666d63b849c44a9aa998d98dfdfa6b95a703bbc0b3"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/validation.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/validation.py",
+      "sha256": "e30b234363c3cd82f00f2bbb8d48923df0ae47373bfce7955756a574007be20b"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/vectorized/__init__.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/vectorized/__init__.py",
+      "sha256": "c730430fa128f332d5eed26c662e26e18c9031e2c9d8e849f572f9acdbe94871"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/wkb.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/wkb.py",
+      "sha256": "5fdbf585fbf780ad46d8b78fafba5b60b2d0702358d0334f0acc62c8fa5c8216"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/wkt.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/geometry_dependencies/shapely/wkt.py",
+      "sha256": "ead6970ab21cd2e4ca4421e38836fcd8f51b44632ced094ae97e7d01a153373a"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/job_runner.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/job_runner.py",
+      "sha256": "f93acc968c41097e1e9c4cc45fe06551b7d56518b751ed37221d3fc86480c20d"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/MachiningPrototype.cs",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/MachiningPrototype.cs",
+      "sha256": "1079da4f04feb397ab757999b8061566e399295778ebd28603e7eaaaf44363c2"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/make_plan.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/make_plan.py",
+      "sha256": "fa88bc7972b9aa4349837aa14a07232bffeb0f9a3558337813a72d6fdb1597b6"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/RebateProbe.cs",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/RebateProbe.cs",
+      "sha256": "f58333feecee810bc807be0f029d9f0542c1cc80734a9929e25b9658eef32144"
+    },
+    {
+      "source": "generated-diagnostics/roc41-native-20261026/sections.py",
+      "file": "legacy/local-code/generated-diagnostics/roc41-native-20261026/sections.py",
+      "sha256": "467c79b26ee22b62d271113a7b551d70bca2cd2e009052da7eb5f9b464440455"
+    },
+    {
+      "source": "generated-diagnostics/runtime-ui-20261022/receipt.py",
+      "file": "legacy/local-code/generated-diagnostics/runtime-ui-20261022/receipt.py",
+      "sha256": "48084bda3866ce5270d733c3379e0a25227e005ae04d5d428db483b11e4eac81"
+    },
+    {
+      "source": "generated-diagnostics/scene14-repair-20261026/BindingDiagnostic.cs",
+      "file": "legacy/local-code/generated-diagnostics/scene14-repair-20261026/BindingDiagnostic.cs",
+      "sha256": "e7615f04be481ccbe4441607cec4ebad6234990f7a68c9e6c903070c82f8ab9b"
+    },
+    {
+      "source": "generated-diagnostics/sidebar-viewcube-20261027/check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/sidebar-viewcube-20261027/check.cjs",
+      "sha256": "aa375c07f466664547f16129e7afa1349981146110779be1b100c9167cbbf152"
+    },
+    {
+      "source": "generated-diagnostics/sidebar-viewcube-20261027/main-check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/sidebar-viewcube-20261027/main-check.cjs",
+      "sha256": "3d261252c54326a072062144aba23d153c169142d5852d58a9635bfb79f1a93d"
+    },
+    {
+      "source": "generated-diagnostics/sidebar-viewcube-20261027/serve.py",
+      "file": "legacy/local-code/generated-diagnostics/sidebar-viewcube-20261027/serve.py",
+      "sha256": "f9dc03d2c278b0a1b4c51ec9f9b9a4391ded4622d6491673076cff3e1cb099df"
+    },
+    {
+      "source": "generated-diagnostics/source-parts-3d-20261027/check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/source-parts-3d-20261027/check.cjs",
+      "sha256": "7295d952a62faf27cdf7347cc34ecfdc667fabd1dbd162d33ef16a3b0228d0e6"
+    },
+    {
+      "source": "generated-diagnostics/source-parts-3d-20261027/diagnose.cjs",
+      "file": "legacy/local-code/generated-diagnostics/source-parts-3d-20261027/diagnose.cjs",
+      "sha256": "fd525268bdfe63cbb2d92445fccde2e33cdf9bf3fcbeed4eb843ab9e8eec6c0d"
+    },
+    {
+      "source": "generated-diagnostics/studio-complete-20261027/e2e.cjs",
+      "file": "legacy/local-code/generated-diagnostics/studio-complete-20261027/e2e.cjs",
+      "sha256": "74a3398538ce150e2aa98427599e51283c2d5dac05347b439c49a2647e06f4f0"
+    },
+    {
+      "source": "generated-diagnostics/studio-complete-20261027/inspect.cjs",
+      "file": "legacy/local-code/generated-diagnostics/studio-complete-20261027/inspect.cjs",
+      "sha256": "7bdc09d1b2f3c2f09c38c7ee0b0486f64d8265ea3e8700ae2671ab8796713bec"
+    },
+    {
+      "source": "generated-diagnostics/studio-fluid-layout-20261027/check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/studio-fluid-layout-20261027/check.cjs",
+      "sha256": "06d79baa365cef8d60dd9a236aa99aee8aa65e6da9040f147e9453cad201c8a1"
+    },
+    {
+      "source": "generated-diagnostics/studio-interaction-20261027/check-math.mjs",
+      "file": "legacy/local-code/generated-diagnostics/studio-interaction-20261027/check-math.mjs",
+      "sha256": "6accd140721fb54960843e4486db67f0ac90251ed9180f449801e79ed65111f9"
+    },
+    {
+      "source": "generated-diagnostics/studio-interaction-20261027/check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/studio-interaction-20261027/check.cjs",
+      "sha256": "240d64f2eb67648db65998444b6d9afc6d19e1123b856f035931407cbc838a2f"
+    },
+    {
+      "source": "generated-diagnostics/studio-interaction-20261027/main-smoke.cjs",
+      "file": "legacy/local-code/generated-diagnostics/studio-interaction-20261027/main-smoke.cjs",
+      "sha256": "64befb7e38934d54fce81b0e30e8b03a0b541e6abc2ded4baeeecc766188ad6f"
+    },
+    {
+      "source": "generated-diagnostics/studio-panels-night-20261027/check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/studio-panels-night-20261027/check.cjs",
+      "sha256": "db22103d68826da15d8d72e1f3e952f3d253bb6467aa3a4ee7202577eff87462"
+    },
+    {
+      "source": "generated-diagnostics/studio-review-20261027/review-browser.cjs",
+      "file": "legacy/local-code/generated-diagnostics/studio-review-20261027/review-browser.cjs",
+      "sha256": "91c29fbce91788547cc973f1ff98bebf31a780236be119bdeb76a8980a4cea4b"
+    },
+    {
+      "source": "generated-diagnostics/studio-step6-20261027/check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/studio-step6-20261027/check.cjs",
+      "sha256": "e7e6f516b60b5134b1bcc4f929e89c9b53345076e42dc8240a56356d2225e05e"
+    },
+    {
+      "source": "generated-diagnostics/studio-supplier-preview-20261028/api/index.py",
+      "file": "legacy/local-code/generated-diagnostics/studio-supplier-preview-20261028/api/index.py",
+      "sha256": "8bc397aded4a9368dd7cd2e7e6e99d6ac9326e20773425498a99a1d9b041b1f0"
+    },
+    {
+      "source": "generated-diagnostics/studio-ux-20261027/check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/studio-ux-20261027/check.cjs",
+      "sha256": "8c6f967842f12ffe4765b0f54384ac713798cd0d4ad6de527943bac6169d0d90"
+    },
+    {
+      "source": "generated-diagnostics/studio-ux-20261027/main-check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/studio-ux-20261027/main-check.cjs",
+      "sha256": "29df374b92caa157762825efac5a037bbd5f760ff9120133b38f3b2a5196b937"
+    },
+    {
+      "source": "generated-diagnostics/studio-ux-20261027/mobile-check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/studio-ux-20261027/mobile-check.cjs",
+      "sha256": "2209e5cffbb9609cf9a8b3a25fd510bb3a39e5c1adf0794dd6cc99ae36484a5c"
+    },
+    {
+      "source": "generated-diagnostics/szuflady-20261030/probe_center_anchor_not_used.cs",
+      "file": "legacy/local-code/generated-diagnostics/szuflady-20261030/probe_center_anchor_not_used.cs",
+      "sha256": "be51074e9ef67d267822d5a322d8f27f7073a7269454dde348b4866888095cab"
+    },
+    {
+      "source": "generated-diagnostics/t1-600x500x350-ic2023-20261026/BindingProbe.cs",
+      "file": "legacy/local-code/generated-diagnostics/t1-600x500x350-ic2023-20261026/BindingProbe.cs",
+      "sha256": "8176eb60f6d6c2f95f7384f834892302aba1c3eb7b6ad1674f64a247358f3813"
+    },
+    {
+      "source": "generated-diagnostics/t1-600x500x350-ic2023-20261026/prepare_unsaved.py",
+      "file": "legacy/local-code/generated-diagnostics/t1-600x500x350-ic2023-20261026/prepare_unsaved.py",
+      "sha256": "079766b1eeee1aadf570a7481052ee38667be3f6f2f114df100079700aa881c8"
+    },
+    {
+      "source": "generated-diagnostics/t1-600x500x350-ic2023-20261026/RepairUnsaved.cs",
+      "file": "legacy/local-code/generated-diagnostics/t1-600x500x350-ic2023-20261026/RepairUnsaved.cs",
+      "sha256": "3f860270cc1f424d1760f2c8236fd94e13d7f6c0a7c86f36a3c039a827ced217"
+    },
+    {
+      "source": "generated-diagnostics/t1-600x500x350-ic2023-20261026/T1Unsaved.cs",
+      "file": "legacy/local-code/generated-diagnostics/t1-600x500x350-ic2023-20261026/T1Unsaved.cs",
+      "sha256": "e9632317ee481d4ba8f910ff072e0698aee9f71589e8d770a37644eea62e16bf"
+    },
+    {
+      "source": "generated-diagnostics/t2-analysis-20261026/build_analysis.py",
+      "file": "legacy/local-code/generated-diagnostics/t2-analysis-20261026/build_analysis.py",
+      "sha256": "7b802a8dda44bfb6079ab520d0317daacae0d87b250b6b005a528f7d8acd1235"
+    },
+    {
+      "source": "generated-diagnostics/tv-counts-20261030/Finish09.cs",
+      "file": "legacy/local-code/generated-diagnostics/tv-counts-20261030/Finish09.cs",
+      "sha256": "598ff7ca027179cd39aeb08bae3caea1bf2327abfea5a3bc557b72f073eaf9f5"
+    },
+    {
+      "source": "generated-diagnostics/tv-counts-20261030/FinishCheckpoint_diagnostic_only.cs",
+      "file": "legacy/local-code/generated-diagnostics/tv-counts-20261030/FinishCheckpoint_diagnostic_only.cs",
+      "sha256": "e3be63e40d4dbf35f5ea2f9bc4841ad340be4ef627fc3ef243ef362332ac57ef"
+    },
+    {
+      "source": "generated-diagnostics/tv-counts-20261030/InspectR004.cs",
+      "file": "legacy/local-code/generated-diagnostics/tv-counts-20261030/InspectR004.cs",
+      "sha256": "649c7f7793bd05db04ec0ad6306d2d38141e8a550095ace83fdbda5c3c6a62d3"
+    },
+    {
+      "source": "generated-diagnostics/tv-counts-20261030/LegacyQuantityExpressions_diagnostic_only.cs",
+      "file": "legacy/local-code/generated-diagnostics/tv-counts-20261030/LegacyQuantityExpressions_diagnostic_only.cs",
+      "sha256": "80850d04c3f48326111f6cf76624e5710c0b40701ec042da4f031182fbd148f4"
+    },
+    {
+      "source": "generated-diagnostics/tv-counts-20261030/NameRead.cs",
+      "file": "legacy/local-code/generated-diagnostics/tv-counts-20261030/NameRead.cs",
+      "sha256": "15832b20d4df879647b136b3bf67661063ac296a553a2ff72a34a3e2262a42ba"
+    },
+    {
+      "source": "generated-diagnostics/tv-counts-20261030/PrepareRestart.cs",
+      "file": "legacy/local-code/generated-diagnostics/tv-counts-20261030/PrepareRestart.cs",
+      "sha256": "6e151968995379e6b8a73f0cb0a2982fcc364601b2bc0b7ff0044ace97c273c4"
+    },
+    {
+      "source": "generated-diagnostics/tv-counts-20261030/ReadBindings.cs",
+      "file": "legacy/local-code/generated-diagnostics/tv-counts-20261030/ReadBindings.cs",
+      "sha256": "6503b55282111884b8a0e6f4c2b054bbbc22754e75538a73bce82dfe5b988875"
+    },
+    {
+      "source": "generated-diagnostics/tv-counts-20261030/ReadCenters.cs",
+      "file": "legacy/local-code/generated-diagnostics/tv-counts-20261030/ReadCenters.cs",
+      "sha256": "9c2870233a7c92baf7bde1fb33253fee5e526978dc03814eb41c22c5aad658d3"
+    },
+    {
+      "source": "generated-diagnostics/tv-counts-20261030/ReadParams.cs",
+      "file": "legacy/local-code/generated-diagnostics/tv-counts-20261030/ReadParams.cs",
+      "sha256": "7fb8352f6603b50ea357d633d7ca0fce0faef0e39e83655e13fbab5e98af3085"
+    },
+    {
+      "source": "generated-diagnostics/tv-counts-20261030/RegistrationProbe.cs",
+      "file": "legacy/local-code/generated-diagnostics/tv-counts-20261030/RegistrationProbe.cs",
+      "sha256": "f6d065e63ca20f3b72ab40ab4241def419fd92cdd241e382b0bed83a7adea2cb"
+    },
+    {
+      "source": "generated-diagnostics/tv-counts-20261030/RepairR004.cs",
+      "file": "legacy/local-code/generated-diagnostics/tv-counts-20261030/RepairR004.cs",
+      "sha256": "5a27f96c5b5d55610f4240043e4576f17d3e9efe0b0b250b294223cbe084e65f"
+    },
+    {
+      "source": "generated-diagnostics/tv-counts-20261030/Snapshot.cs",
+      "file": "legacy/local-code/generated-diagnostics/tv-counts-20261030/Snapshot.cs",
+      "sha256": "032484a3eea4a77fa074c6be6c3c16a4000130033b50dffdaaf95b4e49c2abde"
+    },
+    {
+      "source": "generated-diagnostics/tv-counts-20261030/SnapshotR003.cs",
+      "file": "legacy/local-code/generated-diagnostics/tv-counts-20261030/SnapshotR003.cs",
+      "sha256": "1aca42099219f6cdadf6dce245c90d9dbf84e9db564886c5a41b79daaede0793"
+    },
+    {
+      "source": "generated-diagnostics/tv-fixed-abandoned-20261031/CheckTvFixedMounts2027.cs",
+      "file": "legacy/local-code/generated-diagnostics/tv-fixed-abandoned-20261031/CheckTvFixedMounts2027.cs",
+      "sha256": "1b793f7ba3445e5b7326e210d495de801fc290eb005972de6da4cd72de2a29d3"
+    },
+    {
+      "source": "generated-diagnostics/tv-fixed-abandoned-20261031/FreezeTvMountCounts2027.cs",
+      "file": "legacy/local-code/generated-diagnostics/tv-fixed-abandoned-20261031/FreezeTvMountCounts2027.cs",
+      "sha256": "739fb99f9e03f223e1a85e16147bb39870a56744e00b23c170c62b156b23baa4"
+    },
+    {
+      "source": "generated-diagnostics/tv-hisense85-20261029/finalize-mounting.py",
+      "file": "legacy/local-code/generated-diagnostics/tv-hisense85-20261029/finalize-mounting.py",
+      "sha256": "8be6760709d72cc42941c7dbf75a548d4f16851907eede974bded2ab1c638714"
+    },
+    {
+      "source": "generated-diagnostics/tv-hisense85-20261029/finalize.py",
+      "file": "legacy/local-code/generated-diagnostics/tv-hisense85-20261029/finalize.py",
+      "sha256": "d2fe23e3a49b1053ae230cfeb908589a40f20bd0f88c4197ec08f6d5b31a30bd"
+    },
+    {
+      "source": "generated-diagnostics/ui_conflict_client.py",
+      "file": "legacy/local-code/generated-diagnostics/ui_conflict_client.py",
+      "sha256": "f33c8bda994f4bef2412dda3bb1260c6a47f90491df08cb3c79020b0a721db99"
+    },
+    {
+      "source": "generated-diagnostics/update_history.py",
+      "file": "legacy/local-code/generated-diagnostics/update_history.py",
+      "sha256": "12ac5491116b528adacf5e933f77948e2805df3e25e4d35d2931a68f5b83b179"
+    },
+    {
+      "source": "generated-diagnostics/vercel-studio-20261028-01/api/index.py",
+      "file": "legacy/local-code/generated-diagnostics/vercel-studio-20261028-01/api/index.py",
+      "sha256": "f514c3dd38c45b159ccb09494717110137135790753410be779ff861ba5deca0"
+    },
+    {
+      "source": "generated-diagnostics/vercel-studio-20261028-01/Integracja/rockpro_cad/studio_parts.py",
+      "file": "legacy/local-code/generated-diagnostics/vercel-studio-20261028-01/Integracja/rockpro_cad/studio_parts.py",
+      "sha256": "b17a489db87046f8efeef3214920437566a7dc931fc3e89503bff64c999f380a"
+    },
+    {
+      "source": "generated-diagnostics/vercel-studio-20261028-01/Integracja/rockpro_cad/studio_placement.py",
+      "file": "legacy/local-code/generated-diagnostics/vercel-studio-20261028-01/Integracja/rockpro_cad/studio_placement.py",
+      "sha256": "6b9b4f849ee0084004a2e3acd4959f53234549b244b9edadebd85a7d8086c51d"
+    },
+    {
+      "source": "generated-diagnostics/vercel-studio-20261028-01/Integracja/rockpro_cad/studio_structure.py",
+      "file": "legacy/local-code/generated-diagnostics/vercel-studio-20261028-01/Integracja/rockpro_cad/studio_structure.py",
+      "sha256": "a34be9b52ecf6f843b4d6ae089d875cbc447845f5a5d0f20f227a05ad3ef44da"
+    },
+    {
+      "source": "generated-diagnostics/vercel-studio-20261028-10/Integracja/rockpro_cad/studio_review.py",
+      "file": "legacy/local-code/generated-diagnostics/vercel-studio-20261028-10/Integracja/rockpro_cad/studio_review.py",
+      "sha256": "4cdf6b2a99a852df6459cb8c87757c2ea0f0f62b06562a8e54e0d2203b370aea"
+    },
+    {
+      "source": "generated-diagnostics/vercel-studio-20261028-14/Integracja/rockpro_cad/studio_review.py",
+      "file": "legacy/local-code/generated-diagnostics/vercel-studio-20261028-14/Integracja/rockpro_cad/studio_review.py",
+      "sha256": "03536e61daa2f9df01a5a28c9d2e3486ea9ad85d0f7b0ae239ae7c8cd786c796"
+    },
+    {
+      "source": "generated-diagnostics/version_title.py",
+      "file": "legacy/local-code/generated-diagnostics/version_title.py",
+      "sha256": "c8fe07376915f844e4b97da064d8abf1cc4a25a23ee5587335aaa0df35e7f56a"
+    },
+    {
+      "source": "generated-diagnostics/wizard-20261027/check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/wizard-20261027/check.cjs",
+      "sha256": "890eb3226f3236b3c7b8f2c79435ea89605a4d9a05c8472c4a86452b7d07ae87"
+    },
+    {
+      "source": "generated-diagnostics/wizard-20261027/serve_test.py",
+      "file": "legacy/local-code/generated-diagnostics/wizard-20261027/serve_test.py",
+      "sha256": "dc49bf3181aabcec2a47a78a7e8418249605756fbd8ce815fb091209c2091bff"
+    },
+    {
+      "source": "generated-diagnostics/wizard-joint-result-20261027/check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/wizard-joint-result-20261027/check.cjs",
+      "sha256": "34ebe7148ea4646f50c998770f791b58b5bdbbfa974c8cf145d7df2938cdc60c"
+    },
+    {
+      "source": "generated-diagnostics/wizard-joint-result-20261027/serve_test.py",
+      "file": "legacy/local-code/generated-diagnostics/wizard-joint-result-20261027/serve_test.py",
+      "sha256": "c75137dffd6df7a67c5385564bedc60e09d562e737682f313d94a354193b0f35"
+    },
+    {
+      "source": "generated-diagnostics/wizard-parts-20261027/check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/wizard-parts-20261027/check.cjs",
+      "sha256": "a1d72126819d2cb6b11e0b4f74a98ae1f8db9dd27c8dcb64068b41fe10311dde"
+    },
+    {
+      "source": "generated-diagnostics/wizard-placement-20261027/check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/wizard-placement-20261027/check.cjs",
+      "sha256": "926f5b14aa8bf36e786d0790e1271f0e80fd407a549efca5909914e992f9b687"
+    },
+    {
+      "source": "generated-diagnostics/wizard-placement-20261027/main-smoke.cjs",
+      "file": "legacy/local-code/generated-diagnostics/wizard-placement-20261027/main-smoke.cjs",
+      "sha256": "0d3109f586255c75bfdfb8fe38f2a919d2306c16026f9e9994c9abb78df2c4c9"
+    },
+    {
+      "source": "generated-diagnostics/wizard-placement-20261027/serve_test.py",
+      "file": "legacy/local-code/generated-diagnostics/wizard-placement-20261027/serve_test.py",
+      "sha256": "a69c500d3b7a5b9fb6d619f0d94a1f62c9fcbb1c2e7e1c3e6da18d433a83319b"
+    },
+    {
+      "source": "generated-diagnostics/wizard-removable-lid-20261027/check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/wizard-removable-lid-20261027/check.cjs",
+      "sha256": "40ba7806005d861f43d7fee544e2c271e72d61dd055a23b1da2c0e849c2c70ab"
+    },
+    {
+      "source": "generated-diagnostics/wizard-three-types-20261027/check.cjs",
+      "file": "legacy/local-code/generated-diagnostics/wizard-three-types-20261027/check.cjs",
+      "sha256": "974707b163d1a0bd1fb2a5e7787fdbdd1b8558ee6978b07596a777b8660cd001"
+    }
+  ]
+}

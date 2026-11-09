@@ -1,0 +1,32 @@
+const {chromium}=require('C:/Users/zuzan/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const assert=require('assert/strict'),fs=require('fs'),path=require('path');
+(async()=>{
+ const browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true,args:['--enable-unsafe-swiftshader']});
+ const page=await browser.newPage({viewport:{width:1500,height:1100},acceptDownloads:true}),errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
+ await page.goto('http://127.0.0.1:51343/wizard_test_session_20261027/wizard.html');await page.waitForFunction(()=>window.rockproWizard&&window.rockproWizardView?.model);
+ await page.selectOption('#type','three_piece');await page.click('#apply-type');await page.waitForFunction(()=>window.rockproWizardView.model.draft.type==='three_piece');
+ const legacy=await page.evaluate(()=>({...window.rockproWizard.getDraft(),schema:'rockpro.configurator/2',joint_gap_mm:8.63}));
+ await page.evaluate(value=>{localStorage.removeItem('rockpro.configurator.recovery.v3');localStorage.setItem('rockpro.configurator.recovery.v2',JSON.stringify({draft:value,storage:{id:'a'.repeat(32),revision:2},dirty:true}));},legacy);
+ await page.reload();await page.waitForFunction(()=>window.rockproWizard);await page.locator('#legacy-notice').waitFor({state:'visible'});const archived=await page.evaluate(()=>localStorage.getItem('rockpro.configurator.recovery.v2'));
+ await page.click('#legacy-convert');await page.waitForFunction(()=>window.rockproWizardView.model.draft.type==='three_piece');
+ await page.click('[data-step="3"]');assert.equal(await page.locator('#gap').count(),0);
+ assert.match(await page.locator('#step-3').innerText(),/XYZ to wymiary wewnętrzne samego korpusu/);
+ assert.match(await page.locator('#step-3').innerText(),/do ustalenia po wyborze okucia/);
+ const first=await page.evaluate(()=>{const m=window.rockproWizardView.model;return {draft:m.draft,joints:m.joints,body:m.sections[0],top:m.sections[1],front:m.sections[2]};});
+ assert.equal(first.draft.schema,'rockpro.configurator/3');assert.equal('joint_gap_mm'in first.draft,false);
+ assert.equal(first.top.position_mm[2],first.body.size_mm[2]);assert.equal(first.front.position_mm[1],-first.front.size_mm[1]);
+ assert.equal(first.front.size_mm[2],first.top.position_mm[2]+first.top.size_mm[2]);
+ for(const j of first.joints){assert.equal(j.gap_mm,null);assert.equal(j.plywood_trim_mm,null);assert.equal(j.fit_status,'awaiting_hardware');}
+ for(const [id,value]of[['dim-x','700'],['dim-y','550'],['dim-z','400']])await page.fill('#'+id,value);
+ await page.waitForFunction(()=>window.rockproWizardView.model.draft.internal_mm[2]===400);
+ const body=await page.evaluate(()=>window.rockproWizardView.model.sections[0]);assert.deepEqual(body.size_mm,[719.6,569.6,419.6]);
+ await page.click('#save');await page.waitForFunction(()=>window.rockproWizard.getStorage().revision===1);await page.reload();await page.waitForFunction(()=>window.rockproWizard&&window.rockproWizardView?.model);
+ assert.equal(await page.evaluate(()=>window.rockproWizard.getDraft().schema),'rockpro.configurator/3');
+ assert.equal(await page.evaluate(()=>localStorage.getItem('rockpro.configurator.recovery.v2')),archived);
+ await page.click('[data-step="3"]');const pending=page.waitForEvent('download');await page.click('#export');const download=await pending;await download.saveAs(path.join(__dirname,'draft-v3.json'));
+ assert.equal('joint_gap_mm'in JSON.parse(fs.readFileSync(path.join(__dirname,'draft-v3.json'))),false);
+ const rejected=await page.evaluate(async()=>{const d=window.rockproWizard.getDraft();d.joint_gap_mm=2;return (await fetch('wizard/preview',{method:'POST',headers:{'Content-Type':'application/json','X-RockPro-Session':'wizard_test_session_20261027'},body:JSON.stringify(d)})).status;});assert.equal(rejected,400);
+ await page.screenshot({path:path.join(__dirname,'summary.png'),fullPage:true});assert.deepEqual(errors,[]);
+ fs.writeFileSync(path.join(__dirname,'browser-report.json'),JSON.stringify({passed:true,no_manual_gap:true,gap_and_trim_unknown_until_hardware:true,no_gap_added_to_envelope:true,xyz_explicit_body_interior:true,body_dimensions:true,front_flush:true,legacy_v2_preserved:true,sqlite_roundtrip:true,json_v3:true,manual_gap_refused:true,errors},null,2));
+ await browser.close();console.log('PASS: fitting result, fixed envelope, body XYZ, v3 persistence and v2 archive preservation');
+})().catch(e=>{console.error(e);process.exit(1);});

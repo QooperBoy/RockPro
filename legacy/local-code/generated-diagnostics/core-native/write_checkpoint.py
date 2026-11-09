@@ -1,0 +1,13 @@
+import sys,json,hashlib
+from pathlib import Path
+sys.path.insert(0,str(Path('Integracja').resolve()))
+from rockpro_cad.core_case.native import compare_measurements,preflight_plan,write_receipt_once
+root=Path('artifacts/core-native')
+p=json.loads((root/'source-poses.json').read_text(encoding='utf-8'))
+a=json.loads((root/'native-A-20261021-02/native_receipt.json').read_text(encoding='utf-8'))
+plan=json.loads((root/'plan-A.json').read_text(encoding='utf-8'))
+checks=compare_measurements(preflight_plan(plan),a['measurements'])
+invalid=[{'occurrence_path':r['occurrence_path'],'id':r['id'],'kind':r['kind'],'reason':r['bounding_box_local'].get('reason')} for r in p['rows'] if r.get('bounding_box_local',{}).get('valid') is False]
+evidence={'schema_version':1,'native_A':{'status':'PASS','receipt_path':str((root/'native-A-20261021-02/native_receipt.json').resolve()),'physical_occurrences':len(checks),'max_position_or_bounds_error_mm':max(c['max_error_mm'] for c in checks),'max_rotation_component_error':max(c['max_rotation_component_error'] for c in checks),'proxies':len(a['proxies']),'catalog_reused':a['catalog_reused'],'production_approved':False,'source_guard_code_at_test':'historic native run before strict ROT bridge attach refinement','current_bridge_build':'PASS','current_bridge_native_retest':'NOT RUN: host busy opening full source snapshot'},'source_pose_evidence':{'report_path':str((root/'source-poses.json').resolve()),'status':'partial','nodes':len(p['rows']),'proper_world_matrices':sum('matrix_world_mm' in r for r in p['rows']),'world_AABBs':sum('bbox_world_mm' in r for r in p['rows']),'matrix_errors':len(p['errors']),'invalid_local_boxes_from_existing_evidence':invalid,'current_reader_native_refresh':'NOT RUN: host busy; this validation is derived from prior report','source_unchanged_at_pose_audit':p['source']['unchanged'],'modified':p['cad_document']['before']['modified']},'real_H7159':{'status':'PENDING','operation_dir':str((root/'real-H7159-20261021-01').resolve()),'source_capture':'PASS','open_source_copy':'PENDING','export_import':'NOT RUN','body_topology_volume':'NOT RUN','save_reopen':'NOT RUN','pending_tool_session':16035,'host_action':'one Escape; no host termination or restart; no original save'},'remaining_native':{'B':'NOT RUN','C':'NOT RUN','resize':'NOT RUN','SQLite_service':'NOT RUN'},'offline_native_tests':{'status':'PASS','tests':12},'source_after_pending_attempt':'NOT PROVEN: native file lock prevents final hash and pending COM prevents memory flag check'}
+write_receipt_once(root/'native_checkpoint.json',evidence)
+print(json.dumps({'report':str((root/'native_checkpoint.json').resolve()),'invalid_local_boxes':len(invalid),'A_checks':len(checks)},ensure_ascii=True))

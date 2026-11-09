@@ -1,0 +1,1 @@
+﻿using System;using System.Linq;using interop.ICApiIronCAD;class A{static void Main(){foreach(var t in new[]{typeof(IZAssemblyFeatureGroup),typeof(IZFeature),typeof(IZSceneDocUtility)}){Console.WriteLine(t.Name);foreach(var m in t.GetMethods())Console.WriteLine(m.ToString());}}}

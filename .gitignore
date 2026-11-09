@@ -13,3 +13,35 @@ artifacts/
 # Private Excel source staging and RPC request files
 Integracja/imports/
 examples/excel-input/preview.png
+
+# CAD project inputs/outputs and private runtime state travel separately from code.
+*.ics
+*.icd
+*.icc
+*.ic3d
+*.step
+*.stp
+*.stl
+*.3mf
+*.glb
+*.gltf
+*.sat
+*.x_t
+*.x_b
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+*.sqlite3-journal
+*.sqlite-wal
+*.sqlite-shm
+*.db
+*.zip
+*.7z
+*.rar
+*.dll
+*.exe
+/outputs/
+/projekty/
+/snapshoty/
+/biblioteka_projektow/
+/biblioteka_czesci/

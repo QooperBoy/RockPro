@@ -27,6 +27,14 @@ Czytaj kolejno: ten dokument, [AGENTS](../AGENTS.md), [DEVELOPMENT](DEVELOPMENT.
 [niezawodność i rejestr](RELIABILITY_AND_OBSERVER.md).
 Nie uruchamiaj skryptów CAD podczas samego poznawania projektu.
 
+Uzupełnienie kodu 09.11.2026: [narzędzia workspace](../tools/workspace/README.md)
+oraz [archiwum źródeł lokalnych](../legacy/local-code/README.md). To zachowane
+skrypty pomocnicze i historyczne warianty, nie pliki do nakładania na backend.
+Modele projektu są ignorowane przez Git, także demonstracyjny
+`Integracja/skeleton/demo/RockPro_Epson_szkielet_MVP.ics`. Jego lokalna kopia
+została zachowana, ale nowy klon musi otrzymać ją osobnym kanałem, jeżeli chce
+wykonać dawny scenariusz szkieletu. Nie zastępuj brakującego modelu atrapą.
+
 ## Mapa programów
 
 Ścieżki bez katalogu w tabeli odnoszą się do `Integracja/rockpro_cad/`.
