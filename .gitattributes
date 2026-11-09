@@ -1,0 +1,3 @@
+# Preserve archived source bytes so CODE_INVENTORY SHA256 works across checkouts.
+legacy/local-code/** -text
+tools/workspace/narzedzia/** -text
