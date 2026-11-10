@@ -2,6 +2,12 @@
 
 Data: 2026-10-21. Status: projekt architektury i plan prac, bez implementacji nowych funkcji. Architektura przejrzana przez Astra high.
 
+Aktualizacja wymagań 26.10.2026: użytkownik zlecił rozpisanie ROC-41 —
+[powiązane wycięcia uchwytów/zatrzasków i pasowanie profili](ROC41_CUTOUTS_AND_JOINTS.md).
+Plan dodaje obliczenia złączy i obróbek przed wykonaniem CAD. Historyczne
+wyłączenie technologii z MVP poniżej opisuje dotychczasowy zakres implementacji;
+nowe wymagania są zapisane, lecz funkcje i ich odbiór natywny pozostają NOT RUN.
+
 ## Punkt startowy
 
 Istnieją: konfigurator układu, szkielet 10 płyt i 6 parametrów, wersjonowanie i narzędzia MCP, czytnik wystąpień oraz jego testy. Nie ma jeszcze pełnego automatycznego montażu rodziny Epson ani samodzielnego agenta projektującego w tle. Szczegóły bieżącego kontraktu: [DEVELOPMENT.md](DEVELOPMENT.md), [LAYOUT.md](../LAYOUT.md), [PARTS_CATALOG_PLAN.md](PARTS_CATALOG_PLAN.md), [PARTS_IDENTIFICATION.md](PARTS_IDENTIFICATION.md).
@@ -178,3 +184,10 @@ Nie przenosić całego projektu do innego stosu technologicznego. Osobny pakiet 
 Panel powinien pokazywać: wersję specyfikacji/szablonu, stan mapowania części, plan różnic, właściciela ręcznych zmian, zakres walidacji, nierozstrzygnięte elementy, przebieg operacji i wynik odzyskiwania. Zielony status nie może oznaczać gotowości produkcyjnej, jeśli wycięcia lub technologia są poza zakresem.
 
 Dokumentacja/plan: przygotowane. Nowe testy i implementacja core: NOT RUN / jeszcze do wykonania. Brak zmian źródłowego CAD i instalacji dodatku w ramach tego planowania.
+
+## Aktualna konfiguracja uchwytów do podnoszenia
+
+Dwie przeciwległe ściany boczne, prostopadłe do tylnej ściany zawiasów.
+handles_per_wall=2 domyślnie (cztery łącznie), albo jawne 1 (dwa łącznie,
+wyśrodkowane). SDK dostaje właściwe obroty i kotwy parametryczne.
+Obowiązujące szczegóły i reguły odstępów: [CASE_DEFAULTS.md](CASE_DEFAULTS.md).

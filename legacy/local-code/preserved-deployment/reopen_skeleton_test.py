@@ -1,0 +1,6 @@
+exec(open('test_clean_skeleton.py',encoding='utf-8-sig').read().split('variants=')[0])
+doc.Save();doc.Close();doc=base.OpenFile(m['file'],False);scene=doc.QueryInterface(ICAPI.IZSceneDoc)
+data=capture(scene);data['review']=validate(data);(folder/'measured_reopened.json').write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8');print('reopened',data['review']['passed'],flush=True)
+scene.ParameterMgr.GetParameterByName('RP_Length').Expression='1014 mm';scene.GetTopElement().QueryInterface(ICAPI.IZAssembly).RegenerateParts(True);scene.Update();data=capture(scene);data['review']=validate(data);(folder/'measured_reopened_changed.json').write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8');print('reopened_changed',data['review']['passed'],flush=True)
+scene.ParameterMgr.GetParameterByName('RP_Length').Expression='914 mm';scene.GetTopElement().QueryInterface(ICAPI.IZAssembly).RegenerateParts(True);scene.Update();doc.Save()
+scene.AdjustCameraToFitShapeInRect(1200,800);scene.Redraw()

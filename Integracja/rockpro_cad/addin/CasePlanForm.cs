@@ -11,6 +11,7 @@ namespace RockPro.CAD {
 internal sealed class CasePlanForm : Form {
  readonly string projectId;
  readonly Func<string,object,Dictionary<string,object>> backend;
+ readonly int uiThread=System.Threading.Thread.CurrentThread.ManagedThreadId;
  readonly bool autoLoad;
  readonly ToolTip tips=new ToolTip {AutoPopDelay=20000};
  readonly Label explanation=new Label(),metrics=new Label(),status=new Label(),operationLabel=new Label();
@@ -64,7 +65,12 @@ internal sealed class CasePlanForm : Form {
  static void Style(Button b,bool primary){b.Width=215;b.Height=42;b.Margin=new Padding(0,0,8,6);
   b.BackColor=primary?Color.FromArgb(237,102,21):Color.White;b.ForeColor=primary?Color.White:Color.FromArgb(35,47,60);}
  async Task<Dictionary<string,object>> Call(string name,object args){return await Task.Run(()=>backend(name,args));}
- async Task Run(Func<Task> action){if(busy)return;busy=true;UpdateButtons();status.ForeColor=Color.FromArgb(80,94,110);
+ async Task Run(Func<Task> action){
+  if(System.Threading.Thread.CurrentThread.ManagedThreadId!=uiThread)throw new InvalidOperationException("Case UI operation must start on its owner thread");
+  // A native host may have no ambient WinForms context when it calls the form.
+  // Install it on the owner thread before awaiting backend work.
+  System.Threading.SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+  if(busy)return;busy=true;UpdateButtons();status.ForeColor=Color.FromArgb(80,94,110);
   status.Text=T("Trwa operacja…","Working…");try{await action();}catch(Exception ex){status.ForeColor=Color.FromArgb(174,44,44);
    status.Text=ex.Message+(pendingOperation?T("\nWynik CAD jest niepewny. Odczytaj stan lub odzyskaj operację z dowodów; nie ponawiaj tworzenia.","\nCAD outcome is unknown. Read the status or recover from evidence; do not repeat creation."):
    T("\nNie ponowiono zapisu. Wczytaj aktualne dane przed porównaniem i kolejnym zapisem.","\nSaving was not retried. Reload current data before comparing and saving again."));

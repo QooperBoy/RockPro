@@ -1,0 +1,1009 @@
+{
+  "synthetic_test": true,
+  "production_approved": false,
+  "layout": {
+    "spec": {
+      "name": "Urządzenie",
+      "x": 440,
+      "y": 339,
+      "z": 136,
+      "count": 2,
+      "orientation": "XYZ",
+      "arrangement": "X",
+      "gap": 20,
+      "clearance": 20,
+      "separator": 9,
+      "side": "X",
+      "side_width": 90,
+      "side_depth": 300,
+      "side_height": 100,
+      "side_name": "Kable",
+      "thickness": 9,
+      "lid_height": 25,
+      "lid_hinge_height": 0,
+      "lid_constructor_override": false
+    },
+    "boxes": [
+      {
+        "kind": "device",
+        "label": "Urządzenie 1",
+        "pos": [
+          20,
+          20,
+          20
+        ],
+        "size": [
+          440,
+          339,
+          136
+        ]
+      },
+      {
+        "kind": "device",
+        "label": "Urządzenie 2",
+        "pos": [
+          489,
+          20,
+          20
+        ],
+        "size": [
+          440,
+          339,
+          136
+        ]
+      },
+      {
+        "kind": "divider",
+        "label": "Przegroda 1",
+        "pos": [
+          470.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          9,
+          379,
+          176
+        ]
+      },
+      {
+        "kind": "divider",
+        "label": "Ścianka komory",
+        "pos": [
+          949,
+          0.0,
+          0.0
+        ],
+        "size": [
+          9,
+          379,
+          176
+        ]
+      },
+      {
+        "kind": "accessory",
+        "label": "Kable",
+        "pos": [
+          978,
+          20,
+          20
+        ],
+        "size": [
+          90,
+          300,
+          100
+        ]
+      }
+    ],
+    "internal": [
+      1088,
+      379,
+      192
+    ],
+    "external": [
+      1106,
+      397,
+      210
+    ],
+    "warnings": [
+      "Bryły uproszczone: uwzględnij wystające złącza, uchwyty i przewody.",
+      "Wyjmowanie urządzeń, pianki i wytrzymałość wymagają oceny konstruktora.",
+      "Nie wybrano zawiasu: minimum montażowe pokrywy wymaga potwierdzenia."
+    ],
+    "lid_policy": {
+      "rule": "hinge_minimum_and_shallow_proportion",
+      "minimum_mm": 0.0,
+      "hinge_required_height_mm": 0,
+      "constructor_override": false,
+      "maximum_ratio": 0.15,
+      "height_source": "explicit_configuration"
+    },
+    "volume_l": 92.20722,
+    "checks": {
+      "collisions": false,
+      "contained": true
+    },
+    "parameters": {
+      "RP_Length": 1106,
+      "RP_Depth": 397,
+      "RP_BaseHeight": 185,
+      "RP_LidHeight": 25,
+      "RP_Thickness": 9,
+      "RP_DisplayGap": 0
+    },
+    "ranking": {
+      "criterion": "allowed_feasible_external_volume",
+      "best": {
+        "orientation": "XYZ",
+        "arrangement": "X",
+        "valid": true,
+        "volume_l": 92.20722,
+        "external": [
+          1106,
+          397,
+          210
+        ]
+      },
+      "variants": [
+        {
+          "orientation": "XYZ",
+          "arrangement": "X",
+          "valid": true,
+          "volume_l": 92.20722,
+          "external": [
+            1106,
+            397,
+            210
+          ]
+        },
+        {
+          "orientation": "YXZ",
+          "arrangement": "X",
+          "valid": true,
+          "volume_l": 94.54032,
+          "external": [
+            904,
+            498,
+            210
+          ]
+        },
+        {
+          "orientation": "XYZ",
+          "arrangement": "Y",
+          "valid": true,
+          "volume_l": 102.33405,
+          "external": [
+            637,
+            765,
+            210
+          ]
+        },
+        {
+          "orientation": "YXZ",
+          "arrangement": "Y",
+          "valid": true,
+          "volume_l": 108.84552,
+          "external": [
+            536,
+            967,
+            210
+          ]
+        }
+      ],
+      "orientations": [
+        {
+          "orientation": "XYZ",
+          "arrangement": "X",
+          "valid": true,
+          "volume_l": 92.20722,
+          "external": [
+            1106,
+            397,
+            210
+          ],
+          "key": "XYZ",
+          "score": 0.0
+        },
+        {
+          "orientation": "YXZ",
+          "arrangement": "X",
+          "valid": true,
+          "volume_l": 94.54032,
+          "external": [
+            904,
+            498,
+            210
+          ],
+          "key": "YXZ",
+          "score": 1.0
+        }
+      ],
+      "arrangements": [
+        {
+          "orientation": "XYZ",
+          "arrangement": "X",
+          "valid": true,
+          "volume_l": 92.20722,
+          "external": [
+            1106,
+            397,
+            210
+          ],
+          "key": "X",
+          "score": 0.0
+        },
+        {
+          "orientation": "XYZ",
+          "arrangement": "Y",
+          "valid": true,
+          "volume_l": 102.33405,
+          "external": [
+            637,
+            765,
+            210
+          ],
+          "key": "Y",
+          "score": 1.0
+        }
+      ]
+    },
+    "removal_check": {
+      "passed": true,
+      "failures": [],
+      "scope": "Independent +Z AABB removal through fully open/removable lid; no fitting intrusions, cables or articulated CAD collision proof"
+    },
+    "release_blockers": [],
+    "production_approved": false,
+    "saved": true,
+    "revision": 7,
+    "database": "UI-ONLY-NO-DATABASE",
+    "device_binding": {
+      "catalog_id": "865ba1c274180842bf3e7a5dae22e78d6e1a806400c01626d43a0943628fab4c",
+      "device_revision": 1,
+      "record_sha256": "8be034b97f867a0b0d530662e5ed7ed87e9602317994a37e356aacd1e30247e0",
+      "constraints": {
+        "allowed_orientations": [
+          "XYZ",
+          "YXZ"
+        ],
+        "allowed_arrangements": [
+          "X",
+          "Y"
+        ],
+        "removal_clearance_mm": 10,
+        "max_external_mm": null
+      }
+    },
+    "device_source_info": {
+      "catalog_id": "865ba1c274180842bf3e7a5dae22e78d6e1a806400c01626d43a0943628fab4c",
+      "record_sha256": "8be034b97f867a0b0d530662e5ed7ed87e9602317994a37e356aacd1e30247e0",
+      "identity": {
+        "manufacturer": "QA",
+        "model": "Synthetic projector",
+        "variant": "UI-ONLY"
+      },
+      "axes": {
+        "X": "width",
+        "Y": "depth",
+        "Z": "height"
+      },
+      "fields": {
+        "X": {
+          "value": 440,
+          "unit": "mm",
+          "status": "source_checked",
+          "observations": [
+            {
+              "id": "X",
+              "field": "X",
+              "value": 440,
+              "unit": "mm",
+              "source_id": "page",
+              "confirmation": "source_checked",
+              "normalized_value": 440
+            }
+          ]
+        },
+        "Y": {
+          "value": 339,
+          "unit": "mm",
+          "status": "source_checked",
+          "observations": [
+            {
+              "id": "Y",
+              "field": "Y",
+              "value": 339,
+              "unit": "mm",
+              "source_id": "page",
+              "confirmation": "source_checked",
+              "normalized_value": 339
+            }
+          ]
+        },
+        "Z": {
+          "value": 136,
+          "unit": "mm",
+          "status": "source_checked",
+          "observations": [
+            {
+              "id": "Z",
+              "field": "Z",
+              "value": 136,
+              "unit": "mm",
+              "source_id": "page",
+              "confirmation": "source_checked",
+              "normalized_value": 136
+            }
+          ]
+        },
+        "mass": {
+          "value": 8.4,
+          "unit": "kg",
+          "status": "source_checked",
+          "observations": [
+            {
+              "id": "mass",
+              "field": "mass",
+              "value": 8.4,
+              "unit": "kg",
+              "source_id": "page",
+              "confirmation": "source_checked",
+              "normalized_value": 8.4
+            }
+          ]
+        }
+      },
+      "missing_fields": [],
+      "conflicting_fields": [],
+      "dimensions_ready": true,
+      "production_approved": false,
+      "confirmation_is_caller_claim": true
+    },
+    "device_source_status": "current"
+  },
+  "proposals": {
+    "status": "proposals",
+    "variants": [
+      {
+        "id": "12ea1f5249d295542e6c4d13b3fbd1bc71cf3443a0533989c7d8e0dba36d6479",
+        "orientation": "XYZ",
+        "arrangement": "X",
+        "layout": {
+          "spec": {
+            "name": "Urządzenie",
+            "x": 440,
+            "y": 339,
+            "z": 136,
+            "count": 2,
+            "orientation": "XYZ",
+            "arrangement": "X",
+            "gap": 20,
+            "clearance": 20,
+            "separator": 9,
+            "side": "X",
+            "side_width": 90,
+            "side_depth": 300,
+            "side_height": 100,
+            "side_name": "Kable",
+            "thickness": 9,
+            "lid_height": 25,
+            "lid_hinge_height": 0,
+            "lid_constructor_override": false
+          },
+          "boxes": [
+            {
+              "kind": "device",
+              "label": "Urządzenie 1",
+              "pos": [
+                20,
+                20,
+                20
+              ],
+              "size": [
+                440,
+                339,
+                136
+              ]
+            },
+            {
+              "kind": "device",
+              "label": "Urządzenie 2",
+              "pos": [
+                489,
+                20,
+                20
+              ],
+              "size": [
+                440,
+                339,
+                136
+              ]
+            },
+            {
+              "kind": "divider",
+              "label": "Przegroda 1",
+              "pos": [
+                470.0,
+                0.0,
+                0.0
+              ],
+              "size": [
+                9,
+                379,
+                176
+              ]
+            },
+            {
+              "kind": "divider",
+              "label": "Ścianka komory",
+              "pos": [
+                949,
+                0.0,
+                0.0
+              ],
+              "size": [
+                9,
+                379,
+                176
+              ]
+            },
+            {
+              "kind": "accessory",
+              "label": "Kable",
+              "pos": [
+                978,
+                20,
+                20
+              ],
+              "size": [
+                90,
+                300,
+                100
+              ]
+            }
+          ],
+          "internal": [
+            1088,
+            379,
+            192
+          ],
+          "external": [
+            1106,
+            397,
+            210
+          ],
+          "warnings": [
+            "Bryły uproszczone: uwzględnij wystające złącza, uchwyty i przewody.",
+            "Wyjmowanie urządzeń, pianki i wytrzymałość wymagają oceny konstruktora.",
+            "Nie wybrano zawiasu: minimum montażowe pokrywy wymaga potwierdzenia."
+          ],
+          "lid_policy": {
+            "rule": "hinge_minimum_and_shallow_proportion",
+            "minimum_mm": 0.0,
+            "hinge_required_height_mm": 0,
+            "constructor_override": false,
+            "maximum_ratio": 0.15,
+            "height_source": "explicit_configuration"
+          },
+          "volume_l": 92.20722,
+          "checks": {
+            "collisions": false,
+            "contained": true
+          },
+          "parameters": {
+            "RP_Length": 1106,
+            "RP_Depth": 397,
+            "RP_BaseHeight": 185,
+            "RP_LidHeight": 25,
+            "RP_Thickness": 9,
+            "RP_DisplayGap": 0
+          }
+        },
+        "removal_check": {
+          "passed": true,
+          "failures": [],
+          "scope": "Independent +Z AABB removal through fully open/removable lid; no fitting intrusions, cables or articulated CAD collision proof"
+        },
+        "reasons": [
+          "Dozwolona orientacja i kierunek",
+          "Obrysy bez kolizji i wewnątrz skrzyni",
+          "Niezależne wyjęcie w +Z sprawdzone obrysami"
+        ],
+        "source_record_sha256": "8be034b97f867a0b0d530662e5ed7ed87e9602317994a37e356aacd1e30247e0",
+        "source_catalog_id": "865ba1c274180842bf3e7a5dae22e78d6e1a806400c01626d43a0943628fab4c",
+        "release_blockers": [],
+        "production_approved": false
+      },
+      {
+        "id": "16b1dde34aaace579e9954e548189b53db72b9d9526e94af2d9e967ae4c46259",
+        "orientation": "YXZ",
+        "arrangement": "X",
+        "layout": {
+          "spec": {
+            "name": "Urządzenie",
+            "x": 440,
+            "y": 339,
+            "z": 136,
+            "count": 2,
+            "orientation": "YXZ",
+            "arrangement": "X",
+            "gap": 20,
+            "clearance": 20,
+            "separator": 9,
+            "side": "X",
+            "side_width": 90,
+            "side_depth": 300,
+            "side_height": 100,
+            "side_name": "Kable",
+            "thickness": 9,
+            "lid_height": 25,
+            "lid_hinge_height": 0,
+            "lid_constructor_override": false
+          },
+          "boxes": [
+            {
+              "kind": "device",
+              "label": "Urządzenie 1",
+              "pos": [
+                20,
+                20,
+                20
+              ],
+              "size": [
+                339,
+                440,
+                136
+              ]
+            },
+            {
+              "kind": "device",
+              "label": "Urządzenie 2",
+              "pos": [
+                388,
+                20,
+                20
+              ],
+              "size": [
+                339,
+                440,
+                136
+              ]
+            },
+            {
+              "kind": "divider",
+              "label": "Przegroda 1",
+              "pos": [
+                369.0,
+                0.0,
+                0.0
+              ],
+              "size": [
+                9,
+                480,
+                176
+              ]
+            },
+            {
+              "kind": "divider",
+              "label": "Ścianka komory",
+              "pos": [
+                747,
+                0.0,
+                0.0
+              ],
+              "size": [
+                9,
+                480,
+                176
+              ]
+            },
+            {
+              "kind": "accessory",
+              "label": "Kable",
+              "pos": [
+                776,
+                20,
+                20
+              ],
+              "size": [
+                90,
+                300,
+                100
+              ]
+            }
+          ],
+          "internal": [
+            886,
+            480,
+            192
+          ],
+          "external": [
+            904,
+            498,
+            210
+          ],
+          "warnings": [
+            "Bryły uproszczone: uwzględnij wystające złącza, uchwyty i przewody.",
+            "Wyjmowanie urządzeń, pianki i wytrzymałość wymagają oceny konstruktora.",
+            "Nie wybrano zawiasu: minimum montażowe pokrywy wymaga potwierdzenia."
+          ],
+          "lid_policy": {
+            "rule": "hinge_minimum_and_shallow_proportion",
+            "minimum_mm": 0.0,
+            "hinge_required_height_mm": 0,
+            "constructor_override": false,
+            "maximum_ratio": 0.15,
+            "height_source": "explicit_configuration"
+          },
+          "volume_l": 94.54032,
+          "checks": {
+            "collisions": false,
+            "contained": true
+          },
+          "parameters": {
+            "RP_Length": 904,
+            "RP_Depth": 498,
+            "RP_BaseHeight": 185,
+            "RP_LidHeight": 25,
+            "RP_Thickness": 9,
+            "RP_DisplayGap": 0
+          }
+        },
+        "removal_check": {
+          "passed": true,
+          "failures": [],
+          "scope": "Independent +Z AABB removal through fully open/removable lid; no fitting intrusions, cables or articulated CAD collision proof"
+        },
+        "reasons": [
+          "Dozwolona orientacja i kierunek",
+          "Obrysy bez kolizji i wewnątrz skrzyni",
+          "Niezależne wyjęcie w +Z sprawdzone obrysami"
+        ],
+        "source_record_sha256": "8be034b97f867a0b0d530662e5ed7ed87e9602317994a37e356aacd1e30247e0",
+        "source_catalog_id": "865ba1c274180842bf3e7a5dae22e78d6e1a806400c01626d43a0943628fab4c",
+        "release_blockers": [],
+        "production_approved": false
+      },
+      {
+        "id": "8c3c7081bb80e21740030cffb6702861b07fc75fc6dccef567d76f024ea637b4",
+        "orientation": "XYZ",
+        "arrangement": "Y",
+        "layout": {
+          "spec": {
+            "name": "Urządzenie",
+            "x": 440,
+            "y": 339,
+            "z": 136,
+            "count": 2,
+            "orientation": "XYZ",
+            "arrangement": "Y",
+            "gap": 20,
+            "clearance": 20,
+            "separator": 9,
+            "side": "X",
+            "side_width": 90,
+            "side_depth": 300,
+            "side_height": 100,
+            "side_name": "Kable",
+            "thickness": 9,
+            "lid_height": 25,
+            "lid_hinge_height": 0,
+            "lid_constructor_override": false
+          },
+          "boxes": [
+            {
+              "kind": "device",
+              "label": "Urządzenie 1",
+              "pos": [
+                20,
+                20,
+                20
+              ],
+              "size": [
+                440,
+                339,
+                136
+              ]
+            },
+            {
+              "kind": "device",
+              "label": "Urządzenie 2",
+              "pos": [
+                20,
+                388,
+                20
+              ],
+              "size": [
+                440,
+                339,
+                136
+              ]
+            },
+            {
+              "kind": "divider",
+              "label": "Przegroda 1",
+              "pos": [
+                0.0,
+                369.0,
+                0.0
+              ],
+              "size": [
+                480,
+                9,
+                176
+              ]
+            },
+            {
+              "kind": "divider",
+              "label": "Ścianka komory",
+              "pos": [
+                480,
+                0.0,
+                0.0
+              ],
+              "size": [
+                9,
+                747,
+                176
+              ]
+            },
+            {
+              "kind": "accessory",
+              "label": "Kable",
+              "pos": [
+                509,
+                20,
+                20
+              ],
+              "size": [
+                90,
+                300,
+                100
+              ]
+            }
+          ],
+          "internal": [
+            619,
+            747,
+            192
+          ],
+          "external": [
+            637,
+            765,
+            210
+          ],
+          "warnings": [
+            "Bryły uproszczone: uwzględnij wystające złącza, uchwyty i przewody.",
+            "Wyjmowanie urządzeń, pianki i wytrzymałość wymagają oceny konstruktora.",
+            "Nie wybrano zawiasu: minimum montażowe pokrywy wymaga potwierdzenia."
+          ],
+          "lid_policy": {
+            "rule": "hinge_minimum_and_shallow_proportion",
+            "minimum_mm": 0.0,
+            "hinge_required_height_mm": 0,
+            "constructor_override": false,
+            "maximum_ratio": 0.15,
+            "height_source": "explicit_configuration"
+          },
+          "volume_l": 102.33405,
+          "checks": {
+            "collisions": false,
+            "contained": true
+          },
+          "parameters": {
+            "RP_Length": 637,
+            "RP_Depth": 765,
+            "RP_BaseHeight": 185,
+            "RP_LidHeight": 25,
+            "RP_Thickness": 9,
+            "RP_DisplayGap": 0
+          }
+        },
+        "removal_check": {
+          "passed": true,
+          "failures": [],
+          "scope": "Independent +Z AABB removal through fully open/removable lid; no fitting intrusions, cables or articulated CAD collision proof"
+        },
+        "reasons": [
+          "Dozwolona orientacja i kierunek",
+          "Obrysy bez kolizji i wewnątrz skrzyni",
+          "Niezależne wyjęcie w +Z sprawdzone obrysami"
+        ],
+        "source_record_sha256": "8be034b97f867a0b0d530662e5ed7ed87e9602317994a37e356aacd1e30247e0",
+        "source_catalog_id": "865ba1c274180842bf3e7a5dae22e78d6e1a806400c01626d43a0943628fab4c",
+        "release_blockers": [],
+        "production_approved": false
+      }
+    ],
+    "rejected": [],
+    "feasible_distinct_count": 4,
+    "release_blockers": [],
+    "constructor_can_edit_or_reject": true,
+    "automatic_save": false,
+    "production_approved": false,
+    "device_binding": {
+      "catalog_id": "865ba1c274180842bf3e7a5dae22e78d6e1a806400c01626d43a0943628fab4c",
+      "device_revision": 1,
+      "record_sha256": "8be034b97f867a0b0d530662e5ed7ed87e9602317994a37e356aacd1e30247e0",
+      "constraints": {
+        "allowed_orientations": [
+          "XYZ",
+          "YXZ"
+        ],
+        "allowed_arrangements": [
+          "X",
+          "Y"
+        ],
+        "removal_clearance_mm": 10,
+        "max_external_mm": null
+      }
+    },
+    "device_source_info": {
+      "catalog_id": "865ba1c274180842bf3e7a5dae22e78d6e1a806400c01626d43a0943628fab4c",
+      "record_sha256": "8be034b97f867a0b0d530662e5ed7ed87e9602317994a37e356aacd1e30247e0",
+      "identity": {
+        "manufacturer": "QA",
+        "model": "Synthetic projector",
+        "variant": "UI-ONLY"
+      },
+      "axes": {
+        "X": "width",
+        "Y": "depth",
+        "Z": "height"
+      },
+      "fields": {
+        "X": {
+          "value": 440,
+          "unit": "mm",
+          "status": "source_checked",
+          "observations": [
+            {
+              "id": "X",
+              "field": "X",
+              "value": 440,
+              "unit": "mm",
+              "source_id": "page",
+              "confirmation": "source_checked",
+              "normalized_value": 440
+            }
+          ]
+        },
+        "Y": {
+          "value": 339,
+          "unit": "mm",
+          "status": "source_checked",
+          "observations": [
+            {
+              "id": "Y",
+              "field": "Y",
+              "value": 339,
+              "unit": "mm",
+              "source_id": "page",
+              "confirmation": "source_checked",
+              "normalized_value": 339
+            }
+          ]
+        },
+        "Z": {
+          "value": 136,
+          "unit": "mm",
+          "status": "source_checked",
+          "observations": [
+            {
+              "id": "Z",
+              "field": "Z",
+              "value": 136,
+              "unit": "mm",
+              "source_id": "page",
+              "confirmation": "source_checked",
+              "normalized_value": 136
+            }
+          ]
+        },
+        "mass": {
+          "value": 8.4,
+          "unit": "kg",
+          "status": "source_checked",
+          "observations": [
+            {
+              "id": "mass",
+              "field": "mass",
+              "value": 8.4,
+              "unit": "kg",
+              "source_id": "page",
+              "confirmation": "source_checked",
+              "normalized_value": 8.4
+            }
+          ]
+        }
+      },
+      "missing_fields": [],
+      "conflicting_fields": [],
+      "dimensions_ready": true,
+      "production_approved": false,
+      "confirmation_is_caller_claim": true
+    }
+  },
+  "catalog": {
+    "devices": [
+      {
+        "catalog_id": "865ba1c274180842bf3e7a5dae22e78d6e1a806400c01626d43a0943628fab4c",
+        "revision": 1,
+        "identity": {
+          "manufacturer": "QA",
+          "model": "Synthetic projector",
+          "variant": "UI-ONLY"
+        },
+        "fields": {
+          "X": {
+            "value": 440,
+            "unit": "mm",
+            "status": "source_checked",
+            "observations": [
+              {
+                "id": "X",
+                "field": "X",
+                "value": 440,
+                "unit": "mm",
+                "source_id": "page",
+                "confirmation": "source_checked",
+                "normalized_value": 440
+              }
+            ]
+          },
+          "Y": {
+            "value": 339,
+            "unit": "mm",
+            "status": "source_checked",
+            "observations": [
+              {
+                "id": "Y",
+                "field": "Y",
+                "value": 339,
+                "unit": "mm",
+                "source_id": "page",
+                "confirmation": "source_checked",
+                "normalized_value": 339
+              }
+            ]
+          },
+          "Z": {
+            "value": 136,
+            "unit": "mm",
+            "status": "source_checked",
+            "observations": [
+              {
+                "id": "Z",
+                "field": "Z",
+                "value": 136,
+                "unit": "mm",
+                "source_id": "page",
+                "confirmation": "source_checked",
+                "normalized_value": 136
+              }
+            ]
+          },
+          "mass": {
+            "value": 8.4,
+            "unit": "kg",
+            "status": "source_checked",
+            "observations": [
+              {
+                "id": "mass",
+                "field": "mass",
+                "value": 8.4,
+                "unit": "kg",
+                "source_id": "page",
+                "confirmation": "source_checked",
+                "normalized_value": 8.4
+              }
+            ]
+          }
+        },
+        "dimensions_ready": true
+      }
+    ],
+    "has_more": false,
+    "next_cursor": null
+  }
+}

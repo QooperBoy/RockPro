@@ -1,5 +1,17 @@
 # RockPro CAD — kontrakt developerski
 
+## Środowisko odbiorcy — nowe ustalenie 26.10.2026
+
+Tomasz pracuje w IronCAD 2023. Dotychczasowe testy natywne dotyczą 2027,
+a zapisanych tam ICS nie można otworzyć w 2023. Przed kolejnym natywnym
+wydaniem dla firmy zastosuj [plan zgodności 2023](IRONCAD_2023_COMPATIBILITY.md).
+Build, rejestracja, jawny wybór hosta, autostart i podstawowy test natywny
+2023 są już potwierdzone. Aktualizacja PU1 SP1 jest zainstalowana: 25.0.12.18734.
+T2 przeszedł odczyt oraz zapis/ponowne otwarcie wszystkich 335 części.
+T1 nadal zgłasza „Shape Load Failed” mimo zgodności metadanych wersji;
+pełny generator wymaga otwieralnych zasobów 2023 i próby natywnej.
+Szczegółowa macierz dowodów jest w planie zgodności.
+
 ## Kontrakt i inwentarz części — ROC-15 / ROC-42
 
 Pakiet `Integracja/rockpro_cad/core_case` zawiera walidatory danych, generator
@@ -31,6 +43,20 @@ dopasowanie po nazwie części.
 Architektura i zakres docelowy (nie wszystkie moduły są gotowe produkcyjnie):
 [CORE_CASE_DESIGN.md](CORE_CASE_DESIGN.md) — pełna rodzina skrzyń, kotwy okuć,
 zachowanie ręcznej pracy i TDD. Pierwszy przyrost: ROC-43; plan nadrzędny: ROC-6.
+
+Nowe wymagania technologiczne z 26.10.2026:
+[ROC41_CUTOUTS_AND_JOINTS.md](ROC41_CUTOUTS_AND_JOINTS.md) — wycięcia powiązane
+z wystąpieniami okuć, złącza profili i obliczenia gabarytów przed CAD.
+To plan M01–M08 i przyszłe N01/N02; obejmuje bibliotekę informacji o wycięciach,
+strefy uchwyt–zawias oraz wspólne etapy okucia i jego obróbek. Pierwszy natywny
+przyrost ma osobny, przypięty do źródeł adapter prototypu:
+[T1_MACHINING_PROTOTYPE.md](T1_MACHINING_PROTOTYPE.md). Nie rozszerza automatycznie
+allowlisty dotychczasowego wykonawcy MCP ani zainstalowanego dodatku.
+
+Analiza kolejnej rodziny: [T2_REFERENCE_ANALYSIS.md](T2_REFERENCE_ANALYSIS.md).
+T2 ma zdejmowaną czapkę/klapę, wyjmowany rack i transport teleskopowy.
+Mapa źródła pozostaje szkicem w prywatnych artifacts; nie jest szablonem T1
+ani dowodem działającej parametryzacji nowej rodziny.
 
 ROC-43: [specyfikacja testów i instrukcja uruchomienia](ROC43_TDD.md).
 Zwykły harness uruchamia `core-design` w trybie `all`: zamrożone wymagania

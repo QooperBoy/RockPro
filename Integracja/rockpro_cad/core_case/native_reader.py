@@ -9,7 +9,7 @@ import math
 import time
 from pathlib import Path
 
-from ..parts.native import NativePartsAdapter, file_sha256
+from ..parts.native import NativePartsAdapter, file_sha256, part_bounds
 from ..parts.reader import ReadLimits, normalize_bbox
 
 
@@ -55,7 +55,9 @@ class NativePoseAdapter(NativePartsAdapter):
 
     def bbox(self, node, kind):
         interface = self.api.IZAssembly if kind == "assembly" else self.api.IZPart
-        return normalize_bbox(list(node.QueryInterface(interface).GetBoundingBox(True)))
+        value = node.QueryInterface(interface)
+        return normalize_bbox(list(value.GetBoundingBox(True)) if kind == "assembly"
+                              else part_bounds(value))
 
 
 def read_poses(adapter, limits=None):

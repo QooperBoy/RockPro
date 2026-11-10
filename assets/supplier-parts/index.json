@@ -1,0 +1,2446 @@
+{
+  "schema": "rockpro.supplier-parts/1",
+  "assets": {
+    "penn-875643-9e931ce50f59": {
+      "mesh": "penn-875643-9e931ce50f59.mesh.json.gz",
+      "mesh_sha256": "b08c9dc028a2b6b759966a9863e7581a3fd2798a39169b76e335c6017320d293",
+      "image": "penn-875643-9e931ce50f59.png",
+      "image_sha256": "a8e7b57a2ed8ef4c329886edb91964ea827c6228ac8068764346c876295b4460",
+      "source_step_sha256": "9e931ce50f592c01f36dcf06f3626328f256c72a6276ba478a4e0b55d8fb24d1",
+      "model_id": "875643",
+      "triangles": 21370,
+      "bounds_m": [
+        -0.089,
+        -0.0635,
+        -0.0012000000000002044,
+        0.089,
+        0.0635,
+        0.007000000000000207
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-875643-669568b4b692": {
+      "mesh": "penn-875643-669568b4b692.mesh.json.gz",
+      "mesh_sha256": "2848c2c2fd596722c43d9fc2de833c7d2ad709954d96dc46d99b3a980d119e84",
+      "image": "penn-875643-669568b4b692.png",
+      "image_sha256": "1f2d466b5b105e6c47657e241b7018c83e94997c693d370d46dc4ad669609ea6",
+      "source_step_sha256": "669568b4b6925a11fe5e8c53ce40bedab1989ece9aedc8c43e5133ebae0512dc",
+      "model_id": "875643",
+      "triangles": 21186,
+      "bounds_m": [
+        -0.089,
+        -0.0635,
+        -0.001200000000000056,
+        0.089,
+        0.0635,
+        0.016000000000000094
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-875643-dda9b40afec3": {
+      "mesh": "penn-875643-dda9b40afec3.mesh.json.gz",
+      "mesh_sha256": "cce1c08f5fb5cf43950dd17cb17155cb49dbfa9e894b07f57e1940681f8e8abf",
+      "image": "penn-875643-dda9b40afec3.png",
+      "image_sha256": "a121274c7d6a3adc121efca5f968344c5b5644bd51883d407bd5c5e1f092f323",
+      "source_step_sha256": "dda9b40afec3396fcc7e9a6549eda1cbc9732a1f94bc43a4a863a472a43c7a37",
+      "model_id": "875643",
+      "triangles": 5140,
+      "bounds_m": [
+        -0.089,
+        -0.0635,
+        -5.684341886080802e-17,
+        0.089,
+        0.0635,
+        0.01720000000000009
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-686180-f0c58a6282e5": {
+      "mesh": "penn-686180-f0c58a6282e5.mesh.json.gz",
+      "mesh_sha256": "a1425519e316506f32e92493430acc2bb631aa97da549698454b2cbc112bb6d7",
+      "image": "penn-686180-f0c58a6282e5.png",
+      "image_sha256": "eba9f23db5e153394339c6e0968dc8b5a2d48175ea5b2604be3b8cdfc34f816c",
+      "source_step_sha256": "f0c58a6282e541f2cf99adbf1b737824db500db7ce33b1e897cbe58fa22d148d",
+      "model_id": "686180",
+      "triangles": 8434,
+      "bounds_m": [
+        -0.0290000000000001,
+        -0.02899234516906662,
+        -0.00946611271526258,
+        0.0290000000000001,
+        0.02899234516906662,
+        0.04848469033813305
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-930192-2e3a1d845bd4": {
+      "mesh": "penn-930192-2e3a1d845bd4.mesh.json.gz",
+      "mesh_sha256": "3e7ebd39c92a9c550c8184c48b783f1af53693c5b49651e26cc3f7cb9a151fc9",
+      "image": "penn-930192-2e3a1d845bd4.png",
+      "image_sha256": "e446fc49ce4c89a7fcd97a0bae03d9af2241248e1f1153932d9dfb2568c02b7c",
+      "source_step_sha256": "2e3a1d845bd41cd9a11db0202bf4ea63ad88148a90a023c25e10415dc4b353b0",
+      "model_id": "930192",
+      "triangles": 3550,
+      "bounds_m": [
+        -0.024000000000000056,
+        -0.023999858689375677,
+        -0.0011,
+        0.024000000000000056,
+        0.023999858689375674,
+        0.04689971737875133
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-815534-77b3cd712c13": {
+      "mesh": "penn-815534-77b3cd712c13.mesh.json.gz",
+      "mesh_sha256": "ddc10e8757dda36bf8d3d43512bdde911da330aa853ec39f057bbe4223925a0f",
+      "image": "penn-815534-77b3cd712c13.png",
+      "image_sha256": "0089f2078f41d99d584d11a54dd2914a4783c29229cdf23574bf710413cd1984",
+      "source_step_sha256": "77b3cd712c1373942a02e2c75b0fb738a5444aa6397e8d311c05be32fe109227",
+      "model_id": "815534",
+      "triangles": 5204,
+      "bounds_m": [
+        -0.028983056357631293,
+        -0.02899921473880724,
+        -0.0435,
+        0.028983056357631293,
+        0.02899921473880724,
+        0.009499999999999998
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-791345-d89fc9ed6f93": {
+      "mesh": "penn-791345-d89fc9ed6f93.mesh.json.gz",
+      "mesh_sha256": "8aa3adbf4e9cf321e3bad696f5c79a9ffe17e4055bbd090da1f0a3cdfe0cf663",
+      "image": "penn-791345-d89fc9ed6f93.png",
+      "image_sha256": "63875ec19af12638b41641d32ac2ad77b0eca99f5254215717012bad759734aa",
+      "source_step_sha256": "d89fc9ed6f9334d5a93e8718efe7949a48658eee48cf66dd60a1f9a2e9faf0a2",
+      "model_id": "791345",
+      "triangles": 4265,
+      "bounds_m": [
+        -0.020554099147829255,
+        -0.020554099147829255,
+        -0.0363,
+        0.020554099147829255,
+        0.020554099147829255,
+        0.004808198295658485
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-815529-87e45225291d": {
+      "mesh": "penn-815529-87e45225291d.mesh.json.gz",
+      "mesh_sha256": "64dfde6df3c6e4bc5c45c31ebab6566addfcad4ddf817e3c2e782f1a26947b43",
+      "image": "penn-815529-87e45225291d.png",
+      "image_sha256": "648771f9faf3f3769537c6a5a70d3cac23532e427884dc9deea387e7aa5a2063",
+      "source_step_sha256": "87e45225291d65f1efbd0a5415bcc63e57992a1a23f6dbc76ab687b7569a1780",
+      "model_id": "815529",
+      "triangles": 4644,
+      "bounds_m": [
+        -0.030491907801578736,
+        -0.030499661339145646,
+        -0.0435,
+        0.030491907801578733,
+        0.030499661339145646,
+        0.012500000000000002
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-807418-ed0354bcd9b7": {
+      "mesh": "penn-807418-ed0354bcd9b7.mesh.json.gz",
+      "mesh_sha256": "aafdc24e1c27c9807a96369b50df6a740949e031dcd6943ad499f740e465b078",
+      "image": "penn-807418-ed0354bcd9b7.png",
+      "image_sha256": "d04ace07403adf093a6de2a6a083a8c11fd9397657b264283ea25216efd6088a",
+      "source_step_sha256": "ed0354bcd9b78c8db8902132525c59edc72d9c14dd6c401ff256aee99555ecca",
+      "model_id": "807418",
+      "triangles": 1372,
+      "bounds_m": [
+        -0.022,
+        -0.022,
+        -0.0010000000000000035,
+        0.022,
+        0.022,
+        0.043
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-225326-67ac418b33e1": {
+      "mesh": "penn-225326-67ac418b33e1.mesh.json.gz",
+      "mesh_sha256": "9777beba1b86e03b9d7f68e1f53de15dfc5cef38820112826cfa2f667603ce81",
+      "image": "penn-225326-67ac418b33e1.png",
+      "image_sha256": "80f2b9ff721c0ee2c356f565337a9d0e10d250b5c6fa8e636972ca08144b9ef0",
+      "source_step_sha256": "67ac418b33e1a0e62c6ac681a34068dc8183afc98b875ae5f141c6a495e75b32",
+      "model_id": "225326",
+      "triangles": 1148,
+      "bounds_m": [
+        -0.01450000000000005,
+        -0.02,
+        -0.027800000000000005,
+        0.014500000000000048,
+        0.02,
+        0.0012
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-788870-15c9543f71f7": {
+      "mesh": "penn-788870-15c9543f71f7.mesh.json.gz",
+      "mesh_sha256": "35985a32bb59d9e29c71df9244a97b0f2cdec74078e6d240d72691b4bbda0703",
+      "image": "penn-788870-15c9543f71f7.png",
+      "image_sha256": "bbdf6c0a56f7f9839a161f825a6cb58f4e5983dad4ba883f80c5bd84829901a2",
+      "source_step_sha256": "15c9543f71f74908aba28b02aad925e7709fd58befff1a8ba23881c01bdbd944",
+      "model_id": "788870",
+      "triangles": 1148,
+      "bounds_m": [
+        -0.015500000000000048,
+        -0.02,
+        -0.029800000000000004,
+        0.01550000000000005,
+        0.02,
+        0.0012
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-788864-c56c30cd72cd": {
+      "mesh": "penn-788864-c56c30cd72cd.mesh.json.gz",
+      "mesh_sha256": "aaa4b7001ff6591f76148fcfd299fb7dee5fee51c9709b8dda3bbf08065ccfba",
+      "image": "penn-788864-c56c30cd72cd.png",
+      "image_sha256": "5f75bbd29ba759fd5c77499ba316e57ac07588c654804157a795df2dbd84b741",
+      "source_step_sha256": "c56c30cd72cde33606d19859e7d84e8f825afb7b611896c7994058c7718220cb",
+      "model_id": "788864",
+      "triangles": 1148,
+      "bounds_m": [
+        -0.012350000000000005,
+        -0.0185,
+        -0.0012,
+        0.012350000000000005,
+        0.0185,
+        0.0235
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-788867-5598f0ccaec9": {
+      "mesh": "penn-788867-5598f0ccaec9.mesh.json.gz",
+      "mesh_sha256": "efd3a071b656c889cfe99f5029d8e524c45970351299bbb777455c6fdb773408",
+      "image": "penn-788867-5598f0ccaec9.png",
+      "image_sha256": "1d31cf8c4a02a82b212b13401e016f6e22cbb6d300a845b9e7f27848e2ce61cc",
+      "source_step_sha256": "5598f0ccaec9a37624a3d523209b5620d3c382397ff3b63a32906de3374c549a",
+      "model_id": "788867",
+      "triangles": 15116,
+      "bounds_m": [
+        -0.02,
+        -0.01825000000000002,
+        -0.0027000000000000288,
+        0.02,
+        0.01825000000000002,
+        0.033800000000000004
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-225325-1e19a290093b": {
+      "mesh": "penn-225325-1e19a290093b.mesh.json.gz",
+      "mesh_sha256": "d940511ff641c641871430cf1bfb9eeb1104fd01712eac585aeb603ba50dc0a3",
+      "image": "penn-225325-1e19a290093b.png",
+      "image_sha256": "63db1a95251e0e0e8f406999227b25a09b0b0b940241a811cf2595ccf74ce453",
+      "source_step_sha256": "1e19a290093b37de89b71b04151bd26d552573bf14b1785a780743cc1ec8cbf2",
+      "model_id": "225325",
+      "triangles": 1148,
+      "bounds_m": [
+        -0.01450000000000005,
+        -0.02,
+        -0.029000000000000005,
+        0.014500000000000048,
+        0.02,
+        0.0
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-788521-15ad6481ee1e": {
+      "mesh": "penn-788521-15ad6481ee1e.mesh.json.gz",
+      "mesh_sha256": "0e65591e79666ea290ced30461d65fa2736c2941b4e85cc53378d22e61cfd7ce",
+      "image": "penn-788521-15ad6481ee1e.png",
+      "image_sha256": "87e2f552be36e08cc3ed751531ce60fe5af2a7e69014ad166039e6ce7d966479",
+      "source_step_sha256": "15ad6481ee1efe144f5f536b88859098f52aa60392268eeaa4300bcc755a146c",
+      "model_id": "788521",
+      "triangles": 740,
+      "bounds_m": [
+        -0.015600000000000051,
+        -0.015600000000000001,
+        0.0,
+        0.01560000000000005,
+        0.015600000000000001,
+        0.02
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-1235778-f6a1f8e8d4aa": {
+      "mesh": "penn-1235778-f6a1f8e8d4aa.mesh.json.gz",
+      "mesh_sha256": "92a9fec6e1504117463cd832ce12d97d0f676db59bd3441e0dc710cee68dec30",
+      "image": "penn-1235778-f6a1f8e8d4aa.png",
+      "image_sha256": "5e1934342a0ac20d06a020cb3a36be1831dd1ea8a8036f01458f10aa2b200849",
+      "source_step_sha256": "f6a1f8e8d4aa37bfe6813e48d704a475633882fef5518b3b23ad09e31542a0ba",
+      "model_id": "1235778",
+      "triangles": 31364,
+      "bounds_m": [
+        -0.036000000000000004,
+        -0.03995,
+        -0.011500000000000015,
+        0.036000000000000004,
+        0.03995,
+        0.02341708538661922
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-1239399-2c4e041b19a8": {
+      "mesh": "penn-1239399-2c4e041b19a8.mesh.json.gz",
+      "mesh_sha256": "460fdf47cadf2a609736474f1df41585270773b22d2b387ade7c37b835a1cc55",
+      "image": "penn-1239399-2c4e041b19a8.png",
+      "image_sha256": "af4dbe796526a05d9277c06ae6abe170d04352d1d63a5616483f403c501a9708",
+      "source_step_sha256": "2c4e041b19a81de4ea5af77a1879f5aab64b8fc9ddf05791254b9c0551888408",
+      "model_id": "1239399",
+      "triangles": 167000,
+      "bounds_m": [
+        -0.0635,
+        -0.0865,
+        -0.001899999999992204,
+        0.0635,
+        0.0865,
+        0.0175
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-1701441-de0e769c5252": {
+      "mesh": "penn-1701441-de0e769c5252.mesh.json.gz",
+      "mesh_sha256": "df071c80574eb7725f0633815f5b69c79b74e634397c3154df3b86d1e3f21fac",
+      "image": "penn-1701441-de0e769c5252.png",
+      "image_sha256": "911914678d7011ef311a38e06c39c5fd5a34b76cd82841e12b25502e2de26f90",
+      "source_step_sha256": "de0e769c5252b125794094c61dbf778cba98a4e899364e255e3855c97da25452",
+      "model_id": "1701441",
+      "triangles": 47622,
+      "bounds_m": [
+        -0.03,
+        -0.03204000000000032,
+        -0.0035830000000004036,
+        0.03,
+        0.03204000000000032,
+        0.008849999999999643
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-3173934-bd0d405548d4": {
+      "mesh": "penn-3173934-bd0d405548d4.mesh.json.gz",
+      "mesh_sha256": "4838f70b10fcc16a86ddd4ac076b5b3da2afba80a266b57058b3e8c4c98eed90",
+      "image": "penn-3173934-bd0d405548d4.png",
+      "image_sha256": "ded60bef6597e604d36dc4c60ad17f6f0ee9d7fbf47a7aaf035dd4d1f5a10bb7",
+      "source_step_sha256": "bd0d405548d4549e11e21c2207acf83cc852e02897aa0fa8b1c175714c328394",
+      "model_id": "3173934",
+      "triangles": 49374,
+      "bounds_m": [
+        -0.05275,
+        -0.051,
+        -0.0018999999999999998,
+        0.05275,
+        0.051,
+        0.041532515787173215
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-1353518-c8fcf7634742": {
+      "mesh": "penn-1353518-c8fcf7634742.mesh.json.gz",
+      "mesh_sha256": "c4cc5f71021924cf9b69141845eda9c86d6ab21bddc3bbedb505fbb187a61df4",
+      "image": "penn-1353518-c8fcf7634742.png",
+      "image_sha256": "2b6da1e61342b65545152d1e705a6a693a51d6b2e5a9fd7ce5cd1cd7a5659ff7",
+      "source_step_sha256": "c8fcf7634742ed5024d6e6ac910da7c28babb7eee22f4e797111cb4d91edb001",
+      "model_id": "1353518",
+      "triangles": 138685,
+      "bounds_m": [
+        -0.05275,
+        -0.051000000000000004,
+        -0.001804844798338,
+        0.05275,
+        0.051000000000000004,
+        0.015500000000000153
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-1353519-98deea75357e": {
+      "mesh": "penn-1353519-98deea75357e.mesh.json.gz",
+      "mesh_sha256": "9b71f1b6385870b9bb011601cb50fc8beceb775f657183fe6b4bb24779b686cb",
+      "image": "penn-1353519-98deea75357e.png",
+      "image_sha256": "2b26321e5a858afbacef608d3f5597c7072a89af7eed3f3c7896ccb7a7095e1c",
+      "source_step_sha256": "98deea75357ee654c76ba2d9623bcfaae6a9feb4690b7665caaae4f6aecdc636",
+      "model_id": "1353519",
+      "triangles": 138181,
+      "bounds_m": [
+        -0.05275,
+        -0.051000000000000004,
+        -0.00180856644037,
+        0.052750000000000005,
+        0.051000000000000004,
+        0.015291137043827471
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-1025349-fa434af47afb": {
+      "mesh": "penn-1025349-fa434af47afb.mesh.json.gz",
+      "mesh_sha256": "e3b306240a6ee776daf3e8fa8076b7994078627070f81335e6bb21f5fb5ab9af",
+      "image": "penn-1025349-fa434af47afb.png",
+      "image_sha256": "3537d7835db7599d8da4086e96ac726fc6d871d3ffbde025a90a4f6e5587f009",
+      "source_step_sha256": "fa434af47afb78dfd7a8f1952daa88f15d3c1f18e667a1fbf4c42ca1656b69f8",
+      "model_id": "1025349",
+      "triangles": 145948,
+      "bounds_m": [
+        -0.05750000000000015,
+        -0.08030473518607517,
+        -0.0018999999999999915,
+        0.05750000000000015,
+        0.08030473518607517,
+        0.01646140502114581
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-924700-cc4da1849a74": {
+      "mesh": "penn-924700-cc4da1849a74.mesh.json.gz",
+      "mesh_sha256": "0e28c9e00bb41e6f6c402b06ddeaf25a9470bf818d4396d2d80a7c0b5a93181d",
+      "image": "penn-924700-cc4da1849a74.png",
+      "image_sha256": "9e56cd5baaecb33cc89b74d5d5dbb7b3c78ac240022fb16c4525bde9aac12036",
+      "source_step_sha256": "cc4da1849a746dc56d3aba9d60ad97f56ec7905bbbd66f980e384c8f9d5e29d7",
+      "model_id": "924700",
+      "triangles": 86723,
+      "bounds_m": [
+        -0.051000000000000004,
+        -0.05275,
+        -0.0019000000000000128,
+        0.051000000000000004,
+        0.05275,
+        0.017948491031376777
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-941526-05729e531d2e": {
+      "mesh": "penn-941526-05729e531d2e.mesh.json.gz",
+      "mesh_sha256": "6792d8928bf046b1eabbbfb48ff0c5b7c13f06899755b916d981dbf6281adfcf",
+      "image": "penn-941526-05729e531d2e.png",
+      "image_sha256": "55606d424802d701509fca4b4b20334817baf00237733928a5cb02812a3353c0",
+      "source_step_sha256": "05729e531d2ecfe04f8fb80ba9e51f70ab9a7831b7115fe23f0f94a81868e0e2",
+      "model_id": "941526",
+      "triangles": 75552,
+      "bounds_m": [
+        -0.027000000000000007,
+        -0.05,
+        -0.009000000000000005,
+        0.027000000000000007,
+        0.05,
+        0.0039580663871639525
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-931107-11e3d2f72f1f": {
+      "mesh": "penn-931107-11e3d2f72f1f.mesh.json.gz",
+      "mesh_sha256": "3c2e8a2ebe58462a9f7e2a05588dd071edd85be3357ddbc0f5a12ea09ad93785",
+      "image": "penn-931107-11e3d2f72f1f.png",
+      "image_sha256": "8c2dba8fe7daf5a94e9e736135a546d417b3c5e1e85c8d7798f5fa82802a3de3",
+      "source_step_sha256": "11e3d2f72f1f84f38a7a0da68185f5fb3c97e75bde90e4f006360c1be9bfe062",
+      "model_id": "931107",
+      "triangles": 91862,
+      "bounds_m": [
+        -0.04450000000000001,
+        -0.04350000000000001,
+        -0.002200000000000033,
+        0.04450000000000001,
+        0.04350000000000001,
+        0.017109361295289425
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-3222615-e923d8bbeacc": {
+      "mesh": "penn-3222615-e923d8bbeacc.mesh.json.gz",
+      "mesh_sha256": "677a367330464411702ce8beb1ce35566144ce3687767805deeb600375df19ed",
+      "image": "penn-3222615-e923d8bbeacc.png",
+      "image_sha256": "1990033ec9c4d634c5345aa019234af106ba15f9aa3b8b1d91b300e886d733bf",
+      "source_step_sha256": "e923d8bbeaccf41380d5f7cc0bf7c9fe0b04f4c0d1c77bd0fe87fd0d823bf1da",
+      "model_id": "3222615",
+      "triangles": 192462,
+      "bounds_m": [
+        -0.054834777078061246,
+        -0.018948682930663003,
+        -0.025596241784690336,
+        0.054834777078061246,
+        0.018948682930663003,
+        0.008600083159784732
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-1043821-a7dfc5d2a381": {
+      "mesh": "penn-1043821-a7dfc5d2a381.mesh.json.gz",
+      "mesh_sha256": "9d7d698cabef782d680fa10b369fb71f9d9b7668a333997f07fa6fb34c33eccf",
+      "image": "penn-1043821-a7dfc5d2a381.png",
+      "image_sha256": "80238ed691eebf61d34ee64f9a4a0a00cf75f903426e34f0286f117eeebbe1f3",
+      "source_step_sha256": "a7dfc5d2a38162e5f0f91cdd81ceae04f880915e019d263f8ffef3217d96d079",
+      "model_id": "1043821",
+      "triangles": 32342,
+      "bounds_m": [
+        -0.020497386762142092,
+        -0.03535,
+        -0.0032,
+        0.020497386762142092,
+        0.03535,
+        0.007599999999999997
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-2381972-48daacd77256": {
+      "mesh": "penn-2381972-48daacd77256.mesh.json.gz",
+      "mesh_sha256": "7abe8dc162d94773cd8b99d77e5456732df592d116bda15460502149b62fcf03",
+      "image": "penn-2381972-48daacd77256.png",
+      "image_sha256": "24d10396032f2f5f840ac8cf1b53875050dd489f4cea339a9fe0e87c7e8ddeed",
+      "source_step_sha256": "48daacd7725635b4a870e81efe228d8432a1fe11c4516e8b0fc71ce58f4319db",
+      "model_id": "2381972",
+      "triangles": 29220,
+      "bounds_m": [
+        -0.051,
+        -0.053024999999999996,
+        -0.008199999999999999,
+        0.051,
+        0.053024999999999996,
+        0.006793290876656123
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-924702-aec54460e95d": {
+      "mesh": "penn-924702-aec54460e95d.mesh.json.gz",
+      "mesh_sha256": "912e18349259fe3c2784f42388bf6a097928597c8c7af7c5b12ad0fb43a1d77a",
+      "image": "penn-924702-aec54460e95d.png",
+      "image_sha256": "e367a86ca41baaf25b651ef18de6ec1ea49954e91453ea87d0b4dea6411756e5",
+      "source_step_sha256": "aec54460e95d74b41561acf3d0a97f0777caa1229fc2aea227a3c26111927989",
+      "model_id": "924702",
+      "triangles": 15156,
+      "bounds_m": [
+        -0.046000000000000006,
+        -0.026000000000000002,
+        2.098930388399367e-06,
+        0.046000000000000006,
+        0.026000000000000006,
+        0.008002098930388406
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-2738206-8022ad7c70d7": {
+      "mesh": "penn-2738206-8022ad7c70d7.mesh.json.gz",
+      "mesh_sha256": "979edeaadaf6e75e71ae9349b541e8a417dddb9664733a0a333c56d5b98f32b2",
+      "image": "penn-2738206-8022ad7c70d7.png",
+      "image_sha256": "814bb19aa00757edf87857f011d02cea31d78c6f369a7423c69d6d579399c4cd",
+      "source_step_sha256": "8022ad7c70d73da7a9b54e28dfc4e50282d6c73c7fb48d56fdfe7b41759c6a05",
+      "model_id": "2738206",
+      "triangles": 35512,
+      "bounds_m": [
+        -0.06365883096484361,
+        -0.08753250671658044,
+        -0.0025034761677429954,
+        0.06365883096484361,
+        0.08753250671658044,
+        0.011496523832257013
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-1044533-25845f4c823a": {
+      "mesh": "penn-1044533-25845f4c823a.mesh.json.gz",
+      "mesh_sha256": "79e81989bd0b937777658140d13219f9ebb70d6b842f7490643d7b37cb14ea22",
+      "image": "penn-1044533-25845f4c823a.png",
+      "image_sha256": "ce6bfbe74831f53414b9a6bf50633e14776822a964e3c101c5d8af9be9292603",
+      "source_step_sha256": "25845f4c823afd1aede34ff340f01263f31cd097b9dba396e46b0d4747c6b66d",
+      "model_id": "1044533",
+      "triangles": 79794,
+      "bounds_m": [
+        -0.06350000262260437,
+        -0.08649903309345246,
+        -0.008196694946289064,
+        0.06350000262260437,
+        0.08649903309345246,
+        0.003997190856933592
+      ],
+      "source_vendor_stl_sha256": "7448cec24bc56bde004984e74a5184d751694b01bcdd8f2d68ece73d02dc7bd8"
+    },
+    "penn-1237939-62d0dca82b27": {
+      "mesh": "penn-1237939-62d0dca82b27.mesh.json.gz",
+      "mesh_sha256": "92cd28366bd5f6e8c3703334e8f9552e1d217cac9138cae48a8513747769254a",
+      "image": "penn-1237939-62d0dca82b27.png",
+      "image_sha256": "c4fc7a93cade9d703ef467497ddb6368b7f07c005c99174fb648a7b45e0df7e5",
+      "source_step_sha256": "62d0dca82b27de0dd84022fa5a9d34150baec109462c5ec5c5a85ba2673aa59b",
+      "model_id": "1237939",
+      "triangles": 11508,
+      "bounds_m": [
+        -0.03855,
+        -0.024200000000000003,
+        -0.0007973555808673858,
+        0.03855,
+        0.024200000000000003,
+        0.006702644419132629
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-1022892-2d7c02306bbf": {
+      "mesh": "penn-1022892-2d7c02306bbf.mesh.json.gz",
+      "mesh_sha256": "55885753905104a506c39c331c2919604b13a40d5bfe574103ee8acffd0d7f55",
+      "image": "penn-1022892-2d7c02306bbf.png",
+      "image_sha256": "8774bfdd5ba81d3785ac839d2c103e3ebe6e4b21cc04a044887dbead329e46d7",
+      "source_step_sha256": "2d7c02306bbf64580539eeb418c98799a47c982a3f966c0c76cbbf2fe8f83b28",
+      "model_id": "1022892",
+      "triangles": 183002,
+      "bounds_m": [
+        -0.0805,
+        -0.0535,
+        -0.0030499999999999998,
+        0.0805,
+        0.0535,
+        0.019000063113437247
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-928344-10e0642bbe44": {
+      "mesh": "penn-928344-10e0642bbe44.mesh.json.gz",
+      "mesh_sha256": "3f8cd266665bc3b9cd03db61c1eab3007afe0de7aeed79d839e7efd7e3737691",
+      "image": "penn-928344-10e0642bbe44.png",
+      "image_sha256": "faefb336fba231123d1345710e8b4b4f2cdcfe45c51ab68e0e28c8852001e597",
+      "source_step_sha256": "10e0642bbe44ee8eb45752da41d7199a5e1bc92da68d328237a4fa2bd5c00926",
+      "model_id": "928344",
+      "triangles": 13072,
+      "bounds_m": [
+        -0.037830212796310055,
+        -0.11665000000004563,
+        -0.03597665940802843,
+        0.037830212796310055,
+        0.11665000000004563,
+        0.012509225617843543
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-1612791-7e3fb3388001": {
+      "mesh": "penn-1612791-7e3fb3388001.mesh.json.gz",
+      "mesh_sha256": "9b9534334048379c93fa3b66e5bc75e77b8927f5d12beeeeacefde9d132e2573",
+      "image": "penn-1612791-7e3fb3388001.png",
+      "image_sha256": "1f2001fbeb0467231507a022b89cbba67f393455125778c7fd3e815607ca0b56",
+      "source_step_sha256": "7e3fb3388001a983aa17e5dc136d9e30812c27713b09df97e0beb9ffe1a07c86",
+      "model_id": "1612791",
+      "triangles": 41115,
+      "bounds_m": [
+        -0.064,
+        -0.0395738458587126,
+        -0.00016489253031083705,
+        0.064,
+        0.0395738458587126,
+        0.0188163981037865
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-924855-02a23c9dc19f": {
+      "mesh": "penn-924855-02a23c9dc19f.mesh.json.gz",
+      "mesh_sha256": "61d396b5fbf8157f4b0b2967edfd15da1eab6df2d1e1de96f8625415d9eec322",
+      "image": "penn-924855-02a23c9dc19f.png",
+      "image_sha256": "c79e942c220f6eac919a08cbaf69d0528ab6417c99a1aec2c8478be60c7263cd",
+      "source_step_sha256": "02a23c9dc19fc60a00c2d9f9247f6f6f5870e0deb8ddb2045d6c88697062797a",
+      "model_id": "924855",
+      "triangles": 22106,
+      "bounds_m": [
+        -0.07,
+        -0.04044576961615522,
+        -0.0019032653619507952,
+        0.07,
+        0.04044576961615522,
+        0.014289863660851764
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-929124-4716f8106c0a": {
+      "mesh": "penn-929124-4716f8106c0a.mesh.json.gz",
+      "mesh_sha256": "e7b32da6a6c3c8a31a609d5975c9966291ff7530aa041929145e14cf5c77f377",
+      "image": "penn-929124-4716f8106c0a.png",
+      "image_sha256": "b0be442603d3db8e9f2809d07dae0aeb24e3bd733aa30eb4a29b1273f5b55d68",
+      "source_step_sha256": "4716f8106c0a50e281415ea96270bb43ef70963a626eaa3d60281e62279c5df7",
+      "model_id": "929124",
+      "triangles": 91698,
+      "bounds_m": [
+        -0.07775,
+        -0.041225000000000005,
+        -0.011400000000000004,
+        0.07775,
+        0.041225000000000005,
+        0.004500000000000002
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-1101985-b7bd893c3ae8": {
+      "mesh": "penn-1101985-b7bd893c3ae8.mesh.json.gz",
+      "mesh_sha256": "ec2d29789bfa21698b16af41a7c7960ee253efac0c886f55aff2720da29458b1",
+      "image": "penn-1101985-b7bd893c3ae8.png",
+      "image_sha256": "6ddfcf0cb1f99082cfe56b8ff220bb2f5ca1e29871983dcc61c4077f5ff3454c",
+      "source_step_sha256": "b7bd893c3ae84650eab90b9efdebf44e02422e488d1d778b322e3bf03531e377",
+      "model_id": "1101985",
+      "triangles": 189072,
+      "bounds_m": [
+        -0.089,
+        -0.0635,
+        -0.0030231863352756213,
+        0.089,
+        0.0635,
+        0.01900042021498304
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-1612565-4b3a26c688c9": {
+      "mesh": "penn-1612565-4b3a26c688c9.mesh.json.gz",
+      "mesh_sha256": "6ff6c76d76cd74de246c54adb65b1b9a7899b42536a53701586ac84a2e27da12",
+      "image": "penn-1612565-4b3a26c688c9.png",
+      "image_sha256": "bbe6aa0f2e08153234589852e0832192d2b68efcda4adc383a84ee2a2569fd98",
+      "source_step_sha256": "4b3a26c688c9ee774126a976207e0724f16a3ab95c02792e451649e451530a67",
+      "model_id": "1612565",
+      "triangles": 2504,
+      "bounds_m": [
+        -0.0805,
+        -0.0535,
+        -0.001,
+        0.0805,
+        0.0535,
+        0.0
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-929684-a2db4e58036a": {
+      "mesh": "penn-929684-a2db4e58036a.mesh.json.gz",
+      "mesh_sha256": "9073faf532dbcd4bfe5e941dad3393ff09ad08fc2eba27d6a92a4213509d2e0a",
+      "image": "penn-929684-a2db4e58036a.png",
+      "image_sha256": "e1d14fd326caace7710891aa91826b516578b7fbf2cee565b0a2d6fc6aa2b7f8",
+      "source_step_sha256": "a2db4e58036aeafffc05e8b4b42d04b59b04e7ff9030b70416dd1ab4cba797d0",
+      "model_id": "929684",
+      "triangles": 4992,
+      "bounds_m": [
+        -0.06820000000000001,
+        -0.045,
+        -0.030000000000000002,
+        0.06820000000000001,
+        0.045,
+        1.3322676295501879e-18
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-873304-f91c40603832": {
+      "mesh": "penn-873304-f91c40603832.mesh.json.gz",
+      "mesh_sha256": "b355d65c19ef436d017c77087dc534143ab58fd1a07f66de0ad7e87b4d8fab45",
+      "image": "penn-873304-f91c40603832.png",
+      "image_sha256": "16a01d76728ecb76fe18d3f7eeb75f389d04e7fed439795d0713e0cc743f8103",
+      "source_step_sha256": "f91c4060383278cbced75191a8c6d8daf126d29746c6905ea312ca769a49c0be",
+      "model_id": "873304",
+      "triangles": 5736,
+      "bounds_m": [
+        -0.056000000000000015,
+        -0.051000000000000004,
+        -0.025899999999999992,
+        0.056000000000000015,
+        0.051000000000000004,
+        0.0015000000000000013
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-875625-0521b2db3db3": {
+      "mesh": "penn-875625-0521b2db3db3.mesh.json.gz",
+      "mesh_sha256": "4131c0539fc6a800d1a85c0869b2e3c764057254ec502b10e11ec092c24ca20d",
+      "image": "penn-875625-0521b2db3db3.png",
+      "image_sha256": "fd4277f34507f19b4178489d9d059213390b86bfed35717bc9930cd5bcd88629",
+      "source_step_sha256": "0521b2db3db396fc92783031f951bbe4449471cd0641cf1f2da70678d3ec305c",
+      "model_id": "875625",
+      "triangles": 5844,
+      "bounds_m": [
+        -0.06525,
+        -0.0445,
+        -0.01420000000000005,
+        0.06525,
+        0.0445,
+        1.0724754417879012e-16
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-875625-60fc80298a4c": {
+      "mesh": "penn-875625-60fc80298a4c.mesh.json.gz",
+      "mesh_sha256": "2378fc3e155179381204d0d2e7de210fff17ba67745c924781a9144bb415153a",
+      "image": "penn-875625-60fc80298a4c.png",
+      "image_sha256": "f5a14159595f78659f034bd7b3359f2d12af5bd61dea87b32d66762decd60147",
+      "source_step_sha256": "60fc80298a4cae61a685ff7482def9e9d3db3d2df34fe92327c3a6c9994c453f",
+      "model_id": "875625",
+      "triangles": 5256,
+      "bounds_m": [
+        -0.06525,
+        -0.0445,
+        -0.0012000000000000491,
+        0.06525,
+        0.0445,
+        0.013000000000000109
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-871585-6b0f5c3c4684": {
+      "mesh": "penn-871585-6b0f5c3c4684.mesh.json.gz",
+      "mesh_sha256": "5268228e9dc23809772deed08a247391fb1b235c5922db18ab53f8fe5b3692ae",
+      "image": "penn-871585-6b0f5c3c4684.png",
+      "image_sha256": "c6f0c6b9def6984c859473ae1680cac3745ad66a22d0300f6cfd35b09690e45b",
+      "source_step_sha256": "6b0f5c3c46842c192ec9ba63d90cba0de1d9f524eb28c0f856a44f1b3691f625",
+      "model_id": "871585",
+      "triangles": 7176,
+      "bounds_m": [
+        -0.055999999999999994,
+        -0.05099999999999999,
+        -0.0011999999999999992,
+        0.055999999999999994,
+        0.05099999999999999,
+        0.014
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-871585-23e98cc08132": {
+      "mesh": "penn-871585-23e98cc08132.mesh.json.gz",
+      "mesh_sha256": "5d04fbee02697ce8a7eecd9b09d1aacc3d98484980c97781fe6e3ce963262f00",
+      "image": "penn-871585-23e98cc08132.png",
+      "image_sha256": "1fc613e1962cc1c1dd819ec15349677dd61ccd2c9832c497284199ec55df0201",
+      "source_step_sha256": "23e98cc081320e1c2f0354cfbc8ee67cf3f91372b2c761fab577c7ac57e33b1e",
+      "model_id": "871585",
+      "triangles": 7152,
+      "bounds_m": [
+        -0.055999999999999994,
+        -0.05099999999999999,
+        -0.0011999999999999992,
+        0.055999999999999994,
+        0.05099999999999999,
+        0.014
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-871587-2506e0ec1952": {
+      "mesh": "penn-871587-2506e0ec1952.mesh.json.gz",
+      "mesh_sha256": "858ad636f7d6c1400b899f9f1a67a9f7d92c9ec9d29708f34fe768b9320118e6",
+      "image": "penn-871587-2506e0ec1952.png",
+      "image_sha256": "b2cc8b119015066ccdf2121b543f951b5de472c2a94758bd2bbd45524dc68244",
+      "source_step_sha256": "2506e0ec1952b8e5421f76fd33786d332e25f1e3803143cfee457abb61e79f34",
+      "model_id": "871587",
+      "triangles": 29950,
+      "bounds_m": [
+        -0.0774641828522601,
+        -0.08700000505082656,
+        -0.00939084664334177,
+        0.0774641828522601,
+        0.08700000505082656,
+        0.080716245869929
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-927962-66f1feb77206": {
+      "mesh": "penn-927962-66f1feb77206.mesh.json.gz",
+      "mesh_sha256": "35f1033b25f11ef3c2456fba4ff2ccff28ffd99af6e56ee1dda2abfc559fbd48",
+      "image": "penn-927962-66f1feb77206.png",
+      "image_sha256": "8e3f88a1e9820c2eb04d63c4cf7e55de428f4c54b740e595778a8d51afc0657a",
+      "source_step_sha256": "66f1feb772068fb12ca8142ca8cab61968b6f843aee6b9bbc7139cd22b57f417",
+      "model_id": "927962",
+      "triangles": 5436,
+      "bounds_m": [
+        -0.0765,
+        -0.055000000000000014,
+        -0.028395169555282533,
+        0.0765,
+        0.055000000000000014,
+        0.0015000000000000013
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-3356366-d15c054ef80f": {
+      "mesh": "penn-3356366-d15c054ef80f.mesh.json.gz",
+      "mesh_sha256": "1fc97b8d0d0e08be9dbf5188dc8a23f0017b066125664f644deee1c27d1df57f",
+      "image": "penn-3356366-d15c054ef80f.png",
+      "image_sha256": "19be172f1895d497225f736b2fa130db93a395422fd54597f19b0408cdad67db",
+      "source_step_sha256": "d15c054ef80feb0aa11820a92c3db6940f9dd6ccb6fc8ee7e5cf6779ef412cc1",
+      "model_id": "3356366",
+      "triangles": 9374,
+      "bounds_m": [
+        -0.1295,
+        -0.032,
+        -0.00700000000006185,
+        0.1295,
+        0.032,
+        0.0
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-1529825-6ba95df2ebea": {
+      "mesh": "penn-1529825-6ba95df2ebea.mesh.json.gz",
+      "mesh_sha256": "07ddf46d2d64102b95aa62a2d4bd6d6f8d6c1ed66b4c99e6705fd4c2d45aa598",
+      "image": "penn-1529825-6ba95df2ebea.png",
+      "image_sha256": "41f7dcb1e7524908b56dc1669e4da5a94f69389ad6c9591c6fc3ba7dae0d3f67",
+      "source_step_sha256": "6ba95df2ebeab754bc3ca3e03c47ab05539271a4e1263de0d7d964e2c3f65ee6",
+      "model_id": "1529825",
+      "triangles": 75200,
+      "bounds_m": [
+        -0.21539999999999995,
+        -0.3769552790022969,
+        -0.3553000000000003,
+        0.21539999999999995,
+        0.376955279002297,
+        0.038542723676706456
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-939526-8c27f373afc2": {
+      "mesh": "penn-939526-8c27f373afc2.mesh.json.gz",
+      "mesh_sha256": "ef6f00bc50744f773a7b73520d16db47aa1030d0f8dafac3ea357daf22dc397d",
+      "image": "penn-939526-8c27f373afc2.png",
+      "image_sha256": "614336e94988a65ad12fb51c92ce6de023eb3e277eb687dc915796c254cc49e3",
+      "source_step_sha256": "8c27f373afc29f6273431bd12ea416597f3847889bc1cd248b847c66207a75f6",
+      "model_id": "939526",
+      "triangles": 636,
+      "bounds_m": [
+        -0.057999999999996985,
+        -1.985,
+        -0.09000386451812498,
+        0.057999999999996985,
+        1.985,
+        -3.864518121410753e-06
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-1025395-bd87b19cfc0f": {
+      "mesh": "penn-1025395-bd87b19cfc0f.mesh.json.gz",
+      "mesh_sha256": "f69562c23f746478187254fa2a12732e52255912033199870020ca53db5f1473",
+      "image": "penn-1025395-bd87b19cfc0f.png",
+      "image_sha256": "6acaa52bb391c448b37710c0ad2584a167640a2c73ddc5508ec0e4ac7cc5bc76",
+      "source_step_sha256": "bd87b19cfc0f8905c1411814b2753515896ad451d5673ef33688217402930526",
+      "model_id": "1025395",
+      "triangles": 15656,
+      "bounds_m": [
+        -0.046847132656458,
+        -0.04684719240700021,
+        -0.04000000000000025,
+        0.046847132656458006,
+        0.04684719240700021,
+        0.015000000000000015
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-872255-8a5ff5aa1bf2": {
+      "mesh": "penn-872255-8a5ff5aa1bf2.mesh.json.gz",
+      "mesh_sha256": "cd9da47553cf9cfd7dc19fdcd19e4e61f481d8be47ccd928eea9541ce455a8cf",
+      "image": "penn-872255-8a5ff5aa1bf2.png",
+      "image_sha256": "68f9355d769a1cb03c68110df42fd003d785005d9d5917f632c2c285f816bf10",
+      "source_step_sha256": "8a5ff5aa1bf257a70f5b59f434ddc8baec880f1e2db4b9a4e29022565e159bb2",
+      "model_id": "872255",
+      "triangles": 8416,
+      "bounds_m": [
+        -0.5775,
+        -0.030999999999999993,
+        -0.002000000000000002,
+        0.5775,
+        0.030999999999999993,
+        0.02700000000000004
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-939955-030c3d310a57": {
+      "mesh": "penn-939955-030c3d310a57.mesh.json.gz",
+      "mesh_sha256": "c75600ba18d2b06b3605769e7087ac8ab3ca25d04b4a75c7cef69ce3fe55e2d3",
+      "image": "penn-939955-030c3d310a57.png",
+      "image_sha256": "d32a62acdb90949b215e87fcb3c108d900eb551ac4e355956817e125aec9cfcc",
+      "source_step_sha256": "030c3d310a57ba5894238de4414fbf595d76cb0c1890a5754913541421114382",
+      "model_id": "939955",
+      "triangles": 356,
+      "bounds_m": [
+        -0.015000000000000001,
+        -2.0,
+        -0.0014499999999999992,
+        0.015000000000000001,
+        2.0,
+        0.028549514269225907
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-939958-fbaa54b09136": {
+      "mesh": "penn-939958-fbaa54b09136.mesh.json.gz",
+      "mesh_sha256": "34b2cdf1f6963d3df7a9f4f19907d91a9a5c8b73e76b3c23e0691d76a710089d",
+      "image": "penn-939958-fbaa54b09136.png",
+      "image_sha256": "b70ada6a072064fda8ebc52699128163582004db67f85f2dea995065787522ec",
+      "source_step_sha256": "fbaa54b091368785bb217534e2125c43d94cf0dbedf70d25ba7ab817105489b5",
+      "model_id": "939958",
+      "triangles": 340,
+      "bounds_m": [
+        -0.017500000000000012,
+        -1.985,
+        -0.002000000000000007,
+        0.017500000000000012,
+        1.985,
+        0.03299937846060946
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-939953-c1c0ebcdc3c2": {
+      "mesh": "penn-939953-c1c0ebcdc3c2.mesh.json.gz",
+      "mesh_sha256": "8ec4d43774f3db58f12e9c4f537bbeb84e1851261b0e646462d07bdc461835da",
+      "image": "penn-939953-c1c0ebcdc3c2.png",
+      "image_sha256": "b8cd0425961c340c1d2ce65fc8ca4b999c53cb010b043970859439682deec513",
+      "source_step_sha256": "c1c0ebcdc3c2bc5ec026d038a0574c25f2d512527594e36eb8bbaf33e3aa775b",
+      "model_id": "939953",
+      "triangles": 920,
+      "bounds_m": [
+        -0.010950000000000003,
+        -2.0,
+        -0.020499514269225885,
+        0.010950000000000003,
+        2.0,
+        0.001399999999999995
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-939954-712a7ded9740": {
+      "mesh": "penn-939954-712a7ded9740.mesh.json.gz",
+      "mesh_sha256": "07edcb61789df9224ef3f8fd9ab8baa231a1cf1729e4a916cf5c1e49e400811f",
+      "image": "penn-939954-712a7ded9740.png",
+      "image_sha256": "093f44b555dcde22f30416f614e1d28e5a60cf23e3d8d89813d9a7632a7f2878",
+      "source_step_sha256": "712a7ded9740ef283666e27d7596994e53de7101056753cba3875bdf82c97e44",
+      "model_id": "939954",
+      "triangles": 1100,
+      "bounds_m": [
+        -0.012500000000000018,
+        -2.0,
+        -0.023599514269225928,
+        0.012500000000000018,
+        2.0,
+        0.0014000000000000251
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-939966-db08d3213869": {
+      "mesh": "penn-939966-db08d3213869.mesh.json.gz",
+      "mesh_sha256": "3537280254005785d37f193fda92ecb15571fe51261467d815ebb26a4e10d3a0",
+      "image": "penn-939966-db08d3213869.png",
+      "image_sha256": "be06dd0a8681d846da3cd0796a8634e8f6b9f4c5ca7ef850a9a023512220263b",
+      "source_step_sha256": "db08d32138693f239321df4430ccc78d86f632b7782372a9b3a916a8e5c46b8f",
+      "model_id": "939966",
+      "triangles": 700,
+      "bounds_m": [
+        -0.0095,
+        -2.0,
+        -0.0015500000000000002,
+        0.0095,
+        2.0,
+        0.008250000000000002
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-939968-b63321b83fd9": {
+      "mesh": "penn-939968-b63321b83fd9.mesh.json.gz",
+      "mesh_sha256": "1c60a7520acab2670ec3c155ac848fafca6cd52d394e5fb4c74ed7d21d0541cb",
+      "image": "penn-939968-b63321b83fd9.png",
+      "image_sha256": "6a17e71a02636680e8600aee48d59c2b39d2b249f77269b36bd7c97b79e0211e",
+      "source_step_sha256": "b63321b83fd9a01ed8423d79d3c8f8f4be6d70c413a53e91bc6aa47faf7bf34b",
+      "model_id": "939968",
+      "triangles": 936,
+      "bounds_m": [
+        -0.013499689230304732,
+        -2.0,
+        -0.0014000000000000013,
+        0.013499689230304732,
+        2.0,
+        0.011400000000000002
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-944122-818b33f44493": {
+      "mesh": "penn-944122-818b33f44493.mesh.json.gz",
+      "mesh_sha256": "9d4b0b6345940e761542cbe397a608dba12083b3a20314d84c64c4ac9f2d60f1",
+      "image": "penn-944122-818b33f44493.png",
+      "image_sha256": "a77aa66122431ab683a9b93a7cf70c9dbfcffbf9768d93510d50b2ec2e5fc532",
+      "source_step_sha256": "818b33f444937b08ddb7a800a1c6208daaf5b8d78097ce6818feed71300ce59a",
+      "model_id": "944122",
+      "triangles": 548,
+      "bounds_m": [
+        -0.0125,
+        -2.0,
+        -0.0014000000000000004,
+        0.0125,
+        2.0,
+        0.0109
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-944124-d4004f7cd4df": {
+      "mesh": "penn-944124-d4004f7cd4df.mesh.json.gz",
+      "mesh_sha256": "535874e6b6b2081f12a6ef4a535c4017bd19f74ffdaa871fc32b7ee7246ece7b",
+      "image": "penn-944124-d4004f7cd4df.png",
+      "image_sha256": "58bad7306251afae3e803973d7fcd898c9efe58e02a3032aa3cfc6099aad0c4c",
+      "source_step_sha256": "d4004f7cd4df9752a83939883f42447d8d1b360dd3973e017a1bc9bb97ca3fe4",
+      "model_id": "944124",
+      "triangles": 2316,
+      "bounds_m": [
+        -0.0185,
+        -2.0,
+        -0.01719951426922589,
+        0.0185,
+        2.0,
+        0.0017999999999999874
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-943644-7f7a4368e2e1": {
+      "mesh": "penn-943644-7f7a4368e2e1.mesh.json.gz",
+      "mesh_sha256": "4e3554ae8dc4f3eb778a6aaba317304001451046b5f08ab5c1cbde6d208e8230",
+      "image": "penn-943644-7f7a4368e2e1.png",
+      "image_sha256": "6ef0c99b7de019a7430c953dea7982a23b9c38fede7893cc9168a0f875428feb",
+      "source_step_sha256": "7f7a4368e2e15ace36d38931a7b2eba04790fd211ed5397cc231ae5ba89b60e1",
+      "model_id": "943644",
+      "triangles": 2168,
+      "bounds_m": [
+        -0.02185,
+        -2.0,
+        -0.0278495142692259,
+        0.02185,
+        2.0,
+        0.002149999999999993
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-939961-dc246f98377f": {
+      "mesh": "penn-939961-dc246f98377f.mesh.json.gz",
+      "mesh_sha256": "2bdc990417db23cc392a45263aa1ace045ab2761322420654ba269a099dfa30a",
+      "image": "penn-939961-dc246f98377f.png",
+      "image_sha256": "91025b6d89488ffeeb82285595ef3ac43317509d913f84384bab2926982ff428",
+      "source_step_sha256": "dc246f98377f101b51aa089ccd4def495cfbf07a7b55ed3637cda216e3b87fe2",
+      "model_id": "939961",
+      "triangles": 1968,
+      "bounds_m": [
+        -0.009499757134612947,
+        -2.0,
+        -0.0014499999999999975,
+        0.009499757134612947,
+        2.0,
+        0.017549514269225887
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-939962-46d68e1c7048": {
+      "mesh": "penn-939962-46d68e1c7048.mesh.json.gz",
+      "mesh_sha256": "4d93148921b8372866458c5b4dd2cb82f29b3d5a262848a50f07e517af8a1066",
+      "image": "penn-939962-46d68e1c7048.png",
+      "image_sha256": "e3e74f294566cc0339a97ee5386a27ebda7c696acc7fcc2f773d0027298eea97",
+      "source_step_sha256": "46d68e1c7048a5b63082a1e01525215c5a38bc7efc6258001eeb5ef80feae279",
+      "model_id": "939962",
+      "triangles": 2608,
+      "bounds_m": [
+        -0.014999595224354921,
+        -2.0,
+        -0.028549104401409592,
+        0.014999595224354921,
+        2.0,
+        0.0014499139526997543
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-943656-97806c65ca7e": {
+      "mesh": "penn-943656-97806c65ca7e.mesh.json.gz",
+      "mesh_sha256": "0eb1ac324bedd5cc3a654983bbf8a04da2f5c854bc1b61ac77320708ff265014",
+      "image": "penn-943656-97806c65ca7e.png",
+      "image_sha256": "44e81a4da55a00bf32e3f31e0c5dabb292250a34372385f0578604b16484e213",
+      "source_step_sha256": "97806c65ca7eefe29399989e790ef08bd66f912b3280308e7076388c0a34ae5c",
+      "model_id": "943656",
+      "triangles": 932,
+      "bounds_m": [
+        -0.01749975713461295,
+        -2.0,
+        -0.0014999999999999699,
+        0.01749975713461295,
+        2.0,
+        0.0115
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-2381168-2547edfaf040": {
+      "mesh": "penn-2381168-2547edfaf040.mesh.json.gz",
+      "mesh_sha256": "596e489ea7a0495a7934b1959a8bd156ba2ba2c5f3f3504b6cb826bcb0cca4c0",
+      "image": "penn-2381168-2547edfaf040.png",
+      "image_sha256": "c7ca4b0038bbad88f2842a4178025cdc5fcacd0d4fac21f6635640c203fcff4d",
+      "source_step_sha256": "2547edfaf0407089ee3200b7bc88d04b75199f34f14ec94ba9fe34f73e28ef3c",
+      "model_id": "2381168",
+      "triangles": 1052,
+      "bounds_m": [
+        -0.019999660201754914,
+        -1.0,
+        -0.011500000000000007,
+        0.019999660201754914,
+        1.0,
+        0.0015000000000000052
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-819852-bc02d2e87fc9": {
+      "mesh": "penn-819852-bc02d2e87fc9.mesh.json.gz",
+      "mesh_sha256": "25c07f43ea76325388fab831c55b792ee7ac7fd6089b06aeb9ffd9b98e5d5263",
+      "image": "penn-819852-bc02d2e87fc9.png",
+      "image_sha256": "ec08c77153d0628725fe091730df2f9011d880c62422902ab797f4119aceb11e",
+      "source_step_sha256": "bc02d2e87fc9ce005ac0945409c02e51cd4432c87c5c52a690f3d23ccff65adc",
+      "model_id": "819852",
+      "triangles": 25204,
+      "bounds_m": [
+        -1.0017250000000002,
+        -0.014900000000000009,
+        -0.0175,
+        1.0017250000000002,
+        0.014900000000000007,
+        0.0015000000000000959
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-873918-b790353e99ed": {
+      "mesh": "penn-873918-b790353e99ed.mesh.json.gz",
+      "mesh_sha256": "413b5646af4ec64b599e585714d08e8439174e274ed69e09cafeaeefccea8be6",
+      "image": "penn-873918-b790353e99ed.png",
+      "image_sha256": "3ccb97f25f1a4736c99003bb4dfd106628adc175138888bba4ad45668c3e159c",
+      "source_step_sha256": "b790353e99ed82b2d8eabaea27684c429a2b6e165ff3ce85a5664210f263006c",
+      "model_id": "873918",
+      "triangles": 476,
+      "bounds_m": [
+        -0.02,
+        -1.985,
+        -1.7763568394002505e-17,
+        0.02,
+        1.985,
+        0.02149999999999999
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-873893-437a53b808cb": {
+      "mesh": "penn-873893-437a53b808cb.mesh.json.gz",
+      "mesh_sha256": "904a8d5bfcf4ce711e06c03f90060ba261ab4ac70c7c7650f49e5dd30e350960",
+      "image": "penn-873893-437a53b808cb.png",
+      "image_sha256": "5d6ca586475044edd487ae51b7a85c993ebb9543d2e108afd1f33ed665803f9c",
+      "source_step_sha256": "437a53b808cbeaaa5bf981dfce0a0bf260dee03ae90de64375df876081f33b97",
+      "model_id": "873893",
+      "triangles": 1708,
+      "bounds_m": [
+        -0.0215,
+        -1.985,
+        -1.7763568394002505e-18,
+        0.0215,
+        1.985,
+        0.02149999999999969
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-939524-70410101b302": {
+      "mesh": "penn-939524-70410101b302.mesh.json.gz",
+      "mesh_sha256": "81a22fe28fc4823d1dda8a943844d2531a5bc362f4c65302614fe2ca4ef7c876",
+      "image": "penn-939524-70410101b302.png",
+      "image_sha256": "093f44b555dcde22f30416f614e1d28e5a60cf23e3d8d89813d9a7632a7f2878",
+      "source_step_sha256": "70410101b302f99ee9ef7a0c02fba15b5a7272b4aed95600f941001fe9dc22f2",
+      "model_id": "939524",
+      "triangles": 724,
+      "bounds_m": [
+        -0.015000000000000003,
+        -1.985,
+        -0.02050068262762231,
+        0.015000000000000003,
+        1.985,
+        0.0017993173723776987
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-939523-284207866ece": {
+      "mesh": "penn-939523-284207866ece.mesh.json.gz",
+      "mesh_sha256": "3abde1e4dcb73d967b96483379e802ff245b6eba9dae2c85492f15ba05e3895a",
+      "image": "penn-939523-284207866ece.png",
+      "image_sha256": "b3e0e810a8c3a6d3a314bdce6909e253a4700f7bbc46a24f8c5cd1f067ff1772",
+      "source_step_sha256": "284207866ececa34202805ea454df2fb449a09ee6f242a348a8f5c270d85cdb5",
+      "model_id": "939523",
+      "triangles": 572,
+      "bounds_m": [
+        -0.013500000000000003,
+        -1.985,
+        -0.008500000000000002,
+        0.013500000000000003,
+        1.985,
+        0.0013000000000000082
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-943659-af1e64b9d05a": {
+      "mesh": "penn-943659-af1e64b9d05a.mesh.json.gz",
+      "mesh_sha256": "5d79f75fbef65bd2be9b44ebf02466ee116914a4adf3086e1d7f10130e7efd30",
+      "image": "penn-943659-af1e64b9d05a.png",
+      "image_sha256": "04dab5c2852b7aea35c4ce03d3c91f8bd390f3180ef90872e4c3bd243df62f19",
+      "source_step_sha256": "af1e64b9d05a1e9e44d8f48162643e0efd1ffa82bd3a20ff4769f1cf5b2860ec",
+      "model_id": "943659",
+      "triangles": 548,
+      "bounds_m": [
+        -0.011499463175283125,
+        -2.0,
+        -0.0109,
+        0.011499463175283125,
+        2.0,
+        0.0014000000000000013
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-686188-a9628f3ce24c": {
+      "mesh": "penn-686188-a9628f3ce24c.mesh.json.gz",
+      "mesh_sha256": "a940bb113efce04ac9d38acd0f0ceacdf9a955a42cfcdf20b78768ad25171866",
+      "image": "penn-686188-a9628f3ce24c.png",
+      "image_sha256": "6e1aff5f4b6c0e02484e121a0bb05b7656d11d769b3a4d011fadee78b8dae336",
+      "source_step_sha256": "a9628f3ce24cfd63860a88d9ad540754054fe06189a5e92459f05af9ca5283e3",
+      "model_id": "686188",
+      "triangles": 8956,
+      "bounds_m": [
+        -0.03595873102823686,
+        -0.035956715682589645,
+        -0.007946201943992964,
+        0.035958731028236865,
+        0.035956715682589645,
+        0.06396722942118616
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-1239394-a91676e2b34d": {
+      "mesh": "penn-1239394-a91676e2b34d.mesh.json.gz",
+      "mesh_sha256": "54c0438430e6392149dfef8a859c62de55a5ee46ccf0d40ec1ae415da6b2c484",
+      "image": "penn-1239394-a91676e2b34d.png",
+      "image_sha256": "a857a1f753a3f42cae29f6ed2e796e9c65672f7d917813b70b262d90b6226c6e",
+      "source_step_sha256": "a91676e2b34db5b76e31c69a728c492b5216bc6bf56001e3dd1ac77b9cfc2e3d",
+      "model_id": "1239394",
+      "triangles": 185274,
+      "bounds_m": [
+        -0.0635,
+        -0.0865,
+        -0.001899999999999906,
+        0.0635,
+        0.0865,
+        0.016930926673957285
+      ],
+      "source_vendor_stl_sha256": null
+    },
+    "penn-875643-845919b452aa": {
+      "mesh": "penn-875643-845919b452aa.mesh.json.gz",
+      "mesh_sha256": "6545524f2834bb6c9d4817f97319b7fd637d3ba0d3fe369142dd9902defe1ea2",
+      "image": "penn-875643-845919b452aa.png",
+      "image_sha256": "42ea82f5b517743e2bfc9a35c24808750b9cba8a1024ca9ef8b7250daa16b0a0",
+      "source_step_sha256": "845919b452aa54fa847fffac9d8b88320b0beff936d4e45478afc24147a0e170",
+      "model_id": "875643",
+      "triangles": 15104,
+      "bounds_m": [
+        -0.089,
+        -0.0635,
+        -0.0012000000000002044,
+        0.089,
+        0.0635,
+        0.007000000000000207
+      ],
+      "source_vendor_stl_sha256": null
+    }
+  },
+  "items": [
+    {
+      "asset_id": "penn-875643-9e931ce50f59",
+      "sku": "PN - D0506/07Z",
+      "name": "Duża, bardzo płytka miseczka (kaseton) PennBrite z poziomymi otworami wentylacyjnymi (żaluzjami).",
+      "family_id": "vents",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=875643",
+      "concept_envelope_mm": [
+        178.0,
+        127.0
+      ],
+      "id": "company-5ec3de288a57ba5affd98204",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-5ec3de288a57ba5affd98204"
+    },
+    {
+      "asset_id": "penn-875643-669568b4b692",
+      "sku": "PN - D0506K",
+      "name": "Duża pozioma wentylacja 2 rzędy",
+      "family_id": "vents",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=875643",
+      "concept_envelope_mm": [
+        178.0,
+        127.0
+      ],
+      "id": "company-305a2a32b7d838e1c3f44730",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-305a2a32b7d838e1c3f44730"
+    },
+    {
+      "asset_id": "penn-875643-dda9b40afec3",
+      "sku": "PN - D2101K",
+      "name": "Duża czarna Miska",
+      "family_id": "vents",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=875643",
+      "concept_envelope_mm": [
+        178.0,
+        127.0
+      ],
+      "id": "company-bce9e9c9ca4ae034a500928e",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-bce9e9c9ca4ae034a500928e"
+    },
+    {
+      "asset_id": "penn-686180-f0c58a6282e5",
+      "sku": "PN - C1351K",
+      "name": "Duży, czarny narożnik kulowy z przesunięciem (offsetem) 30 mm i promieniem wewnętrznym 0.5 mm.",
+      "family_id": "corners",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=686180",
+      "concept_envelope_mm": [
+        58.0,
+        57.985
+      ],
+      "id": "company-46e2f29c1aaf3de5323dc871",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-46e2f29c1aaf3de5323dc871"
+    },
+    {
+      "asset_id": "penn-930192-2e3a1d845bd4",
+      "sku": "C0675-30",
+      "name": "C0675-30 - 2 Leg Cranked Wrap-Around Corner",
+      "family_id": "corners",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=930192",
+      "concept_envelope_mm": [
+        48.0,
+        48.0
+      ],
+      "id": "supplier-penn-930192-2e3a1d845bd4",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-815534-77b3cd712c13",
+      "sku": "C1349",
+      "name": "C1349 - Brace Ball Corner",
+      "family_id": "corners",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=815534",
+      "concept_envelope_mm": [
+        57.966,
+        57.998
+      ],
+      "id": "supplier-penn-815534-77b3cd712c13",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-791345-d89fc9ed6f93",
+      "sku": "PN - C1187Z",
+      "name": "Średni z promieniem gięcia 2 mm.",
+      "family_id": "corners",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=791345",
+      "concept_envelope_mm": [
+        41.108,
+        41.108
+      ],
+      "id": "company-03e8e345b87962d8470d2b0a",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-03e8e345b87962d8470d2b0a"
+    },
+    {
+      "asset_id": "penn-815529-87e45225291d",
+      "sku": "PN - C1346Z",
+      "name": "Duży\nnarożnik kulowy ze wzmocnieniem/ramieniem",
+      "family_id": "corners",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=815529",
+      "concept_envelope_mm": [
+        60.984,
+        60.999
+      ],
+      "id": "company-943698575118cf86f9bcd160",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-943698575118cf86f9bcd160"
+    },
+    {
+      "asset_id": "penn-807418-ed0354bcd9b7",
+      "sku": "PN - C1186",
+      "name": "Średni narożnik płaski PennBrite o promieniu gięcia 2 mm.",
+      "family_id": "corners",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=807418",
+      "concept_envelope_mm": [
+        44.0,
+        44.0
+      ],
+      "id": "company-4365f3d1bef0eb8e260cd55d",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-4365f3d1bef0eb8e260cd55d"
+    },
+    {
+      "asset_id": "penn-225326-67ac418b33e1",
+      "sku": "PN - B1130K",
+      "name": "Czarna, 4-otworowa płytka wzmacniająca (kątownik/złącze) o wymiarach 29 mm x 40 mm.",
+      "family_id": "corners",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=225326",
+      "concept_envelope_mm": [
+        29.0,
+        40.0
+      ],
+      "id": "company-689495fef63efa7e2eee82d6",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-689495fef63efa7e2eee82d6"
+    },
+    {
+      "asset_id": "penn-788870-15c9543f71f7",
+      "sku": "PN - B1121K",
+      "name": "Czarny, Duży, czterootworowy kątownik wzmacniający PennBrite o wymiarach 31,2 mm na 40 mm.",
+      "family_id": "latches",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=788870",
+      "concept_envelope_mm": [
+        31.0,
+        40.0
+      ],
+      "id": "company-8f16b5a5b0a4a5de19c5c2e6",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-8f16b5a5b0a4a5de19c5c2e6"
+    },
+    {
+      "asset_id": "penn-788864-c56c30cd72cd",
+      "sku": "PN - B1928",
+      "name": "Czterootworowy kątownik wzmacniający PennBrite o wymiarach 25 mm na 37 mm",
+      "family_id": "latches",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=788864",
+      "concept_envelope_mm": [
+        24.7,
+        37.0
+      ],
+      "id": "company-c7d16327a08d201faa20cf36",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-c7d16327a08d201faa20cf36"
+    },
+    {
+      "asset_id": "penn-788867-5598f0ccaec9",
+      "sku": "PN - B1930",
+      "name": "Wspornik 4-otworowy PennBrite z przetłoczeniami wzmacniającymi 35,5 mm x 40 mm.",
+      "family_id": "latches",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=788867",
+      "concept_envelope_mm": [
+        40.0,
+        36.5
+      ],
+      "id": "company-8f512034d51174ec58a458c5",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-8f512034d51174ec58a458c5"
+    },
+    {
+      "asset_id": "penn-225325-1e19a290093b",
+      "sku": "B1125",
+      "name": "B1125 - 4 Hole Brace",
+      "family_id": "latches",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=225325",
+      "concept_envelope_mm": [
+        29.0,
+        40.0
+      ],
+      "id": "supplier-penn-225325-1e19a290093b",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-788521-15ad6481ee1e",
+      "sku": "PN - B1121/20",
+      "name": "2-otworowy uchwyt PennBrite 31,2 mm × 20 mm",
+      "family_id": "latches",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=788521",
+      "concept_envelope_mm": [
+        31.2,
+        31.2
+      ],
+      "id": "company-d3b75a8de4ab312b7e91f583",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-d3b75a8de4ab312b7e91f583"
+    },
+    {
+      "asset_id": "penn-1235778-f6a1f8e8d4aa",
+      "sku": "PN - 3759",
+      "name": "Miniaturowy zamek motylkowy wpuszczany w płytkiej miseczce.",
+      "family_id": "latches",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=1235778",
+      "concept_envelope_mm": [
+        72.0,
+        79.9
+      ],
+      "id": "company-daa37db3377313c328c7e491",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-daa37db3377313c328c7e491"
+    },
+    {
+      "asset_id": "penn-1239399-2c4e041b19a8",
+      "sku": "L944-537MOL3",
+      "name": "L944-537MOL3 - Large MOL3™ Offset Latch",
+      "family_id": "latches",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=1239399",
+      "concept_envelope_mm": [
+        127.0,
+        173.0
+      ],
+      "id": "supplier-penn-1239399-2c4e041b19a8",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-1701441-de0e769c5252",
+      "sku": "PN - L2455",
+      "name": "Mały zatrzask uderzeniowy (samozamykający) do systemu pokrywy samozamykającej (Slam-Lid System).",
+      "family_id": "latches",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=1701441",
+      "concept_envelope_mm": [
+        60.0,
+        64.08
+      ],
+      "id": "company-c9cec8f606f32d0ac107ea58",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-c9cec8f606f32d0ac107ea58"
+    },
+    {
+      "asset_id": "penn-3173934-bd0d405548d4",
+      "sku": "PN - L905/915Z",
+      "name": "Średni zamek motylkowy wpuszczany w głębokiej miseczce.",
+      "family_id": "latches",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=3173934",
+      "concept_envelope_mm": [
+        105.5,
+        102.0
+      ],
+      "id": "company-c5b9589d8f1e8fe9ed432d52",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-c5b9589d8f1e8fe9ed432d52"
+    },
+    {
+      "asset_id": "penn-3173934-bd0d405548d4",
+      "sku": "PN - L905/915K",
+      "name": "Średni, czarny, wpuszczany zamek motylkowy w głębokiej miseczce.",
+      "family_id": "latches",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=3173934",
+      "concept_envelope_mm": [
+        105.5,
+        102.0
+      ],
+      "id": "company-c540356f62908fef1a09c0d8",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-c540356f62908fef1a09c0d8"
+    },
+    {
+      "asset_id": "penn-1353518-c8fcf7634742",
+      "sku": "PN - L907/928S MOL3",
+      "name": "Średni zamek motylkowy wpuszczany SMOL3 w głębokiej miseczce z przesunięciem (offsetem) 27 mm.",
+      "family_id": "latches",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=1353518",
+      "concept_envelope_mm": [
+        105.5,
+        102.0
+      ],
+      "id": "company-7a74c1661e7a7feb1d2299f5",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-7a74c1661e7a7feb1d2299f5"
+    },
+    {
+      "asset_id": "penn-1353519-98deea75357e",
+      "sku": "l9075-928-10smol3",
+      "name": "L9075/928/10SMOL3 - Medium MOL®3 Latch in Offset Dish",
+      "family_id": "latches",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=1353519",
+      "concept_envelope_mm": [
+        105.5,
+        102.0
+      ],
+      "id": "supplier-penn-1353519-98deea75357e",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-1025349-fa434af47afb",
+      "sku": "L0747-50",
+      "name": "L0747-50 - Valance Spanning Overlatch",
+      "family_id": "latches",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=1025349",
+      "concept_envelope_mm": [
+        115.0,
+        160.609
+      ],
+      "id": "supplier-penn-1025349-fa434af47afb",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-924700-cc4da1849a74",
+      "sku": "L907-928",
+      "name": "L927-928 - Range of Medium Recessed Latches",
+      "family_id": "latches",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=924700",
+      "concept_envelope_mm": [
+        102.0,
+        105.5
+      ],
+      "id": "supplier-penn-924700-cc4da1849a74",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-941526-05729e531d2e",
+      "sku": "PN - L903/7336Z",
+      "name": "Zamek do pokrywy szafy rack typu \"recessed\" (wpuszczany), w formacie 2U, w wąskiej i bardzo płytkiej miseczce.",
+      "family_id": "latches",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=941526",
+      "concept_envelope_mm": [
+        54.0,
+        100.0
+      ],
+      "id": "company-77cca5d74fe8259895ebf058",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-77cca5d74fe8259895ebf058"
+    },
+    {
+      "asset_id": "penn-931107-11e3d2f72f1f",
+      "sku": "PN - L904/914Z",
+      "name": "Mały zamek motylkowy w głębokiej miseczce.",
+      "family_id": "latches",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=931107",
+      "concept_envelope_mm": [
+        89.0,
+        87.0
+      ],
+      "id": "company-bf177599d8152e1fe62e098b",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-bf177599d8152e1fe62e098b"
+    },
+    {
+      "asset_id": "penn-3222615-e923d8bbeacc",
+      "sku": "L0350",
+      "name": "L0350 - Black Lever Latch with Pop-up Lever Mechanism",
+      "family_id": "latches",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=3222615",
+      "concept_envelope_mm": [
+        109.67,
+        37.897
+      ],
+      "id": "supplier-penn-3222615-e923d8bbeacc",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-1043821-a7dfc5d2a381",
+      "sku": "PN - L0560",
+      "name": "Mała niklowana śruba pociągowa",
+      "family_id": "latches",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=1043821",
+      "concept_envelope_mm": [
+        40.995,
+        70.7
+      ],
+      "id": "company-a3a21e6e09acbeec1df9c64b",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-a3a21e6e09acbeec1df9c64b"
+    },
+    {
+      "asset_id": "penn-2381972-48daacd77256",
+      "sku": "PN - P2598Z",
+      "name": "Zawias z podtrzymaniem pokrywy, wpuszczany w płytkiej miseczce, z przesunięciem (offsetem) 30 mm",
+      "family_id": "hinges",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=2381972",
+      "concept_envelope_mm": [
+        102.0,
+        106.05
+      ],
+      "id": "company-a267a88dd8c2d092d46f6748",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-a267a88dd8c2d092d46f6748"
+    },
+    {
+      "asset_id": "penn-924702-aec54460e95d",
+      "sku": "PN - P1995EZ",
+      "name": "Duży zawias rozpórkowy cynkowany",
+      "family_id": "hinges",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=924702",
+      "concept_envelope_mm": [
+        92.0,
+        52.0
+      ],
+      "id": "company-b31253bffc98e224380c9993",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-b31253bffc98e224380c9993"
+    },
+    {
+      "asset_id": "penn-924702-aec54460e95d",
+      "sku": "PN - P1995K",
+      "name": "Duży, czarny zawias rozpórkowy (z podtrzymaniem pokrywy)",
+      "family_id": "hinges",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=924702",
+      "concept_envelope_mm": [
+        92.0,
+        52.0
+      ],
+      "id": "company-e25095840b6be5cb8106f937",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-e25095840b6be5cb8106f937"
+    },
+    {
+      "asset_id": "penn-2738206-8022ad7c70d7",
+      "sku": "PN - D0558Z",
+      "name": "Duże ramię podtrzymujące pokrywę, wpuszczane w miseczkę o głębokości 10 mm, z przesunięciem (offsetem) 27 mm",
+      "family_id": "hinges",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=2738206",
+      "concept_envelope_mm": [
+        127.318,
+        175.065
+      ],
+      "id": "company-f9bda930da5fc1dd4a83df4c",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-f9bda930da5fc1dd4a83df4c"
+    },
+    {
+      "asset_id": "penn-1044533-25845f4c823a",
+      "sku": "PN - P2558K",
+      "name": "Czarny, duży stabilizator (ramię podtrzymujące) pokrywy, wpuszczany w płytkiej miseczce o głębokości 7 mm, z przesunięciem (offsetem) 27 mm.",
+      "family_id": "hinges",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=1044533",
+      "concept_envelope_mm": [
+        127.0,
+        172.998
+      ],
+      "id": "company-41102a59864b926e09cfff6d",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-41102a59864b926e09cfff6d"
+    },
+    {
+      "asset_id": "penn-1237939-62d0dca82b27",
+      "sku": "PN - P1990Z",
+      "name": "Średni, cynkowany zawias rozpórkowy (z podtrzymaniem pokrywy).",
+      "family_id": "hinges",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=1237939",
+      "concept_envelope_mm": [
+        77.1,
+        48.4
+      ],
+      "id": "company-bd216d63b988b6d082683a5a",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-bd216d63b988b6d082683a5a"
+    },
+    {
+      "asset_id": "penn-1022892-2d7c02306bbf",
+      "sku": "PN - H7159K",
+      "name": "Heavy Duty Medium Black Recessed Handle with Rivet Protection",
+      "family_id": "handles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=1022892",
+      "concept_envelope_mm": [
+        161.0,
+        107.0
+      ],
+      "id": "company-67963eb4f250cec5f04f40fd",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-67963eb4f250cec5f04f40fd"
+    },
+    {
+      "asset_id": "penn-928344-10e0642bbe44",
+      "sku": "PN - H2026Z",
+      "name": "Dwuczęściowy, cynkowany uchwyt narożny o ciasnym (małym) promieniu gięcia.",
+      "family_id": "handles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=928344",
+      "concept_envelope_mm": [
+        75.66,
+        233.3
+      ],
+      "id": "company-225ea8d0217ff507e8372022",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-225ea8d0217ff507e8372022"
+    },
+    {
+      "asset_id": "penn-928344-10e0642bbe44",
+      "sku": "PN - H2026K",
+      "name": "Dwuczęściowy, czarny uchwyt narożny o ciasnym (małym) promieniu gięcia.",
+      "family_id": "handles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=928344",
+      "concept_envelope_mm": [
+        75.66,
+        233.3
+      ],
+      "id": "company-fc42d610ede14b6de869d3c7",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-fc42d610ede14b6de869d3c7"
+    },
+    {
+      "asset_id": "penn-1612791-7e3fb3388001",
+      "sku": "H1078",
+      "name": "H1078 - Sprung Surface Handle",
+      "family_id": "handles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=1612791",
+      "concept_envelope_mm": [
+        128.0,
+        79.148
+      ],
+      "id": "supplier-penn-1612791-7e3fb3388001",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-924855-02a23c9dc19f",
+      "sku": "PN - H1052S",
+      "name": "Uchwyt powierzchniowy sprężynowy ze stali nierdzewnej, z chwytem (wgłębieniem) o głębokości 15 mm.",
+      "family_id": "handles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=924855",
+      "concept_envelope_mm": [
+        140.0,
+        80.892
+      ],
+      "id": "company-dd8154fd0f0658b5079850a6",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-dd8154fd0f0658b5079850a6"
+    },
+    {
+      "asset_id": "penn-924855-02a23c9dc19f",
+      "sku": "PN - H1052S",
+      "name": "Uchwyt powierzchniowy sprężynowy ze stali nierdzewnej, z chwytem (wgłębieniem) o głębokości 15 mm",
+      "family_id": "handles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=924855",
+      "concept_envelope_mm": [
+        140.0,
+        80.892
+      ],
+      "id": "company-a0c5195cbac5109b4f9cc8f4",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-a0c5195cbac5109b4f9cc8f4"
+    },
+    {
+      "asset_id": "penn-929124-4716f8106c0a",
+      "sku": "PN - H7148Z",
+      "name": "Wąski (płytki) uchwyt kasetonowy (wpuszczany) do pokrywy, z ochroną nitów",
+      "family_id": "handles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=929124",
+      "concept_envelope_mm": [
+        155.5,
+        82.45
+      ],
+      "id": "company-b1f0aec77ded68ff12daee3f",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-b1f0aec77ded68ff12daee3f"
+    },
+    {
+      "asset_id": "penn-1101985-b7bd893c3ae8",
+      "sku": "PN - H7165/10EZ",
+      "name": "Duży, cynkowany uchwyt kasetonowy (wpuszczany) w płytkiej miseczce, z wydłużonym chwytem (rękojeścią).",
+      "family_id": "handles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=1101985",
+      "concept_envelope_mm": [
+        178.0,
+        127.0
+      ],
+      "id": "company-18a59331341f01a94820f09a",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-18a59331341f01a94820f09a"
+    },
+    {
+      "asset_id": "penn-1101985-b7bd893c3ae8",
+      "sku": "PN - H7165/10K",
+      "name": "Duży czarny płytki uchwyt wpuszczany z przedłużoną rączką ",
+      "family_id": "handles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=1101985",
+      "concept_envelope_mm": [
+        178.0,
+        127.0
+      ],
+      "id": "company-c127aaf0860f2d4b819e722a",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-c127aaf0860f2d4b819e722a"
+    },
+    {
+      "asset_id": "penn-1612565-4b3a26c688c9",
+      "sku": "PN - H1906",
+      "name": "Płyta tylna do średnich wpuszczanych uchwytów",
+      "family_id": "handles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=1612565",
+      "concept_envelope_mm": [
+        161.0,
+        107.0
+      ],
+      "id": "company-77250293be28fbbdb531a95a",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-77250293be28fbbdb531a95a"
+    },
+    {
+      "asset_id": "penn-929684-a2db4e58036a",
+      "sku": "PN - W0968Z",
+      "name": "Miseczka/kaseton na kółka (rynnienka transportowa) do montażu w pokrywie. Zamiennik - AH 38083",
+      "family_id": "vents",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=929684",
+      "concept_envelope_mm": [
+        136.4,
+        90.0
+      ],
+      "id": "company-2151b4da8d91364f19e979d4",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-2151b4da8d91364f19e979d4"
+    },
+    {
+      "asset_id": "penn-873304-f91c40603832",
+      "sku": "PN - W0964Z",
+      "name": "Miseczka wpuszczana na kółko (rynnienka transportowa) z wykończeniem PennBrite",
+      "family_id": "vents",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=873304",
+      "concept_envelope_mm": [
+        112.0,
+        102.0
+      ],
+      "id": "company-b8e658b9bf65fd997003a4f0",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-b8e658b9bf65fd997003a4f0"
+    },
+    {
+      "asset_id": "penn-875625-0521b2db3db3",
+      "sku": "PN - D0604Z",
+      "name": "Średnia miseczka (kaseton) PennBrite, z wyciętymi otworami pod 2 złącza typu D-Series.",
+      "family_id": "vents",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=875625",
+      "concept_envelope_mm": [
+        130.5,
+        89.0
+      ],
+      "id": "company-1407d3a3e3454048968634a8",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-1407d3a3e3454048968634a8"
+    },
+    {
+      "asset_id": "penn-875625-60fc80298a4c",
+      "sku": "PN - D0941/10Z",
+      "name": "Średnia miseczka (kaseton) PennBrite, z wyciętym otworem pod 1 gniazdo zasilające IEC.",
+      "family_id": "vents",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=875625",
+      "concept_envelope_mm": [
+        130.5,
+        89.0
+      ],
+      "id": "company-39a8dba58570fad183e566ff",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-39a8dba58570fad183e566ff"
+    },
+    {
+      "asset_id": "penn-871585-6b0f5c3c4684",
+      "sku": "PN - D0946/10Z",
+      "name": " Mała miseczka (kaseton) PennBrite na 1 gniazdo zasilające IEC.",
+      "family_id": "vents",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=871585",
+      "concept_envelope_mm": [
+        112.0,
+        102.0
+      ],
+      "id": "company-5fbdb03332e8024d5069fa7d",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-5fbdb03332e8024d5069fa7d"
+    },
+    {
+      "asset_id": "penn-871585-23e98cc08132",
+      "sku": "PN - D0949Z",
+      "name": "Mała miska PennBrite na 1 x złącze D-Series",
+      "family_id": "vents",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=871585",
+      "concept_envelope_mm": [
+        112.0,
+        102.0
+      ],
+      "id": "company-eb9af5148bb28510dbbe42c1",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-eb9af5148bb28510dbbe42c1"
+    },
+    {
+      "asset_id": "penn-871587-2506e0ec1952",
+      "sku": "PN - D9802",
+      "name": "Czarna, 4-otworowa płytka wzmacniająca (kątownik/złącze) o wymiarach 29 mm x 40 mm.",
+      "family_id": "vents",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=871587",
+      "concept_envelope_mm": [
+        154.928,
+        174.0
+      ],
+      "id": "company-e66a1eb90f959110ffceba5e",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-e66a1eb90f959110ffceba5e"
+    },
+    {
+      "asset_id": "penn-927962-66f1feb77206",
+      "sku": "PN - W0962Z",
+      "name": "Miska z pokrywą PennBrite do kółek samonastawnych - Dla SQM",
+      "family_id": "vents",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=927962",
+      "concept_envelope_mm": [
+        153.0,
+        110.0
+      ],
+      "id": "company-42ce01e510028734414944c5",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-42ce01e510028734414944c5"
+    },
+    {
+      "asset_id": "penn-3356366-d15c054ef80f",
+      "sku": "PN - G1560Z",
+      "name": "Duża, cienka, bardzo płytka misa PennBrite z otworami wentylacyjnymi typu louvre",
+      "family_id": "vents",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=3356366",
+      "concept_envelope_mm": [
+        259.0,
+        64.0
+      ],
+      "id": "company-0c47df020bb133a39929510f",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-0c47df020bb133a39929510f"
+    },
+    {
+      "asset_id": "penn-1529825-6ba95df2ebea",
+      "sku": "PN - R1600",
+      "name": "lekkie aluminiowe składane nogi stołowe",
+      "family_id": "feet",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=1529825",
+      "concept_envelope_mm": [
+        430.8,
+        753.911
+      ],
+      "id": "company-b4d1b11fd9a55c7e6b2714bb",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-b4d1b11fd9a55c7e6b2714bb"
+    },
+    {
+      "asset_id": "penn-939526-8c27f373afc2",
+      "sku": "E0090",
+      "name": "E0090 - Flight case pallet skid",
+      "family_id": "feet",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=939526",
+      "concept_envelope_mm": [
+        116.0,
+        3970.0
+      ],
+      "id": "supplier-penn-939526-8c27f373afc2",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-1025395-bd87b19cfc0f",
+      "sku": "W2060",
+      "name": "W2060 - Non Rattle Recessed Castor",
+      "family_id": "wheels",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=1025395",
+      "concept_envelope_mm": [
+        93.694,
+        93.694
+      ],
+      "id": "supplier-penn-1025395-bd87b19cfc0f",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-872255-8a5ff5aa1bf2",
+      "sku": "PN - MX91155",
+      "name": "czarna listwa rozdzielająca o długości 1155 mm do paneli przegród 9 mm",
+      "family_id": "feet",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=872255",
+      "concept_envelope_mm": [
+        1155.0,
+        62.0
+      ],
+      "id": "company-e4c81dddcca356fb4fd97cef",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-e4c81dddcca356fb4fd97cef"
+    },
+    {
+      "asset_id": "penn-939955-030c3d310a57",
+      "sku": "EG-0100",
+      "name": "EG-0100 - Single Angle Extrusion",
+      "family_id": "profiles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=939955",
+      "concept_envelope_mm": [
+        30.0,
+        4000.0
+      ],
+      "id": "supplier-penn-939955-030c3d310a57",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-939958-fbaa54b09136",
+      "sku": "EG-0113",
+      "name": "EG-0113 - Single Angle Extrusion",
+      "family_id": "profiles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=939958",
+      "concept_envelope_mm": [
+        35.0,
+        3970.0
+      ],
+      "id": "supplier-penn-939958-fbaa54b09136",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-939953-c1c0ebcdc3c2",
+      "sku": "EG-0125",
+      "name": "EG-0125 - Single Angle Extrusion",
+      "family_id": "profiles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=939953",
+      "concept_envelope_mm": [
+        21.9,
+        4000.0
+      ],
+      "id": "supplier-penn-939953-c1c0ebcdc3c2",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-939954-712a7ded9740",
+      "sku": "EG-0126",
+      "name": "EG-0126 - Single Angle Extrusion",
+      "family_id": "profiles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=939954",
+      "concept_envelope_mm": [
+        25.0,
+        4000.0
+      ],
+      "id": "supplier-penn-939954-712a7ded9740",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-939966-db08d3213869",
+      "sku": "EG-0300",
+      "name": "EG-0300 - Hybrid Extrusion",
+      "family_id": "profiles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=939966",
+      "concept_envelope_mm": [
+        19.0,
+        4000.0
+      ],
+      "id": "supplier-penn-939966-db08d3213869",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-939968-b63321b83fd9",
+      "sku": "EG-0591",
+      "name": "EG-0591 - Hybrid Extrusion",
+      "family_id": "profiles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=939968",
+      "concept_envelope_mm": [
+        26.999,
+        4000.0
+      ],
+      "id": "supplier-penn-939968-b63321b83fd9",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-944122-818b33f44493",
+      "sku": "EG-0500-1",
+      "name": "EG-0500-1 - Tongue Extrusion",
+      "family_id": "profiles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=944122",
+      "concept_envelope_mm": [
+        25.0,
+        4000.0
+      ],
+      "id": "supplier-penn-944122-818b33f44493",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-944124-d4004f7cd4df",
+      "sku": "EG-0405",
+      "name": "EG-0405 - Lid / Base Maker Hybrid Extrusion",
+      "family_id": "profiles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=944124",
+      "concept_envelope_mm": [
+        37.0,
+        4000.0
+      ],
+      "id": "supplier-penn-944124-d4004f7cd4df",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-943644-7f7a4368e2e1",
+      "sku": "EG-0425",
+      "name": "EG-0425 - Lid / Base Maker Hybrid Extrusion",
+      "family_id": "profiles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=943644",
+      "concept_envelope_mm": [
+        43.7,
+        4000.0
+      ],
+      "id": "supplier-penn-943644-7f7a4368e2e1",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-939961-dc246f98377f",
+      "sku": "EG-0152",
+      "name": "EG-0152 - Double Angle Extrusion",
+      "family_id": "profiles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=939961",
+      "concept_envelope_mm": [
+        19.0,
+        4000.0
+      ],
+      "id": "supplier-penn-939961-dc246f98377f",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-939962-46d68e1c7048",
+      "sku": "EG-0162",
+      "name": "EG-0162 - Double Angle Extrusion",
+      "family_id": "profiles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=939962",
+      "concept_envelope_mm": [
+        29.999,
+        4000.0
+      ],
+      "id": "supplier-penn-939962-46d68e1c7048",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-943656-97806c65ca7e",
+      "sku": "EG-0632",
+      "name": "EG-0632 - Door Trim h Extrusion",
+      "family_id": "profiles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=943656",
+      "concept_envelope_mm": [
+        35.0,
+        4000.0
+      ],
+      "id": "supplier-penn-943656-97806c65ca7e",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-2381168-2547edfaf040",
+      "sku": "EG-0641",
+      "name": "EG-0641 - 10mm H-Shape Extension Extrusion with 19mm Legs",
+      "family_id": "profiles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=2381168",
+      "concept_envelope_mm": [
+        39.999,
+        2000.0
+      ],
+      "id": "supplier-penn-2381168-2547edfaf040",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-819852-bc02d2e87fc9",
+      "sku": "PN - R0863",
+      "name": "listwa do szafy rack 45U z kwadratowymi otworami o grubości 1,5 mm",
+      "family_id": "profiles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=819852",
+      "concept_envelope_mm": [
+        2003.45,
+        29.8
+      ],
+      "id": "company-cf97c9f7bf5d77b692dc7aed",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-cf97c9f7bf5d77b692dc7aed"
+    },
+    {
+      "asset_id": "penn-873918-b790353e99ed",
+      "sku": "E2220",
+      "name": "E2220- Divider Extrusion",
+      "family_id": "profiles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=873918",
+      "concept_envelope_mm": [
+        40.0,
+        3970.0
+      ],
+      "id": "supplier-penn-873918-b790353e99ed",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-873893-437a53b808cb",
+      "sku": "E2226",
+      "name": "E2226 - Divider Extrusion",
+      "family_id": "profiles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=873893",
+      "concept_envelope_mm": [
+        43.0,
+        3970.0
+      ],
+      "id": "supplier-penn-873893-437a53b808cb",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-939524-70410101b302",
+      "sku": "E0490",
+      "name": "E0490 - Edge Extrusion with Lip for Slam-Lid System",
+      "family_id": "profiles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=939524",
+      "concept_envelope_mm": [
+        30.0,
+        3970.0
+      ],
+      "id": "supplier-penn-939524-70410101b302",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-939523-284207866ece",
+      "sku": "E2355",
+      "name": "E2355 - Door Trim h Extrusion",
+      "family_id": "profiles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=939523",
+      "concept_envelope_mm": [
+        27.0,
+        3970.0
+      ],
+      "id": "supplier-penn-939523-284207866ece",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-943659-af1e64b9d05a",
+      "sku": "EG-0500-2",
+      "name": "EG-0500-2 - Groove Extrusion",
+      "family_id": "profiles",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=943659",
+      "concept_envelope_mm": [
+        22.999,
+        4000.0
+      ],
+      "id": "supplier-penn-943659-af1e64b9d05a",
+      "identity_status": "supplier_variant_separate_from_excel"
+    },
+    {
+      "asset_id": "penn-686188-a9628f3ce24c",
+      "sku": "PN - C1339/30K",
+      "name": "Duży, czarny, wytrzymały (Heavy Duty) narożnik kulowy z przesunięciem (offsetem) 30 mm i promieniem wewnętrznym 2.5 mm",
+      "family_id": "corners",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=686188",
+      "concept_envelope_mm": [
+        71.917,
+        71.913
+      ],
+      "id": "company-b80500155ef85f356b3102b9",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-b80500155ef85f356b3102b9"
+    },
+    {
+      "asset_id": "penn-686188-a9628f3ce24c",
+      "sku": "PN - C1339/30Z",
+      "name": "Duży\nnarożnik kulowy o dużej wytrzymałości (Heavy Duty) PennBrite z offsetem 30 mm",
+      "family_id": "corners",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=686188",
+      "concept_envelope_mm": [
+        71.917,
+        71.913
+      ],
+      "id": "company-88ca29c4ec2022f584744289",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-88ca29c4ec2022f584744289"
+    },
+    {
+      "asset_id": "penn-1239394-a91676e2b34d",
+      "sku": "PN - L944/537/10 MOL3",
+      "name": "Duży, czarny zamek motylkowy wpuszczany MOL3 w płytkiej miseczce, z przesunięciem (offsetem) 27 mm.",
+      "family_id": "latches",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=1239394",
+      "concept_envelope_mm": [
+        127.0,
+        173.0
+      ],
+      "id": "company-6408a8afacc26a09c834b772",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-6408a8afacc26a09c834b772"
+    },
+    {
+      "asset_id": "penn-875643-845919b452aa",
+      "sku": "PN - D0536/07Z",
+      "name": "Duża, bardzo płytka miseczka (kaseton) PennBrite z pionowymi otworami wentylacyjnymi (żaluzjami).",
+      "family_id": "vents",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=875643",
+      "concept_envelope_mm": [
+        178.0,
+        127.0
+      ],
+      "id": "company-18ea4ba7c975655ece6af044",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-18ea4ba7c975655ece6af044"
+    },
+    {
+      "asset_id": "penn-875643-845919b452aa",
+      "sku": "PM - D0536/07K",
+      "name": "Duża Płaska czarna wentylacja Pionowa\n\n\n",
+      "family_id": "vents",
+      "source_url": "https://www.3dcontentcentral.com/download-model.aspx?catalogid=6237&id=875643",
+      "concept_envelope_mm": [
+        178.0,
+        127.0
+      ],
+      "id": "company-571e67a4f8e9612075691fec",
+      "identity_status": "exact_catalog_code",
+      "pricing_company_id": "company-571e67a4f8e9612075691fec"
+    }
+  ],
+  "errors": [],
+  "scope": "public_supplier_geometry_display_only"
+}

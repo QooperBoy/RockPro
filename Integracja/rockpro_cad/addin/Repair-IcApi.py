@@ -4,8 +4,9 @@ import winreg
 from pathlib import Path
 from comtypes import HRESULT, typeinfo
 
-def repair():
-    key=winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,r"SOFTWARE\IronCAD\IRONCAD\29.0")
+def repair(year=2023):
+    if year not in (2023,2027):raise ValueError("Unsupported IronCAD year")
+    key=winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,rf"SOFTWARE\IronCAD\IRONCAD\{year-1998}.0")
     install=Path(winreg.QueryValueEx(key,"InstallDir")[0]);key.Close()
     folder=install/"bin"
     files=["3iICApiIronCADApp.dll","3iICApiDrawing.dll","3iICApiCore.dll","3iICApiBase.dll"]
@@ -37,4 +38,7 @@ def repair():
         register(typeinfo.LoadTypeLibEx(path,typeinfo.REGKIND_NONE),path,str(folder))
     print("ICAPI COM metadata registered for current user. Restart IronCAD.")
 
-if __name__=="__main__":repair()
+if __name__=="__main__":
+    import argparse
+    parser=argparse.ArgumentParser();parser.add_argument("--year",type=int,choices=(2023,2027),default=2023)
+    repair(parser.parse_args().year)

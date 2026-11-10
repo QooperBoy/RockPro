@@ -100,7 +100,47 @@ namespace RockPro { public static class LatchInProcess
     }
     static IZElement Child(IZElement e,int index){object raw;e.GetChildrenZArray().Get(index,out raw);return (IZElement)raw;}
     static void CheckCancel(){if(File.Exists(Path.Combine(Folder,"cancel.marker")))throw new OperationCanceledException("Cancelled at safe boundary");}
+    static void ReadProfiles(Dictionary<string,object> request) {
+        int[] ids={853,1319,1433,1322,9018,9025,9028,9031,9034,9037,9040,9043,247,266,285,288,9053,9056,9059,9062,9065,9068,9071,9074};
+        string path=Full(request["source_copy"]);if(Hash(path)!=SourceSHA)throw new Exception("Pinned profile source copy differs");
+        IZDoc d=OpenOwned(path,true);if(Guid.Parse(d.FileGUID)!=Guid.Parse("{D6ECD56D-7836-4796-B64A-C63C0699FF96}")||d.Modified)throw new Exception("Pinned profile source identity differs");
+        var rows=new List<object>();
+        foreach(int id in ids){CheckCancel();IZElement e=(IZElement)((IZSceneDocUtility)d).GetElementById(id);if(e.Id!=id||!(e.Name=="EG-0500_1"||e.Name=="EG-0500_2"||e.Name=="EG-0113"))throw new Exception("Profile sourceID/name differs");
+            var row=Guard("profile-whole-read",()=>Whole(e));if((string)row["kind"]!="part")throw new Exception("Physical profilepart required");
+            IZElement parent=e.GetParent();row["source_id"]=id;row["parent_id"]=parent.Id;row["parent_name"]=parent.Name;
+            var parameters=new Dictionary<string,object>();var errors=new List<string>();
+            try{IZSizeBox box=(IZSizeBox)e;parameters["dimensions_native"]=new[]{box.Length,box.Width,box.Height};parameters["dimensions_mm"]=new[]{box.Length*1000,box.Width*1000,box.Height*1000};parameters["resize_aspect_lock"]=(int)box.ResizeAspectLock;
+                parameters["resize_behaviors"]=new[]{(int)box.LengthResizeBehavior,(int)box.WidthResizeBehavior,(int)box.HeightResizeBehavior};}
+            catch(Exception ex){errors.Add("sizebox: "+ex.Message);}
+            try{IZPartFeatureMgr mgr=(IZPartFeatureMgr)e;int count=mgr.GetFeaturesCount();parameters["features_count"]=count;
+                if(count>0){IZFeature first=mgr.GetFeatureAt(0);IZElement fe=(IZElement)first;parameters["first_feature_id"]=fe.Id;parameters["first_feature_name"]=fe.Name;
+                    IZExtrudeFeature extrude=(IZExtrudeFeature)first;double x,y,z;extrude.GetExtrudeDirection(out x,out y,out z);parameters["extrude_direction"]=new[]{x,y,z};parameters["first_feature_parent_matrix_mm"]=MatrixParent((IZSceneElement)first);
+                    parameters["extrude_distances_native"]=new[]{extrude.get_ExtrudeDistance(eZExtrudeDirectionType.Z_EXTRUDE_DIRECTION_FORWARD),extrude.get_ExtrudeDistance(eZExtrudeDirectionType.Z_EXTRUDE_DIRECTION_BACKWARD)};
+                    parameters["extrude_to_options"]=new[]{(int)extrude.get_ExtrudeToOption(eZExtrudeDirectionType.Z_EXTRUDE_DIRECTION_FORWARD),(int)extrude.get_ExtrudeToOption(eZExtrudeDirectionType.Z_EXTRUDE_DIRECTION_BACKWARD)};}}
+            catch(Exception ex){errors.Add("first-feature bounded length probe: "+ex.Message);}
+            row["length_parameters"]=parameters;row["length_parameter_errors"]=errors;
+            string asset=Path.Combine(Folder,"profile_"+id+".ics");Guard("export-whole-profile",()=>((IZPart)e).SaveAs(asset,false));row["asset_path"]=asset;row["asset_sha256"]=Hash(asset);rows.Add(row);
+        }
+        if(d.Modified||Hash(path)!=SourceSHA)throw new Exception("Profile getter/export changed owned source");CloseOwned(d);
+        WriteOnce(Path.Combine(Folder,"profiles_result.json"),new{passed=true,rows=rows,source_sha256=SourceSHA,source_guid="{D6ECD56D-7836-4796-B64A-C63C0699FF96}",scope="24physical wholeprofiles; bounded sizebox+first-feature length getters; no BRep or feature traversal"});
+    }
+    static IZElement SingleProfile(IZSceneDoc scene){IZElement root=scene.GetTopElement();if(root.Name!="EG-0113"&&root.Name!="EG-0500_1"&&root.Name!="EG-0500_2"){if(root.GetChildrenCount()!=1)throw new Exception("Single profile asset required");root=Child(root,0);}if((string)Whole(root)["kind"]!="part")throw new Exception("Physical profilepart required");return root;}
+    static object SizeValues(IZSizeBox box){return new{native=new[]{box.Length,box.Width,box.Height},mm=new[]{box.Length*1000,box.Width*1000,box.Height*1000}};}
+    static void ProfileSpike(Dictionary<string,object> request){
+        string path=Full(request["asset_path"]),output=Full(request["output"]);if(Hash(path)!=(string)request["asset_sha256"]||File.Exists(output)||!Same(Path.GetDirectoryName(output),Folder))throw new Exception("Profile spike paths/hash differ");
+        double target=Num(request["target_span_mm"]);IZDoc d=OpenOwned(path,false);IZElement e=SingleProfile((IZSceneDoc)d);IZSizeBox size=(IZSizeBox)e;
+        var before=Whole(e);WriteOnce(Path.Combine(Folder,"spike_before.json"),new{whole=before,sizebox=SizeValues(size)});
+        Guard("sizebox-reset",()=>size.Reset(false));var reset=Whole(e);WriteOnce(Path.Combine(Folder,"spike_after_reset.json"),new{whole=reset,sizebox=SizeValues(size)});
+        double[] box=(double[])reset["local_bounds_mm"];if(Math.Abs(size.Height*1000-(box[5]-box[2]))>.003||Math.Abs(size.Length*1000-(box[3]-box[0]))>.003||Math.Abs(size.Width*1000-(box[4]-box[1]))>.003)throw new Exception("Reset sizebox axes do not match local profilebbox");
+        Guard("resize-profile-localZ",()=>size.ResizeHeight(target*.001,eZResizeBehaviorType.Z_RESIZE_ABOUT_SIZEBOX_CENTER,eZResizeAspectLockType.Z_RESIZE_LOCK_NONE));
+        Guard("profile-update",()=>((IZPart)e).Update());Guard("profile-dirty",()=>e.SetDirtyFlag(eZDirtyFlag.Z_DIRTY_GRAPHICS));
+        var after=Whole(e);double[] resized=(double[])after["local_bounds_mm"];if(Math.Abs(resized[5]-resized[2]-target)>.003||Math.Abs((resized[3]-resized[0])-(box[3]-box[0]))>.003||Math.Abs((resized[4]-resized[1])-(box[4]-box[1]))>.003)throw new Exception("Longitudinal resize/crosssection gate failed");
+        WriteOnce(Path.Combine(Folder,"spike_after_resize.json"),new{whole=after,sizebox=SizeValues(size)});
+        Guard("save-profile-spike",()=>((IZSceneDoc)d).SaveAs(output,eZLinksSaveOptions.Z_LINKS_COPY_ALL,false));CloseOwned(d);d=OpenOwned(output,false);
+        WriteOnce(Path.Combine(Folder,"spike_after_reopen.json"),Whole(SingleProfile((IZSceneDoc)d)));CloseOwned(d);
+    }
     static void Source(Dictionary<string,object> request) {
+        object profileOnly;if(request.TryGetValue("profiles_only",out profileOnly)&&profileOnly is bool&&(bool)profileOnly){ReadProfiles(request);return;}
         string path=Full(request["source_copy"]);if(Hash(path)!=SourceSHA)throw new Exception("Source copy hash differs");
         IZDoc d=OpenOwned(path,true);WriteOnce(Path.Combine(Folder,"source_identity.json"),new{path=d.Name,guid=d.FileGUID,readonly_flag=d.IsReadOnly(),modified=d.Modified,sha256=Hash(path)});if(Guid.Parse(d.FileGUID)!=Guid.Parse("{D6ECD56D-7836-4796-B64A-C63C0699FF96}")||d.Modified)throw new Exception("Read-only source GUID/flags differ");
         List<object> rows=new List<object>();int[] ids={12631,12630,12782,12781};string[] roles={"lid","base","lid","base"},sides={"left","left","right","right"};
@@ -166,7 +206,7 @@ namespace RockPro { public static class LatchInProcess
 
     public static int Run(string folder) {
         Folder=Path.GetFullPath(folder).TrimEnd(Path.DirectorySeparatorChar);Counter=0;
-        string phase=File.Exists(Path.Combine(Folder,"execute_request.json"))?"execute":"source";Phase=phase;
+        string phase=File.Exists(Path.Combine(Folder,"profile_spike_request.json"))?"profile_spike":File.Exists(Path.Combine(Folder,"execute_request.json"))?"execute":"source";Phase=phase;
         string error=null,before=null,source=null,after=null,sourceAfter=null,version=null;bool passed=false,contextWasDirty=false;List<object> cleanup=new List<object>();
         try {
             CheckCancel();
@@ -183,7 +223,7 @@ namespace RockPro { public static class LatchInProcess
             IZDoc user;if(context.Length==0){if(!allowDirty)throw new Exception("Unsaved active context requires explicit preserve flag");user=App.ActiveDoc;if(user==null)throw new Exception("Active document required");}
             else{context=Full(context);user=App.GetOpenDocByName(context);if(user==null||!Same(user.Name,context))throw new Exception("Exact existing context required");}
             contextWasDirty=user.Modified;if(contextWasDirty&&!allowDirty)throw new Exception("Dirty context requires explicit preserve flag");
-            CheckCancel();if(phase=="source")Source(request);else Execute(request);CheckCancel();
+            CheckCancel();if(phase=="source")Source(request);else if(phase=="profile_spike")ProfileSpike(request);else Execute(request);CheckCancel();
             passed=true;
         }catch(Exception e){error=e.ToString();}
         finally {

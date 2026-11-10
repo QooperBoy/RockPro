@@ -1,5 +1,16 @@
 # Okucia — zakres i dowody MVP
 
+Nowsza kontynuacja 24.10: [wersja v3 z zawiasami, kołami i gniazdami](CASE_TRANSPORT_V3.md)
+ma dwie pary 270836, cztery zespoły kół, cztery gniazda i dwie podkładki.
+Native resize, rejestracja siatki XY, wspólna płaszczyzna gruntu i zapis/otwarcie
+PASS. SKU/nośność koła oraz mechaniczne pasowanie do piętrowania pozostają pending.
+
+Aktualizacja 24.10.2026: [pełna skrzynia v2 z profilami](CASE_PROFILES_V2.md)
+ma 24 rzeczywiste profile i 8 wzmocnień powiązanych natywnie z siedmioma parametrami.
+Resize, stałe przekroje i zapis/otwarcie PASS na tym stanowisku. Poniższa tabela
+zachowuje wcześniejszy stan źródłowych POC; nie jest aktualną blokadą wersji v2.
+Produkcja, dokładne styki i odbiór całej rodziny nadal pozostają niezatwierdzone.
+
 Ten dokument oddziela obliczony plan od rzeczywiście zapisanego modelu CAD.
 Stan odbioru odnosi się do konkretnego przebiegu, nie do wszystkich przyszłych
 wymiarów ani do gotowości produkcyjnej. Bieżące modele i raporty klienta są

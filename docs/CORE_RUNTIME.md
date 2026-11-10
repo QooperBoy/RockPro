@@ -114,3 +114,42 @@ Stan `outcome_unknown` bez kompletnego dowodu nadal blokuje nowego wykonawcę.
 Nie zmieniaj identyfikatora, aby obejść dziennik. Wynik natywny `registered`
 potwierdza wyłącznie prototyp z bryłami zastępczymi i sprawdzone archiwum.
 Próba z prawdziwymi okuciami Epson wymaga osobnego zatwierdzenia ich mapowania.
+
+
+## 25.10 — wątek okna odczytu i odzyskiwania (ROC-20/22)
+
+Potwierdzono błąd w CasePlanForm: gdy natywny host nie zapewnia zastanego
+kontekstu WinForms, powrót z asynchronicznego odczytu/odzyskania mógł zmieniać
+kontrolki na wątku roboczym. Regresja z włączonym
+Control.CheckForIllegalCrossThreadCalls odtworzyła InvalidOperationException
+w UpdateButtons. Dowód FAIL: artifacts/verification/20261025T084757241325Z.
+
+Run wymaga teraz wywołania na wątku właściciela okna i instaluje kontekst
+WinForms przed rozpoczęciem asynchronicznej pracy. Backend nadal wykonuje się
+poza wątkiem interfejsu. Nowe próby obejmują odczyt niepewnego wyniku,
+odzyskanie do registered i błąd dziennika bez zastanego kontekstu. Każda
+wywołuje backend raz, zachowuje ID, zwalnia stan pracy i blokuje ponowne
+wykonanie CAD. Błąd odczytu nie oznacza sukcesu ani utraty pendingOperation.
+
+PASS: pełny harness, build i regresje okien, w tym dotychczasowe PL/EN 100/150:
+artifacts/verification/20261025T084838344110Z/results.json.
+To izolowane próby formularzy z backendem testowym, bez wywołania natywnego CAD.
+Nowej DLL nie rejestrowano i nie załadowano. Native host pozostaje niedostępny;
+pełna akceptacja konstruktora i wydania ROC-22 pozostaje NOT RUN.
+
+
+## 25.10 — kontynuacje panelu głównego (ROC-20/22)
+
+Ten sam błąd bez zastanego kontekstu hosta odtworzono osobno w RockProPanel.Run:
+artifacts/verification/20261025T094747597593Z/ui-checks.log, FAIL dostępu
+między wątkami. Naprawa wymaga wątku właściciela i ustawia kontekst WinForms
+przed rozpoczęciem async pracy. Nie zmienia backendu, CAS, akceptacji ani danych.
+
+Test tworzy uchwyty kontrolek bez pokazywania panelu, żeby Shown nie połączył
+się z prawdziwą bazą. Kontrolowane zakończenie pracy na wątku roboczym jest
+zwalniane dopiero po zawieszeniu await; eliminuje przypadkowy sukces szybkiego
+zadania. Wykrywanie dostępu między wątkami pozostaje włączone. Sprawdzane są
+wynik, zakończenie stanu busy, odblokowanie akcji i zachowanie niezapisanej uwagi.
+Bez wywołań MCP, SQLite i CAD. PASS pełnego harnessu/build/UI:
+artifacts/verification/20261025T094844067175Z/results.json.
+To nie jest dowód nowej DLL załadowanej w IronCAD; native nadal NOT RUN.

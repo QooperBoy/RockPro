@@ -70,6 +70,20 @@ class CoreServiceTests(unittest.TestCase):
             action()
         self.assertEqual(caught.exception.details['code'], code)
 
+    def test_busy_before_native_work_is_terminal_and_retry_is_explicit(self):
+        from rockpro_cad.cad_lock import CadBusyError
+        plan = self.saved_plan()
+        with patch.object(service, '_native_execute', side_effect=CadBusyError('busy')) as native:
+            result = service.execute_case_plan(self.project_id, plan['plan_id'], 'busy-attempt', plan['revision'])
+            self.assertEqual(result['status'], 'failed')
+            self.assertFalse(result['diagnostic']['execution_started'])
+            # Same ID returns the refusal; never retries implicitly.
+            same = service.execute_case_plan(self.project_id, plan['plan_id'], 'busy-attempt', plan['revision'])
+            self.assertEqual(same['status'], 'failed')
+            self.assertEqual(native.call_count, 1)
+        result = self.execute(plan, 'explicit-new-attempt')
+        self.assertEqual(result['status'], 'registered')
+
     def test_preview_is_pure_and_saved_request_is_detached(self):
         data = request()
         before = copy.deepcopy(data)

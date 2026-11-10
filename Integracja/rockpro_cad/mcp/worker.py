@@ -100,6 +100,23 @@ def inspect_project(source=None):
     return result
 
 
+def cleanup_owned_revisions(documents, api, folder):
+    errors=[]
+    for document in reversed(documents):
+        try:
+            if document.Modified:
+                recovery=(Path(folder)/('owned_recovery_'+uuid.uuid4().hex+'.ics')).resolve()
+                scene=document.QueryInterface(api.IZSceneDoc)
+                scene.Update()
+                scene.SaveAs(str(recovery),api.Z_LINKS_COPY_ALL,False)
+                if not recovery.is_file() or Path(document.Name).resolve()!=recovery or document.Modified:
+                    raise RuntimeError('Recovery save not confirmed; document retained in host')
+            document.Close()
+        except Exception as exc:
+            errors.append(str(exc))
+    if errors: raise RuntimeError('; '.join(errors))
+
+
 def _change_dimensions_on_copy(changes, source=None):
     """Native snapshot preserves unsaved source geometry; edits apply only to new document."""
     from ironcad_adapter import connect, ICAPI
@@ -119,6 +136,7 @@ def _change_dimensions_on_copy(changes, source=None):
     report = {"source": str(path), "copy": str(target), "changes_mm": changes,
               "before": before, "source_sha256_before": original_hash, "passed": False,
               "stage": "snapshot"}
+    owned = []
     try:
         # This API is available in installed ICAPI and previously exercised by prepare_wholecase.
         # No SaveAs or original-document Save fallback is permitted.
@@ -129,6 +147,7 @@ def _change_dimensions_on_copy(changes, source=None):
         copy_doc = base.OpenFile(str(target), False)
         if Path(copy_doc.Name).resolve() != target.resolve():
             raise RuntimeError("IronCAD did not open the requested revision")
+        owned.append(copy_doc)
         copy_scene = copy_doc.QueryInterface(ICAPI.IZSceneDoc)
         report["stage"] = "change_parameters"
         for name, value in changes.items():
@@ -140,10 +159,12 @@ def _change_dimensions_on_copy(changes, source=None):
         report["stage"] = "save_copy"
         copy_doc.Save()
         copy_doc.Close()
+        owned.remove(copy_doc)
         report["stage"] = "reopen_copy"
         reopened = base.OpenFile(str(target), False)
         if Path(reopened.Name).resolve() != target.resolve():
             raise RuntimeError("IronCAD reopened a different document")
+        owned.append(reopened)
         report["stage"] = "validate_after_reopen"
         report["after_reopen"] = measure(reopened.QueryInterface(ICAPI.IZSceneDoc), manifest)
         actual = report["after_reopen"]["measurements"]["parameters_mm"]
@@ -166,6 +187,14 @@ def _change_dimensions_on_copy(changes, source=None):
             report["source_verification_error"] = str(exc)
         if not report["source_unchanged"]:
             report["passed"] = False
+        if not report["passed"]:
+            try:
+                cleanup_owned_revisions(owned, ICAPI, folder)
+                report["cleanup"] = {"status": "closed_owned_documents"}
+            except Exception as cleanup_error:
+                report["cleanup"] = {"status": "failed_preserved_in_host", "error": str(cleanup_error)}
+        else:
+            report["cleanup"] = {"status": "delivery_handed_to_user", "path": str(target)}
         (folder/"report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2),
                                          encoding="utf-8")
     if not report["passed"]:
@@ -184,10 +213,18 @@ def change_dimensions_on_copy(changes, source=None, project_id=None, label=None,
         from layout import get_layout
         if not project_id: raise ValueError('layout_revision requires project_id')
         binding=get_layout(project_id,layout_revision)
+        if binding.get('device_source_status') in ('stale','unavailable'):raise ValueError('DEVICE_REVISION_CONFLICT: source data changed after the layout was saved')
         if changes != binding['parameters']: raise ValueError('CAD parameters do not match the pinned layout revision')
     report = _change_dimensions_on_copy(changes,source)
     if binding:
         report['layout_binding']={k:binding[k] for k in ('revision','sha256','spec')}
+        if binding.get('device_binding'):
+            report['layout_binding']['device_binding']=binding['device_binding']
+            current=get_layout(project_id,layout_revision)
+            if current['device_source_status']!='current':
+                report['device_source_outdated']=True
+                (Path(report['copy']).parent/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+                raise ValueError('DEVICE_REVISION_CONFLICT: source changed during CAD; unregistered copy retained at '+str(report['copy']))
         (Path(report['copy']).parent/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
     if project_id:
         report.update(register_snapshot(project_id,report,label or "Zmiana wymiarów",advance=True))
@@ -205,6 +242,98 @@ def create_snapshot(project_id,label="Snapshot",note=""):
 
 
 def dispatch(name, arguments):
+    device_layout_keys={
+        'preview_catalog_layouts':{'catalog_id','spec','constraints','expected_device_revision'},
+        'preview_bound_device_layout':{'binding','spec'},
+        'save_bound_device_layout':{'project_id','spec','binding','expected_revision','actor','change_source'},
+        'unlink_layout_device':{'project_id','expected_revision','actor','change_source'},
+    }
+    if name in device_layout_keys:
+        if not isinstance(arguments,dict) or set(arguments)-device_layout_keys[name]:raise ValueError('Invalid device layout argument')
+        import device_layout_service
+        return getattr(device_layout_service,name)(**arguments)
+    handle_decision_keys={
+        'preview_handle_reconciliation':{'evidence','choice','prior_state'},
+        'get_handle_reconciliation':{'project_id'},
+        'measure_handle_reconciliation':{'project_id','expected_revision','expected_project_revision','target_values'},
+        'save_handle_reconciliation':{'project_id','evidence','choice','expected_revision','expected_project_revision','review_sha256','decision_reference','prior_state','measurement_id'},
+    }
+    if name in handle_decision_keys:
+        if not isinstance(arguments,dict) or set(arguments)-handle_decision_keys[name]:raise ValueError('Invalid handle decision tool argument')
+        import handle_decision_service
+        return getattr(handle_decision_service,name)(**arguments)
+    revision_keys={
+        'save_material_plan':{'plan_id','project_ids','sheets','technology','cut_plan','supersedes_plan_id'},
+        'get_material_plan':{'plan_id'},'list_material_plans':{'limit','after_plan_id'},'start_material_plan':{'plan_id','expected_revision'},
+        'record_material_progress':{'plan_id','event_id','event','expected_revision'},
+        'compare_material_plans':{'old_plan_id','new_plan_id'},
+    }
+    if name in revision_keys:
+        if not isinstance(arguments,dict) or set(arguments)-revision_keys[name]:raise ValueError('Invalid material revision tool argument')
+        import material_revisions
+        return getattr(material_revisions,name)(**arguments)
+    if name=='preview_purchases':
+        if not isinstance(arguments,dict) or set(arguments)-{'requirements','offers','policy'}:raise ValueError('Invalid purchase tool argument')
+        from purchase_proposals import preview_purchases
+        return preview_purchases(**arguments)
+    intent_keys={'prepare_inventory_command':{'command','operation_id','expected_revision','decision_reference','actor'},
+                 'execute_inventory_intent':{'operation_id'},'cancel_inventory_intent':{'operation_id','command_sha256'},
+                 'get_inventory_intent':{'operation_id'},'list_inventory_intents':{'state','limit'}}
+    if name in intent_keys:
+        if not isinstance(arguments,dict) or set(arguments)-intent_keys[name]:raise ValueError('Invalid inventory intent argument')
+        import inventory_intents
+        return getattr(inventory_intents,name)(**arguments)
+    inventory_keys={'inventory_command': {'command','operation_id','expected_revision'},
+                    'get_inventory':set(),'get_inventory_history':{'limit'},
+                    'get_inventory_operation':{'operation_id','command','expected_revision'}}
+    if name in inventory_keys:
+        if not isinstance(arguments,dict) or set(arguments)-inventory_keys[name]:raise ValueError('Invalid inventory tool argument')
+        import inventory_service
+        return getattr(inventory_service,name)(**arguments)
+    cutting_keys={'verify_cut_plan': {'demand','sheets','technology','plan'},
+                  'solve_reference_cut_plan': {'demand','sheets','technology','max_seconds'},
+                  'export_cutting_csv': {'demand'}}
+    if name in cutting_keys:
+        if not isinstance(arguments,dict) or set(arguments)-cutting_keys[name]:raise ValueError('Invalid cutting tool argument')
+        import cutting_plan
+        function={'solve_reference_cut_plan':'solve_reference','export_cutting_csv':'export_neutral_csv'}.get(name,name)
+        return getattr(cutting_plan,function)(**arguments)
+    material_keys={
+        'preview_bom_file': {'path'},
+        'import_bom_file': {'project_id','path','expected_revision','expected_source_sha256'},
+        'aggregate_bom_demand': {'project_ids'},
+    }
+    if name in material_keys:
+        if not isinstance(arguments,dict) or set(arguments)-material_keys[name]:raise ValueError('Invalid material tool argument')
+        import material_service
+        return getattr(material_service,name)(**arguments)
+    if name=='preview_device_layouts':
+        keys={'record','spec','allowed_orientations','allowed_arrangements','removal_clearance_mm','max_external_mm'}
+        if not isinstance(arguments,dict) or set(arguments)-keys:raise ValueError('Invalid device layout tool argument')
+        from layout_variants import preview_device_layouts
+        return preview_device_layouts(**arguments)
+    recommendation_keys={'recommend_case_families': {'query','families'},'benchmark_case_recommendations': {'families','cases'}}
+    if name in recommendation_keys:
+        if not isinstance(arguments,dict) or set(arguments)-recommendation_keys[name]:raise ValueError('Invalid recommendation tool argument')
+        import family_recommendation
+        return getattr(family_recommendation,name)(**arguments)
+    device_keys={
+        'preview_device_record': {'record'},'save_device_record': {'record','expected_revision'},
+        'get_device_record': {'catalog_id','revision'},'draft_device_inquiry': {'record'},'list_device_records':{'limit','after_catalog_id'},
+    }
+    if name in device_keys:
+        if not isinstance(arguments,dict) or set(arguments)-device_keys[name]:raise ValueError('Invalid device tool argument')
+        import device_catalog
+        return getattr(device_catalog,name)(**arguments)
+    excel_keys={
+        'preview_excel_configuration': {'path'},
+        'import_excel_configuration': {'project_id','path','expected_revision','expected_source_sha256'},
+    }
+    if name in excel_keys:
+        if not isinstance(arguments,dict) or set(arguments)-excel_keys[name]:raise ValueError('Invalid Excel tool argument')
+        import excel_input
+        return getattr(excel_input,name)(**arguments)
+
     core_keys = {
         'preview_case': {'request'},
         'prepare_case_request': {'project_id','expected_layout_revision'},

@@ -66,6 +66,28 @@ internal static class CasePlanUiChecks {
    if(reads!=2||Field<TextBox>(reopened,"operation").Text!=operationId||!Field<bool>(reopened,"pendingOperation"))throw new Exception("Outstanding operation not restored after reopening");
    reopened.Close();
   }
-  Console.WriteLine("PASS: case prototype PL/EN 100/150 percent, button bounds, synthetic scope, busy/recovery, lost reply retained without retry, restart recovery discovery");
+  NoAmbientContextChecks();
+  Console.WriteLine("PASS: case prototype PL/EN 100/150 percent, button bounds, synthetic scope, busy/recovery, lost reply retained without retry, restart recovery discovery, owner-thread recovery without ambient context");
  }finally{UiText.SetLanguage(prior,false);}}
+ static void NoAmbientContextChecks(){
+  bool previous=Control.CheckForIllegalCrossThreadCalls;var context=SynchronizationContext.Current;
+  Control.CheckForIllegalCrossThreadCalls=true;
+  try{foreach(string mode in new[]{"read","recover","error"}){
+   int calls=0,owner=Thread.CurrentThread.ManagedThreadId;
+   using(var form=new CasePlanForm("ui-only-no-database",delegate(string name,object args){
+    calls++;if(Thread.CurrentThread.ManagedThreadId==owner)throw new Exception("Backend ran on the UI thread");
+    if(name!=(mode=="recover"?"recover_case_operation":"get_case_operation"))throw new Exception("Unexpected write/retry");
+    if(mode=="error")throw new Exception("SIMULATED_JOURNAL_UNAVAILABLE");
+    return new Dictionary<string,object>{{"status",mode=="recover"?"registered":"outcome_unknown"},{"snapshot_path","UI-ONLY-NO-FILE"}};
+   },false)){
+    form.Show();Application.DoEvents();Field<TextBox>(form,"operation").Text="pinned-operation-ui-only";Set(form,"pendingOperation",true);
+    SynchronizationContext.SetSynchronizationContext(null);
+    Wait((Task)Invoke(form,"Run",new Func<Task>(delegate{return (Task)Invoke(form,"ReadOperation",mode=="recover");})));
+    if(calls!=1||Field<bool>(form,"busy")||Field<Button>(form,"execute").Enabled||Field<TextBox>(form,"operation").Text!="pinned-operation-ui-only")throw new Exception("Recovery retried or lost its operation ID");
+    if(Field<bool>(form,"pendingOperation")!=(mode!="recover"))throw new Exception("Recovery state was not retained");
+    if(mode=="error"&&!Field<Label>(form,"status").Text.Contains("SIMULATED_JOURNAL_UNAVAILABLE"))throw new Exception("Journal failure not shown");
+    form.Close();
+   }
+  }}finally{SynchronizationContext.SetSynchronizationContext(context);Control.CheckForIllegalCrossThreadCalls=previous;}
+ }
 }

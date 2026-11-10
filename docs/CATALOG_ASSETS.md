@@ -1,5 +1,9 @@
 # CatalogAsset v1 — zmierzony kandydat H7159
 
+Świeży, węższy dowód natywny z zapisanej rewizji opisuje
+[H7159_FRESH_MOUNT.md](H7159_FRESH_MOUNT.md). Sam pomiar pary nie spełnia
+kontraktu pełnego POC 37 części poniżej i nie zastępuje jego raportów.
+
 Moduł `Integracja/rockpro_cad/core_case/catalog_assets.py` przekształca jawnie
 przekazane, zapisane raporty JSON w wersjonowaną definicję jednego assetu H7159.
 Nie odczytuje plików, nie importuje adapterów natywnych, COM ani IronCAD i nie

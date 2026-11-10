@@ -1,5 +1,35 @@
 # Core skrzyni — stan przyrostu 22.10.2026
 
+Najnowsza korekta użytkownika: [uchwyty na przeciwległych ścianach](CASE_HANDLES_V3.md),
+po dwa na każdym boku; opcja konstruktora po jednym, wyśrodkowanym.
+Oba warianty mają natywne testy zmiany wymiarów i zapisu/otwarcia PASS.
+
+
+Kontynuacja: [zawiasy, cztery koła i cztery gniazda w pełnej skrzyni v3](CASE_TRANSPORT_V3.md).
+Native resize oraz zmiana samych parametrów po otwarciu PASS. SKU koła, nośność
+i mechaniczne pasowanie przy piętrowaniu pozostają niezatwierdzone.
+
+Najnowszy wynik 24.10: [24 parametryczne profile i 8 wzmocnień w pełnej
+skrzyni v2](CASE_PROFILES_V2.md). Natywne zależności, resize i zapis/otwarcie PASS;
+osobny kontrakt siedmiu parametrów, bez zmiany starej allowlisty szkieletu.
+
+## Kontynuacja na nowym stanowisku — 24.10.2026
+
+[Porównanie zadań Linear i kolejność prac](LINEAR_CONTINUATION_20261024.md).
+ROC-42: świeży inwentarz 403 węzłów i pozycje z jednej zapisanej kopii źródła
+przeszły kontrolę integralności oraz pełne rozliczenie szkicu. H7159 (ID 11797,
+ścieżka [1,6]) wybrano jawnie z zachowaniem odbitej ramy rodzica i poprawnej ramy
+świata. Eksport 13 rzeczywistych części z tej samej rewizji przeszedł import,
+sztywny ruch, zapis i otwarcie; błąd położenia/rotacji 0. Własne dokumenty
+zamknięte, źródło niezmienione. Szczegóły i ograniczenia:
+[przechwycenie zapisanej rewizji](SOURCE_REVISION_CAPTURE.md).
+
+Nie jest to jeszcze zakończony sidecar katalogu ani montaż całej skrzyni.
+Świeży pomiar płaszczyzn i węższy natywny POC samej pary są już PASS:
+[H7159_FRESH_MOUNT.md](H7159_FRESH_MOUNT.md). Następny krok: pełny POC z płytami
+i uzgodnienie istniejącego `catalog_assets`. Brak zgody montażowej/produkcyjnej
+pozostaje jawny. Starsze wyniki poniżej odnoszą się do poprzedniego stanowiska.
+
 Kod realizuje deterministyczny prototyp skrzyni. Nie jest jeszcze zatwierdzonym
 generatorem rzeczywistych okuć Epson. Sol implementował planer, serwis, wykonawcę
 i formularz; Astra niezależnie sprawdzała wymagania, nowe przypadki i błędy.

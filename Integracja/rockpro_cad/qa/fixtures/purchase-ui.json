@@ -1,0 +1,270 @@
+{
+  "synthetic_test": true,
+  "production_approved": false,
+  "input_document": {
+    "requirements": {
+      "scope": "synthetic_test",
+      "bindings": [
+        {
+          "bom_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      ],
+      "lines": [
+        {
+          "id": "locks-1",
+          "item_id": "lock-test",
+          "unit": "piece",
+          "quantity": 120,
+          "required_date": "2026-11-05"
+        }
+      ]
+    },
+    "offers": [
+      {
+        "id": "offer",
+        "item_id": "lock-test",
+        "unit": "piece",
+        "supplier": "test-supplier",
+        "currency": "PLN",
+        "quote_date": "2026-10-20",
+        "valid_until": "2026-11-10",
+        "pack_size": 25,
+        "moq": 25,
+        "lead_days": 3,
+        "available_quantity": 1000,
+        "price_breaks": [
+          {
+            "min_quantity": 1,
+            "unit_net": "10"
+          }
+        ],
+        "shipping_net": "20",
+        "tax_percent": "23"
+      }
+    ],
+    "policy": {
+      "as_of_date": "2026-10-25",
+      "currency": "PLN",
+      "max_surplus_units": 50,
+      "max_cash_gross": "10000",
+      "approved_substitutes": {}
+    }
+  },
+  "on_time": {
+    "lines": [
+      {
+        "requirement": {
+          "id": "locks-1",
+          "item_id": "lock-test",
+          "unit": "piece",
+          "quantity": 120,
+          "required_date": "2026-11-05"
+        },
+        "allocations": [
+          {
+            "supply_id": "lot",
+            "kind": "free_stock",
+            "quantity": 20,
+            "available_date": "2026-10-25"
+          },
+          {
+            "supply_id": "delivery",
+            "kind": "confirmed_delivery",
+            "quantity": 30,
+            "available_date": "2026-11-01"
+          }
+        ],
+        "shortage": 70,
+        "options": [
+          {
+            "offer_id": "offer",
+            "supplier": "test-supplier",
+            "item_id": "lock-test",
+            "substitute": false,
+            "quantity": 75,
+            "shortage": 70,
+            "surplus": 5,
+            "unit_net": "10",
+            "shipping_net": "20.00",
+            "total_net": "770.00",
+            "total_gross": "947.10",
+            "currency": "PLN",
+            "arrival_date": "2026-10-28",
+            "feasible": true,
+            "restrictions": []
+          }
+        ],
+        "rejected_offers": [],
+        "preferred_option": {
+          "offer_id": "offer",
+          "supplier": "test-supplier",
+          "item_id": "lock-test",
+          "substitute": false,
+          "quantity": 75,
+          "shortage": 70,
+          "surplus": 5,
+          "unit_net": "10",
+          "shipping_net": "20.00",
+          "total_net": "770.00",
+          "total_gross": "947.10",
+          "currency": "PLN",
+          "arrival_date": "2026-10-28",
+          "feasible": true,
+          "restrictions": []
+        }
+      }
+    ],
+    "bindings": [
+      {
+        "bom_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    ],
+    "scope": "synthetic_test",
+    "offer_issues": [],
+    "input_sha256": "569300578a4b98ac35d7fba682b9092f6d2401b76fcbba980774e9a83c89965d",
+    "shipping_basis": "per_requirement_offer; consolidated shipping not optimized",
+    "lead_time_basis": "calendar_days",
+    "cash_limit_basis": "per_option; combined cash not approved",
+    "proposal_only": true,
+    "orders_placed": false,
+    "production_approved": false,
+    "proposal_sha256": "5f538e25bc90062a2cae34df3ba4c5e70e83449c6059091865485da20016cac3"
+  },
+  "late": {
+    "lines": [
+      {
+        "requirement": {
+          "id": "locks-1",
+          "item_id": "lock-test",
+          "unit": "piece",
+          "quantity": 120,
+          "required_date": "2026-11-05"
+        },
+        "allocations": [
+          {
+            "supply_id": "lot",
+            "kind": "free_stock",
+            "quantity": 20,
+            "available_date": "2026-10-25"
+          }
+        ],
+        "shortage": 100,
+        "options": [
+          {
+            "offer_id": "offer",
+            "supplier": "test-supplier",
+            "item_id": "lock-test",
+            "substitute": false,
+            "quantity": 100,
+            "shortage": 100,
+            "surplus": 0,
+            "unit_net": "10",
+            "shipping_net": "20.00",
+            "total_net": "1020.00",
+            "total_gross": "1254.60",
+            "currency": "PLN",
+            "arrival_date": "2026-10-28",
+            "feasible": true,
+            "restrictions": []
+          }
+        ],
+        "rejected_offers": [],
+        "preferred_option": {
+          "offer_id": "offer",
+          "supplier": "test-supplier",
+          "item_id": "lock-test",
+          "substitute": false,
+          "quantity": 100,
+          "shortage": 100,
+          "surplus": 0,
+          "unit_net": "10",
+          "shipping_net": "20.00",
+          "total_net": "1020.00",
+          "total_gross": "1254.60",
+          "currency": "PLN",
+          "arrival_date": "2026-10-28",
+          "feasible": true,
+          "restrictions": []
+        }
+      }
+    ],
+    "bindings": [
+      {
+        "bom_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    ],
+    "scope": "synthetic_test",
+    "offer_issues": [],
+    "input_sha256": "8c08c08afc11a19ae75e2d1fe0522cbbf27ec9926bbfdc6f7918e539631201e0",
+    "shipping_basis": "per_requirement_offer; consolidated shipping not optimized",
+    "lead_time_basis": "calendar_days",
+    "cash_limit_basis": "per_option; combined cash not approved",
+    "proposal_only": true,
+    "orders_placed": false,
+    "production_approved": false,
+    "proposal_sha256": "9ef264b04cefbca991bcb1106d51da457efe32a7f62bafb9d5ef70731c1ef1a1"
+  },
+  "incomplete": {
+    "lines": [
+      {
+        "requirement": {
+          "id": "locks-1",
+          "item_id": "lock-test",
+          "unit": "piece",
+          "quantity": 120,
+          "required_date": "2026-11-05"
+        },
+        "allocations": [
+          {
+            "supply_id": "lot",
+            "kind": "free_stock",
+            "quantity": 20,
+            "available_date": "2026-10-25"
+          },
+          {
+            "supply_id": "delivery",
+            "kind": "confirmed_delivery",
+            "quantity": 30,
+            "available_date": "2026-11-01"
+          }
+        ],
+        "shortage": 70,
+        "options": [],
+        "rejected_offers": [
+          {
+            "offer_id": "offer",
+            "reason": "incomplete_offer",
+            "missing_fields": [
+              "supplier"
+            ]
+          }
+        ],
+        "preferred_option": null
+      }
+    ],
+    "bindings": [
+      {
+        "bom_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    ],
+    "scope": "synthetic_test",
+    "offer_issues": [
+      {
+        "offer_index": 0,
+        "offer_id": "offer",
+        "reason": "incomplete_offer",
+        "missing_fields": [
+          "supplier"
+        ]
+      }
+    ],
+    "input_sha256": "ec09d96402f2ed969c5d4db9e0d7e89f5c43bd94a82280ac95168e0c5e784a1e",
+    "shipping_basis": "per_requirement_offer; consolidated shipping not optimized",
+    "lead_time_basis": "calendar_days",
+    "cash_limit_basis": "per_option; combined cash not approved",
+    "proposal_only": true,
+    "orders_placed": false,
+    "production_approved": false,
+    "proposal_sha256": "d7e606fe9d49c5473d7e1f9b12bcb893f48a1ced8c51816cad4d5fdeaef56d30"
+  }
+}

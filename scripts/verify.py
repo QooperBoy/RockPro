@@ -22,7 +22,7 @@ def run_check(name,command,folder,steps,cwd=ROOT):
 
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--build',action='store_true');parser.add_argument('--ui',action='store_true');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--build',action='store_true');parser.add_argument('--ui',action='store_true');parser.add_argument('--year',type=int,choices=(2023,2027),default=2023);args=parser.parse_args()
     stamp=datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
     folder=ROOT/'artifacts'/'verification'/stamp;folder.mkdir(parents=True)
     steps=[];py=sys.executable;source=ROOT/'Integracja'/'rockpro_cad'
@@ -39,16 +39,17 @@ def main():
           ('harness',[py,'-m','unittest','discover','-s',ROOT/'scripts','-p','test_verification.py','-v'])]
     if args.build or args.ui:
         binary='bin-verify-'+stamp
-        jobs.append(('addin-build',['powershell.exe','-NoProfile','-ExecutionPolicy','Bypass','-File',source/'addin/Build.ps1','-OutputFolder',binary]))
+        jobs.append(('addin-build',['powershell.exe','-NoProfile','-ExecutionPolicy','Bypass','-File',source/'addin/Build.ps1','-OutputFolder',binary,'-IronCADYear',str(args.year)]))
         if args.ui:
             exe=source/'addin'/binary/'LayoutUiChecks.exe'
             jobs.extend([
                 ('ui-check-build',[r'C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe',
                  '/nologo','/target:exe','/platform:x64','/out:'+str(exe),
-                 r'/reference:C:\Program Files\IronCAD\2027\ICAPI\Samples\C#\References\interop.ICApiIronCAD.dll',
+                 f'/define:IRONCAD{args.year}',
+                 fr'/reference:C:\Program Files\IronCAD\{args.year}\ICAPI\Samples\C#\References\interop.ICApiIronCAD.dll',
                  r'/reference:C:\Program Files (x86)\Microsoft.NET\Primary Interop Assemblies\stdole.dll',
                  '/reference:System.Windows.Forms.dll','/reference:System.Drawing.dll','/reference:System.Web.Extensions.dll',
-                 source/'addin/RockProAddin.cs',source/'addin/UiText.cs',source/'addin/RockProPanel.cs',source/'addin/LayoutForm.cs',source/'addin/CasePlanForm.cs',source/'qa/LayoutUiChecks.cs',source/'qa/CasePlanUiChecks.cs']),
+                 source/'addin/RockProAddin.cs',source/'addin/UiText.cs',source/'addin/RockProPanel.cs',source/'addin/RpcProcessSession.cs',source/'addin/LayoutForm.cs',source/'addin/CasePlanForm.cs',source/'addin/HandleDecisionForm.cs',source/'addin/DeviceVariantsForm.cs',source/'addin/InventoryForm.cs',source/'addin/InventoryCommandForm.cs',source/'addin/PurchaseProposalForm.cs',source/'addin/MaterialPlanForm.cs',source/'qa/LayoutUiChecks.cs',source/'qa/CasePlanUiChecks.cs',source/'qa/HandleDecisionUiChecks.cs',source/'qa/DeviceVariantsUiChecks.cs',source/'qa/InventoryUiChecks.cs',source/'qa/InventoryCommandUiChecks.cs',source/'qa/PurchaseUiChecks.cs',source/'qa/MaterialPlanUiChecks.cs']),
                 ('ui-checks',[exe])])
     passed=True
     for name,command in jobs:

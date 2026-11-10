@@ -1,36 +1,212 @@
-# RockPro CAD
+# RockPro CAD / Studio
 
-Natywny dodatek IronCAD 2027: panel projektu, parametry szkieletu skrzyni, historia snapshotów oraz lokalny serwer MCP i SQLite.
+**Pierwsze uruchomienie przez Kubę lub nowego agenta AI:**
+[aktualna instrukcja przekazania — 03.11.2026](docs/KUBA_HANDOVER.md).
+Zawiera mapę kodu, uruchomienie Studio, paczki danych z SHA, parametry CAD,
+testy, ograniczenia i prompt pierwszej sesji. Zacznij od tej instrukcji;
+starsze opisy poniżej zachowują kontekst wcześniejszych wydań.
 
-**Wersja MVP 0.4.** Obsługa CAD obejmuje znany szkielet dziesięciu płyt. To nie jest jeszcze automat do dowolnych projektów WoodLAB ani wydanie produkcyjne.
+**Demo dla Tomka:** [rockpro-studio.vercel.app](https://rockpro-studio.vercel.app).
+Konfigurator, podgląd 3D i zdjęcia producentów. Drafty oraz ulubione są zapisywane
+tylko w przeglądarce; projekt przekaż przez eksport/import JSON. Bez firmowej bazy,
+stanów magazynowych oraz bez zdalnego sterowania IronCADem. Pełny katalog ma
+265 rekordów z cenami; na końcu konfiguracji jest częściowa wycena okuć.
+Krok 8 „Kontrola projektu” zbiera błędy, braki i ostrzeżenia oraz prowadzi do
+odpowiednich kroków i grup okuć. Zapis w przeglądarce oraz pobranie JSON są
+oddzielnymi operacjami; Studio online nie generuje jeszcze pliku ICS.
+[Wdrożenie i aktualizacja](docs/STUDIO_VERCEL.md).
 
-## Start
+**Biblioteka CAD producenta (28.10):** 74 rzeczywiste modele Penn Elcom,
+81 osobnych definicji wariantów, miniatury i siatki 3D do rozmieszczania.
+W kroku 4 wybierz filtr **Modele 3D producenta — STEP**, a następnie umieszczaj
+części w krokach 5–6. Dane podglądu są w repozytorium, więc działają po klonowaniu.
+To geometria koncepcyjnego rozmieszczenia; montaż i wycięcia wymagają potwierdzenia.
+[Import i odtwarzanie siatek](docs/SUPPLIER_MODELS_STUDIO.md).
 
-1. Windows x64, Python x64, Git, IronCAD 2027 z ICAPI SDK i .NET Framework.
-2. Przeczytaj [HANDOVER.md](HANDOVER.md).
-3. W stałym katalogu checkoutu: `powershell -NoProfile -ExecutionPolicy Bypass -File .\Setup.ps1 -InstallAddin`.
-4. Otwórz model `Integracja/skeleton/demo/RockPro_Epson_szkielet_MVP.ics` i dodatek **Dodatki → RockPro CAD**.
+[Interfejs i proces Studio](docs/STUDIO_UX_DESIGN.md): kompas, narzędzia 3D,
+spójne kroki i kierunek dalszego rozwoju, wraz z przeglądem bibliotek UI/UX.
 
-Agent programistyczny powinien najpierw przeczytać [AGENTS.md](AGENTS.md). Zmiany wizualne: [UI_CHANGELOG.md](UI_CHANGELOG.md).
+Studio ma teraz [krok 6 — zatrzaski i zawiasy na złączach](docs/WIZARD_CLOSURES.md):
+liczba, równy rozstaw i omijanie uchwytów, z zachowaniem draftu oraz podglądem 3D.
 
-## Źródła
+Budujemy konfigurator skrzyń: od wyboru konstrukcji i wymaganego wnętrza,
+przez części i ich montaż, do kontrolowanego projektu IronCAD, snapshotu
+oraz zestawienia materiałów i firmowego Excela. Obliczenia mają wykonywać
+skrypty; AI pomaga w propozycjach i wyjątkach przez te same operacje.
 
-- `Integracja/rockpro_cad/addin`: C# / WinForms i rejestracja dodatku.
-- `Integracja/rockpro_cad/mcp`: protokół MCP, operacje CAD, SQLite i testy.
-- `Integracja/rockpro_cad/qa`: testy odbiorcze i checklisty.
-- `Integracja/*.py`: adapter COM i walidatory geometrii.
+**Stan przekazania: 03.11.2026 — prototyp, bez odbioru produkcyjnego.** Aktualne Studio
+jest na gałęzi `codex/roc42-catalog-continuation`. `main` zawiera wcześniejszą
+integrację T1/T2; ten push nie scala ani nie nadpisuje innych gałęzi.
 
-Dane klientów, baza SQLite, logi, środowisko Python, wygenerowane DLL i robocze rewizje nie należą do repozytorium. Zależność Python IronCAD jest przypięta do konkretnego commita. SDK jest pobierane z lokalnej instalacji IronCAD podczas budowania.
+## Start dla Kuby / udreka13
 
-## Testy bez CAD
+Przyjmij zaproszenie do prywatnego repozytorium i pobierz właściwą gałąź:
 
 ```powershell
-.\Integracja\.venv\Scripts\python.exe -m unittest discover -s .\Integracja\rockpro_cad\mcp -p test_*.py -v
-.\Integracja\.venv\Scripts\python.exe -m unittest discover -s .\Integracja\rockpro_cad\qa -p test_acceptance.py -v
+git clone --branch codex/roc42-catalog-continuation https://github.com/qoopercodding/RockPro.git
+cd RockPro
 ```
 
-22 testów backendu + 7 odbiorczych. Testy te nie zastępują testu natywnego IronCAD na komputerze docelowym.
+Przy istniejącym checkoutcie najpierw zachowaj swoją pracę, potem pobierz
+zmiany i przełącz się na tę gałąź. Nie resetuj lokalnych zmian:
 
-Konfigurator rozmieszczenia: [LAYOUT.md](LAYOUT.md) — podgląd 3D, zapis w SQLite oraz gabaryty kopii ICS.
+```powershell
+git fetch origin
+git switch codex/roc42-catalog-continuation
+git pull --ff-only
+```
 
-Instrukcje dla agentów i powtarzalne sprawdzanie: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md). Audyt i kolejność dalszych poprawek: [docs/REPOSITORY_AUDIT.md](docs/REPOSITORY_AUDIT.md).
+Przeczytaj [AGENTS.md](AGENTS.md) i [zasady rozwoju](docs/DEVELOPMENT.md).
+Pracujemy na kopiach CAD, jednym wykonawcą SDK. Nie zmieniamy oryginałów,
+archiwalnych snapshotów ani prywatnej bazy drugiego wdrożenia.
+
+## Uruchomienie Studio — przeglądarka i Python
+
+Studio korzysta z lokalnego HTTP, Three.js i standardowej biblioteki Pythona.
+Do oglądania kreatora i gotowych siatek nie trzeba uruchamiać IronCADa ani
+podawać klucza AI. Zalecany Python 3.12 x64 i aktualna przeglądarka z WebGL.
+
+Z głównego folderu repozytorium utwórz venv, jeśli jeszcze go nie masz:
+
+```powershell
+py -3.12 -m venv Integracja\.venv
+cd Integracja
+.\.venv\Scripts\python.exe -m rockpro_cad.reference_studio --bundle "C:\RockPro-data\model-library-20261026" --previews "C:\RockPro-data\family-3d-20261027\index.json"
+```
+
+Ścieżki powyżej to przykładowa lokalizacja danych, nie pliki dołączone do Gita.
+Potrzebne są osobno przekazane prywatne pakiety:
+
+- `model-library-20261026`: manifest, inwentarze `native-02`, standardy
+  `working-standard-v1` i opcjonalne obrazy wzorców;
+- `family-3d-20261027`: `index.json` oraz wskazane w nim względne foldery
+  z `model.json` i `geometry.bin`.
+
+Obecny launcher wymaga pakietu `--bundle` także dla kreatora. Bez tych danych
+nie uruchomisz pełnego Studio z samego klona; poproś prowadzącego o paczki.
+Nie zastępuj ich sztucznymi źródłami ani nie commituj modeli klienta.
+
+Serwer wypisze własny adres `http://127.0.0.1:<port>/<sesja>/` i otworzy
+przeglądarkę. Z galerii przejdź do kreatora.
+Możesz też dopisać `wizard.html` do adresu sesji. Adres z komputera autora
+nie zadziała na Twoim komputerze. Zatrzymanie serwera: Ctrl+C w jego terminalu.
+
+## Co już działa
+
+| Obszar | Obecny zakres |
+|---|---|
+| Galeria wzorców | Siedem źródłowych modeli w sześciu grupach, rzeczywiste siatki, zmiana nominalnego gabarytu i ruchy zespołów; Workstation ma cztery wysuwane moduły |
+| Krok 1 | Dokładnie trzy typy: Skrzynia, Szafa, Skrzynia 3-elementowa; brak podtypów i wariantu dwojga drzwi |
+| Krok 2 | Skrzynia: wieko na zawiasach albo zdejmowane. Szafa: jedna przednia powłoka otwierana lub zdejmowana. Typ 3-elementowy: zdejmowany przód i góra; współpraca pokryw i zależności otwierania |
+| Krok 3 | Wymiary wnętrza korpusu, grubość sklejki, wysokość/głębokość pokryw, aktualizowany schemat 3D. Przód wariantu 3-elementowego automatycznie licuje z górą |
+| Krok 4 | Katalog 265 rekordów firmowych, definicje bazowe, opcjonalne części źródłowe i 81 definicji wariantów producenta; rendery, kategorie, filtry i wersjonowane definicje. Rekord katalogu nie oznacza gotowego montażu CAD |
+| Krok 5 | Płynny drag and drop, obrót środkowym przyciskiem, 1–16 uchwytów/ściankę, symetria, równe rzędy zawiasów na styku sekcji, wstępne ostrzeżenia i zapis |
+| Draft | Zapis/odczyt w SQLite, historia rewizji, konflikt starszego zapisu, odzyskiwanie przeglądarki oraz JSON. Format aktualny: `rockpro.configurator/3`; stare formaty są zachowane i konwertowane jawnie jako nowe |
+| Dotychczasowy dodatek | C# / WinForms, Python MCP, karty projektów, układ, snapshoty i ograniczone operacje na znanym szkielecie; pełne prototypy CAD to osobny tor od Studio |
+
+**XYZ oznaczają obecnie wnętrze samego korpusu, nie całej skrzyni z pokrywami.**
+Pokrywy mają własne wymiary; nominalny gabaryt zamkniętej konstrukcji jest
+pokazany oddzielnie. Zielona sklejka: `#408080`.
+
+Szczelina złącza i docięcie sklejki mają wynikać z wybranego okucia/profilu.
+Nie są ręcznym dodatkiem do gabarytu. Na razie biblioteka montażowa nie jest
+podłączona: wyniki mają status „do ustalenia po wyborze okucia”, nie fikcyjne
+zero. Płyty podglądu nie są formatkami produkcyjnymi. Zatwierdzony montaż przy złączach,
+obróbki, kompletny plan CAD, generowanie ICS z kreatora i synchronizacja firmowego Excela
+**nie są jeszcze wdrożone**.
+
+Dostępna biblioteka i ograniczenia wyboru: [krok 4](docs/WIZARD_PARTS_SELECTION.md).
+Rozmieszczanie, liczby i symetria: [krok 5](docs/WIZARD_PLACEMENT.md).
+Sterowanie, biblioteki i rzędy zawiasów: [interakcje Studio](docs/STUDIO_INTERACTION.md).
+Odczyt innych otwartych projektów i rozszerzona paleta: [warianty źródłowe](docs/STUDIO_SOURCE_PARTS.md).
+
+Dokładniej: [aktualne wymiary i złącza](docs/WIZARD_JOINT_DIMENSIONS.md),
+[trzy typy](docs/WIZARD_THREE_TYPES.md), [galeria 3D](docs/ALL_REFERENCE_PREVIEWS.md).
+[Opis pierwszego kreatora](docs/WIZARD_STEPS_1_3.md) zachowuje również historyczny
+zakres v1 — aktualne ograniczenia mają pierwszeństwo.
+
+## Następne prace
+
+1. Przyjąć pełny katalog części od Tomka: SKU, jednostki zakupowe, modele CAD,
+   zgodność wersji, ramy montażu, wymagane wycięcia i dane połączeń.
+2. Powiązać koncepcyjnie rozmieszczone zawiasy/zatrzaski ze złączami sekcji,
+   potwierdzić ramy i przestrzeń ruchu, generować wycięcia oraz przerwy profili
+   z tej samej kotwy co okucie. Rozszerzyć bibliotekę zweryfikowanych obrysów.
+3. Wyliczać szczeliny, osadzenie profili i docięcie sklejki z konkretnego
+   szablonu montażowego wewnątrz ustalonego gabarytu. Brak danych blokuje CAD.
+4. Transport/koła i sparowane górne gniazda, podpory, teleskopy oraz logo klienta.
+5. Review konkretnej rewizji i adapter kompletnej rodziny do IronCAD 2023:
+   wykonanie na nowej kopii, pomiary, zapis/otwarcie, snapshot oraz foldery.
+6. BOM roboczy na jedną skrzynię i całe zlecenie, a potem integracja z realnym
+   firmowym Excelem. Czekamy na jego strukturę i zasady współdzielenia;
+   nie odgadujemy kolumn ani nie nadpisujemy ręcznych ustaleń.
+
+Cały kierunek: [proces w 11 krokach](docs/CUSTOM_CASE_WORKFLOW.md) i
+[architektura konfiguratora](docs/CASE_CONFIGURATOR_ARCHITECTURE.md).
+Trzeba oddzielać działający podgląd, kod/test offline, dowód CAD i odbiór konstruktora.
+
+## Dodatek w IronCAD
+
+Osobno od Studio: Windows x64, wybrana wersja IronCAD z ICAPI SDK oraz kompilator
+.NET Framework. Docelowe stanowisko firmy: **2023 PU1 SP1**; część późniejszych
+modeli źródłowych i eksportów pochodzi z 2027. Nie oznacza to, że ich ICS
+otworzy się w 2023. [Macierz zgodności](docs/IRONCAD_2023_COMPATIBILITY.md).
+
+Zapisz pracę i zamknij IronCAD przed instalacją/rejestracją:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\Setup.ps1 -Python python -IronCADYear 2023 -InstallAddin
+```
+
+Dla stanowiska developerskiego 2027 użyj `-IronCADYear 2027`. Skrypt instaluje
+zależności natywnego backendu, konfiguruje ścieżki, buduje i rejestruje DLL.
+Uruchom host normalnie jako ten sam użytkownik; **Dodatki → RockPro CAD**.
+Po instalacji nie przenoś checkoutu. Demo `Integracja/skeleton/demo/` to znany
+szkielet, nie kompletny generator wszystkich rodzin.
+Szczegóły: [HANDOVER](HANDOVER.md), [AUTOSTART](AUTOSTART.md).
+
+## Kod i weryfikacja
+
+- `Integracja/rockpro_cad/studio_parts.py` i `reference_studio/parts-picker.js`: katalog oraz wybór okuć w kroku 4.
+- `Integracja/rockpro_cad/studio_placement.py`, `reference_studio/placement-editor.js` i `placement3d.js`: kotwy, grupy, wstępna kontrola i interakcje kroku 5.
+- `Integracja/rockpro_cad/configurator.py`: reguły kroków 1–3, nominalna geometria,
+  walidacja i rewizje draftów; `reference_studio.py`: lokalne trasy HTTP.
+- `Integracja/rockpro_cad/reference_studio/wizard*`: kreator i jego schemat 3D.
+- `family_concepts.py`, `reference_studio/app.js`, `reference3d.js`: galeria
+  i źródłowe podglądy; `scripts/prepare_workstation_preview.py`: konwersja siatek.
+- `Integracja/rockpro_cad/mcp`: wspólna SQLite i usługi; `core_case`: kontrakty
+  i wykonanie CAD; `addin`: C# / WinForms. Nie twórz drugiej bazy w frontendzie.
+
+Testy kreatora z katalogu `Integracja`:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest rockpro_cad.mcp.test_configurator rockpro_cad.mcp.test_reference_studio -v
+```
+
+Pełna regresja z katalogu głównego:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Verify.ps1
+```
+
+Ostatnia pełna regresja: PASS — repository, backend, parts, core-design,
+core-contracts, qa i harness. UI/WebGL, zapis/odczyt draftu i JSON również
+sprawdzone lokalnie. Wyniki lokalne nie potwierdzają instalacji na nowym
+stanowisku ani produkcyjnej poprawności konstrukcji. Prywatne raporty
+`artifacts/verification/20261027T144729496423Z/` nie należą do repozytorium.
+Modele, biblioteki geometrii, SQLite, snapshoty, logi, SDK i wygenerowane DLL
+pozostają poza tym pushem; dane wymieniamy osobnym kanałem.
+
+## Linear — gdzie śledzić pracę
+
+[Projekt RockPro CAD](https://linear.app/rock-pro/project/rockpro-cad-d99cc3102643/overview)
+— zaloguj się do workspace **Rock_Pro**. Zaproszenie GitHub nie daje dostępu do
+Linear; potrzebne jest osobne zaproszenie od właściciela workspace.
+
+Przed zadaniem przeczytaj wymagania, zależności i kryteria odbioru. Po pracy
+powiąż commit/PR z zadaniem i podaj wynik odpowiednich testów. Nie oznaczaj
+odbiorów konstruktora jako ukończonych samym testem. Punkty wejścia:
+[ROC-45 — mapowanie wzorców](https://linear.app/rock-pro/issue/ROC-45),
+[ROC-41 — wycięcia i styki](https://linear.app/rock-pro/issue/ROC-41),
+[ROC-42 — manifest części](https://linear.app/rock-pro/issue/ROC-42).
+Statusy sprawdzaj bezpośrednio w Linear; starsze lokalne raporty są historyczne.

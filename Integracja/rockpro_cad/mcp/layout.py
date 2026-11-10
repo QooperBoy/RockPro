@@ -3,6 +3,7 @@ import itertools
 import json
 import math
 import project_store
+from lid_policy import validate_lid_height
 from project_store import db, project_exists, now, change_stages
 
 DEFAULT = dict(name="Urządzenie", x=345.4, y=241.9, z=88.2, count=2,
@@ -10,14 +11,27 @@ DEFAULT = dict(name="Urządzenie", x=345.4, y=241.9, z=88.2, count=2,
                separator=0, side="none", side_width=80, side_depth=300,
                side_height=50, side_name="Kable", thickness=9, lid_height=50)
 
+# Public field contract includes optional policy fields without opting legacy
+# saved layouts into the new policy merely by loading them.
+LAYOUT_PROPERTIES = {k: {'type': 'string' if isinstance(v, str) else 'integer' if k == 'count' else 'number'}
+                     for k, v in DEFAULT.items()}
+LAYOUT_PROPERTIES.update(lid_hardware_width={'type': 'number', 'minimum': 0, 'maximum': 1000},
+                         lid_hinge_height={'type': 'number', 'minimum': 0, 'maximum': 1000},
+                         lid_constructor_override={'type': 'boolean'})
+
 def _calculate_layout(spec):
-    if not isinstance(spec, dict) or set(spec)-set(DEFAULT):
+    if not isinstance(spec, dict) or set(spec)-set(LAYOUT_PROPERTIES):
         raise ValueError("Nieznane pola układu")
     s = DEFAULT | spec
+    s.setdefault('lid_hardware_width',0)
+    active_lid_policy='lid_hinge_height' in spec or 'lid_constructor_override' in spec
+    s.setdefault('lid_hinge_height',0)
+    s.setdefault('lid_constructor_override',False)
+    if type(s['lid_constructor_override']) is not bool:raise ValueError('Odstępstwo konstruktora musi być jawne')
     for key in ("name", "side_name"):
         if not isinstance(s[key], str) or not s[key].strip() or len(s[key])>100:
             raise ValueError("Podaj nazwę (do 100 znaków)")
-    for key, low, high in [(k, 1, 5000) for k in ("x","y","z","side_width","side_depth","side_height")] + [("gap",0,500),("clearance",0,500),("separator",0,50),("thickness",1,100),("lid_height",2,1000)]:
+    for key, low, high in [(k, 1, 5000) for k in ("x","y","z","side_width","side_depth","side_height")] + [("gap",0,500),("clearance",0,500),("separator",0,50),("thickness",1,100),("lid_height",2,1000),("lid_hardware_width",0,1000),("lid_hinge_height",0,1000)]:
         v=s[key]
         if isinstance(v,bool) or not isinstance(v,(float,int)) or not math.isfinite(v) or not low<=v<=high:
             raise ValueError(key+": nieprawidłowa wartość w mm")
@@ -25,6 +39,7 @@ def _calculate_layout(spec):
         raise ValueError("Liczba urządzeń: 1–30")
     if s["orientation"] not in ["".join(p) for p in itertools.permutations("XYZ")] or s["arrangement"] not in ("X","Y","Z") or s["side"] not in ("none","X","Y"):
         raise ValueError("Nieznany kierunek lub orientacja")
+    minimum=validate_lid_height(s['lid_height'],[s['lid_hinge_height']] if s['lid_hinge_height'] else [])
     sizes=[s[c.lower()] for c in s["orientation"]]
     axis="XYZ".index(s["arrangement"])
     clearance=s["clearance"]
@@ -57,9 +72,14 @@ def _calculate_layout(spec):
         dims=[0.,0.,s["side_height"]];dims[a]=s["side_width"];dims[1-a]=s["side_depth"]
         boxes.append(dict(kind="accessory",label=s["side_name"],pos=pos,size=dims))
         inside[a]+=s["thickness"]+s["side_width"]+2*clearance
+    if active_lid_policy or s['lid_hardware_width']:
+        # Keep the equipment compartment below the seam while adding the chosen lid.
+        inside[2]+=s['lid_height']-s['thickness']
     outer=[v+2*s["thickness"] for v in inside]
     if max(outer)>10000 or s["lid_height"]<=s["thickness"] or outer[2]-s["lid_height"]<=s["thickness"]:
         raise ValueError("Gabaryt lub wysokość pokrywy poza zakresem szkieletu")
+    if active_lid_policy:
+        validate_lid_height(s['lid_height'],[s['lid_hinge_height']] if s['lid_hinge_height'] else [],outer[2]-s['lid_height'],s['lid_constructor_override'])
     for i,b in enumerate(boxes):
         if any(p<0 or p+d>lim+1e-6 for p,d,lim in zip(b["pos"],b["size"],inside)):
             raise ValueError("Element poza obrysem")
@@ -69,7 +89,16 @@ def _calculate_layout(spec):
     warnings=["Bryły uproszczone: uwzględnij wystające złącza, uchwyty i przewody.","Wyjmowanie urządzeń, pianki i wytrzymałość wymagają oceny konstruktora."]
     if s["arrangement"]=="Z" and s["count"]>1:
         warnings.append("Piętrowanie: zaprojektuj podparcie i dostęp do dolnych urządzeń; przegroda nie jest zweryfikowaną półką.")
-    return dict(spec=s,boxes=boxes,internal=inside,external=outer,warnings=warnings,
+    if active_lid_policy and not s['lid_hinge_height']:warnings.append('Nie wybrano zawiasu: minimum montażowe pokrywy wymaga potwierdzenia.')
+    if active_lid_policy and s['lid_constructor_override']:warnings.append('Jawne odstępstwo konstruktora od proporcji pokrywy 10–15%.')
+    saved_spec=dict(s)
+    if not active_lid_policy:
+        saved_spec.pop('lid_hinge_height');saved_spec.pop('lid_constructor_override')
+    if not s['lid_hardware_width']:saved_spec.pop('lid_hardware_width')
+    return dict(spec=saved_spec,boxes=boxes,internal=inside,external=outer,warnings=warnings,
+                lid_policy=dict(rule='hinge_minimum_and_shallow_proportion',minimum_mm=minimum,
+                    hinge_required_height_mm=s['lid_hinge_height'],constructor_override=s['lid_constructor_override'],maximum_ratio=.15,
+                    height_source='explicit_configuration' if active_lid_policy else 'legacy_without_hardware_rule'),
                 volume_l=math.prod(outer)/1_000_000,
                 checks=dict(collisions=False,contained=True),
                 parameters=dict(RP_Length=outer[0],RP_Depth=outer[1],RP_BaseHeight=outer[2]-s["lid_height"],RP_LidHeight=s["lid_height"],RP_Thickness=s["thickness"],RP_DisplayGap=0))
@@ -125,26 +154,38 @@ def get_layout(project_id,revision=None):
             if row is None: raise ValueError('Layout revision not found')
         else:
             row=conn.execute('SELECT * FROM layout_versions WHERE project_id=? ORDER BY revision DESC LIMIT 1',(project_id,)).fetchone()
-    return dict(saved=bool(row),revision=row['revision'] if row else 0,sha256=row['sha256'] if row else None,updated_at=row['created_at'] if row else None,**calculate_layout(json.loads(row['spec']) if row else {}))
+        from device_layout_service import source_for_layout
+        device_source=source_for_layout(conn,project_id,row['revision'] if row else 0)
+    return dict(saved=bool(row),revision=row['revision'] if row else 0,sha256=row['sha256'] if row else None,updated_at=row['created_at'] if row else None,**device_source,**calculate_layout(json.loads(row['spec']) if row else {}))
+
+
+def save_layout_in_transaction(conn,project_id,result,expected_revision,actor,change_source,*,device_binding_update=False):
+    """Shared CAS write; caller owns BEGIN IMMEDIATE and the transaction."""
+    if type(expected_revision) is not int or expected_revision<0: raise ValueError('expected_revision must be a nonnegative integer; read get_layout first')
+    stamp=now();payload,digest=encode_spec(result['spec'])
+    project_exists(conn,project_id);ensure(conn)
+    current=conn.execute('SELECT COALESCE(MAX(revision),0) FROM layout_versions WHERE project_id=?',(project_id,)).fetchone()[0]
+    if current!=expected_revision:
+        raise ValueError('LAYOUT_CONFLICT: Układ zmienił inny użytkownik lub AI. Odczytana wersja '+str(expected_revision)+', aktualna '+str(current)+'. Pobierz aktualny układ i porównaj zmiany przed ponownym zapisem.')
+    if not device_binding_update:
+        from device_layout_service import binding_for_layout
+        if binding_for_layout(conn,project_id,current) is not None:
+            raise ValueError('DEVICE_LAYOUT_BOUND: użyj zapisu z powiązaniem urządzenia lub jawnie odłącz dane źródłowe')
+    revision=current+1
+    conn.execute('INSERT INTO layout_versions VALUES (?,?,?,?,?)',(project_id,revision,payload,digest,stamp))
+    conn.execute("INSERT OR REPLACE INTO layouts VALUES (?,?,?)",(project_id,payload,stamp))
+    conn.execute("UPDATE projects SET updated_at=? WHERE id=?",(stamp,project_id))
+    change_stages(conn,project_id,['geometry','hardware','wheels','documentation','materials','production'],
+                  'outdated',actor,change_source,'layout_saved',stamp)
+    change_stages(conn,project_id,['layout'],'review',actor,change_source,'layout_saved',stamp)
+    conn.execute("INSERT INTO events(project_id,created_at,kind,payload) VALUES (?,?,?,?)",(project_id,stamp,"layout_saved",json.dumps(dict(revision=revision,sha256=digest,spec=result['spec']),ensure_ascii=False)))
+    return dict(saved=True,revision=revision,sha256=digest,updated_at=stamp,
+                database=str(project_store.DB_PATH),**result)
 
 
 def save_layout(project_id,spec,expected_revision,actor='unspecified',change_source='unspecified'):
     if type(expected_revision) is not int or expected_revision<0: raise ValueError('expected_revision must be a nonnegative integer; read get_layout first')
-    result=calculate_layout(spec);stamp=now()
-    payload,digest=encode_spec(result['spec'])
+    result=calculate_layout(spec)
     with db() as conn:
         conn.execute('BEGIN IMMEDIATE')
-        project_exists(conn,project_id);ensure(conn)
-        current=conn.execute('SELECT COALESCE(MAX(revision),0) FROM layout_versions WHERE project_id=?',(project_id,)).fetchone()[0]
-        if current!=expected_revision:
-            raise ValueError('LAYOUT_CONFLICT: Układ zmienił inny użytkownik lub AI. Odczytana wersja '+str(expected_revision)+', aktualna '+str(current)+'. Pobierz aktualny układ i porównaj zmiany przed ponownym zapisem.')
-        revision=current+1
-        conn.execute('INSERT INTO layout_versions VALUES (?,?,?,?,?)',(project_id,revision,payload,digest,stamp))
-        conn.execute("INSERT OR REPLACE INTO layouts VALUES (?,?,?)",(project_id,payload,stamp))
-        conn.execute("UPDATE projects SET updated_at=? WHERE id=?",(stamp,project_id))
-        change_stages(conn,project_id,['geometry','hardware','wheels','documentation','materials','production'],
-                      'outdated',actor,change_source,'layout_saved',stamp)
-        change_stages(conn,project_id,['layout'],'review',actor,change_source,'layout_saved',stamp)
-        conn.execute("INSERT INTO events(project_id,created_at,kind,payload) VALUES (?,?,?,?)",(project_id,stamp,"layout_saved",json.dumps(dict(revision=revision,sha256=digest,spec=result['spec']),ensure_ascii=False)))
-    return dict(saved=True,revision=revision,sha256=digest,updated_at=stamp,
-                database=str(project_store.DB_PATH),**result)
+        return save_layout_in_transaction(conn,project_id,result,expected_revision,actor,change_source)

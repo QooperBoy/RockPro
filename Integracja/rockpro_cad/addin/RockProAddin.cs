@@ -18,10 +18,20 @@ namespace RockPro.CAD {
             return (stdole.IPictureDisp)GetIPictureDispFromPicture(image);
         }
     }
+#if IRONCAD2023
+    [Guid("BEC3F005-C8B6-4A90-97CC-841324F7A635")]
+    [ProgId("RockPro.CAD.Addin2023")]
+#else
     [Guid("B7659903-7C95-4E26-923F-DB5119AD1460")]
     [ProgId("RockPro.CAD.Addin")]
+#endif
     [ClassInterface(ClassInterfaceType.None)]
     public class Addin : IZAddinServer {
+#if IRONCAD2023
+        internal const int HostYear=2023;
+#else
+        internal const int HostYear=2027;
+#endif
         private ZAddinSite site;
         private ZCommandHandler command;
         private RockProPanel panel;
@@ -35,6 +45,9 @@ namespace RockPro.CAD {
         public void InitSelf(ZAddinSite addinSite) {
             try {
                 site=addinSite;
+                string apiVersion=site.Application.ApiVersion;
+                if(!apiVersion.StartsWith((HostYear-1998).ToString(CultureInfo.InvariantCulture)+".",StringComparison.Ordinal))
+                    throw new InvalidOperationException("Ten build RockPro wymaga IronCAD "+HostYear+"; API hosta: "+apiVersion);
                 var logo=Image.FromFile(Path.Combine(Root,"assets","rockpro-logo.png"));
                 command=site.CreateCommandHandler("RockProCAD.Connect","RockPro CAD",
                     "RockPro CAD — projekty, układ i parametry / projects, layout and parameters","RockPro CAD",
@@ -50,7 +63,7 @@ namespace RockPro.CAD {
                 string digest;
                 using(var hash=System.Security.Cryptography.SHA256.Create())
                 using(var stream=File.OpenRead(binary))digest=BitConverter.ToString(hash.ComputeHash(stream)).Replace("-","").ToLowerInvariant();
-                Log("InitSelf OK; build=core-prototype-20261021; ribbon command registered; dll="+binary+"; sha256="+digest);
+                Log("InitSelf OK; host="+apiVersion+"; target="+HostYear+"; ribbon command registered; dll="+binary+"; sha256="+digest);
             } catch(Exception e) {Log("InitSelf ERROR "+e);MessageBox.Show(e.Message,"RockPro CAD");}
         }
         private void OnUpdate() {if(command!=null) command.Enabled=true;}

@@ -30,8 +30,8 @@ def schema(name, description, properties, required=(), readonly=False):
 S={"type":"string"}
 REV={"type":"integer","minimum":0}
 PROVENANCE={"actor":S,"change_source":S}
-from layout import DEFAULT
-layout_spec={"type":"object","additionalProperties":False,"properties":{k:{"type":"string" if isinstance(v,str) else "integer" if k=="count" else "number"} for k,v in DEFAULT.items()}}
+from layout import LAYOUT_PROPERTIES
+layout_spec={"type":"object","additionalProperties":False,"properties":LAYOUT_PROPERTIES}
 SCHEMAS += [
  schema("preview_layout","Calculate device envelopes, partitions and accessory space in mm; no CAD edits",{"spec":layout_spec},["spec"],True),
  schema("get_layout","Read current or historical immutable layout; revision 0 means unsaved",{"project_id":S,"revision":{"type":"integer","minimum":1}},["project_id"],True),
@@ -72,6 +72,120 @@ SCHEMAS += [
         {"project_id":S,"operation_id":S},["project_id","operation_id"],True),
  schema("recover_case_operation", "Reconcile saved evidence after interruption; does not reinsert CAD parts",
         {"project_id":S,"operation_id":S},["project_id","operation_id"])
+]
+
+
+SCHEMAS += [
+ schema('preview_excel_configuration','Validate a bounded XLSX staged in Integracja/imports; explicit units, no CAD edits',
+        {'path':S},['path'],True),
+ schema('import_excel_configuration','Import the previewed XLSX into versioned SQLite layout with CAS and duplicate protection; does not run CAD',
+        {'project_id':S,'path':S,'expected_revision':REV,'expected_source_sha256':S},
+        ['project_id','path','expected_revision','expected_source_sha256']),
+]
+
+
+SCHEMAS += [
+ schema('preview_device_record','Validate a device variant with per-field units, sources and confirmation claims; preserve missing/conflicting data',{'record':{'type':'object'}},['record'],True),
+ schema('save_device_record','Version source-cited device data in the shared SQLite with CAS; no product variant merging',{'record':{'type':'object'},'expected_revision':REV},['record','expected_revision']),
+ schema('get_device_record','Read a current or historical device observation record',{'catalog_id':S,'revision':{'type':'integer','minimum':1}},['catalog_id'],True),
+ schema('draft_device_inquiry','Draft missing/conflicting device data questions for an authorized sender; never sends messages',{'record':{'type':'object'}},['record'],True),
+]
+
+
+SCHEMAS += [
+ schema('recommend_case_families','Filter source-bound family capabilities and rank candidates with reasons; no match routes to manual design',
+        {'query':{'type':'object'},'families':{'type':'array','maxItems':200,'items':{'type':'object'}}},['query','families'],True),
+ schema('benchmark_case_recommendations','Evaluate supplied closed labeled cases; never invent historical success labels',
+        {'families':{'type':'array','maxItems':200,'items':{'type':'object'}},'cases':{'type':'array','minItems':1,'maxItems':500,'items':{'type':'object'}}},['families','cases'],True),
+]
+
+
+SCHEMAS += [schema('preview_device_layouts','Propose up to three allowed layouts from cited device dimensions with collision and conservative vertical removal checks; constructor edits/saves separately',
+    {'record':{'type':'object'},'spec':{'type':'object','additionalProperties':False,'properties':{k:v for k,v in LAYOUT_PROPERTIES.items() if k not in ('x','y','z')}},
+     'allowed_orientations':{'type':'array','minItems':1,'maxItems':6,'items':{'enum':['XYZ','XZY','YXZ','YZX','ZXY','ZYX']}},
+     'allowed_arrangements':{'type':'array','minItems':1,'maxItems':3,'items':{'enum':['X','Y','Z']}},
+     'removal_clearance_mm':{'type':'number','minimum':0,'maximum':500},
+     'max_external_mm':{'type':'array','minItems':3,'maxItems':3,'items':{'type':'number','exclusiveMinimum':0,'maximum':10000}}},
+    ['record','spec','allowed_orientations','allowed_arrangements'],True)]
+
+
+SCHEMAS += [
+ schema('preview_bom_file','Validate staged technology cutting BOM JSON and its approval reference; no CAD or production approval',{'path':S},['path'],True),
+ schema('import_bom_file','Import immutable cutting BOM into shared SQLite with source hash and optimistic concurrency; repeated revision never adds demand',
+        {'project_id':S,'path':S,'expected_revision':REV,'expected_source_sha256':S},['project_id','path','expected_revision','expected_source_sha256']),
+ schema('aggregate_bom_demand','Aggregate only the latest cutting BOM per project; separate material, finish, thickness, technology, grain and exact due date',
+        {'project_ids':{'type':'array','minItems':1,'maxItems':100,'uniqueItems':True,'items':S}},['project_ids'],True),
+]
+
+
+CUT_INPUT={'demand':{'type':'object'},'sheets':{'type':'array','minItems':1,'maxItems':500,'items':{'type':'object'}},'technology':{'type':'object'}}
+SCHEMAS += [
+ schema('verify_cut_plan','Independently verify exact quantities, material, grain, kerf, trims and guillotine cut sequence; not machine approval',
+        CUT_INPUT|{'plan':{'type':'object'}},['demand','sheets','technology','plan'],True),
+ schema('solve_reference_cut_plan','Bounded deterministic first-fit guillotine proposal; no optimum claim, timeout returns no unverified result',
+        CUT_INPUT|{'max_seconds':{'type':'number','exclusiveMinimum':0,'maximum':30}},['demand','sheets','technology'],True),
+ schema('export_cutting_csv','Export neutral cutting columns for explicit mapping in a verified vendor profile; not machine-ready',{'demand':{'type':'object'}},['demand'],True),
+]
+
+
+SCHEMAS += [
+ schema('inventory_command','Operator-only transactional register/reserve/issue/consume/return/cancel/delivery/receive. CAS uses lot revision; no automatic purchasing',
+        {'command':{'type':'object'},'operation_id':S,'expected_revision':REV},['command','operation_id','expected_revision']),
+ schema('get_inventory','Read physical, held and free stock without double subtraction; confirmed unreceived deliveries are separate',{},readonly=True),
+ schema('get_inventory_history','Read bounded immutable inventory operation receipts; caller identity is unverified',{'limit':{'type':'integer','minimum':1,'maximum':500}},readonly=True),
+ schema('get_inventory_operation','Read one preserved inventory receipt by operation ID without retrying; optionally verify the exact pending command and revision. Missing is only a point-in-time observation',
+        {'operation_id':S,'command':{'type':'object'},'expected_revision':REV},['operation_id'],True),
+ schema('prepare_inventory_command','Operator-only durable request; does not reserve or change stock. Execution rechecks pinned lot/delivery revision',
+        {'command':{'type':'object'},'operation_id':S,'expected_revision':REV,'decision_reference':S,'actor':S},['command','operation_id','expected_revision','decision_reference']),
+ schema('execute_inventory_intent','Operator-only execution of the exact stored request; stock and committed state change atomically and retries never duplicate effects',{'operation_id':S},['operation_id']),
+ schema('cancel_inventory_intent','Operator-only cancellation of an unexecuted request; cannot undo committed stock use',{'operation_id':S,'command_sha256':S},['operation_id','command_sha256']),
+ schema('get_inventory_intent','Read a durable operator request and its preserved outcome without executing it',{'operation_id':S},['operation_id'],True),
+ schema('list_inventory_intents','Read durable requests after restart; prepared does not mean stock availability or approval',{'state':{'type':'string','enum':['all','prepared','committed','rejected','cancelled']},'limit':{'type':'integer','minimum':1,'maximum':100}},readonly=True),
+]
+
+
+SCHEMAS += [schema('preview_purchases','Draft dated piece/sheet SKU purchase options from actual free stock and outstanding deliveries; MOQ/pack/tier/shipping/tax/cash limits; never orders',
+    {'requirements':{'type':'object'},'offers':{'type':'array','maxItems':200,'items':{'type':'object'}},'policy':{'type':'object'}},['requirements','offers','policy'],True)]
+
+
+SCHEMAS += [
+ schema('save_material_plan','Persist an immutable independently verified draft cutting plan tied to current BOM/card/layout/source/snapshot; does not reserve stock',
+        {'plan_id':S,'project_ids':{'type':'array','minItems':1,'maxItems':100,'items':S},'sheets':CUT_INPUT['sheets'],'technology':{'type':'object'},'cut_plan':{'type':'object'},'supersedes_plan_id':S},['plan_id','project_ids','sheets','technology','cut_plan']),
+ schema('get_material_plan','Read saved plan, append-only progress and computed staleness against saved files and database revisions',{'plan_id':S},['plan_id'],True),
+ schema('list_material_plans','Page through stored plan metadata without claiming current file freshness; use get_material_plan for explicit verification',{'limit':{'type':'integer','minimum':1,'maximum':100},'after_plan_id':S},readonly=True),
+ schema('start_material_plan','Record operator start once with CAS; refuses stale plan and does not execute a machine',{'plan_id':S,'expected_revision':REV},['plan_id','expected_revision']),
+ schema('record_material_progress','Append actual produced quantities or committed-order claims; never undo consumption or cancel purchases',
+        {'plan_id':S,'event_id':S,'event':{'type':'object'},'expected_revision':REV},['plan_id','event_id','event','expected_revision']),
+ schema('compare_material_plans','Compare revisions: produced parts, unapproved reuse candidates, shortages, preserved orders/expense and explicit unknown cost delta',
+        {'old_plan_id':S,'new_plan_id':S},['old_plan_id','new_plan_id'],True),
+]
+
+
+HANDLE_EVIDENCE={'type':'object'}
+HANDLE_CHOICE={'enum':['preserve_absolute','restore_rule','adopt_offset','leave_manual']}
+SCHEMAS += [
+ schema('measure_handle_reconciliation','Observe bound H7159 in the already-open project source, preserving active context; persist an observation token, no CAD edits',
+        {'project_id':S,'expected_revision':REV,'expected_project_revision':REV,'target_values':{'type':'object'}},['project_id','expected_revision','expected_project_revision']),
+ schema('preview_handle_reconciliation','Preview explicit whole-group H7159 decisions and fit at new anchors; evidence is a caller claim until native capture verifies it',
+        {'evidence':HANDLE_EVIDENCE,'choice':HANDLE_CHOICE,'prior_state':{'type':'object'}},['evidence'],True),
+ schema('get_handle_reconciliation','Read the latest durable constructor decision for bound handles; not full-case approval',{'project_id':S},['project_id'],True),
+ schema('save_handle_reconciliation','Record an operator decision with review hash and independent project/decision CAS; does not edit CAD',
+        {'project_id':S,'evidence':HANDLE_EVIDENCE,'choice':HANDLE_CHOICE,'prior_state':{'type':'object'},'expected_revision':REV,'expected_project_revision':REV,'review_sha256':S,'decision_reference':S,'measurement_id':S},
+        ['project_id','evidence','choice','expected_revision','expected_project_revision','review_sha256','decision_reference']),
+]
+
+
+SCHEMAS += [
+ schema('list_device_records','Page through current device variants with units and confirmation statuses; variants remain distinct',
+        {'limit':{'type':'integer','minimum':1,'maximum':100},'after_catalog_id':S},readonly=True),
+ schema('preview_catalog_layouts','Propose up to three constrained layouts from a saved catalog revision, retaining its source binding',
+        {'catalog_id':S,'spec':layout_spec,'constraints':{'type':'object'},'expected_device_revision':{'type':'integer','minimum':1}},['catalog_id','spec','constraints'],True),
+ schema('preview_bound_device_layout','Recheck a constructor-edited layout against pinned current device data, allowed choices and removal access',
+        {'binding':{'type':'object'},'spec':layout_spec},['binding','spec'],True),
+ schema('save_bound_device_layout','Atomically save the edited layout and immutable catalog source binding with independent source/layout checks; draft only',
+        {'project_id':S,'spec':layout_spec,'binding':{'type':'object'},'expected_revision':REV}|PROVENANCE,['project_id','spec','binding','expected_revision']),
+ schema('unlink_layout_device','Explicitly create an unlinked layout revision before entering manual device dimensions; historical source binding is retained',
+        {'project_id':S,'expected_revision':REV}|PROVENANCE,['project_id','expected_revision']),
 ]
 
 

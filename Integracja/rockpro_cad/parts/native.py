@@ -30,6 +30,16 @@ def file_sha256(path):
     return digest.hexdigest()
 
 
+def part_bounds(part):
+    """Read local exact-body bounds on 2023, or the newer part getter.
+
+    Select by available interface, never retry a failed COM geometry operation.
+    Missing/non-solid bodies remain explicit read errors in the caller.
+    """
+    getter = getattr(part, "GetBoundingBox", None)
+    return list(getter(True) if getter is not None else part.GetBody(True).GetBoundingBox())
+
+
 class NativePartsAdapter:
     """Only getters and interface queries. No launch/open/save/close/activation."""
 
@@ -49,7 +59,7 @@ class NativePartsAdapter:
             import comtypes.client
             from comtypes import HRESULT
             from comtypes.automation import IDispatch
-            from python_ironcad import ICAPI
+            from ..icapi_runtime import ICAPI, assert_host
 
         source = Path(source).resolve(strict=True)
         ole = ct.OleDLL("ole32")
@@ -74,6 +84,7 @@ class NativePartsAdapter:
                 continue
             legacy = comtypes.client.GetBestInterface(rot.GetObject(moniker).QueryInterface(IDispatch))
             base = legacy.Application.ZIronCADApp.QueryInterface(ICAPI.IZBaseApp)
+            assert_host(base)
             document = base.GetOpenDocByName(str(source))
             # IZDoc.Name is the full saved filename in this API. A basename alone
             # cannot authorize a read of a similarly named document elsewhere.
@@ -130,7 +141,7 @@ class NativePartsAdapter:
                   "bom_description": lambda: part.BOMDescription,
                   "included": lambda: bool(part.IncludedInBOM),
                   "hidden": lambda: bool(part.IsHidden),
-                  "bbox_raw": lambda: list(part.GetBoundingBox(True))}
+                  "bbox_raw": lambda: part_bounds(part)}
         for field, read in fields.items():
             try:
                 result[field] = read()

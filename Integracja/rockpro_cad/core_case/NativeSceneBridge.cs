@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using RunningTable = System.Runtime.InteropServices.ComTypes.IRunningObjectTable;
 using BindContext = System.Runtime.InteropServices.ComTypes.IBindCtx;
@@ -96,9 +97,28 @@ internal static class NativeSceneBridge
         }
         return rows.ToArray();
     }
+    static void PreserveOwned(IZDoc doc,IZSceneDoc scene,string path) {
+        // This document was created by this operation, never the source.
+        scene.Update();
+        scene.SaveAs(path,eZLinksSaveOptions.Z_LINKS_COPY_ALL,false);
+        if(!File.Exists(path) || !Same(doc.Name,path) || doc.Modified)
+            throw new IOException("Recovery save not confirmed; owned document retained in host");
+    }
+    static void Progress(string output,string stage,Stopwatch timer,string id=null,string family=null) {
+        var row=new Dictionary<string,object>{{"schema_version",1},{"event","operation_finished"},
+            {"operation",stage},{"timestamp_utc",DateTime.UtcNow.ToString("o")},
+            {"duration_ms",timer.Elapsed.TotalMilliseconds},{"actor","script"},
+            {"decision_origin",null},{"model",null},{"tokens",null},{"cost",null},
+            {"occurrence_id",id},{"family",family},{"result",new Dictionary<string,object>{{"status","passed"}}}};
+        File.AppendAllText(Path.Combine(Path.GetDirectoryName(output),"native_progress.jsonl"),Json.Serialize(row)+"\n");
+    }
     [STAThread]
     static int Main(string[] args) {
         if(args.Length!=2) return 2;
+        var owned=new OwnedDocumentScope();
+        string recoveryFolder=Path.GetDirectoryName(Path.GetFullPath(args[1]));
+        Dictionary<string,object> result=null;
+        int exitCode=1;
         try {
             var input=Obj(Json.DeserializeObject(File.ReadAllText(args[0])));
             if(input.Count!=3 || !input.ContainsKey("source") || !input.ContainsKey("output") || !input.ContainsKey("parts"))
@@ -113,10 +133,13 @@ internal static class NativeSceneBridge
             AssertSource(original,source,guid,modified);
             IZDoc created=app.OpenNewDoc(eZDocType.Z_SCENE,false,true,"");
             IZSceneDoc scene=(IZSceneDoc)created;
+            owned.Add(created,()=>created.Modified,
+                path=>PreserveOwned(created,scene,path),()=>created.Close());
             object[] parts=Arr(input["parts"]);
             if(parts.Length<1 || parts.Length>1000) throw new ArgumentException("Bounded parts required");
             HashSet<string> ids=new HashSet<string>();
             foreach(object item in parts) {
+                var partTimer=Stopwatch.StartNew();
                 var p=Obj(item); string id=Convert.ToString(p["id"]);
                 if(String.IsNullOrEmpty(id) || id.Length>160 || !ids.Add(id)) throw new ArgumentException("Unique IDs required");
                 object[] bounds=Arr(p["local_bounds"]);
@@ -141,24 +164,39 @@ internal static class NativeSceneBridge
                     m.SetValue(i,j,v*(i==3 && j<3?0.001:1.0));
                 }
                 se.SetTransformToParent(m);
+                Progress(output,"native.create",partTimer,id,Convert.ToString(p["family"]));
             }
-            scene.Update(); object[] before=Measure(scene);
+            var phaseTimer=Stopwatch.StartNew();
+            scene.Update(); Progress(output,"native.regenerate",phaseTimer);
+            phaseTimer.Restart(); object[] before=Measure(scene); Progress(output,"native.measure",phaseTimer);
+            phaseTimer.Restart();
             scene.SaveAs(output,eZLinksSaveOptions.Z_LINKS_COPY_ALL,false);
+            Progress(output,"native.save",phaseTimer);
             if(!Same(created.Name,output) || created.Modified) throw new InvalidOperationException("Saved output not clean");
             // Only this newly created clean document is closed.
-            created.Close(); IZDoc reopened=app.OpenFile(output,false);
+            phaseTimer.Restart();
+            created.Close(); owned.Release(created); IZDoc reopened=app.OpenFile(output,false);
+            Progress(output,"native.reopen",phaseTimer);
             if(!Same(reopened.Name,output)) throw new InvalidOperationException("Reopened wrong document");
+            owned.Add(reopened,()=>reopened.Modified,
+                path=>PreserveOwned(reopened,(IZSceneDoc)reopened,path),()=>reopened.Close());
             object[] after=Measure((IZSceneDoc)reopened);
             AssertSource(original,source,guid,modified);
-            var result=new Dictionary<string,object>{{"passed",true},{"before",before},{"reopened",after},
+            result=new Dictionary<string,object>{{"passed",true},{"before",before},{"reopened",after},
                 {"source",Provenance(original)},{"bridge","IronCAD 2027 official .NET SDK interop"}};
-            File.WriteAllText(args[1],Json.Serialize(result));
-            Console.WriteLine("Native bridge PASS: "+parts.Length+" proxy occurrences");
-            // IronCAD marshals foreground COM helper threads into this client.
-            // All writes and readback are complete; avoid waiting on RCW shutdown.
-            Environment.Exit(0); return 0;
+            exitCode=0;
         } catch(Exception ex) {
-            Console.Error.WriteLine(ex.ToString()); Environment.Exit(1); return 1;
+            result=new Dictionary<string,object>{{"passed",false},{"error",ex.ToString()}};
+            Console.Error.WriteLine(ex.ToString());
+        } finally {
+            string[] cleanupErrors=owned.Cleanup(recoveryFolder);
+            if(result==null) result=new Dictionary<string,object>{{"passed",false}};
+            result["cleanup_errors"]=cleanupErrors;
+            result["owned_documents_closed"]=cleanupErrors.Length==0;
+            if(cleanupErrors.Length>0) { result["passed"]=false; exitCode=1; }
+            File.WriteAllText(args[1],Json.Serialize(result));
         }
+        // Exit only after finally preserved/closed the operation's documents.
+        Environment.Exit(exitCode); return exitCode;
     }
 }

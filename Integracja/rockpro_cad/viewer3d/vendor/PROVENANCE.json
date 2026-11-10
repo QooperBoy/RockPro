@@ -1,0 +1,34 @@
+{
+  "three.module.min.js": {
+    "url": "https://raw.githubusercontent.com/mrdoob/three.js/r180/build/three.module.min.js",
+    "sha256": "e2b5ee6bccd38fd6d8a2428546b83c5f2426d84b152ef82be8055556e3b40eb6"
+  },
+  "three.core.min.js": {
+    "url": "https://raw.githubusercontent.com/mrdoob/three.js/r180/build/three.core.min.js",
+    "sha256": "61ba0df005b05991361d040d8ff670e1aadfd0ce7aeebd1fdb0725957a8957de"
+  },
+  "OrbitControls.js": {
+    "url": "https://raw.githubusercontent.com/mrdoob/three.js/r180/examples/jsm/controls/OrbitControls.js",
+    "sha256": "b97879c748170baadeb3fb84cea1ffdf4674e283dc06042f34e2acb95a76042c"
+  },
+  "LICENSE": {
+    "url": "https://raw.githubusercontent.com/mrdoob/three.js/r180/LICENSE",
+    "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601"
+  },
+  "three-viewport-gizmo.js": {
+    "url": "https://registry.npmjs.org/three-viewport-gizmo/-/three-viewport-gizmo-2.2.0.tgz",
+    "package": "three-viewport-gizmo",
+    "version": "2.2.0",
+    "license": "MIT",
+    "sha256": "fcd54071d68fa9456d64c1764d199120e63e9cbe07a9e9036e6995afcf392a68",
+    "tarball_integrity": "sha512-Jo9Liur1rUmdKk75FZumLU/+hbF+RtJHi1qsKZpntjKlCYScK6tjbYoqvJ9M+IJphrlQJF5oReFW7Sambh0N4Q=="
+  },
+  "three-viewport-gizmo.LICENSE": {
+    "url": "https://registry.npmjs.org/three-viewport-gizmo/-/three-viewport-gizmo-2.2.0.tgz",
+    "package": "three-viewport-gizmo",
+    "version": "2.2.0",
+    "license": "MIT",
+    "sha256": "a6987d9b52752616d7ad34a515cf4413f86c3338293d54973cce1691482478b5",
+    "tarball_integrity": "sha512-Jo9Liur1rUmdKk75FZumLU/+hbF+RtJHi1qsKZpntjKlCYScK6tjbYoqvJ9M+IJphrlQJF5oReFW7Sambh0N4Q=="
+  }
+}

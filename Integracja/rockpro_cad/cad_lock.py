@@ -10,6 +10,11 @@ MUTEX_NAME = r'Local\RockProCAD.NativeWriter.v1'
 _state = threading.local()
 
 
+class CadBusyError(RuntimeError):
+    """Writer refused before yielding the lock; no CAD work has started."""
+    pass
+
+
 def legacy_lock_paths():
     integration = Path(__file__).resolve().parents[1]
     candidates = [integration/'rockpro_cad/mcp/cad.lock',
@@ -30,7 +35,7 @@ def _legacy_lock(path):
             stream.seek(0)
             msvcrt.locking(stream.fileno(), msvcrt.LK_NBLCK, 1)
         except OSError as exc:
-            raise RuntimeError('Another RockPro CAD operation is running') from exc
+            raise CadBusyError('Another RockPro CAD operation is running') from exc
         try:
             yield
         finally:
@@ -67,7 +72,7 @@ def cad_writer_lock():
         if outcome == 0x80:
             raise RuntimeError('Previous CAD writer stopped unexpectedly; reconcile operation journal before retry')
         if outcome != 0:
-            raise RuntimeError('Another RockPro CAD operation is running')
+            raise CadBusyError('Another RockPro CAD operation is running')
         with ExitStack() as stack:
             for path in legacy_lock_paths():
                 stack.enter_context(_legacy_lock(path))

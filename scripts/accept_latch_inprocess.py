@@ -75,6 +75,8 @@ def main():
     p.add_argument('--corner-receipt',type=Path,required=True);p.add_argument('--corner-assets',type=Path,required=True)
     p.add_argument('--output',type=Path,required=True);p.add_argument('--expected-pid',type=int,required=True)
     p.add_argument('--preserve-dirty-context',action='store_true',help='Preserve an already dirty user context exactly; never save or modify it')
+    p.add_argument('--profile-spike-asset',type=Path,help='One exported profile for Reset/ResizeHeight proof on owncopy')
+    p.add_argument('--profiles-readback-only',action='store_true',help='24pinned source profiles wholebbox/frames/length getters+export only; no case build')
     p.add_argument('--single-size',nargs=3,type=float,metavar=('W','D','H'))
     p.add_argument('--handle-proof',type=Path,help='Known successful H7159 POC04 receipt; optional whole pair')
     p.add_argument('--compile-only',action='store_true');a=p.parse_args();folder=a.output.resolve()
@@ -113,7 +115,7 @@ def main():
         pins={str(q):file_sha256(q) for q in (dll,folder/managed_name(),folder/VENDOR.name)}
         exclusive_copy(a.source,folder/'source_disk_copy.ics')
         common={'expected_pid':a.expected_pid,'original_source':str(a.source.resolve()),'context':before['active_path'],'allow_dirty_context':bool(a.preserve_dirty_context)}
-        source_request=dict(common,source_copy=str(folder/'source_disk_copy.ics'))
+        source_request=dict(common,source_copy=str(folder/'source_disk_copy.ics'),profiles_only=bool(a.profiles_readback_only))
         handle_proof=None
         if a.handle_proof:
             handle_proof=json.loads(a.handle_proof.read_text(encoding='utf-8'))
@@ -124,6 +126,9 @@ def main():
             handle_copy=folder/'H7159_getter_asset_copy.ics';exclusive_copy(handle_proof['asset_path'],handle_copy)
             source_request['handle_asset']={'path':str(handle_copy),'sha256':handle_proof['asset_sha256']}
         write_receipt_once(folder/'source_request.json',source_request)
+        if a.profile_spike_asset:
+            spike_copy=folder/'profile_spike_working.ics';exclusive_copy(a.profile_spike_asset,spike_copy)
+            write_receipt_once(folder/'profile_spike_request.json',dict(common,asset_path=str(spike_copy),asset_sha256=file_sha256(spike_copy),target_span_mm=970,output=str(folder/'profile_spike_resized.ics')))
         write_receipt_once(folder/'pins.json',pins)
         def check_cancel():
             if (folder/'cancel.marker').exists():raise RuntimeError('Cancelled at safe phase boundary')
@@ -148,32 +153,41 @@ def main():
             if phase_after!=before:raise RuntimeError('Post-execution context/foreground changed')
         result={'passed':False,'before':before,'user_context_already_dirty':not before['saved'],'dirty_context_preservation_explicit':bool(a.preserve_dirty_context),'context_memory_disk_equivalence':'not claimed; context never saved/modified/closed'}
         try:
-            print('SOURCE WHOLE ROOT READ/EXPORT',flush=True);invoke('source');check_cancel()
-            fresh=json.loads((folder/'source_result.json').read_text(encoding='utf-8'));rows=fresh['rows']
-            receipt=json.loads(a.corner_receipt.read_text(encoding='utf-8'));assets=json.loads(a.corner_assets.read_text(encoding='utf-8'))
-            if not receipt['passed'] or receipt['source_sha256_before']!=SOURCE_SHA or assets['source_sha256']!=SOURCE_SHA:raise RuntimeError('Pinned corner provenance differs')
-            frame=receipt['plan']['binding']['case_frame']['matrix_world_mm'];minimum=frame[3][:3];cases=[]
-            requested=[('single_'+'x'.join(format(v,'g') for v in a.single_size),a.single_size)] if a.single_size else [('A_914x602x352',[914,602,352]),('B_1100x720x410',[1100,720,410])]
-            for label,size in requested:
-                latch=plan_latch_pairs([{k:r[k] for k in ('id','role','side','matrix_world_mm','local_bounds_mm')} for r in rows],minimum,[914,602,352],size);corner=plan_corner_resize(receipt['plan']['binding'],size)
-                ca=[]
-                for root in corner['assemblies']:
-                    asset=next(r for r in assets['roots'] if r['source_id']==root['id']);ca.append(dict(asset,matrix_world_mm=root['matrix_world_mm']))
-                la=[dict(r,asset_path=next(s['asset_path'] for s in rows if s['id']==r['id']),asset_sha256=next(s['asset_sha256'] for s in rows if s['id']==r['id'])) for r in latch['occurrences']]
-                cases.append({'label':label,'size':size,'case_min':minimum,'output':str(folder/('POC_zatrzaski_'+label+'.ics')),'panels':panel_occurrences(size,frame),'corners':corner['occurrences'],'corner_assets':ca,'latches':la,'handles':[]})
-                if handle_proof:
-                    origin=handle_proof['plan']['datum']['origin_mm'];base=size[2]-104.13
-                    for side,anchor_x in [('left',minimum[0]+180.5),('right',minimum[0]+size[0]-180.5)]:
-                        matrix=[[1,0,0,0],[0,-1,0,0],[0,0,-1,0],[anchor_x-origin[0],minimum[1]+origin[1],minimum[2]+base/2+origin[2],1]]
-                        cases[-1]['handles'].append({'id':'H7159-'+side,'asset_path':source_request['handle_asset']['path'],'asset_sha256':handle_proof['asset_sha256'],'matrix_world_mm':matrix})
-            check_cancel()
-            write_receipt_once(folder/'execute_request.json',dict(common,cases=cases))
-            print('EXECUTE '+str(len(cases))+' CASE(S)',flush=True);invoke('execute');results=[]
-            for c in cases:
-                pre=json.loads((folder/(c['label']+'_before.json')).read_text(encoding='utf-8'));post=json.loads((folder/(c['label']+'_after.json')).read_text(encoding='utf-8'))
-                gaps=validate_case(pre,post,c,rows,fresh.get('handle_reference'));output=Path(c['output']);archive=folder/(c['label']+'_snapshot.ics');exclusive_copy(output,archive)
-                results.append({'output_path':str(output),'sha256':file_sha256(output),'archive_path':str(archive),'archive_sha256':file_sha256(archive),'center_edge_gaps_mm':gaps,'size_mm':c['size'],'real_handle_assemblies':len(c['handles'])})
-            result.update(passed=True,cases=results,visual_qa='NOT_RUN',production_approved=False,scope='Regular10panel proxies+8real corners+4opaque latch halves'+('+2whole H7159 assemblies' if handle_proof else '')+'; not full Epson. Regenerated dimensions; no persistent mating constraints, no cuts or collision approval.')
+            if a.profile_spike_asset:
+                print('ONE PROFILE LENGTH SPIKE',flush=True);invoke('profile_spike');check_cancel()
+                result.update(passed=True,cases=[],profile_spike_only=True)
+            else:
+                print('SOURCE WHOLE ROOT READ/EXPORT',flush=True);invoke('source');check_cancel()
+            if a.profile_spike_asset:
+                pass
+            elif a.profiles_readback_only:
+                result.update(passed=True,cases=[],profiles_readback_file=str(folder/'profiles_result.json'),verification='wholeprofile readback+exports only; no case mutation')
+            else:
+                fresh=json.loads((folder/'source_result.json').read_text(encoding='utf-8'));rows=fresh['rows']
+                receipt=json.loads(a.corner_receipt.read_text(encoding='utf-8'));assets=json.loads(a.corner_assets.read_text(encoding='utf-8'))
+                if not receipt['passed'] or receipt['source_sha256_before']!=SOURCE_SHA or assets['source_sha256']!=SOURCE_SHA:raise RuntimeError('Pinned corner provenance differs')
+                frame=receipt['plan']['binding']['case_frame']['matrix_world_mm'];minimum=frame[3][:3];cases=[]
+                requested=[('single_'+'x'.join(format(v,'g') for v in a.single_size),a.single_size)] if a.single_size else [('A_914x602x352',[914,602,352]),('B_1100x720x410',[1100,720,410])]
+                for label,size in requested:
+                    latch=plan_latch_pairs([{k:r[k] for k in ('id','role','side','matrix_world_mm','local_bounds_mm')} for r in rows],minimum,[914,602,352],size);corner=plan_corner_resize(receipt['plan']['binding'],size)
+                    ca=[]
+                    for root in corner['assemblies']:
+                        asset=next(r for r in assets['roots'] if r['source_id']==root['id']);ca.append(dict(asset,matrix_world_mm=root['matrix_world_mm']))
+                    la=[dict(r,asset_path=next(s['asset_path'] for s in rows if s['id']==r['id']),asset_sha256=next(s['asset_sha256'] for s in rows if s['id']==r['id'])) for r in latch['occurrences']]
+                    cases.append({'label':label,'size':size,'case_min':minimum,'output':str(folder/('POC_zatrzaski_'+label+'.ics')),'panels':panel_occurrences(size,frame),'corners':corner['occurrences'],'corner_assets':ca,'latches':la,'handles':[]})
+                    if handle_proof:
+                        origin=handle_proof['plan']['datum']['origin_mm'];base=size[2]-104.13
+                        for side,anchor_x in [('left',minimum[0]+180.5),('right',minimum[0]+size[0]-180.5)]:
+                            matrix=[[1,0,0,0],[0,-1,0,0],[0,0,-1,0],[anchor_x-origin[0],minimum[1]+origin[1],minimum[2]+base/2+origin[2],1]]
+                            cases[-1]['handles'].append({'id':'H7159-'+side,'asset_path':source_request['handle_asset']['path'],'asset_sha256':handle_proof['asset_sha256'],'matrix_world_mm':matrix})
+                check_cancel()
+                write_receipt_once(folder/'execute_request.json',dict(common,cases=cases))
+                print('EXECUTE '+str(len(cases))+' CASE(S)',flush=True);invoke('execute');results=[]
+                for c in cases:
+                    pre=json.loads((folder/(c['label']+'_before.json')).read_text(encoding='utf-8'));post=json.loads((folder/(c['label']+'_after.json')).read_text(encoding='utf-8'))
+                    gaps=validate_case(pre,post,c,rows,fresh.get('handle_reference'));output=Path(c['output']);archive=folder/(c['label']+'_snapshot.ics');exclusive_copy(output,archive)
+                    results.append({'output_path':str(output),'sha256':file_sha256(output),'archive_path':str(archive),'archive_sha256':file_sha256(archive),'center_edge_gaps_mm':gaps,'size_mm':c['size'],'real_handle_assemblies':len(c['handles'])})
+                result.update(passed=True,cases=results,visual_qa='NOT_RUN',production_approved=False,scope='Regular10panel proxies+8real corners+4opaque latch halves'+('+2whole H7159 assemblies' if handle_proof else '')+'; not full Epson. Regenerated dimensions; no persistent mating constraints, no cuts or collision approval.')
         except Exception as e:result['error']=repr(e);raise
         finally:
             try:
