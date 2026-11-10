@@ -3,7 +3,8 @@
 Zacznij od [docs/KUBA_HANDOVER.md](docs/KUBA_HANDOVER.md), następnie tego pliku
 i [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md). Handover rozdziela główną gałąź,
 osobny tor T2, zasoby prywatne, podgląd Studio i natywne wykonanie CAD.
-Nie używaj starego main jako aktualnego stanu; brak prywatnego pakietu danych
+Od 10.11.2026 aktualny main jest w QooperBoy/RockPro; nie myl go ze starszą
+kopią qoopercodding/RockPro. Brak prywatnego pakietu danych
 nie upoważnia do tworzenia sztucznych manifestów ani publikowania modeli klienta.
 
 ## Rejestr przebiegu Studio — 31.10.2026

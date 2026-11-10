@@ -1,21 +1,24 @@
 # Start dla Kuby i jego agenta AI
 
 Stan przekazania: **3 listopada 2026**; kod funkcji do 31.10, kontrola paczek 03.11.
-Repozytorium: [qoopercodding/RockPro](https://github.com/qoopercodding/RockPro).
+Aktualizacja publikacji 10.11.2026: repozytorium
+[QooperBoy/RockPro](https://github.com/QooperBoy/RockPro), gałąź **main**.
 To prototyp developerski, bez odbioru produkcyjnego. [Starszy opis](KUBA_HANDOVER_20261021.md)
 pozostaje historią; nie używaj jego komend ani statusów jako aktualnego planu.
 
 ## Właściwy kod i pierwsza sesja
 
 ```powershell
-git clone --branch codex/roc42-catalog-continuation https://github.com/qoopercodding/RockPro.git
+git clone https://github.com/QooperBoy/RockPro.git
 cd RockPro
 git status --short
 git log -5 --oneline
 ```
 
-`codex/roc42-catalog-continuation` to główny tor Studio, nowych rodzin CAD,
-montażu i rejestru SDK/AI. `main` jest starszym wydaniem.
+`main` zawiera aktualny kod Studio, nowych rodzin CAD, montażu i rejestru SDK/AI.
+10.11 połączono obie historie bez force push; 19 commitów starego main miało
+odpowiedniki patchy w nowszym kodzie. Gałąź `codex/roc42-catalog-continuation`
+zachowuje wcześniejszy tor roboczy, a `qoopercodding/RockPro` jest starszą kopią.
 `codex/t2-parametryzacja` to osobny tor T2/T1 z drugiego czatu. Nie nakładaj go
 na bieżącą gałąź i nie scalaj automatycznie: najpierw porównaj kontrakty i testy.
 Gałęzie snapshotów są historią. Push nie aktualizuje Vercela ani zainstalowanej DLL.

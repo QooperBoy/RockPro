@@ -34,16 +34,18 @@ przez części i ich montaż, do kontrolowanego projektu IronCAD, snapshotu
 oraz zestawienia materiałów i firmowego Excela. Obliczenia mają wykonywać
 skrypty; AI pomaga w propozycjach i wyjątkach przez te same operacje.
 
-**Stan przekazania: 03.11.2026 — prototyp, bez odbioru produkcyjnego.** Aktualne Studio
-jest na gałęzi `codex/roc42-catalog-continuation`. `main` zawiera wcześniejszą
-integrację T1/T2; ten push nie scala ani nie nadpisuje innych gałęzi.
+**Stan publikacji: 10.11.2026 — prototyp, bez odbioru produkcyjnego.**
+Aktualny kod jest na `main` w [QooperBoy/RockPro](https://github.com/QooperBoy/RockPro).
+Historia wcześniejszego main i nowszych prac została zachowana. Gałąź
+`codex/roc42-catalog-continuation` zachowuje poprzedni tor roboczy;
+`codex/t2-parametryzacja` pozostaje osobnym torem do świadomej integracji.
 
 ## Start dla Kuby / udreka13
 
 Przyjmij zaproszenie do prywatnego repozytorium i pobierz właściwą gałąź:
 
 ```powershell
-git clone --branch codex/roc42-catalog-continuation https://github.com/qoopercodding/RockPro.git
+git clone https://github.com/QooperBoy/RockPro.git
 cd RockPro
 ```
 
@@ -52,7 +54,7 @@ zmiany i przełącz się na tę gałąź. Nie resetuj lokalnych zmian:
 
 ```powershell
 git fetch origin
-git switch codex/roc42-catalog-continuation
+git switch main
 git pull --ff-only
 ```
 
