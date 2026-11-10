@@ -84,7 +84,11 @@ Window A, Phoenix (the dashboard):
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Start-Phoenix.ps1
 ```
-Wait for the line `Uvicorn running on http://127.0.0.1:6006`.
+Wait for the line `Uvicorn running on http://127.0.0.1:6006`. A few `sqlalchemy`
+lines and Pydantic/SAWarning warnings before it are normal. If the script says a
+port is already in use, Phoenix is already running somewhere: just open
+http://127.0.0.1:6006, or close the other window first. Only one Phoenix and one
+Studio per port can run on this computer, including other users' RDP sessions.
 
 Window B, Studio (the configurator):
 ```powershell
@@ -265,5 +269,7 @@ releases.
 | `Wrong CAD host: API 29...` | The 2027 IronCAD is running. Close it and start 2023. |
 | `Przebieg Studio nie jest aktywny` | That run is already closed. Start a new one. |
 | `Najpierw zapisz powód interwencji AI` | Run `decide` before the `--origin ai` job, with the same ID. |
+| Phoenix: `Failed to bind to address 127.0.0.1:4317` / `port ... already in use` | Phoenix is already running (another window or RDP user). Use it at http://127.0.0.1:6006, or stop it first. |
+| Studio: address already in use on 8765 | Another Studio is running. Close it, or start yours with `--port 8766`. |
 | Exporter: `Phoenix did not accept the spans` | Window A (Phoenix) is not running. |
 | A corrected run still shows old values | Phoenix keeps the first copy of a span. Delete that trace (`DELETE http://127.0.0.1:6006/v1/traces/<trace id>`), remove the run from `export-state.json` and export again. |

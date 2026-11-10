@@ -19,6 +19,18 @@ if (-not (Test-Path -LiteralPath $exe)) {
     if ($LASTEXITCODE -ne 0) { throw 'Phoenix installation failed' }
 }
 if ($InstallOnly) { return }
+# Phoenix needs the web port and the gRPC port 4317. If either is taken, Phoenix is
+# usually already running (another window, another Windows user on this RDP machine).
+$busy = @(Get-NetTCPConnection -State Listen -LocalPort $Port, 4317 -ErrorAction SilentlyContinue)
+if ($busy.Count -gt 0) {
+    foreach ($c in $busy) {
+        $p = Get-Process -Id $c.OwningProcess -ErrorAction SilentlyContinue
+        Write-Output ("Port {0} is already in use by process {1} ({2})." -f $c.LocalPort, $c.OwningProcess, $p.ProcessName)
+    }
+    Write-Output "Phoenix is probably already running: open http://127.0.0.1:$Port"
+    Write-Output "To restart it, close the window that runs it (or: Stop-Process -Id <process>) and run this script again."
+    exit 1
+}
 $data = Join-Path $root 'artifacts\phoenix'
 New-Item -ItemType Directory -Force $data | Out-Null
 $env:PHOENIX_HOST = '127.0.0.1'
