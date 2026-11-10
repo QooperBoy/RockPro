@@ -129,9 +129,14 @@ nie dotyka CAD i odmawia zastąpienia istniejącego katalogu docelowego.
 
 ## Parametry i bezpieczna praca CAD
 
-Bieżący kierunek: **IronCAD 2027**. Firma ma także 2023; build dodatku 2023
-nie oznacza otwieralności ICS zapisanych w 2027. Patrz
-[macierz zgodności](IRONCAD_2023_COMPATIBILITY.md).
+Docelowa wersja: **IronCAD 2023** — klient pracuje na 2023 (potwierdzone
+ponownie 04.11.2026; jeden komputer firmy, konstruktorzy łączą się przez RDP).
+Dotychczasowe rodziny parametryczne zapisano w 2027 (`*_IC2027.ics`) i nie
+otwierają się w 2023; wymagają odtworzenia w 2023. Build dodatku 2023 tego nie
+zmienia. Patrz [macierz zgodności](IRONCAD_2023_COMPATIBILITY.md).
+10.11.2026 natywny test 2023 (część diagnostyczna, wiązanie parametru, zapis i
+ponowne otwarcie) wraz z rejestrem i panelem Phoenix: PASS —
+[OBSERVABILITY_HOWTO](OBSERVABILITY_HOWTO.md).
 
 **Nie dodawaj parametrów liczby okuć, pól `*_Liczba`, szyków ani automatycznego
 powielania/usuwania uchwytów, zawiasów i zamków w CAD.** Użytkownik wycofał to
@@ -160,7 +165,7 @@ Instalacja dodatku: Windows x64, własny IronCAD/ICAPI SDK i .NET Framework.
 Zapisz dokumenty i zamknij host przed instalacją:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\Setup.ps1 -Python python -IronCADYear 2027 -InstallAddin
+powershell -NoProfile -ExecutionPolicy Bypass -File .\Setup.ps1 -Python python -IronCADYear 2023 -InstallAddin
 ```
 
 Setup instaluje zależności z `requirements.txt`, buduje i rejestruje DLL.
@@ -170,9 +175,9 @@ Szczegóły: [HANDOVER](../HANDOVER.md), [AUTOSTART](../AUTOSTART.md).
 ## Weryfikacja i dalsze zadania
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Verify.ps1 -IronCADYear 2027
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Verify.ps1 -IronCADYear 2023
 # Po przygotowaniu SDK, dla zmiany dodatku:
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Verify.ps1 -IronCADYear 2027 -WithAddinBuild -WithUiChecks
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Verify.ps1 -IronCADYear 2023 -WithAddinBuild -WithUiChecks
 ```
 
 Dla samych dokumentów: `scripts/repo_audit.py`, odnośniki i zgodność komend.

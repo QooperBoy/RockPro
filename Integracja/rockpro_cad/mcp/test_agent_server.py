@@ -1,5 +1,6 @@
 import json
 import hashlib
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -110,11 +111,23 @@ class AgentPolicyTests(unittest.TestCase):
             log=session.log_path.read_text(encoding='utf-8')
             self.assertNotIn(str(source),log);self.assertNotIn('EB-L630U',log)
 
+    def test_client_name_is_logged_and_hostile_values_are_dropped(self):
+        session=self.session(dispatcher=Mock(return_value={}))
+        session.handle({'id':1,'method':'initialize','params':{'protocolVersion':'2025-06-18','clientInfo':{'name':'claude-code','version':'2.1.0'}}})
+        session.call('preview_layout',{'spec':{}})
+        log=json.loads(session.log_path.read_text(encoding='utf-8').splitlines()[0])
+        self.assertEqual(log['client'],'claude-code/2.1.0')
+        other=self.session(dispatcher=Mock(return_value={}))
+        other.handle({'id':1,'method':'initialize','params':{'clientInfo':{'name':'x\n{"forged":1}','version':'1'}}})
+        other.call('preview_layout',{'spec':{}})
+        self.assertIsNone(json.loads(other.log_path.read_text(encoding='utf-8'))['client'])
+
     def test_real_stdio_lists_only_proposal_tools_and_denies_execution(self):
         requests=[{'jsonrpc':'2.0','id':1,'method':'initialize','params':{'protocolVersion':'2025-06-18'}},
             {'jsonrpc':'2.0','id':2,'method':'tools/list'},
             {'jsonrpc':'2.0','id':3,'method':'tools/call','params':{'name':'execute_case_plan','arguments':{}}}]
-        run=subprocess.run([sys.executable,str(Path(__file__).with_name('agent_server.py'))],
+        env=dict(os.environ,ROCKPRO_AGENT_LOG_DIR=str(self.root))  # never pollute the real agent-runs dashboard
+        run=subprocess.run([sys.executable,str(Path(__file__).with_name('agent_server.py'))],env=env,
             input='\n'.join(json.dumps(r) for r in requests)+'\n',text=True,encoding='utf-8',capture_output=True,check=True,timeout=20)
         replies=[json.loads(line) for line in run.stdout.splitlines()]
         self.assertEqual(len(replies),3)
@@ -122,3 +135,4 @@ class AgentPolicyTests(unittest.TestCase):
         self.assertTrue(names<=ALLOWLIST);self.assertNotIn('execute_case_plan',names)
         self.assertTrue({'list_device_records','preview_catalog_layouts','preview_bound_device_layout'}<=names)
         self.assertEqual(self.code(replies[2]['result']),'AGENT_TOOL_DENIED')
+        self.assertEqual(len(list(self.root.glob('*.jsonl'))),1)

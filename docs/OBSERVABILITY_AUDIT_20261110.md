@@ -39,6 +39,20 @@ interventions. That makes it the right source of truth for the dashboard.
 4. **[MINOR]** `HANDOVER.md` still told AI clients to expect `server.py` with 8 tools;
    `configure.py` has pointed them at `agent_server.py` (19 tools) since ROC-26.
 
+5. **[MINOR, CONFIRMED]** The real-stdio test of `agent_server.py` wrote its session into
+   the real `artifacts/agent-runs`, so every test run would appear as an agent session on
+   the dashboard. Four such files were found and moved to `artifacts/agent-runs-test-leftovers`.
+   `ROCKPRO_AGENT_LOG_DIR` now redirects the log; the test uses a temp folder and checks it.
+6. **[ADDED]** Agent logs record the MCP `clientInfo` (e.g. `claude-code/2.x`,
+   `codex-mcp-client/…`) as `client`, limited to a short safe string. It is a label the
+   client reports, not proof of identity.
+7. **[ADDED]** `studio_process_run.py` takes `--database` (it always used the default
+   SQLite, while Studio may use another file) and a `decide` command that records an AI
+   decision with its reason and the current time.
+8. **[ADDED]** Phoenix exporter (`rockpro_cad/phoenix_export.py`, `scripts/export_to_phoenix.py`),
+   `scripts/Start-Phoenix.ps1`, the 2023 end-to-end job `scripts/run_2023_parametric_job.py`
+   and the guide [OBSERVABILITY_HOWTO.md](OBSERVABILITY_HOWTO.md).
+
 ## Open findings — need a decision
 
 **O1 [IMPORTANT, CONFIRMED] The AI share is weighted by job size, not by decisions.**
@@ -71,8 +85,47 @@ The run correctly cannot complete, but the dashboard needs a stale-run indicator
 That is correct for subscription clients (Claude Desktop, Codex); it can only be filled
 by an API-based agent or by the client's own telemetry export.
 
-**O7 [REQUIREMENT CONFLICT]** `docs/KUBA_HANDOVER.md` says the current direction is
-IronCAD 2027; the client uses 2023. For Marcin to confirm.
+**O7 [REQUIREMENT CONFLICT → docs updated]** `docs/KUBA_HANDOVER.md` said the current
+direction was IronCAD 2027; the client uses 2023. HANDOVER, KUBA_HANDOVER and DEVELOPMENT
+now name 2023 as the target. Marcin should still confirm the plan for the 2027-saved models (O10).
+
+**O8 [MINOR, CONFIRMED]** `timestamp_utc` is free text (up to 80 characters). Nothing checks
+the format, or that the time falls inside the run. In the E2E test, a hand-written decision
+dated 12:00 UTC stretched a 68-second run to 1 h 9 min in Phoenix. The exporter now bounds
+the run span by the run's own `created_at`/`updated_at` and counts
+`rockpro.events_outside_run_window`; the registry itself still accepts any text.
+Proposal: require ISO-8601 with a timezone in `validate_event`.
+
+**O9 [IMPORTANT, shared computer]** `agent_server.py` limits only what an agent can do
+*through RockPro*. Claude Code and Codex have their own file and shell tools. "Agents must
+not touch engineers' private files" has to be enforced by the client configuration and by
+Windows permissions, not by the MCP allowlist. See the admin section of
+[OBSERVABILITY_HOWTO](OBSERVABILITY_HOWTO.md).
+
+**O10 [BLOCKER for real families on 2023]** All six parametrized family models in the
+2026-11-03 package are saved in IronCAD 2027 (`*_IC2027.ics`), and 2023 cannot open them.
+The 2023 end-to-end proof therefore runs on a diagnostic part that the job creates itself.
+
+## End-to-end test — 10 November 2026, IronCAD 2023
+
+Host 25.0.0.18479 (base 2023, trial; the client has PU1 SP1). Steps exactly as in
+[OBSERVABILITY_HOWTO](OBSERVABILITY_HOWTO.md):
+
+| Step | Result |
+|---|---|
+| Python ↔ IronCAD COM after uninstalling 2027 | FAIL at first: stale per-user 29.0 ICAPI registrations ("error loading type library"). PASS after `Repair-IcApi.py --year 2023` (HKCU only, backed up), without restarting IronCAD |
+| Add-in build for 2023 | PASS (`Build.ps1 -IronCADYear 2023`); registration and panel click NOT RUN (they need IronCAD closed) |
+| Studio on a new database; save a draft in the wizard | PASS |
+| Process run bound to draft revision 1 | PASS |
+| Job "create" (C# probe): part, scene parameter, save, reopen | PASS |
+| Job "resize" (native expression): 20 → 40 mm, save, reopen at 40, then 60 and 20 | PASS |
+| AI decision (`decide`), then resize to 45 mm with `origin=ai` | PASS |
+| Close the run as `completed` | PASS: 36 steps, 26 standard / 10 AI (27.8 %), 4 jobs (3 standard, 1 AI), 1 decision; O1 is visible |
+| Agent session over stdio (one allowed and one denied call) | PASS: logged with the client name; the denied call shows `AGENT_TOOL_DENIED` |
+| Export to Phoenix 21.0.0, then re-export | PASS: 42 + 3 spans; the re-export sends nothing. Phoenix ignores span IDs it already has, so correcting a span means deleting its trace first |
+| Phoenix filters `attributes['rockpro']['origin'] == 'ai'` and `span_kind == 'AGENT'` | PASS |
+
+No source model was opened. Every CAD file is new, under `artifacts/`.
 
 ## Checked and holding
 
@@ -92,3 +145,7 @@ spans to a local Phoenix. Span attributes: `rockpro.origin`, `rockpro.executor`,
 `rockpro.stage`, `rockpro.run_id`, draft id/revision/SHA, occurrence id; CAD jobs as
 chain spans, agent tool calls as tool spans. Phoenix binds to 127.0.0.1 on the RockPro
 machine. Order: O1 decision → O2 link → exporter → agent-side traces.
+
+Status 10.11: the exporter is built and in use, without waiting for O1/O2. It shows the
+current step-weighted share (`rockpro.ops.*`) next to job counts (`rockpro.jobs.*`) and
+AI decisions, so O1 can be judged on real data. O2 still needs a decision.

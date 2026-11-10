@@ -9,6 +9,7 @@ from contextlib import redirect_stdout
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 import re
 import sys
@@ -61,12 +62,22 @@ def validate(value,schema,path='$',depth=0):
         for key,item in value.items():validate(item,properties.get(key,{}),path+'.'+str(key),depth+1)
 
 
+def client_label(params):
+    """Name/version the MCP client reports about itself; metadata, not identity proof."""
+    info=params.get('clientInfo') if isinstance(params,dict) else None
+    if not isinstance(info,dict):return None
+    parts=[str(info.get(k)) for k in ('name','version') if isinstance(info.get(k),(str,int,float))]
+    label='/'.join(parts)
+    return label if re.fullmatch(r'[A-Za-z0-9 ._@+/-]{1,80}',label or '') else None
+
+
 class AgentSession:
     def __init__(self,policy=None,log_dir=None,clock=time.perf_counter,dispatcher=None):
         self.policy=policy or Policy();self.clock=clock;self.started=clock();self.calls=0;self.failures={}
+        self.client=None  # MCP clientInfo from initialize, e.g. claude-code/2.x or codex-mcp-client/0.x
         self.schemas={r['name']:r for r in server.SCHEMAS if r['name'] in ALLOWLIST}
         self.dispatcher=dispatcher or server.dispatch
-        self.run_id=uuid.uuid4().hex;self.log_dir=Path(log_dir) if log_dir is not None else Path(__file__).resolve().parents[3]/'artifacts/agent-runs'
+        self.run_id=uuid.uuid4().hex;self.log_dir=Path(log_dir if log_dir is not None else os.environ.get('ROCKPRO_AGENT_LOG_DIR') or Path(__file__).resolve().parents[3]/'artifacts/agent-runs')
         self.log_dir.mkdir(parents=True,exist_ok=True);self.log_path=self.log_dir/(self.run_id+'.jsonl')
         self.log_path.touch(exist_ok=False);self.stop_path=self.log_dir/(self.run_id+'.stop')
         # Bind the run to the actual exposed contracts, not only numeric budgets.
@@ -79,6 +90,7 @@ class AgentSession:
             tool=tool if tool in self.schemas else 'denied',arguments_sha256=argument_sha,
             policy_sha256=self.policy_sha,toolset_sha256=self.toolset_sha,prompt_version=self.policy.prompt_version,
             result={'status':status},duration_ms=duration,tool_calls=self.calls,error_code=code,
+            client=self.client,
             model=None,reasoning_effort=None,tokens=None,cost=None,usage_status='unavailable',
             provenance='local tool execution; not model decision authorship')
         if self.log_path.stat().st_size>1024*1024:raise RuntimeError('Agent metadata log exhausted')
@@ -128,6 +140,7 @@ class AgentSession:
             params=request.get('params',{})
             result=self.call(params.get('name'),params.get('arguments',{}))
         elif method=='initialize':
+            self.client=client_label(request.get('params'))
             reply=server.handle(request)
             reply['result']['serverInfo']={'name':'rockpro-cad-proposals','version':'1.0.0'}
             return reply
