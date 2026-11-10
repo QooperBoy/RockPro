@@ -1,4 +1,6 @@
 import copy
+from contextlib import redirect_stderr
+import io
 import json
 from pathlib import Path
 import tempfile
@@ -93,6 +95,27 @@ class ProcessRunTests(unittest.TestCase):
         s=runs.read(self.run['id'])['summary'];self.assertEqual(s['completed'],1)
         self.assertEqual(s['by_origin']['unknown'],1);self.assertEqual(s['operations'][0]['occurrence_id'],'handle/1')
 
+    def test_trace_problems_never_change_the_job_outcome(self):
+        p=self.root/'native_progress.jsonl'
+        raw=json.dumps(dict(event='operation_finished',operation='native.create',result={'status':'passed'}))
+        p.write_text(raw,encoding='utf-8')  # missing final newline
+        with redirect_stderr(io.StringIO()):
+            with capture(dict(run_id=self.run['id'],origin='standard'),self.root):done=True
+        self.assertTrue(done)
+        spans=runs.read(self.run['id'])['summary']['spans']
+        self.assertEqual(sorted(s['status'] for s in spans),['failed','success'])
+        self.assertIn('Niepełny ślad natywny',[s for s in spans if s['status']=='failed'][0]['reason'])
+        p.write_text('not json\n',encoding='utf-8')
+        with redirect_stderr(io.StringIO()),self.assertRaises(RuntimeError) as caught:
+            with capture(dict(run_id=self.run['id'],origin='standard'),self.root):raise RuntimeError('Native job failed')
+        self.assertEqual(str(caught.exception),'Native job failed')
+        self.assertIn('JSONDecodeError',caught.exception.__notes__[0])
+        other=runs.create(self.saved['id'],1,'Zamknięty w trakcie')
+        with redirect_stderr(io.StringIO()):
+            with capture(dict(run_id=other['id'],origin='standard'),self.root/'missing'):
+                runs.append(other['id'],state='partial')
+        self.assertEqual(runs.read(other['id'])['state'],'partial')
+
     def test_native_trace_reimport_deduplicates_and_truncation_rejected(self):
         raw=dict(event='operation_finished',operation='native.create',result={'status':'passed'})
         p=self.root/'native_progress.jsonl';p.write_text(json.dumps(raw)+'\n',encoding='utf-8')
@@ -136,6 +159,9 @@ class ProcessRunTests(unittest.TestCase):
             conn.request('POST','/process-test/process',payload,headers)
             response=conn.getresponse();self.assertEqual(response.status,200)
             self.assertEqual(json.loads(response.read())['summary']['completed'],1)
+            for body in ('[]','"append"'):
+                conn.request('POST','/process-test/process',body,headers)
+                response=conn.getresponse();self.assertEqual(response.status,400);response.read()
             conn.close()
         finally:
             server.shutdown();server.server_close();thread.join(timeout=2)

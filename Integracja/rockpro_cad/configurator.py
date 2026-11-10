@@ -53,7 +53,8 @@ def validate(value):
         ids.append(c['id'])
         if not isinstance(c['label'], str) or not 1 <= len(c['label'].strip()) <= 100:
             raise ValueError('Podaj nazwę każdej sekcji pokrywy')
-        if c['face'] not in FACES or c['kind'] not in ('hinged', 'removable') or c['hinge_edge'] not in ('low', 'high'):
+        if (not isinstance(c['face'], str) or c['face'] not in FACES
+                or c['kind'] not in ('hinged', 'removable') or c['hinge_edge'] not in ('low', 'high')):
             raise ValueError('Nieprawidłowa ściana lub sposób otwierania')
         if not number(c['depth_mm'], 2*d['thickness_mm'], 3000):
             raise ValueError('Wysokość/głębokość pokrywy: od 2 grubości sklejki do 3000 mm')

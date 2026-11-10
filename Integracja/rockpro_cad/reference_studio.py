@@ -182,6 +182,7 @@ def make_handler(catalog, images, token, preview=None, previews=None, hardware_i
                     raise ValueError('Nieprawidłowy rozmiar szkicu')
                 draft = json.loads(self.rfile.read(length).decode('utf-8'))
                 if self.endpoint() == 'process':
+                    if not isinstance(draft, dict): raise ValueError('Nieprawidłowe polecenie rejestru')
                     action=draft.get('action')
                     if action == 'create':
                         receipt=process_runs.create(draft['draft_id'],draft['revision'],draft['label'],draft.get('mode','actual'))

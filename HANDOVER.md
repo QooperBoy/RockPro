@@ -32,7 +32,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\Setup.ps1 -Python python -
 Jeżeli nie ma przycisku: sprawdź SDK, wynik kompilacji, rejestrację HKCU i restart IronCAD. Jeśli COM nie widzi dokumentu: otwórz wskazany plik, zamknij modalne dialogi i sprawdź zgodność sesji/uprawnień. Nie naprawiaj tego przez wyłączanie walidacji.
 
 ## Podłączenie agenta AI
-Panel sam uruchamia MCP jako lokalny subprocess stdio, nie potrzebuje klucza AI. `configure.py` generuje `mcp-config.local.json` z absolutnymi ścieżkami dla klienta obsługującego format mcpServers. W Codex/innym kliencie przenieś wartości command i args do formatu jego konfiguracji; nie nadpisuj pozostałych serwerów. Uruchom ponownie klienta i sprawdź tools/list (8 narzędzi). Serwer: `Integracja/rockpro_cad/mcp/server.py`.
+Panel sam uruchamia MCP jako lokalny subprocess stdio, nie potrzebuje klucza AI. `configure.py` generuje `mcp-config.local.json` z absolutnymi ścieżkami dla klienta obsługującego format mcpServers. W Codex/innym kliencie przenieś wartości command i args do formatu jego konfiguracji; nie nadpisuj pozostałych serwerów. Uruchom ponownie klienta i sprawdź tools/list. Klient AI dostaje `Integracja/rockpro_cad/mcp/agent_server.py` (tylko allowlista odczytu i propozycji, [AGENT_RUN_POLICY](docs/AGENT_RUN_POLICY.md)); panel nadal używa operatorowego `server.py`.
 
 Narzędzia: inspect_project, change_dimensions_on_copy, list_projects, save_project, get_project, set_stage, list_snapshots, create_snapshot. Nie ma portu HTTP. Nie dodawaj narzędzia wykonującego dowolny Python/polecenia powłoki.
 
