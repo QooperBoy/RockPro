@@ -65,7 +65,11 @@ def collect(database, agent_dir, state, agent_idle, flush):
         if state['runs'].get(report['id']) == report['updated_at']:
             continue
         if report['state'] == 'running' and not flush:
-            pending.append('run ' + report['id'] + ' (still running)')
+            failed = sum(1 for e in report['events'] if e.get('status') == 'failed')
+            pending.append(f"run {report['id']} '{report.get('label', '')}' is still open "
+                           f"(started {report['created_at'][:19]}Z, {len(report['events'])} events, "
+                           f"{failed} failed). It is sent when closed with "
+                           f"studio_process_run.py finish {report['id']} completed|partial|failed")
             continue
         batches.append((('runs', report['id'], report['updated_at']), phoenix_export.run_spans(report)))
     for log in sorted(Path(agent_dir).glob('*.jsonl')) if Path(agent_dir).exists() else []:

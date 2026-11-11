@@ -111,8 +111,12 @@ changes every time Studio starts.
 
 ## 3. Run the job and record it
 
-Open a third PowerShell window in the repository folder. Keep IronCAD 2023
-open and idle. Don't click in it while the job runs.
+**First start IronCAD 2023** and wait until its main window is ready (close
+the trial/licence dialog). The job attaches to a running IronCAD and does not
+start one; without it you get `MK_E_UNAVAILABLE` / `Operacja niedostępna`.
+Keep IronCAD open and idle; don't click in it while the job runs.
+
+Open a third PowerShell window in the repository folder.
 
 ```powershell
 $py = 'Integracja\.venv\Scripts\python.exe'
@@ -143,6 +147,12 @@ Your own models are never opened.
 `finish ... completed` is refused if anything failed or is still running.
 In that case close it with `partial` or `failed`; that refusal is intentional.
 
+**Every `start` opens a new run, and it stays open until you `finish` it.** If
+a job failed, or you ran `start` twice, close the run you abandoned, e.g.
+`finish <old run id> failed`. Otherwise the exporter keeps printing
+`waiting: run ... is still open` for it. Nothing is actually running then;
+the run is just not closed.
+
 ## 4. Send it to Phoenix
 
 ```powershell
@@ -153,7 +163,8 @@ The exporter prints lines like these:
 
 - `sent run <id>: 42 spans`
 - `sent agent <file>: 3 spans`
-- `waiting: ...` for things still running
+- `waiting: run ... is still open` for a run that was not closed with `finish`
+  (see the bold note above), or `waiting: agent session ...` for an agent that was active in the last 5 minutes
 - `nothing new`
 
 To keep the dashboard up to date automatically, leave this running in its own
@@ -265,6 +276,8 @@ releases.
 | Symptom | Fix |
 |---|---|
 | `COMError ... error loading type library/DLL` | Run step 0.3, then retry. |
+| `MK_E_UNAVAILABLE` / `Operacja niedostępna` from `GetActiveObject` | IronCAD 2023 is not running (or still shows a start dialog). Start it, wait for the main window, retry. Close the run of the failed attempt with `finish <id> failed`. |
+| Exporter keeps printing `waiting: run ... is still open` | That run was never closed. Close it with `finish <id> failed` (or `partial`). |
 | `Operation unavailable` / nothing happens | IronCAD shows a dialog (trial, licence, save?). Close it and retry. |
 | `Wrong CAD host: API 29...` | The 2027 IronCAD is running. Close it and start 2023. |
 | `Przebieg Studio nie jest aktywny` | That run is already closed. Start a new one. |
