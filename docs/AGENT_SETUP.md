@@ -120,20 +120,25 @@ calls within 120 seconds of its first call; after that, every call is refused.
    $run = '<run id from the output>'
    ```
 2. **Ask the agent** (in Claude Code or Codex, started as above):
-   > Use only the rockpro-cad tools. Call `preview_case` for a simple case of
-   > your choice and look at the panel thickness it uses. Propose one panel
-   > thickness in whole millimetres between 5 and 500 (not 60) for a test
-   > part, and explain in two sentences which tool result you based it on.
-   > Don't edit any files.
+   > Use only the rockpro-cad tools and don't read or edit any files. Call
+   > `preview_layout` once with `{"spec": {"name": "Test device", "x": 545, "y": 436, "z": 164, "count": 1}}`.
+   > From the result, read the panel thickness (`parameters.RP_Thickness`).
+   > Propose one panel thickness in whole millimetres between 5 and 500
+   > (not 60) for a test part. Explain in two sentences which tool result
+   > you based it on.
+
+   Don't use `preview_case` for this test. It needs a complete case plan
+   (about 42 KB) unless a project has a saved case request, and an agent
+   can't write that by hand within the session budget.
 3. **Find the agent session id**: the newest file in `artifacts\agent-runs`
    (the command in section 3).
 4. **Record the decision** with the agent's own reason and the session id:
    ```powershell
    & $py -X utf8 scripts\studio_process_run.py --database $db decide $run ai/agent-thickness "agent_session=<session id> client=claude-code: <paste the agent's reason>"
    ```
-5. **Run the job with the agent's value** (here 18 mm as an example):
+5. **Run the job with the agent's value** (here 9 mm as an example):
    ```powershell
-   & $py -X utf8 scripts\run_2023_parametric_job.py --run-id $run --database $db --target-mm 18 --origin ai --intervention-id ai/agent-thickness
+   & $py -X utf8 scripts\run_2023_parametric_job.py --run-id $run --database $db --target-mm 9 --origin ai --intervention-id ai/agent-thickness
    ```
    It must end with `"passed": true`, and `native_expression_resize` must show the agent's value.
 6. **Close and export:**
@@ -195,5 +200,6 @@ you install, and test by asking the agent to read a file it shouldn't.
 | Claude Code doesn't ask about `.mcp.json` | It was opened in another folder, or you declined earlier. Open it in the RockPro folder; check `/mcp`. |
 | Agent says a tool is refused (`AGENT_TOOL_DENIED`) | The tool is not on the allowlist, by design. |
 | `AGENT_TIME_LIMIT` or `AGENT_CALL_LIMIT` | Session budget (`Policy` in `agent_server.py`): 30 calls and 120 s, counted from the agent's first RockPro call. Start a new client session (Claude Code: new session; Codex: restart). Keep one task per session. Audit O11. |
+| Tool call shows `blocked` (red in Phoenix, `AGENT_TOOL_BLOCKED`) | The tool rejected the input and told the agent why. `diagnostic_codes` in the log says what was wrong, e.g. `FIELD_REQUIRED`. |
 | No new file in `artifacts\agent-runs` | The agent didn't call any RockPro tool, or `ROCKPRO_AGENT_LOG_DIR` points elsewhere. |
 | Exporter: `waiting: agent session …` | Normal while the agent is active; sent after 5 idle minutes (or `--agent-idle 0`). |

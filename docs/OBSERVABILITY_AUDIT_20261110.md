@@ -116,6 +116,19 @@ calls, is still refused until the client is restarted. The budget fits autonomou
 not conversations. Options for Marcin: a per-turn budget, an idle reset, or a larger
 limit configured per client in `.mcp.json`.
 
+**O12 [IMPORTANT, CONFIRMED, fixed 12.11]** The agent log recorded a tool call as
+`passed` whenever the tool did not raise. Tools such as `preview_case` report rejected
+input as data (`"status": "blocked"` with diagnostics), so in the first real Claude Code
+session 11 rejected `preview_case` calls showed as passed, and Phoenix would have shown
+them green. The log now writes `blocked` / `AGENT_TOOL_BLOCKED` with the tool's
+status and its diagnostic codes only (no paths or messages). The exporter shows these
+spans as errors and counts `rockpro.agent.blocked_calls`. The agent's response is unchanged.
+
+Observed in the same session: the only project had no saved case request, so a
+`preview_case` call needed a complete 42 KB plan written by hand. The agent spent its
+120 s budget on that and was then refused (O11 in practice). The test now uses
+`preview_layout` ([AGENT_SETUP.md](AGENT_SETUP.md), section 4).
+
 ## End-to-end test — 10 November 2026, IronCAD 2023
 
 Host 25.0.0.18479 (base 2023, trial; the client has PU1 SP1). Steps exactly as in

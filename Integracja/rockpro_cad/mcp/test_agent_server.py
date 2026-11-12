@@ -56,6 +56,22 @@ class AgentPolicyTests(unittest.TestCase):
         self.assertTrue(data['agent_run']['budget_exceeded_after_call'])
         self.assertEqual(self.code(session.call('preview_layout',{'spec':{}})),'AGENT_TIME_LIMIT')
 
+    def test_blocked_tool_result_is_logged_as_blocked_with_codes_only(self):
+        blocked={'status':'blocked','changes':[],'diagnostics':[
+            {'code':'FIELD_REQUIRED','path':'$.manifest','message':'SECRET_REQUEST_TEXT'},
+            {'code':'bad code; rm -rf','message':'x'}]}
+        session=self.session(dispatcher=Mock(return_value=blocked))
+        result=session.call('preview_layout',{'spec':{}})
+        self.assertFalse(result['isError'])  # the agent still receives the diagnostics as before
+        log=json.loads(session.log_path.read_text(encoding='utf-8').splitlines()[0])
+        self.assertEqual((log['result']['status'],log['error_code'],log['tool_status']),('blocked','AGENT_TOOL_BLOCKED','blocked'))
+        self.assertEqual(log['diagnostic_codes'],['FIELD_REQUIRED'])
+        self.assertNotIn('SECRET_REQUEST_TEXT',session.log_path.read_text(encoding='utf-8'))
+        ok=self.session(dispatcher=Mock(return_value={'status':'planned'}))
+        ok.call('preview_layout',{'spec':{}})
+        row=json.loads(ok.log_path.read_text(encoding='utf-8'))
+        self.assertEqual((row['result']['status'],row['tool_status'],row['diagnostic_codes']),('passed','planned',None))
+
     def test_time_budget_starts_at_first_call_not_when_client_opens(self):
         clock=[0.]
         session=self.session(policy=Policy(max_seconds=120),clock=lambda:clock[0],dispatcher=Mock(return_value={'ok':True}))

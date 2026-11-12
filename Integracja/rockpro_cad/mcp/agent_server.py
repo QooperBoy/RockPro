@@ -86,13 +86,15 @@ class AgentSession:
         self.toolset_sha=hashlib.sha256(json.dumps(self.schemas,sort_keys=True,separators=(',',':')).encode()).hexdigest()
         self.policy_sha=hashlib.sha256(json.dumps(dict(policy=self.policy.__dict__,toolset_sha256=self.toolset_sha),sort_keys=True).encode()).hexdigest()
 
-    def _log(self,tool,argument_sha,status,duration,code=None):
+    def _log(self,tool,argument_sha,status,duration,code=None,tool_status=None,diagnostic_codes=None):
         row=dict(schema_version=1,run_id=self.run_id,timestamp_utc=datetime.now(timezone.utc).isoformat(),
             event='operation_finished',operation='agent.tool',actor='agent',
             tool=tool if tool in self.schemas else 'denied',arguments_sha256=argument_sha,
             policy_sha256=self.policy_sha,toolset_sha256=self.toolset_sha,prompt_version=self.policy.prompt_version,
             result={'status':status},duration_ms=duration,tool_calls=self.calls,error_code=code,
             client=self.client,
+            tool_status=tool_status if tool_status is None or re.fullmatch(r'[a-z_]{1,40}',tool_status) else 'other',
+            diagnostic_codes=diagnostic_codes or None,
             model=None,reasoning_effort=None,tokens=None,cost=None,usage_status='unavailable',
             provenance='local tool execution; not model decision authorship')
         if self.log_path.stat().st_size>1024*1024:raise RuntimeError('Agent metadata log exhausted')
@@ -126,7 +128,13 @@ class AgentSession:
             self._log(name,argument_sha,'failed',(self.clock()-start)*1000,'AGENT_TOOL_FAILED')
             return self._error('AGENT_TOOL_FAILED',str(exc))
         duration=(self.clock()-start)*1000
-        self._log(name,argument_sha,'passed',duration)
+        # Tools report refused input as data ({"status": "blocked", "diagnostics": [...]}),
+        # not as an exception. Log that as blocked, with the diagnostic codes only.
+        tool_status=result.get('status') if isinstance(result,dict) and isinstance(result.get('status'),str) else None
+        codes=[d.get('code') for d in (result.get('diagnostics') or [])[:5] if isinstance(d,dict)] if isinstance(result,dict) and isinstance(result.get('diagnostics'),list) else []
+        codes=[c for c in codes if isinstance(c,str) and re.fullmatch(r'[A-Z][A-Z0-9_]{0,39}',c)]
+        if tool_status=='blocked':self._log(name,argument_sha,'blocked',duration,'AGENT_TOOL_BLOCKED',tool_status,codes)
+        else:self._log(name,argument_sha,'passed',duration,None,tool_status,codes)
         # A completed call is returned even if its duration passed the budget.
         # Subsequent calls are refused; no worker or host is killed mid-operation.
         data=dict(tool_result=result,agent_run=dict(run_id=self.run_id,tool_calls=self.calls,

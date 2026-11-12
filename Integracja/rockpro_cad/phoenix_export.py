@@ -163,24 +163,28 @@ def agent_spans(rows, run_id=None):
             'rockpro.arguments_sha256': row.get('arguments_sha256'),
             'rockpro.duration_ms': row.get('duration_ms'), 'rockpro.client': row.get('client'),
             'rockpro.studio_run_id': row.get('studio_run_id'),
+            'rockpro.tool_status': row.get('tool_status'),
+            'rockpro.diagnostic_codes': ','.join(row.get('diagnostic_codes') or []) or None,
             'llm.model_name': row.get('model'),
         }
         spans.append(_span(trace, _id('agent', run_id, index, size=8), root, 'tool: ' + str(row.get('tool')),
-                           'TOOL', start, end, 'ERROR' if status == 'failed' else ('UNSET' if status == 'limited' else 'OK'),
+                           'TOOL', start, end, 'ERROR' if status in ('failed', 'blocked') else ('UNSET' if status == 'limited' else 'OK'),
                            attributes))
     first = rows[0] if rows else {}
     client = next((r.get('client') for r in rows if r.get('client')), None)
     failed = sum((r.get('result') or {}).get('status') == 'failed' for r in rows)
     limited = sum((r.get('result') or {}).get('status') == 'limited' for r in rows)
+    blocked = sum((r.get('result') or {}).get('status') == 'blocked' for r in rows)
     starts = [_time(s['start'], now) for s in spans] or [now]
     ends = [_time(s['end'], now) for s in spans] or [now]
     attributes = {
         'openinference.span.kind': 'AGENT', 'rockpro.agent.run_id': run_id, 'rockpro.client': client,
         'rockpro.agent.tool_calls': len(rows), 'rockpro.agent.failed_calls': failed,
-        'rockpro.agent.refused_calls': limited, 'rockpro.agent.prompt_version': first.get('prompt_version'),
+        'rockpro.agent.refused_calls': limited, 'rockpro.agent.blocked_calls': blocked,
+        'rockpro.agent.prompt_version': first.get('prompt_version'),
         'rockpro.agent.policy_sha256': first.get('policy_sha256'), 'rockpro.agent.toolset_sha256': first.get('toolset_sha256'),
         'rockpro.agent.usage_status': first.get('usage_status'),
-        'output.value': json.dumps(dict(tools=sorted({str(r.get('tool')) for r in rows}), failed=failed, refused=limited)),
+        'output.value': json.dumps(dict(tools=sorted({str(r.get('tool')) for r in rows}), failed=failed, blocked=blocked, refused=limited)),
     }
     spans.insert(0, _span(trace, root, None, 'Agent session' + (f' ({client})' if client else ''), 'AGENT',
                           min(starts), max(ends), 'ERROR' if failed else 'OK', attributes))

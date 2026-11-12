@@ -77,5 +77,14 @@ class PhoenixExportTests(unittest.TestCase):
         self.assertEqual([s['parent_id'] for s in spans[1:]],[spans[0]['span_id']]*2)
         self.assertEqual(spans[2]['attributes']['rockpro.error_code'],'AGENT_TOOL_DENIED')
 
+    def test_blocked_tool_result_is_an_error_span_and_counted(self):
+        rows=[dict(run_id='r2',timestamp_utc='2026-11-12T10:00:54+00:00',tool='preview_case',result={'status':'blocked'},
+                   duration_ms=3,tool_calls=1,error_code='AGENT_TOOL_BLOCKED',tool_status='blocked',
+                   diagnostic_codes=['FIELD_REQUIRED'])]
+        spans=phoenix_export.agent_spans(rows,'r2')
+        self.assertEqual(spans[1]['status'],'ERROR')
+        self.assertEqual(spans[1]['attributes']['rockpro.diagnostic_codes'],'FIELD_REQUIRED')
+        self.assertEqual(spans[0]['attributes']['rockpro.agent.blocked_calls'],1)
+
 
 if __name__=='__main__':unittest.main()
