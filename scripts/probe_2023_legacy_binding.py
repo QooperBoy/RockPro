@@ -19,9 +19,11 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def run(source, expected_sha256, output):
+def run(source, expected_sha256, output, target_mm=40):
     if selected_year() != 2023:
         raise ValueError('This diagnostic targets IronCAD 2023 only')
+    if not (type(target_mm) in (int, float) and 5 <= target_mm <= 500 and target_mm != 60):
+        raise ValueError('target_mm must be 5..500 mm and differ from the 60 mm re-check')
     source = Path(source).resolve(strict=True)
     output = Path(output).resolve()
     if sha(source) != expected_sha256:
@@ -34,7 +36,7 @@ def run(source, expected_sha256, output):
     from ironcad_adapter import connect
     legacy_api = comtypes.client.GetModule(str(installation_dir() / 'bin/IronCad.tlb'))
     result = dict(passed=False, source_sha256=expected_sha256, checks=[],
-                  binding_mode='native_legacy_sizebox_expression')
+                  binding_mode='native_legacy_sizebox_expression', target_mm=target_mm)
     owned = None
     base = None
 
@@ -88,8 +90,8 @@ def run(source, expected_sha256, output):
             expression = r'Parent\Params\RP_ProbeThickness'
             variable.Expression = expression
             parameter = scene.ParameterMgr.GetParameterByName('RP_ProbeThickness')
-            parameter.Expression = '40 mm'
-            measure(scene, part, 'native_expression_resize', 40)
+            parameter.Expression = f'{target_mm} mm'
+            measure(scene, part, 'native_expression_resize', target_mm)
             saved = output / 'bound.ics'
             scene.SaveAs(str(saved), api.Z_LINKS_COPY_ALL, False)
             if owned.Modified:
@@ -102,7 +104,7 @@ def run(source, expected_sha256, output):
             scene, part, variable = objects(saved)
             if variable.Expression != expression:
                 raise ValueError('Native expression did not survive reopening')
-            measure(scene, part, 'reopened', 40)
+            measure(scene, part, 'reopened', target_mm)
             parameter = scene.ParameterMgr.GetParameterByName('RP_ProbeThickness')
             parameter.Expression = '60 mm'
             measure(scene, part, 'post_reopen_parameter_only_resize', 60)
@@ -136,7 +138,8 @@ if __name__ == '__main__':
     parser.add_argument('--source', required=True, type=Path)
     parser.add_argument('--expected-sha256', required=True)
     parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--target-mm', type=float, default=40)
     args = parser.parse_args()
-    report = run(args.source, args.expected_sha256, args.output)
+    report = run(args.source, args.expected_sha256, args.output, args.target_mm)
     print(json.dumps(report, ensure_ascii=True))
     raise SystemExit(0 if report['passed'] else 1)

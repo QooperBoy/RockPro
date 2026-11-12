@@ -9,6 +9,7 @@ from contextlib import redirect_stdout
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 import re
 import sys
@@ -61,24 +62,39 @@ def validate(value,schema,path='$',depth=0):
         for key,item in value.items():validate(item,properties.get(key,{}),path+'.'+str(key),depth+1)
 
 
+def client_label(params):
+    """Name/version the MCP client reports about itself; metadata, not identity proof."""
+    info=params.get('clientInfo') if isinstance(params,dict) else None
+    if not isinstance(info,dict):return None
+    parts=[str(info.get(k)) for k in ('name','version') if isinstance(info.get(k),(str,int,float))]
+    label='/'.join(parts)
+    return label if re.fullmatch(r'[A-Za-z0-9 ._@+/-]{1,80}',label or '') else None
+
+
 class AgentSession:
     def __init__(self,policy=None,log_dir=None,clock=time.perf_counter,dispatcher=None):
-        self.policy=policy or Policy();self.clock=clock;self.started=clock();self.calls=0;self.failures={}
+        # The time budget starts at the first tool call. Interactive clients (Claude Code,
+        # Codex) start this process when the window opens, long before the agent acts.
+        self.policy=policy or Policy();self.clock=clock;self.started=None;self.calls=0;self.failures={}
+        self.client=None  # MCP clientInfo from initialize, e.g. claude-code/2.x or codex-mcp-client/0.x
         self.schemas={r['name']:r for r in server.SCHEMAS if r['name'] in ALLOWLIST}
         self.dispatcher=dispatcher or server.dispatch
-        self.run_id=uuid.uuid4().hex;self.log_dir=Path(log_dir) if log_dir is not None else Path(__file__).resolve().parents[3]/'artifacts/agent-runs'
+        self.run_id=uuid.uuid4().hex;self.log_dir=Path(log_dir if log_dir is not None else os.environ.get('ROCKPRO_AGENT_LOG_DIR') or Path(__file__).resolve().parents[3]/'artifacts/agent-runs')
         self.log_dir.mkdir(parents=True,exist_ok=True);self.log_path=self.log_dir/(self.run_id+'.jsonl')
         self.log_path.touch(exist_ok=False);self.stop_path=self.log_dir/(self.run_id+'.stop')
         # Bind the run to the actual exposed contracts, not only numeric budgets.
         self.toolset_sha=hashlib.sha256(json.dumps(self.schemas,sort_keys=True,separators=(',',':')).encode()).hexdigest()
         self.policy_sha=hashlib.sha256(json.dumps(dict(policy=self.policy.__dict__,toolset_sha256=self.toolset_sha),sort_keys=True).encode()).hexdigest()
 
-    def _log(self,tool,argument_sha,status,duration,code=None):
+    def _log(self,tool,argument_sha,status,duration,code=None,tool_status=None,diagnostic_codes=None):
         row=dict(schema_version=1,run_id=self.run_id,timestamp_utc=datetime.now(timezone.utc).isoformat(),
             event='operation_finished',operation='agent.tool',actor='agent',
             tool=tool if tool in self.schemas else 'denied',arguments_sha256=argument_sha,
             policy_sha256=self.policy_sha,toolset_sha256=self.toolset_sha,prompt_version=self.policy.prompt_version,
             result={'status':status},duration_ms=duration,tool_calls=self.calls,error_code=code,
+            client=self.client,
+            tool_status=tool_status if tool_status is None or re.fullmatch(r'[a-z_]{1,40}',tool_status) else 'other',
+            diagnostic_codes=diagnostic_codes or None,
             model=None,reasoning_effort=None,tokens=None,cost=None,usage_status='unavailable',
             provenance='local tool execution; not model decision authorship')
         if self.log_path.stat().st_size>1024*1024:raise RuntimeError('Agent metadata log exhausted')
@@ -89,6 +105,7 @@ class AgentSession:
 
     def call(self,name,arguments):
         start=self.clock();self.calls+=1
+        if self.started is None:self.started=start
         payload=json.dumps(arguments,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False)
         argument_sha=hashlib.sha256(payload.encode()).hexdigest();fingerprint=(name,argument_sha)
         if self.calls>self.policy.max_tool_calls:code='AGENT_CALL_LIMIT'
@@ -111,7 +128,13 @@ class AgentSession:
             self._log(name,argument_sha,'failed',(self.clock()-start)*1000,'AGENT_TOOL_FAILED')
             return self._error('AGENT_TOOL_FAILED',str(exc))
         duration=(self.clock()-start)*1000
-        self._log(name,argument_sha,'passed',duration)
+        # Tools report refused input as data ({"status": "blocked", "diagnostics": [...]}),
+        # not as an exception. Log that as blocked, with the diagnostic codes only.
+        tool_status=result.get('status') if isinstance(result,dict) and isinstance(result.get('status'),str) else None
+        codes=[d.get('code') for d in (result.get('diagnostics') or [])[:5] if isinstance(d,dict)] if isinstance(result,dict) and isinstance(result.get('diagnostics'),list) else []
+        codes=[c for c in codes if isinstance(c,str) and re.fullmatch(r'[A-Z][A-Z0-9_]{0,39}',c)]
+        if tool_status=='blocked':self._log(name,argument_sha,'blocked',duration,'AGENT_TOOL_BLOCKED',tool_status,codes)
+        else:self._log(name,argument_sha,'passed',duration,None,tool_status,codes)
         # A completed call is returned even if its duration passed the budget.
         # Subsequent calls are refused; no worker or host is killed mid-operation.
         data=dict(tool_result=result,agent_run=dict(run_id=self.run_id,tool_calls=self.calls,
@@ -128,6 +151,7 @@ class AgentSession:
             params=request.get('params',{})
             result=self.call(params.get('name'),params.get('arguments',{}))
         elif method=='initialize':
+            self.client=client_label(request.get('params'))
             reply=server.handle(request)
             reply['result']['serverInfo']={'name':'rockpro-cad-proposals','version':'1.0.0'}
             return reply

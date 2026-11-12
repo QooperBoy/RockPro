@@ -8,6 +8,8 @@
 Integracja/skeleton_state.json
 Integracja/skeleton/demo/skeleton_manifest.json
 mcp-config.local.json
+# Local agent config with absolute paths; the template is .mcp_example.json
+.mcp.json
 artifacts/
 
 # Private Excel source staging and RPC request files
