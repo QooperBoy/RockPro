@@ -47,6 +47,10 @@ Claude Code reads a file called `.mcp.json` in the folder you open it in.
 3. Start Claude Code **in the RockPro folder**:
    - Terminal: `cd C:\...\RockPro` then `claude`.
    - Desktop app (Code tab): start a new session and choose the RockPro folder.
+     A session that shows **No folder** runs in a temporary folder and never
+     sees `.mcp.json`. Don't run it in a Git worktree either: `.mcp.json` is
+     git-ignored, so a worktree copy doesn't have it. If you need worktrees, add the
+     server for your user instead (`claude mcp add rockpro-cad --scope user -- …`).
 4. Claude Code asks whether to use the MCP servers from `.mcp.json`. Approve
    `rockpro-cad`.
 5. Type `/mcp`. You should see `rockpro-cad` as connected, with 19 tools. In
@@ -187,6 +191,7 @@ you install, and test by asking the agent to read a file it shouldn't.
 | Symptom | Fix |
 |---|---|
 | `/mcp` shows `rockpro-cad` failed | Wrong path in `.mcp.json`/`config.toml`, or the venv is missing. Run the `command` with its `args` in PowerShell yourself; it should wait silently (Ctrl+C to stop). |
+| Agent says it has no `rockpro-cad` tools | The session was not opened in the RockPro folder (desktop app: "No folder", or a worktree). Start a new session in the RockPro folder itself; restarting the same session doesn't help. |
 | Claude Code doesn't ask about `.mcp.json` | It was opened in another folder, or you declined earlier. Open it in the RockPro folder; check `/mcp`. |
 | Agent says a tool is refused (`AGENT_TOOL_DENIED`) | The tool is not on the allowlist, by design. |
 | `AGENT_TIME_LIMIT` or `AGENT_CALL_LIMIT` | Session budget (`Policy` in `agent_server.py`): 30 calls and 120 s, counted from the agent's first RockPro call. Start a new client session (Claude Code: new session; Codex: restart). Keep one task per session. Audit O11. |
