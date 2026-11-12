@@ -172,3 +172,14 @@ machine. Order: O1 decision → O2 link → exporter → agent-side traces.
 Status 10.11: the exporter is built and in use, without waiting for O1/O2. It shows the
 current step-weighted share (`rockpro.ops.*`) next to job counts (`rockpro.jobs.*`) and
 AI decisions, so O1 can be judged on real data. O2 still needs a decision.
+
+Status 12.11 (branch `feat/observability-by-default`): observability is on by default.
+`scripts/Start-Observability.ps1` starts Phoenix and the exporter in the background
+(optionally at Windows login). `run_2023_parametric_job.py` opens and closes its own run
+(bound to the newest saved draft) and can record the AI decision itself
+(`--decision-reason`); `--no-record` opts out. The exporter flags runs open for more
+than 2 hours as probably abandoned, and `studio_process_run.py list --open` lists them
+(a first answer to O5). The shared default database for these tools is
+`artifacts/studio.sqlite` (or `ROCKPRO_STUDIO_DATABASE`). User manual:
+[PHOENIX_DASHBOARD.md](PHOENIX_DASHBOARD.md). Not covered: the RockPro panel
+(`server.py`) and manual work in IronCAD.

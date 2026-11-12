@@ -12,7 +12,7 @@ Running process runs are sent once they are closed (completed/partial/failed).
 Agent sessions are sent after the log has been idle for --agent-idle seconds.
 """
 import argparse
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 from pathlib import Path
 import sqlite3
@@ -22,9 +22,20 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'Integracja'))
 from rockpro_cad import phoenix_export, process_runs  # noqa: E402
-from rockpro_cad.mcp import project_store  # noqa: E402
+from rockpro_cad.auto_run import studio_database  # noqa: E402
 
 DEFAULT_ENDPOINT = 'http://127.0.0.1:6006/v1/traces'
+STALE_HOURS = 2  # an open run older than this is almost always abandoned
+
+
+def _age_hours(stamp):
+    try:
+        started = datetime.fromisoformat(str(stamp).replace('Z', '+00:00'))
+    except ValueError:
+        return None
+    if started.tzinfo is None:
+        started = started.replace(tzinfo=timezone.utc)
+    return (datetime.now(timezone.utc) - started).total_seconds() / 3600
 
 
 def load_state(path):
@@ -66,10 +77,13 @@ def collect(database, agent_dir, state, agent_idle, flush):
             continue
         if report['state'] == 'running' and not flush:
             failed = sum(1 for e in report['events'] if e.get('status') == 'failed')
-            pending.append(f"run {report['id']} '{report.get('label', '')}' is still open "
+            age = _age_hours(report['created_at'])
+            stale = (f' Open for {age:.0f} h: probably abandoned, close it with '
+                     f'studio_process_run.py finish {report["id"]} failed.') if age is not None and age >= STALE_HOURS else ''
+            pending.append((('run', report['id']), f"run {report['id']} '{report.get('label', '')}' is still open "
                            f"(started {report['created_at'][:19]}Z, {len(report['events'])} events, "
                            f"{failed} failed). It is sent when closed with "
-                           f"studio_process_run.py finish {report['id']} completed|partial|failed")
+                           f"studio_process_run.py finish {report['id']} completed|partial|failed.{stale}"))
             continue
         batches.append((('runs', report['id'], report['updated_at']), phoenix_export.run_spans(report)))
     for log in sorted(Path(agent_dir).glob('*.jsonl')) if Path(agent_dir).exists() else []:
@@ -77,7 +91,7 @@ def collect(database, agent_dir, state, agent_idle, flush):
         if state['agent'].get(log.name) == stat.st_size or stat.st_size == 0:
             continue
         if time.time() - stat.st_mtime < agent_idle and not flush:
-            pending.append('agent session ' + log.stem + ' (still active)')
+            pending.append((('agent', log.stem), 'agent session ' + log.stem + ' (still active)'))
             continue
         batches.append((('agent', log.name, stat.st_size), phoenix_export.agent_spans(phoenix_export.read_agent_log(log), log.stem)))
     return batches, pending
@@ -114,9 +128,12 @@ def send(spans, endpoint):
         exporter.shutdown()
 
 
-def once(args, state_path):
+def once(args, state_path, quiet_pending=None):
+    """Export what is new. With `quiet_pending` (a set, watch mode) a waiting item
+    is printed only when it first appears, and 'nothing new' is not printed."""
     state = load_state(state_path)
     batches, pending = collect(args.database, args.agent_dir, state, args.agent_idle, args.flush)
+    stamp = datetime.now().strftime('%H:%M:%S ') if quiet_pending is not None else ''
     for (bucket, key, marker), spans in batches:
         if args.dry_run:
             print(json.dumps(spans, ensure_ascii=False, indent=2))
@@ -124,17 +141,21 @@ def once(args, state_path):
         send(spans, args.endpoint)
         state[bucket][key] = marker
         save_state(state_path, state)
-        print(f'sent {bucket[:-1] if bucket == "runs" else bucket} {key}: {len(spans)} spans')
-    for item in pending:
-        print('waiting:', item)
-    if not batches and not pending:
+        print(f'{stamp}sent {bucket[:-1] if bucket == "runs" else bucket} {key}: {len(spans)} spans', flush=True)
+    for key, item in pending:
+        if quiet_pending is None or key not in quiet_pending:
+            print(f'{stamp}waiting:', item, flush=True)
+    if quiet_pending is not None:
+        quiet_pending.clear(); quiet_pending.update(key for key, _ in pending)
+    elif not batches and not pending:
         print('nothing new')
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('--database', type=Path, default=project_store.DB_PATH,
-                        help='Studio SQLite (same file as reference_studio --database)')
+    parser.add_argument('--database', type=Path, default=studio_database(),
+                        help='Studio SQLite, the same file as reference_studio --database '
+                             '(default: ROCKPRO_STUDIO_DATABASE or artifacts/studio.sqlite)')
     parser.add_argument('--agent-dir', type=Path, default=ROOT / 'artifacts/agent-runs')
     parser.add_argument('--endpoint', default=DEFAULT_ENDPOINT)
     parser.add_argument('--state', type=Path, default=ROOT / 'artifacts/phoenix/export-state.json')
@@ -150,11 +171,18 @@ def main():
         # A snapshot of an open run must not mark it as exported for good.
         args.state = args.state.with_name('flush-' + args.state.name)
     if args.watch:
+        print(f'watching {args.database} and {args.agent_dir} every {args.watch:g} s -> {args.endpoint}', flush=True)
+        seen = set(); failing = None
         while True:
             try:
-                once(args, args.state)
+                once(args, args.state, seen)
+                if failing:
+                    print(datetime.now().strftime('%H:%M:%S '), 'export works again', flush=True)
+                failing = None
             except Exception as exc:  # Keep watching; Phoenix may be restarting.
-                print('export failed:', exc, file=sys.stderr)
+                if str(exc) != failing:
+                    print(datetime.now().strftime('%H:%M:%S '), 'export failed (retrying):', exc, file=sys.stderr, flush=True)
+                failing = str(exc)
             time.sleep(args.watch)
     once(args, args.state)
 

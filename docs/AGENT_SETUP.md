@@ -141,6 +141,14 @@ calls within 120 seconds of its first call; after that, every call is refused.
    & $py -X utf8 scripts\run_2023_parametric_job.py --run-id $run --database $db --target-mm 9 --origin ai --intervention-id ai/agent-thickness
    ```
    It must end with `"passed": true`, and `native_expression_resize` must show the agent's value.
+
+   **Shorter (since 12.11):** skip steps 1, 4 and 6. One command opens the run,
+   records the decision, runs the job and closes the run. With
+   `Start-Observability.ps1` running, it reaches Phoenix by itself
+   ([PHOENIX_DASHBOARD.md](PHOENIX_DASHBOARD.md)):
+   ```powershell
+   & $py -X utf8 scripts\run_2023_parametric_job.py --target-mm 9 --origin ai --decision-reason "agent_session=<session id> client=claude-code: <paste the agent's reason>"
+   ```
 6. **Close and export:**
    ```powershell
    & $py -X utf8 scripts\studio_process_run.py --database $db finish $run completed

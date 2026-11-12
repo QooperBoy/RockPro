@@ -5,6 +5,11 @@ For developers and admins of the shared RockPro computer. Tested end to end on
 commands below, exactly as written. Background and open issues:
 [OBSERVABILITY_AUDIT_20261110.md](OBSERVABILITY_AUDIT_20261110.md).
 
+> **Everyday use is simpler now (12.11):** one command starts Phoenix and the
+> automatic export, and every job records itself. See
+> **[PHOENIX_DASHBOARD.md](PHOENIX_DASHBOARD.md)**. This guide keeps the one-time
+> setup (step 0) and the manual way (one run for several jobs, by hand).
+
 ## What you will see
 
 ```
@@ -76,11 +81,15 @@ it is `C:\Users\jakub\Projects\RockPro`; replace it with yours.
    into the repository's `artifacts\`. Studio needs it. Never overwrite
    existing folders.
 
-## 1. Start the two background windows
+## 1. Start Phoenix and Studio
 
-Open **two** PowerShell windows in the repository folder and leave them open.
+Phoenix and the automatic export, in the background (no window to keep open):
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Start-Observability.ps1
+```
+Details, `-Status`, `-Stop` and start at login: [PHOENIX_DASHBOARD.md](PHOENIX_DASHBOARD.md).
 
-Window A, Phoenix (the dashboard):
+If you prefer to watch Phoenix in its own window instead (window A):
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Start-Phoenix.ps1
 ```
@@ -90,7 +99,8 @@ port is already in use, Phoenix is already running somewhere: just open
 http://127.0.0.1:6006, or close the other window first. Only one Phoenix and one
 Studio per port can run on this computer, including other users' RDP sessions.
 
-Window B, Studio (the configurator):
+Window B, Studio (the configurator). Keep `--database ..\artifacts\studio.sqlite`:
+the jobs and the exporter use that file by default.
 ```powershell
 cd Integracja
 .\.venv\Scripts\python.exe -X utf8 -m rockpro_cad.reference_studio --bundle ..\artifacts\model-library-20261026 --previews ..\artifacts\family-3d-20261027\index.json --database ..\artifacts\studio.sqlite --port 8765 --no-browser
@@ -110,6 +120,16 @@ changes every time Studio starts.
    ```
 
 ## 3. Run the job and record it
+
+The short way: one command per job. It opens its own run on the newest saved
+draft, records an AI decision if you give `--decision-reason`, and closes the
+run at the end:
+
+```powershell
+& Integracja\.venv\Scripts\python.exe -X utf8 scripts\run_2023_parametric_job.py --target-mm 45 --origin ai --decision-reason "Agent proposed 45 mm because ..."
+```
+
+The manual way below is for several jobs in **one** run.
 
 **First start IronCAD 2023** and wait until its main window is ready (close
 the trial/licence dialog). The job attaches to a running IronCAD and does not
@@ -155,6 +175,9 @@ the run is just not closed.
 
 ## 4. Send it to Phoenix
 
+If you started `Start-Observability.ps1`, this happens automatically every 30
+seconds; skip to step 5. By hand:
+
 ```powershell
 tools\phoenix\.venv\Scripts\python.exe -X utf8 scripts\export_to_phoenix.py --database artifacts\studio.sqlite
 ```
@@ -183,7 +206,8 @@ Rules:
 
 ## 5. Read the dashboard
 
-Open `http://127.0.0.1:6006`, then open the **rockpro** project.
+The full user manual is [PHOENIX_DASHBOARD.md](PHOENIX_DASHBOARD.md). In short:
+open `http://127.0.0.1:6006`, then open the **rockpro** project.
 
 - **Traces** tab: one row per process run and per agent session. Click a run
   to see its tree. The **Output** of the top span is the summary:

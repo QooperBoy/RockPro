@@ -2,7 +2,7 @@
 
 Stan 10.11.2026: aktualny start projektu to [docs/KUBA_HANDOVER.md](docs/KUBA_HANDOVER.md); ten plik opisuje bazową instalację dodatku i backendu (wersja 0.3), uzupełnioną o bieżące różnice. Konfigurator urządzeń i układu: [LAYOUT.md](LAYOUT.md). Liczby narzędzi MCP i testów odczytuj z `tools/list` i wyniku `scripts/Verify.ps1`, nie z tego opisu.
 
-Obserwowalność (rejestr przebiegów SDK/AI, logi agentów, panel Phoenix) — instrukcja krok po kroku: [docs/OBSERVABILITY_HOWTO.md](docs/OBSERVABILITY_HOWTO.md).
+Obserwowalność (rejestr przebiegów SDK/AI, logi agentów, panel Phoenix) — instrukcja krok po kroku: [docs/OBSERVABILITY_HOWTO.md](docs/OBSERVABILITY_HOWTO.md). Na co dzień: `scripts\Start-Observability.ps1` uruchamia Phoenix i automatyczny eksport, a każde zadanie CAD zapisuje się samo; instrukcja panelu: [docs/PHOENIX_DASHBOARD.md](docs/PHOENIX_DASHBOARD.md).
 
 Aktualny kontrakt pracy i jedno polecenie sprawdzeń: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md). Otwieraj agenta w checkoutcie, żeby wykrył lokalne .agents/skills. Stan audytu: [docs/REPOSITORY_AUDIT.md](docs/REPOSITORY_AUDIT.md).
 
