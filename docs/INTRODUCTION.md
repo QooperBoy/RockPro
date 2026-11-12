@@ -431,8 +431,8 @@ operator server:
 
 Caveat for the shared RDP computer: the allowlist does **not** limit the client's own
 built-in file and shell tools. Keeping agents away from private files is a client
-configuration and Windows permissions matter ([AGENT_SETUP.md](AGENT_SETUP.md) when present,
-and the admin section of [OBSERVABILITY_HOWTO.md](OBSERVABILITY_HOWTO.md)).
+configuration and Windows permissions matter ([AGENT_SETUP.md](AGENT_SETUP.md) and the admin
+section of [OBSERVABILITY_HOWTO.md](OBSERVABILITY_HOWTO.md)).
 
 ---
 
