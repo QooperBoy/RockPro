@@ -73,7 +73,9 @@ def client_label(params):
 
 class AgentSession:
     def __init__(self,policy=None,log_dir=None,clock=time.perf_counter,dispatcher=None):
-        self.policy=policy or Policy();self.clock=clock;self.started=clock();self.calls=0;self.failures={}
+        # The time budget starts at the first tool call. Interactive clients (Claude Code,
+        # Codex) start this process when the window opens, long before the agent acts.
+        self.policy=policy or Policy();self.clock=clock;self.started=None;self.calls=0;self.failures={}
         self.client=None  # MCP clientInfo from initialize, e.g. claude-code/2.x or codex-mcp-client/0.x
         self.schemas={r['name']:r for r in server.SCHEMAS if r['name'] in ALLOWLIST}
         self.dispatcher=dispatcher or server.dispatch
@@ -101,6 +103,7 @@ class AgentSession:
 
     def call(self,name,arguments):
         start=self.clock();self.calls+=1
+        if self.started is None:self.started=start
         payload=json.dumps(arguments,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False)
         argument_sha=hashlib.sha256(payload.encode()).hexdigest();fingerprint=(name,argument_sha)
         if self.calls>self.policy.max_tool_calls:code='AGENT_CALL_LIMIT'

@@ -22,6 +22,8 @@ sprawdzane względem schematów znanych narzędzi, z ograniczeniem rozmiaru i g�
 Nieznane narzędzie, błędne jednostki lub instrukcja ukryta w referencji dokumentu
 nie zwiększają uprawnień. Błędna próba zużywa budżet wywołań.
 
+Limit czasu liczy się od pierwszego wywołania narzędzia, nie od startu procesu
+(Claude Code i Codex uruchamiają serwer przy otwarciu okna, zanim agent cokolwiek zrobi).
 Limit czasu jest kooperacyjny: wywołanie kończy się znanym wynikiem; kolejne
 są odrzucane. Nie zabija się workera ani IronCAD w trakcie pracy. Plik
 <run_id>.stop w katalogu logów blokuje następne wywołanie. Powtórzenia tego

@@ -106,6 +106,16 @@ Windows permissions, not by the MCP allowlist. See the admin section of
 2026-11-03 package are saved in IronCAD 2027 (`*_IC2027.ics`), and 2023 cannot open them.
 The 2023 end-to-end proof therefore runs on a diagnostic part that the job creates itself.
 
+**O11 [IMPORTANT, CONFIRMED, partly fixed 11.11]** The agent session's 120-second budget
+started when `agent_server.py` started. Claude Code and Codex start it when the window
+opens, so a user who typed the first prompt after two minutes got `AGENT_TIME_LIMIT` on
+every RockPro call. Fixed: the clock starts at the first tool call
+(`test_time_budget_starts_at_first_call_not_when_client_opens`). Still open: one
+interactive session with follow-up questions over more than 2 minutes, or more than 30
+calls, is still refused until the client is restarted. The budget fits autonomous runs,
+not conversations. Options for Marcin: a per-turn budget, an idle reset, or a larger
+limit configured per client in `.mcp.json`.
+
 ## End-to-end test — 10 November 2026, IronCAD 2023
 
 Host 25.0.0.18479 (base 2023, trial; the client has PU1 SP1). Steps exactly as in

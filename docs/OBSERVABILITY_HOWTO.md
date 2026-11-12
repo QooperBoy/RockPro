@@ -213,26 +213,10 @@ shell commands. Every call is logged to `artifacts\agent-runs\<session>.jsonl`.
 The log holds the tool name, status, duration, a hash of the arguments and the
 client name. It does not hold the arguments, any results, or file contents.
 
-Connect a client. Use full paths; the Python is the RockPro venv.
-
-- **Claude Code**: add a `.mcp.json` in the folder you open Claude Code in
-  (or use `claude mcp add`):
-  ```json
-  {"mcpServers": {"rockpro-cad": {"command": "C:\\...\\RockPro\\Integracja\\.venv\\Scripts\\python.exe",
-    "args": ["C:\\...\\RockPro\\Integracja\\rockpro_cad\\mcp\\agent_server.py"]}}}
-  ```
-- **OpenAI Codex**: in `%USERPROFILE%\.codex\config.toml`:
-  ```toml
-  [mcp_servers.rockpro-cad]
-  command = 'C:\...\RockPro\Integracja\.venv\Scripts\python.exe'
-  args = ['C:\...\RockPro\Integracja\rockpro_cad\mcp\agent_server.py']
-  ```
-- `python configure.py` writes the same thing to `mcp-config.local.json`.
-  It also sets up the demo, so on an existing install copy the two lines instead.
-
-Restart the client and check that its tool list shows `rockpro-cad` with about
-19 tools. In Phoenix, sessions appear as *Agent session (claude-code/…)* or
-*Agent session (codex-…)*.
+To connect Claude Code (`.mcp.json`, template `.mcp_example.json`) or Codex
+(`config.toml`), and to test a real agent's decision end to end, follow
+**[AGENT_SETUP.md](AGENT_SETUP.md)**. In Phoenix, sessions appear as
+*Agent session (claude-code/…)* or *Agent session (codex-…)*.
 
 Limits of the agent log today:
 
@@ -245,18 +229,11 @@ Limits of the agent log today:
 
 `agent_server.py` limits what the agent can do **through RockPro**. It does not
 limit the client's own built-in tools: Claude Code and Codex can read files and
-run commands themselves. On the shared computer, set this up per Windows user:
-
-- **Claude Code**: use managed or user settings with `permissions.deny` for
-  `Bash`, `Edit`, `Write` and `WebFetch`, and allow only `mcp__rockpro-cad__*`.
-  Start it in a folder that contains nothing private.
-- **Codex**: set `sandbox_mode = "read-only"` and an approval policy that asks
-  before every command. Start it in an empty working folder.
-- Engineers' private folders should not be readable by the Windows account
-  that runs the agent.
-
-Check these keys against the client version you install; they change between
-releases.
+run commands themselves. The per-client settings, including denying `Read`
+(not only `Edit`/`Write`), are in
+[AGENT_SETUP.md](AGENT_SETUP.md#keeping-agents-away-from-private-files-admin).
+The real boundary is Windows file permissions: engineers' private folders
+should not be readable by the Windows account that runs the agent.
 
 ## 7. Shared computer (RDP) notes
 

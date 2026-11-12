@@ -56,6 +56,16 @@ class AgentPolicyTests(unittest.TestCase):
         self.assertTrue(data['agent_run']['budget_exceeded_after_call'])
         self.assertEqual(self.code(session.call('preview_layout',{'spec':{}})),'AGENT_TIME_LIMIT')
 
+    def test_time_budget_starts_at_first_call_not_when_client_opens(self):
+        clock=[0.]
+        session=self.session(policy=Policy(max_seconds=120),clock=lambda:clock[0],dispatcher=Mock(return_value={'ok':True}))
+        clock[0]=600.  # the user typed the first prompt ten minutes after opening the client
+        self.assertFalse(session.call('preview_layout',{'spec':{}})['isError'])
+        clock[0]=719.
+        self.assertFalse(session.call('preview_layout',{'spec':{}})['isError'])
+        clock[0]=720.
+        self.assertEqual(self.code(session.call('preview_layout',{'spec':{}})),'AGENT_TIME_LIMIT')
+
     def test_invalid_arguments_and_retry_budget_do_not_execute(self):
         dispatch=Mock();session=self.session(policy=Policy(max_retries=1),dispatcher=dispatch)
         for _ in range(2):self.assertEqual(self.code(session.call('preview_layout',{'spec':{},'shell':'secret'})),'AGENT_TOOL_FAILED')

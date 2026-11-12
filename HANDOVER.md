@@ -36,6 +36,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\Setup.ps1 -Python python -
 Jeżeli nie ma przycisku: sprawdź SDK, wynik kompilacji, rejestrację HKCU i restart IronCAD. Jeśli COM nie widzi dokumentu: otwórz wskazany plik, zamknij modalne dialogi i sprawdź zgodność sesji/uprawnień. Nie naprawiaj tego przez wyłączanie walidacji.
 
 ## Podłączenie agenta AI
+Instrukcja krok po kroku dla Claude Code i Codex oraz test decyzji agenta: [docs/AGENT_SETUP.md](docs/AGENT_SETUP.md) (szablon `.mcp_example.json`; lokalny `.mcp.json` jest ignorowany przez Git).
+
 Panel sam uruchamia MCP jako lokalny subprocess stdio, nie potrzebuje klucza AI. `configure.py` generuje `mcp-config.local.json` z absolutnymi ścieżkami dla klienta obsługującego format mcpServers. W Codex/innym kliencie przenieś wartości command i args do formatu jego konfiguracji; nie nadpisuj pozostałych serwerów. Uruchom ponownie klienta i sprawdź tools/list. Klient AI dostaje `Integracja/rockpro_cad/mcp/agent_server.py` (tylko allowlista odczytu i propozycji, [AGENT_RUN_POLICY](docs/AGENT_RUN_POLICY.md)); panel nadal używa operatorowego `server.py`.
 
 Narzędzia agenta: allowlista odczytu i propozycji z `agent_server.py` (sprawdź `tools/list`); zapisy, set_stage, wykonanie CAD i odzyskiwanie ma tylko operatorowy `server.py`. Allowlista nie ogranicza wbudowanych narzędzi klienta (pliki/powłoka w Claude Code lub Codex) — patrz sekcja o prywatnych plikach w OBSERVABILITY_HOWTO. MCP nie ma portu HTTP. Nie dodawaj narzędzia wykonującego dowolny Python/polecenia powłoki.
