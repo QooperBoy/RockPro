@@ -101,7 +101,7 @@ rzeczywistego wykonania.
 
 Źródłem kodu jest checkout `rockpro-cad`. Sąsiedni `../Integracja/rockpro_cad` to lokalne wdrożenie autora, z własnym venv, bazą, manifestem i rewizjami. Zmiany wdrożeniowe należy najpierw zachować w Git; baz i konfiguracji nie kopiujemy między checkoutami. Nowa kompilacja nie przeładowuje DLL w otwartym IronCAD.
 
-Windows x64, IronCAD 2027 / 29.0 i lokalny ICAPI SDK. C# używa kompilatora .NET Framework z Build.ps1 oraz WinForms, System.Drawing, System.Web.Extensions i interop dostawcy. Nie stosujemy automatycznie zaleceń C# 14/ASP.NET. Python u autora: 3.14.3; backend bez CAD używa stdlib, operacje natywne comtypes i przypiętego python-ironcad z requirements.txt. Inne wersje hosta wymagają osobnej próby.
+Windows x64, IronCAD 2023 / 25.0 (wersja klienta; domyślny `-IronCADYear 2023`) lub osobno sprawdzany 2027 / 29.0, z lokalnym ICAPI SDK danego roku. C# używa kompilatora .NET Framework z Build.ps1 oraz WinForms, System.Drawing, System.Web.Extensions i interop dostawcy. Nie stosujemy automatycznie zaleceń C# 14/ASP.NET. Python u autora: 3.14.3; backend bez CAD używa stdlib, operacje natywne comtypes i przypiętego python-ironcad z requirements.txt. Inne wersje hosta wymagają osobnej próby.
 
 ## Granice modułów
 

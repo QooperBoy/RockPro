@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
+import sys
 import time
 import uuid
 from . import process_runs
@@ -41,13 +42,30 @@ def capture(descriptor, folder):
     process_runs.append(run_id,[parent('running')])
     try:
         yield
-    except BaseException:
-        process_runs.append(run_id,[parent('failed')])
-        import_native_progress(run_id,folder,descriptor,operation)
+    except BaseException as exc:
+        _finish(run_id,parent('failed'),folder,descriptor,operation,exc)
         raise
     else:
-        process_runs.append(run_id,[parent('success')])
-        import_native_progress(run_id,folder,descriptor,operation)
+        _finish(run_id,parent('success'),folder,descriptor,operation,None)
+
+
+def _finish(run_id, span, folder, descriptor, operation, job_error):
+    # Bookkeeping after the job never replaces its outcome: a finished CAD job
+    # stays finished and a failed one keeps its own error. Gaps stay visible.
+    problems=[]
+    for step in (lambda:process_runs.append(run_id,[span]),
+                 lambda:import_native_progress(run_id,folder,descriptor,operation)):
+        try:step()
+        except Exception as exc:problems.append(exc)
+    if not problems:return
+    note='Ślad Studio niepełny: '+'; '.join(f'{type(e).__name__}: {e}' for e in problems)
+    print(note,file=sys.stderr)
+    if job_error is not None:job_error.add_note(note)
+    try:
+        process_runs.append(run_id,[dict(event_id=uuid.uuid4().hex,kind='span',operation_id=operation+'/trace-import',
+            stage=span['stage'],label='Import śladu natywnego',origin=span['origin'],executor='python',
+            status='failed',reason=note[:1000],timestamp_utc=stamp())])
+    except Exception:pass  # Run already closed; stderr and the job's own receipt remain.
 
 
 def import_native_progress(run_id, folder, descriptor, prefix):

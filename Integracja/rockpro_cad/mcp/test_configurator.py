@@ -121,6 +121,9 @@ class ConfiguratorTests(unittest.TestCase):
         with self.assertRaises(ValueError):c.preview(d)
         d=concept();d['subtype']='double_front'
         with self.assertRaises(ValueError):c.preview(d)
+        for value in ([0,0,0],{'top':1},None):
+            d=concept();d['covers'][0]['face']=value
+            with self.subTest(face=value),self.assertRaises(ValueError):c.preview(d)
         d=concept();d['type']='cabinet';d['covers'][0]['face']='front';other=copy.deepcopy(d['covers'][0]);other['id']='other';d['covers'].append(other)
         with self.assertRaises(ValueError):c.preview(d)
 
