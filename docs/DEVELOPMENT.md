@@ -124,6 +124,7 @@ Windows x64, IronCAD 2027 / 29.0 i lokalny ICAPI SDK. C# używa kompilatora .NET
 - .github/prompts/*.prompt.md: jawnie uruchamiane zadania. W obsługującym je edytorze wybierz prompt; w innym kliencie załącz plik lub wklej jego treść.
 - .agents/skills/rockpro-scope-check: ocena zakresu i konkretny prompt powrotu do jakości.
 - .agents/skills/rockpro-verification: dobór dowodów i komend.
+- .agents/skills/rockpro-adversarial-review: niezależny przegląd zmiany, PR lub raportu przez próbę obalenia twierdzeń; tylko przegląd, bez napraw. Claude Code widzi go przez `.claude/skills`.
 - .agents/skills/bug-reproduction-brief: pobrany upstream, tylko do zleconego briefu diagnostycznego. Pełna naprawa nie kończy się na briefie.
 
 Skille są repozytoryjne: otwieraj Codex w katalogu checkoutu. Przy pracy z katalogu nadrzędnego odczytuj je bezpośrednio według AGENTS.md workspace. Instalacja nie dodaje działającego w tle agenta do IronCAD i nie gwarantuje, że model zawsze rozpozna problem; wykonawcze sprawdzenia zapewnia harness.

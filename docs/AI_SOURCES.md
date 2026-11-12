@@ -20,7 +20,8 @@ Pobranie repo nie oznacza aktywacji wszystkich jego skilli lub wykonywania jego 
 
 ## Uruchamianie
 
-- Codex w checkoutcie: `$rockpro-scope-check`, `$rockpro-verification`, `$bug-reproduction-brief`. Nowe skille będą dostępne po odświeżeniu wykrywania, zwykle w kolejnym turnie; w razie braku uruchom klienta ponownie.
+- Codex w checkoutcie: `$rockpro-scope-check`, `$rockpro-verification`, `$rockpro-adversarial-review`, `$bug-reproduction-brief`. Nowe skille będą dostępne po odświeżeniu wykrywania, zwykle w kolejnym turnie; w razie braku uruchom klienta ponownie.
+- Claude Code w checkoutcie: `/rockpro-adversarial-review` z `.claude/skills`; plik tylko odsyła do treści w `.agents/skills`.
 - Copilot: instrukcja repozytorium w `.github/copilot-instructions.md` oraz applyTo w `.github/instructions`. Prompty są w `.github/prompts`; uruchamiaj je z listy promptów obsługującego je edytora.
 - Ten chat działa z katalogu nadrzędnego. Workspace AGENTS.md kieruje pracę RockPro do checkoutu i bezpośredniego odczytu skilli. Nie instalowano globalnych reguł dla innych projektów.
 

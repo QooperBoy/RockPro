@@ -20,6 +20,7 @@ REQUIRED = [
     '.agents/skills/rockpro-scope-check/SKILL.md',
     '.agents/skills/rockpro-verification/SKILL.md',
     '.agents/skills/bug-reproduction-brief/SKILL.md',
+    '.agents/skills/rockpro-adversarial-review/SKILL.md',
 ]
 
 
