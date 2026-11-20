@@ -143,6 +143,8 @@ zakres v1 — aktualne ograniczenia mają pierwszeństwo.
    firmowym Excelem. Czekamy na jego strukturę i zasady współdzielenia;
    nie odgadujemy kolumn ani nie nadpisujemy ręcznych ustaleń.
 
+Instrukcja dla konstruktora: [parametryzacja i odbiór modelu w IronCAD](docs/PARAMETRYZACJA_IRONCAD.md).
+
 Cały kierunek: [proces w 11 krokach](docs/CUSTOM_CASE_WORKFLOW.md) i
 [architektura konfiguratora](docs/CASE_CONFIGURATOR_ARCHITECTURE.md).
 Trzeba oddzielać działający podgląd, kod/test offline, dowód CAD i odbiór konstruktora.
