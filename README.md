@@ -145,6 +145,8 @@ zakres v1 — aktualne ograniczenia mają pierwszeństwo.
 
 Instrukcja dla konstruktora: [parametryzacja i odbiór modelu w IronCAD](docs/PARAMETRYZACJA_IRONCAD.md).
 
+Dodatkowa instrukcja: [wdrożenie i odbiór pełnego procesu RockPro](docs/ROCKPRO_PIPELINE_LINEAR.md).
+
 Cały kierunek: [proces w 11 krokach](docs/CUSTOM_CASE_WORKFLOW.md) i
 [architektura konfiguratora](docs/CASE_CONFIGURATOR_ARCHITECTURE.md).
 Trzeba oddzielać działający podgląd, kod/test offline, dowód CAD i odbiór konstruktora.
